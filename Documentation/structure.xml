@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project version="0.14.1" title="PEAR2_Net_Transmitter documentation">
+<project version="0.14.1" title="PEAR2_Net_RouterOS documentation">
   <file path="\Autoload.php" hash="b9a586c6468ec7bc192850a7dded96d8" package="PEAR2\Net\RouterOS">
     <docblock>
       <description>RouterOS API client implementation.</description>
