@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    bootstrap="bootstrap.php"
+    colors="false"
+    stopOnFailure="false"
+    verbose="true"
+    strict="true"
+    
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+>
+    <!--
+    convertErrorsToExceptions="false"
+    convertNoticesToExceptions="false"
+    convertWarningsToExceptions="false"
+>
+    -->
+    <php>
+        <!--
+        The actual RouterOS machine and the port of the API service.
+        
+        The router is expected to contain at least two entries in
+        "/queue/simple" and "/ip/arp", with those being HOSTNAME_INVALID and
+        HOSTNAME_SILENT.
+        -->
+        <const name="HOSTNAME" value="192.168.0.1" />
+        <const name="PORT" value="8728" />
+        
+        <!--
+        A server with a service at the API port, but a different one.
+        -->
+        <const name="HOSTNAME_INVALID" value="192.168.0.254" />
+        <!--
+        A port on which there's a service for all HOSTNAME_* addresses,
+        but never the API one.
+        -->
+        <const name="PORT_INVALID" value="80" />
+        
+        <!--
+        A device that doesn't answer at the API or the invalid port.
+        -->
+        <const name="HOSTNAME_SILENT" value="192.168.0.100" />
+        <!--
+        A port on which none of the hosts answers.
+        -->
+        <const name="PORT_SILENT" value="65534" />
+        
+        <!--
+        A RouterOS username and password. Must have full privileges.
+        -->
+        <const name="USERNAME" value="apifull" />
+        <const name="PASSWORD" value="apifull" />
+        
+        <!--
+        A RouterOS username and password. Must not have writing privileges.
+        -->
+        <const name="USERNAME2" value="api" />
+        <const name="PASSWORD2" value="api" />
+        
+        <!--
+        A RouterOS username that doesn't exist.
+        -->
+        <const name="USERNAME_INVALID" value="tester" />
+        <!--
+        A RouterOS password that is not used by either valid RouterOS accounts.
+        -->
+        <const name="PASSWORD_INVALID" value="tester" />
+        
+        <!--
+        A name for a test queue. It must be a name not currently in the list of
+        simple queues. It's also a good idea to keep it ASCII compatible,
+        because it's used in a charset test.
+        -->
+        <const name="TEST_QUEUE_NAME" value="TEST_QUEUE" />
+        
+        <!--
+        The port for the preudo server.
+        The preudo server is a small utility in the tests folder that needs to
+        be started from the command line right before running the tests. It
+        simulates harsh network conditions.
+        
+        The selected port must not be any of the ports above, and must not be in
+        use by other applications or blocked by a local firewall application.
+        -->
+        <const name="PSEUDO_SERVER_PORT" value="6666" />
+        
+    </php>
+    <testsuites>
+        <testsuite name="All tests">
+            <file>ConnectionTest.php</file>
+            <file>RequestHandlingTest.php</file>
+            <file>ClientFeaturesTest.php</file>
+            <file>StateAlteringFeaturesTest.php</file>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">../src/PEAR2/Net/RouterOS</directory>
+        </whitelist>
+    </filter>
+</phpunit>

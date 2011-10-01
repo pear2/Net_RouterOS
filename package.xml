@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package
+    version="2.0"
+    xmlns="http://pear.php.net/dtd/package-2.0"
+    xmlns:tasks="http://pear.php.net/dtd/tasks-1.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+    http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd
+    http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd
+    "
+>
+    <name>PEAR2_Net_RouterOS</name>
+    <channel>pear2.php.net</channel>
+    <summary>RouterOS API client implementation.</summary>
+    <description>This package allows you to read and write information from a RouterOS host using MikroTik's RouterOS API.</description>
+    <lead>
+        <name>Vasil Rangelov</name>
+        <user>boen_robot</user>
+        <email>boen.robot@gmail.com</email>
+        <active>yes</active>
+    </lead>
+    <date>2011-09-26</date>
+    <version>
+        <release>1.0.0b1</release>
+        <api>1.0.0</api>
+    </version>
+    <stability>
+        <release>beta</release>
+        <api>beta</api>
+    </stability>
+    <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</license>
+    <notes>First PEAR2 compatible release.</notes>
+    <contents>
+        <dir name="/">
+            <dir name="src" baseinstalldir="/">
+                <file name="PEAR2/Net/RouterOS/Autoload.php" role="php">
+                    <tasks:replace type="package-info" from="~~summary~~" to="summary"/>
+                    <tasks:replace type="package-info" from="~~description~~" to="description"/>
+                    <tasks:replace type="package-info" from="SVN: $WCREV$" to="version"/>
+                </file>
+                <file name="PEAR2/Net/RouterOS/Client.php" role="php">
+                    <tasks:replace type="package-info" from="~~summary~~" to="summary"/>
+                    <tasks:replace type="package-info" from="~~description~~" to="description"/>
+                    <tasks:replace type="package-info" from="SVN: $WCREV$" to="version"/>
+                </file>
+                <file name="PEAR2/Net/RouterOS/Communicator.php" role="php">
+                    <tasks:replace type="package-info" from="~~summary~~" to="summary"/>
+                    <tasks:replace type="package-info" from="~~description~~" to="description"/>
+                    <tasks:replace type="package-info" from="SVN: $WCREV$" to="version"/>
+                </file>
+                <file name="PEAR2/Net/RouterOS/DataFlowException.php" role="php">
+                    <tasks:replace type="package-info" from="~~summary~~" to="summary"/>
+                    <tasks:replace type="package-info" from="~~description~~" to="description"/>
+                    <tasks:replace type="package-info" from="SVN: $WCREV$" to="version"/>
+                </file>
+                <file name="PEAR2/Net/RouterOS/Exception.php" role="php">
+                    <tasks:replace type="package-info" from="~~summary~~" to="summary"/>
+                    <tasks:replace type="package-info" from="~~description~~" to="description"/>
+                    <tasks:replace type="package-info" from="SVN: $WCREV$" to="version"/>
+                </file>
+                <file name="PEAR2/Net/RouterOS/InvalidArgumentException.php" role="php">
+                    <tasks:replace type="package-info" from="~~summary~~" to="summary"/>
+                    <tasks:replace type="package-info" from="~~description~~" to="description"/>
+                    <tasks:replace type="package-info" from="SVN: $WCREV$" to="version"/>
+                </file>
+                <file name="PEAR2/Net/RouterOS/LengthException.php" role="php">
+                    <tasks:replace type="package-info" from="~~summary~~" to="summary"/>
+                    <tasks:replace type="package-info" from="~~description~~" to="description"/>
+                    <tasks:replace type="package-info" from="SVN: $WCREV$" to="version"/>
+                </file>
+                <file name="PEAR2/Net/RouterOS/Message.php" role="php">
+                    <tasks:replace type="package-info" from="~~summary~~" to="summary"/>
+                    <tasks:replace type="package-info" from="~~description~~" to="description"/>
+                    <tasks:replace type="package-info" from="SVN: $WCREV$" to="version"/>
+                </file>
+                <file name="PEAR2/Net/RouterOS/SocketClientTransmitter.php" role="php">
+                    <tasks:replace type="package-info" from="~~summary~~" to="summary"/>
+                    <tasks:replace type="package-info" from="~~description~~" to="description"/>
+                    <tasks:replace type="package-info" from="SVN: $WCREV$" to="version"/>
+                </file>
+                <file name="PEAR2/Net/RouterOS/NotSupportedException.php" role="php">
+                    <tasks:replace type="package-info" from="~~summary~~" to="summary"/>
+                    <tasks:replace type="package-info" from="~~description~~" to="description"/>
+                    <tasks:replace type="package-info" from="SVN: $WCREV$" to="version"/>
+                </file>
+                <file name="PEAR2/Net/RouterOS/Query.php" role="php">
+                    <tasks:replace type="package-info" from="~~summary~~" to="summary"/>
+                    <tasks:replace type="package-info" from="~~description~~" to="description"/>
+                    <tasks:replace type="package-info" from="SVN: $WCREV$" to="version"/>
+
+                </file>
+                <file name="PEAR2/Net/RouterOS/Request.php" role="php">
+                    <tasks:replace type="package-info" from="~~summary~~" to="summary"/>
+                    <tasks:replace type="package-info" from="~~description~~" to="description"/>
+                    <tasks:replace type="package-info" from="SVN: $WCREV$" to="version"/>
+                </file>
+                <file name="PEAR2/Net/RouterOS/Response.php" role="php">
+                    <tasks:replace type="package-info" from="~~summary~~" to="summary"/>
+                    <tasks:replace type="package-info" from="~~description~~" to="description"/>
+                    <tasks:replace type="package-info" from="SVN: $WCREV$" to="version"/>
+                </file>
+                <file name="PEAR2/Net/RouterOS/ResponseCollection.php" role="php">
+                    <tasks:replace type="package-info" from="~~summary~~" to="summary"/>
+                    <tasks:replace type="package-info" from="~~description~~" to="description"/>
+                    <tasks:replace type="package-info" from="SVN: $WCREV$" to="version"/>
+                </file>
+                <file name="PEAR2/Net/RouterOS/SocketException.php" role="php">
+                    <tasks:replace type="package-info" from="~~summary~~" to="summary"/>
+                    <tasks:replace type="package-info" from="~~description~~" to="description"/>
+                    <tasks:replace type="package-info" from="SVN: $WCREV$" to="version"/>
+                </file>
+                <file name="PEAR2/Net/RouterOS/Transmitter.php" role="php">
+                    <tasks:replace type="package-info" from="~~summary~~" to="summary"/>
+                    <tasks:replace type="package-info" from="~~description~~" to="description"/>
+                    <tasks:replace type="package-info" from="SVN: $WCREV$" to="version"/>
+                </file>
+                <file name="PEAR2/Net/RouterOS/UnexpectedValueException.php" role="php">
+                    <tasks:replace type="package-info" from="~~summary~~" to="summary"/>
+                    <tasks:replace type="package-info" from="~~description~~" to="description"/>
+                    <tasks:replace type="package-info" from="SVN: $WCREV$" to="version"/>
+                </file>
+            </dir>
+            <dir name="tests">
+                <file name="ClientFeaturesTest.php" role="test" />
+                <file name="ConnectionTest.php" role="test" />
+                <file name="RequestHandlingTest.php" role="test" />
+                <file name="StateAlteringFeaturesTest.php" role="test" />
+                <file name="PseudoServer.php" role="test" />
+                <file name="bootstrap.php" role="test">
+                    <tasks:replace type="pear-config" from="../src" to="php_dir" />
+                </file>
+                <file name="configuration.xml" role="test" />
+            </dir>
+            <dir name="examples">
+                <file name="callback-and-loop.php" role="doc" />
+                <file name="loop-and-extract.php" role="doc" />
+                <file name="send-and-complete.php" role="doc" />
+                <file name="send-and-forget.php" role="doc" />
+                <file name="sync-request-arguments.php" role="doc" />
+                <file name="sync-request-simple.php" role="doc" />
+            </dir>
+            <dir name="docs">
+                <file name="doxygen.ini" role="doc">
+                    <tasks:replace type="package-info" from="SVN: $WCREV$" to="version" />
+                    <tasks:replace type="pear-config" from="../src" to="php_dir" />
+                </file>
+                <file name="docblox.xml" role="doc">
+                    <tasks:replace type="pear-config" from="../src" to="php_dir" />
+                </file>
+                <file name="tutorials/PEAR2_Net_RouterOS/Client.cls" role="doc" />
+                <file name="tutorials/PEAR2_Net_RouterOS/PEAR2_Net_RouterOS.pkg" role="doc" />
+                <file name="tutorials/PEAR2_Net_RouterOS/Query.cls" role="doc" />
+            </dir>
+        </dir>
+    </contents>
+    <dependencies>
+        <required>
+            <php>
+                <min>5.3.0</min>
+            </php>
+            <pearinstaller>
+                <min>1.4.0</min>
+            </pearinstaller>
+            <package>
+                <name>PEAR2_Net_Transmitter</name>
+                <channel>pear2.php.net</channel>
+            </package>
+            <extension>
+                <name>PCRE</name>
+            </extension>
+        </required>
+        <optional>
+            <extension>
+                <name>iconv</name>
+            </extension>
+        </optional>
+    </dependencies>
+    <phprelease>
+        <filelist>
+            <install
+                name="src/PEAR2/Net/RouterOS/Autoload.php"
+                as="PEAR2/Net/RouterOS/Autoload.php"
+            />
+            <install
+                name="src/PEAR2/Net/RouterOS/Client.php"
+                as="PEAR2/Net/RouterOS/Client.php"
+            />
+            <install
+                 name="src/PEAR2/Net/RouterOS/Communicator.php"
+                 as="PEAR2/Net/RouterOS/Communicator.php"
+            />
+            <install
+                name="src/PEAR2/Net/RouterOS/DataFlowException.php"
+                as="PEAR2/Net/RouterOS/DataFlowException.php"
+            />
+            <install
+                name="src/PEAR2/Net/RouterOS/Exception.php"
+                as="PEAR2/Net/RouterOS/Exception.php"
+            />
+            <install
+                name="src/PEAR2/Net/RouterOS/InvalidArgumentException.php"
+                as="PEAR2/Net/RouterOS/InvalidArgumentException.php"
+            />
+            <install
+                name="src/PEAR2/Net/RouterOS/LengthException.php"
+                as="PEAR2/Net/RouterOS/LengthtException.php"
+            />
+            <install
+                name="src/PEAR2/Net/RouterOS/Message.php"
+                as="PEAR2/Net/RouterOS/Message.php"
+            />
+            <install
+                name="src/PEAR2/Net/RouterOS/NotSupportedException.php"
+                as="PEAR2/Net/RouterOS/NotSupportedException.php"
+            />
+            <install
+                name="src/PEAR2/Net/RouterOS/Query.php"
+                as="PEAR2/Net/RouterOS/Query.php"
+            />
+            <install
+                name="src/PEAR2/Net/RouterOS/Request.php"
+                as="PEAR2/Net/RouterOS/Request.php"
+            />
+            <install
+                name="src/PEAR2/Net/RouterOS/Response.php"
+                as="PEAR2/Net/RouterOS/Response.php"
+            />
+            <install
+                name="src/PEAR2/Net/RouterOS/ResponseCollection.php"
+                as="PEAR2/Net/RouterOS/ResponseCollection.php"
+            />
+            <install
+                name="src/PEAR2/Net/RouterOS/SocketException.php"
+                as="PEAR2/Net/RouterOS/SocketException.php"
+            />
+            <install
+                name="src/PEAR2/Net/RouterOS/UnexpectedValueException.php"
+                as="PEAR2/Net/RouterOS/UnexpectedValueException.php"
+            />
+            
+            <install
+                name="tests/ClientFeaturesTest.php"
+                as="ClientFeaturesTest.php"
+            />
+            <install
+                name="tests/ConnectionTest.php" 
+                as="ConnectionTest.php"
+            />
+            <install
+                name="tests/RequestHandlingTest.php"
+                as="RequestHandlingTest.php"
+            />
+            <install
+                name="tests/StateAlteringFeaturesTest.php"
+                as="StateAlteringFeaturesTest.php"
+            />
+            <install
+                name="tests/PseudoServer.php"
+                as="PseudoServer.php"
+            />
+            <install
+                name="tests/configuration.xml"
+                as="configuration.xml"
+            />
+            <install
+                name="tests/bootstrap.php"
+                as="bootstrap.php"
+            />
+            
+            <install
+                name="docs/doxygen.ini"
+                as="doxygen.ini"
+            />
+            <install
+                name="docs/docblox.xml"
+                as="docblox.xml"
+            />
+            <install
+                name="docs/tutorials/PEAR2_Net_RouterOS/Client.cls"
+                as="tutorials/PEAR2_Net_RouterOS/Client.cls"
+            />
+            <install
+                name="docs/tutorials/PEAR2_Net_RouterOS/PEAR2_Net_RouterOS.pkg"
+                as="tutorials/PEAR2_Net_RouterOS/PEAR2_Net_RouterOS.pkg"
+            />
+            <install
+                name="docs/tutorials/PEAR2_Net_RouterOS/Query.cls"
+                as="tutorials/PEAR2_Net_RouterOS/Query.cls"
+            />
+        </filelist>
+    </phprelease>
+</package>

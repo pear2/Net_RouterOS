@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<refentry id="{@id}">
+    <refnamediv>
+        <refname>Getting started</refname>
+        <refpurpose>First steps in using PEAR2_Net_RouterOS</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+        <author>Vasil Rangelov
+            <authorblurb>
+                {@link mailto:boen.robot@gmail.com boen.robot@gmail.com}
+            </authorblurb>
+        </author>
+    </refsynopsisdiv>
+    {@toc}
+    <refsect1 id="{@id intro}">
+        <title>Introduction</title>
+        <para>
+RouterOS is the flag product of the company {@link http://mikrotik.com/ MikroTik}
+and is a powerful router software. One of its many abilities is to allow control over it via an API.
+This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.
+        </para>
+    </refsect1>
+    <refsect1 id="{@id requirements}">
+        <title>Requirements</title>
+        <itemizedlist>
+            <listitem>PHP 5.3.0 or later.</listitem>
+            <listitem>A host with RouterOS v3 or later.</listitem>
+            <listitem>Enabled API service on the RouterOS host.</listitem>
+        </itemizedlist>
+        <para>
+There are no dependencies from extensions that are not bundled with PHP.
+The only dependency is the PCRE (Pearl Compatible Regular Expressions) extension, which is bundled and enabled by default in PHP.
+        </para>
+        <para>
+The API service is disabled by default. To enable it, you need to execute
+<programlisting role="cmd">/ip service set numbers="api" address="0.0.0.0/0" disabled="no"</programlisting>
+at a RouterOS terminal. The "address" argument in the command above allows you to limit access to this service only to certain IP addresses. For security's sake, it's better that you limit connections only to the IP address with which PHP will access RouterOS.
+        </para>
+    </refsect1>
+    <refsect1 id="{@id install}">
+        <title>Installation</title>
+        <refsect2 id="{@id pear-install}">
+            <title>Installation with the PEAR installer.</title>
+            <para>
+If you don't already have the pear installer, see the
+{@link http://pear.php.net/manual/en/installation.php installation instructions in the PEAR manual}. The version of the PEAR installer that is bundled with PHP 5.3.0 should be sufficient.
+            </para>
+            <para>
+To use the PEAR installer, you must have the TGZ version of the file.
+Installation is as easy as opening up a command prompt, going to the pear installer's folder and typing
+            <programlisting role="cmd">pear install "%tgz%"</programlisting>
+Replacing <emphasis>%tgz%</emphasis> with the location of the archive.
+            </para>
+        </refsect2>
+        <refsect2 id="{@id manual-install}">
+            <title>Manual installation.</title>
+            <para>
+Instead of using the PEAR installer, you can also just extract the files into any directory in your include_path.
+To emulate the PEAR installer, you can simply extract the contents of the folder "src" in that folder.
+Note that the examples in the rest of the documentation assume installation with the PEAR installer.
+            </para>
+        </refsect2>
+    </refsect1>
+    <refsect1 id="{@id usage}">
+        <title>Usage.</title>
+        <para>
+To use this in a PHP file, you could manally include every required class, but to save yourself some hassle, it's a better idea that you just include the file Autoload.php, like:
+        </para>
+        <programlisting role="php">
+&lt;?php
+include_once 'PEAR2/Net/RouterOS/Autoload.php';
+//Use any Net_RouterOS class
+?&gt;
+        </programlisting>
+        <para>
+Net_RouterOS uses namespaces - a feature introduced in PHP 5.3 - for its organization.
+Among other things, this means that instead of you having to write long class names, you can just declare at the top that you'll be using this namespace, and then just write shorter class names. The possible approaches are as follows:</para>
+        <itemizedlist>
+            <listitem>
+Using a fully qualified class name
+                <programlisting role="php">
+&lt;?php
+include_once 'PEAR2/Net/RouterOS/Autoload.php';
+$client = new PEAR2\Net\RouterOS\Client('example.com', 'admin');
+// Use the client here
+?&gt;
+                </programlisting>
+            </listitem>
+            <listitem>
+Declaring the \PEAR2\Net\RouterOS as your default namespace
+                <programlisting role="php">
+&lt;?php
+namespace PEAR2\Net\RouterOS;
+include_once 'PEAR2/Net/RouterOS/Autoload.php';
+$client = new Client('example.com', 'admin');
+// Use the client here
+?&gt;
+                </programlisting>
+            </listitem>
+            <listitem>
+Declaring the PEAR2\Net\RouterOS as an aliased namespace
+                <programlisting role="php">
+&lt;?php
+use PEAR2\Net\RouterOS as Ros;
+include_once 'PEAR2/Net/RouterOS/Autoload.php';
+$client = new Ros\Client('example.com', 'admin');
+// Use the client here
+?&gt;
+                </programlisting>
+            </listitem>
+            <listitem>
+Declaring an alias of each class you intend to use directly.
+                <programlisting role="php">
+&lt;?php
+use PEAR2\Net\RouterOS\Client as Ros;
+include_once 'PEAR2/Net/RouterOS/Autoload.php';
+$client = new Ros('example.com', 'admin');
+// Use the client here
+?&gt;
+                </programlisting>
+            </listitem>
+        </itemizedlist>
+        <para>
+Note that namespace declarations must appear before any includes.
+They must in fact be the first thing in a PHP file. The rest of the examples in this documentation will be setting \PEAR2\Net\RouterOS as the default namespace.
+        </para>
+    </refsect1>
+    <refsect1 id="{@id further-info}">
+        <title>Further information.</title>
+        <para>
+Net_RouterOS is flexible in the code patterns it allows you to use, but using the
+{@link Client} class with {@link Client::sendSync()} is the reccomended approach for simple scenarios. See {@tutorial Client.cls the tutorial for the Client class} for description of this and other ways to use PEAR2_Net_RouterOS.
+        </para>
+    </refsect1>
+</refentry>

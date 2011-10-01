@@ -1,0 +1,2 @@
+RouterOS API client implementation.
+This package allows you to read and write information from a RouterOS host using MikroTik's RouterOS API.

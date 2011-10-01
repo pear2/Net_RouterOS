@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+    <system systemId="http://pear.php.net/dtd/tasks-1.0.xsd" uri="pear.php.net/dtd/tasks-1.0.xsd"/>
+    <system systemId="http://pear.php.net/dtd/package-2.0.xsd" uri="pear.php.net/dtd/package-2.0.xsd"/>
+    <system systemId="http://docbook.org/xml/5.0/xsd/docbook.xsd" uri="docbook.org/xml/5.0/xsd/docbook.xsd"/>
+    <system systemId="http://docbook.org/xml/5.0/xsd/xlink.xsd" uri="docbook.org/xml/5.0/xsd/xlink.xsd"/>
+    <system systemId="http://docbook.org/xml/5.0/xsd/xml.xsd" uri="docbook.org/xml/5.0/xsd/xml.xsd"/>
+</catalog>
