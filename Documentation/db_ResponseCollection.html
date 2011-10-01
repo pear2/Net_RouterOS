@@ -1,0 +1,751 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>PEAR2_Net_Transmitter documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/black-tie/jquery-ui-1.8.2.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script type="text/javascript" src="js/menu.js"></script><script>
+
+      function filterElements()
+      {
+        inherited = !$('a#show-inherited').hasClass('deselected');
+        public    = !$('a#show-public').hasClass('deselected');
+        protected = !$('a#show-protected').hasClass('deselected');
+        private   = !$('a#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+        $('div.file-nav').show();
+
+        $('a#show-public, a#show-protected, a#show-private, a#show-inherited').click(function(){
+            $(this).toggleClass('deselected');
+            if ($(this).hasClass('deselected')) {
+              $(this).fadeTo('fast', '0.4');
+            } else {
+              $(this).fadeTo('fast', '1.0');
+            }
+            filterElements();
+            return false;
+        });
+        $('a#show-protected, a#show-private').click();
+
+      });
+      
+    </script><h1 class="file">\ResponseCollection.php</h1>
+<div class="file-nav">
+<ul id="file-nav">
+<li><a href="#top">Global</a></li>
+<li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                      Classes
+                  </a><ul><li><a href="#%5CPEAR2%5CNet%5CRouterOS%5CResponseCollection">\PEAR2\Net\RouterOS\ResponseCollection</a></li></ul>
+</li>
+</ul>
+<div style="float: right;padding-right: 20px;">
+              Show:
+              <a href="#" id="show-public"><img src="images/icons/visibility_public.png"></a><a href="#" id="show-protected"><img src="images/icons/visibility_protected.png"></a><a href="#" id="show-private"><img src="images/icons/visibility_private.png"></a><a href="#" id="show-inherited"><span class="attribute">inherited</span></a>
+</div>
+</div>
+<a name="top" class="anchor"></a><div id="file-description">
+<p class="short-description">RouterOS API client implementation.</p>
+<div class="long-description"><p>This package allows you to read and write information from a RouterOS host using MikroTik's RouterOS API.</p>
+
+<p>PHP version 5</p>
+</div>
+</div>
+<dl class="file-info">
+<dt>Author</dt>
+<dd>
+<a href="mailto:boen.robot@gmail.com">Vasil Rangelov</a>
+         
+    </dd>
+<dt>Category</dt>
+<dd>Net
+         
+    </dd>
+<dt>Copyright</dt>
+<dd>2011 Vasil Rangelov
+         
+    </dd>
+<dt>License</dt>
+<dd>
+<a href="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</a>
+         
+    </dd>
+<dt>Link</dt>
+<dd>
+<a href="http://netrouteros.sourceforge.net/">http://netrouteros.sourceforge.net/</a>
+         
+    </dd>
+<dt>Package</dt>
+<dd>PEAR2_Net_RouterOS
+         
+    </dd>
+<dt>Version</dt>
+<dd>1.0.0b1
+         
+    </dd>
+</dl>
+<a name="classes" class="anchor"></a><a id="\PEAR2\Net\RouterOS\ResponseCollection" class="anchor"></a><h2 class="class">\PEAR2\Net\RouterOS\ResponseCollection<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div class="class">
+<small class="package"><b>Package: </b>PEAR2\Net\RouterOS</small><p class="short-description">Represents a collection of RouterOS responses.</p>
+<div class="long-description">
+</div>
+<dl class="class-info">
+<dt>Implements</dt>
+<dd></dd>
+<dd></dd>
+<dd></dd>
+<dt>Author</dt>
+<dd>
+<a href="mailto:boen.robot@gmail.com">Vasil Rangelov</a>
+         
+    </dd>
+<dt>Category</dt>
+<dd>Net
+         
+    </dd>
+<dt>License</dt>
+<dd>
+<a href="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</a>
+         
+    </dd>
+<dt>Link</dt>
+<dd>
+<a href="http://netrouteros.sourceforge.net/">http://netrouteros.sourceforge.net/</a>
+         
+    </dd>
+</dl>
+<h3>Properties</h3>
+<div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::$argumentMap" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$argumentMap</span>= 'null'
+                </code><div class="description">
+<p class="short-description"></p>An array with all distinct arguments across all {@link Response} objects. Created at the first call of {@link getArgumentMap()}.</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::$position" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">int
+                 <span class="highlight">$position</span>= '0'
+                </code><div class="description">
+<p class="short-description"></p>A pointer, as required by SeekableIterator.</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>0</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>int</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::$responseTags" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$responseTags</span>= 'array('
+                </code><div class="description">
+<p class="short-description"></p>An array with each {@link Response} object's tag.</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>array(</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::$responseTypes" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$responseTypes</span>= 'array('
+                </code><div class="description">
+<p class="short-description"></p>An array with each {@link Response} object's type.</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>array(</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::$responses" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$responses</span>= 'array('
+                </code><div class="description">
+<p class="short-description"></p>An array with all {@link Response} objects.</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>array(</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::__call()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__call</span><span class="nb-faded-text">(
+          string $method, array $args
+          )
+        </span>
+        :
+          mixed</code><div class="description"><p class="short_description">Calls a method of the response pointed by the pointer.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Calls a method of the response pointed by the pointer. This is a magic
+PHP method, thanks to which any function you call on the collection that
+is not defined will be redirected to the response.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$method</th>
+<td>string</td>
+<td><em><p>The name of the method to call.</p></em></td>
+</tr>
+<tr>
+<th>$args</th>
+<td>array</td>
+<td><em><p>The arguments to pass to the method.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>mixed</td>
+<td>Whatever the called function returns.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          array $responses
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Creates a new collection.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$responses</th>
+<td>array</td>
+<td><em><p>An array of responses, in network order.</p></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::count()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">count</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          int</code><div class="description"><p class="short_description">Counts the responses in the collection.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>int</td>
+<td>The number of responses in the collection.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::current()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">current</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Response.html#%5CPEAR2%5CNet%5CRouterOS%5CResponse">\PEAR2\Net\RouterOS\Response</a></code><div class="description"><p class="short_description">Gets the response at the current pointer position.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Response.html#%5CPEAR2%5CNet%5CRouterOS%5CResponse">\PEAR2\Net\RouterOS\Response</a></td>
+<td>The response at the current pointer position, or FALSE if the position is not valid.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::getAllOfType()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getAllOfType</span><span class="nb-faded-text">(
+          string $type
+          )
+        </span>
+        :
+          <a href="db_ResponseCollection.html#%5CPEAR2%5CNet%5CRouterOS%5CResponseCollection">\PEAR2\Net\RouterOS\ResponseCollection</a></code><div class="description"><p class="short_description">Gets all responses of a specified type.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$type</th>
+<td>string</td>
+<td><em><p>The response type to filter by. Valid values are the Response::TYPE_* constants.</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ResponseCollection.html#%5CPEAR2%5CNet%5CRouterOS%5CResponseCollection">\PEAR2\Net\RouterOS\ResponseCollection</a></td>
+<td>A new collection with responses of the specified type.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::getAllTagged()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getAllTagged</span><span class="nb-faded-text">(
+          string $tag
+          )
+        </span>
+        :
+          <a href="db_ResponseCollection.html#%5CPEAR2%5CNet%5CRouterOS%5CResponseCollection">\PEAR2\Net\RouterOS\ResponseCollection</a></code><div class="description"><p class="short_description">Gets all responses with a specified tag.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$tag</th>
+<td>string</td>
+<td><em><p>The tag to filter by.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ResponseCollection.html#%5CPEAR2%5CNet%5CRouterOS%5CResponseCollection">\PEAR2\Net\RouterOS\ResponseCollection</a></td>
+<td>A new collection with responses having the specified tag.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::getArgumentMap()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getArgumentMap</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Gets all distinct argument names.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Gets all distinct argument names across all responses.</p>
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>An array with all distinct argument names as keys, and the indexes at which they occur as values.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::getLast()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getLast</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Response.html#%5CPEAR2%5CNet%5CRouterOS%5CResponse">\PEAR2\Net\RouterOS\Response</a></code><div class="description"><p class="short_description">Gets the last {@link Response} in the collection.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Response.html#%5CPEAR2%5CNet%5CRouterOS%5CResponse">\PEAR2\Net\RouterOS\Response</a></td>
+<td>The last response in the collection.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::key()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">key</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          int</code><div class="description"><p class="short_description">Gets the key at the current pointer position.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>int</td>
+<td>The key at the current pointer position, i.e. the pointer position itself, or FALSE if the position is not valid.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::next()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">next</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Response.html#%5CPEAR2%5CNet%5CRouterOS%5CResponse">\PEAR2\Net\RouterOS\Response</a></code><div class="description"><p class="short_description">Moves the pointer forward by 1, and gets the next response.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Response.html#%5CPEAR2%5CNet%5CRouterOS%5CResponse">\PEAR2\Net\RouterOS\Response</a></td>
+<td>The next {@link Response} object, or FALSE if the position is not valid.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::offsetExists()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">offsetExists</span><span class="nb-faded-text">(
+          int $offset
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description">Checks if an offset exists.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$offset</th>
+<td>int</td>
+<td><em><p>The offset to check.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td>TRUE if the offset exists, FALSE otherwise.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::offsetGet()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">offsetGet</span><span class="nb-faded-text">(
+          int $offset
+          )
+        </span>
+        :
+          <a href="db_Response.html#%5CPEAR2%5CNet%5CRouterOS%5CResponse">\PEAR2\Net\RouterOS\Response</a></code><div class="description"><p class="short_description">Gets a {@link Response} from a specified offset.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$offset</th>
+<td>int</td>
+<td><em><p>The offset of the desired response.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Response.html#%5CPEAR2%5CNet%5CRouterOS%5CResponse">\PEAR2\Net\RouterOS\Response</a></td>
+<td>The response at the specified offset.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::offsetSet()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">offsetSet</span><span class="nb-faded-text">(
+          int $offset, <a href="db_Response.html#%5CPEAR2%5CNet%5CRouterOS%5CResponse">\PEAR2\Net\RouterOS\Response</a> $value
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">N/A</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>This method exists only because it is required for ArrayAccess. The
+collection is read only.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$offset</th>
+<td>int</td>
+<td><em><p>N/A</p>
+</em></td>
+</tr>
+<tr>
+<th>$value</th>
+<td><a href="db_Response.html#%5CPEAR2%5CNet%5CRouterOS%5CResponse">\PEAR2\Net\RouterOS\Response</a></td>
+<td><em><p>N/A</p>
+</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::offsetUnset()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">offsetUnset</span><span class="nb-faded-text">(
+          int $offset
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">N/A</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>This method exists only because it is required for ArrayAccess. The
+collection is read only.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$offset</th>
+<td>int</td>
+<td><em><p>N/A</p>
+</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::rewind()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">rewind</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Response.html#%5CPEAR2%5CNet%5CRouterOS%5CResponse">\PEAR2\Net\RouterOS\Response</a></code><div class="description"><p class="short_description">Resets the pointer to 0, and returns the first response.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Response.html#%5CPEAR2%5CNet%5CRouterOS%5CResponse">\PEAR2\Net\RouterOS\Response</a></td>
+<td>The first response in the collection, or FALSE if the collection is empty.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::seek()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">seek</span><span class="nb-faded-text">(
+          int $position
+          )
+        </span>
+        :
+          <a href="db_Response.html#%5CPEAR2%5CNet%5CRouterOS%5CResponse">\PEAR2\Net\RouterOS\Response</a></code><div class="description"><p class="short_description">Moves the position pointer to a specified position.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$position</th>
+<td>int</td>
+<td><em><p>The position to move to.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Response.html#%5CPEAR2%5CNet%5CRouterOS%5CResponse">\PEAR2\Net\RouterOS\Response</a></td>
+<td>The {@link Response} at the specified position, or FALSE if the specified position is not valid.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::toArray()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">toArray</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Gets the whole collection as an array.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>An array with all responses, in network order.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\ResponseCollection::valid()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">valid</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description">Checks if the pointer is still pointing to an existing offset.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td>TRUE if the pointer is valid, FALSE otherwise.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.14.1</a>.
+    </small></body></html>

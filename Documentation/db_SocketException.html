@@ -1,0 +1,289 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>PEAR2_Net_Transmitter documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/black-tie/jquery-ui-1.8.2.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script type="text/javascript" src="js/menu.js"></script><script>
+
+      function filterElements()
+      {
+        inherited = !$('a#show-inherited').hasClass('deselected');
+        public    = !$('a#show-public').hasClass('deselected');
+        protected = !$('a#show-protected').hasClass('deselected');
+        private   = !$('a#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+        $('div.file-nav').show();
+
+        $('a#show-public, a#show-protected, a#show-private, a#show-inherited').click(function(){
+            $(this).toggleClass('deselected');
+            if ($(this).hasClass('deselected')) {
+              $(this).fadeTo('fast', '0.4');
+            } else {
+              $(this).fadeTo('fast', '1.0');
+            }
+            filterElements();
+            return false;
+        });
+        $('a#show-protected, a#show-private').click();
+
+      });
+      
+    </script><h1 class="file">\SocketException.php</h1>
+<div class="file-nav">
+<ul id="file-nav">
+<li><a href="#top">Global</a></li>
+<li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                      Classes
+                  </a><ul><li><a href="#%5CPEAR2%5CNet%5CRouterOS%5CSocketException">\PEAR2\Net\RouterOS\SocketException</a></li></ul>
+</li>
+</ul>
+<div style="float: right;padding-right: 20px;">
+              Show:
+              <a href="#" id="show-public"><img src="images/icons/visibility_public.png"></a><a href="#" id="show-protected"><img src="images/icons/visibility_protected.png"></a><a href="#" id="show-private"><img src="images/icons/visibility_private.png"></a><a href="#" id="show-inherited"><span class="attribute">inherited</span></a>
+</div>
+</div>
+<a name="top" class="anchor"></a><div id="file-description">
+<p class="short-description">RouterOS API client implementation.</p>
+<div class="long-description"><p>This package allows you to read and write information from a RouterOS host using MikroTik's RouterOS API.</p>
+
+<p>PHP version 5</p>
+</div>
+</div>
+<dl class="file-info">
+<dt>Author</dt>
+<dd>
+<a href="mailto:boen.robot@gmail.com">Vasil Rangelov</a>
+         
+    </dd>
+<dt>Category</dt>
+<dd>Net
+         
+    </dd>
+<dt>Copyright</dt>
+<dd>2011 Vasil Rangelov
+         
+    </dd>
+<dt>License</dt>
+<dd>
+<a href="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</a>
+         
+    </dd>
+<dt>Link</dt>
+<dd>
+<a href="http://netrouteros.sourceforge.net/">http://netrouteros.sourceforge.net/</a>
+         
+    </dd>
+<dt>Package</dt>
+<dd>PEAR2_Net_RouterOS
+         
+    </dd>
+<dt>Version</dt>
+<dd>1.0.0b1
+         
+    </dd>
+</dl>
+<a name="classes" class="anchor"></a><a id="\PEAR2\Net\RouterOS\SocketException" class="anchor"></a><h2 class="class">\PEAR2\Net\RouterOS\SocketException<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div class="class">
+<small class="package"><b>Package: </b>PEAR2\Net\RouterOS</small><p class="short-description">Exception thrown when something goes wrong with the connection.</p>
+<div class="long-description">
+</div>
+<dl class="class-info">
+<dt>Implements</dt>
+<dd><a href="db_Exception.html#%5CPEAR2%5CNet%5CRouterOS%5CException">\PEAR2\Net\RouterOS\Exception</a></dd>
+<dt>Parent(s)</dt>
+<dd><a href="http://php.net/manual/en/class.runtimeexception.php">\RuntimeException</a></dd>
+<dt>Author</dt>
+<dd>
+<a href="mailto:boen.robot@gmail.com">Vasil Rangelov</a>
+         
+    </dd>
+<dt>Category</dt>
+<dd>Net
+         
+    </dd>
+<dt>License</dt>
+<dd>
+<a href="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</a>
+         
+    </dd>
+<dt>Link</dt>
+<dd>
+<a href="http://netrouteros.sourceforge.net/">http://netrouteros.sourceforge.net/</a>
+         
+    </dd>
+</dl>
+<h3>Methods</h3>
+<div>
+<a id="\PEAR2\Net\RouterOS\SocketException::__construct()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    \RuntimeException::__construct()</small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\SocketException::__toString()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__toString</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    \RuntimeException::__toString()</small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\SocketException::getCode()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getCode</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">final</span><span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    \RuntimeException::getCode()</small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\SocketException::getFile()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getFile</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">final</span><span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    \RuntimeException::getFile()</small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\SocketException::getLine()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getLine</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">final</span><span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    \RuntimeException::getLine()</small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\SocketException::getMessage()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getMessage</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">final</span><span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    \RuntimeException::getMessage()</small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\SocketException::getPrevious()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getPrevious</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">final</span><span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    \RuntimeException::getPrevious()</small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\SocketException::getTrace()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getTrace</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">final</span><span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    \RuntimeException::getTrace()</small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\SocketException::getTraceAsString()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getTraceAsString</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">final</span><span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    \RuntimeException::getTraceAsString()</small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.14.1</a>.
+    </small></body></html>

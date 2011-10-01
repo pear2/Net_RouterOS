@@ -1,0 +1,485 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>PEAR2_Net_Transmitter documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/black-tie/jquery-ui-1.8.2.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script type="text/javascript" src="js/menu.js"></script><script>
+
+      function filterElements()
+      {
+        inherited = !$('a#show-inherited').hasClass('deselected');
+        public    = !$('a#show-public').hasClass('deselected');
+        protected = !$('a#show-protected').hasClass('deselected');
+        private   = !$('a#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+        $('div.file-nav').show();
+
+        $('a#show-public, a#show-protected, a#show-private, a#show-inherited').click(function(){
+            $(this).toggleClass('deselected');
+            if ($(this).hasClass('deselected')) {
+              $(this).fadeTo('fast', '0.4');
+            } else {
+              $(this).fadeTo('fast', '1.0');
+            }
+            filterElements();
+            return false;
+        });
+        $('a#show-protected, a#show-private').click();
+
+      });
+      
+    </script><h1 class="file">\Message.php</h1>
+<div class="file-nav">
+<ul id="file-nav">
+<li><a href="#top">Global</a></li>
+<li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                      Classes
+                  </a><ul><li><a href="#%5CPEAR2%5CNet%5CRouterOS%5CMessage">\PEAR2\Net\RouterOS\Message</a></li></ul>
+</li>
+</ul>
+<div style="float: right;padding-right: 20px;">
+              Show:
+              <a href="#" id="show-public"><img src="images/icons/visibility_public.png"></a><a href="#" id="show-protected"><img src="images/icons/visibility_protected.png"></a><a href="#" id="show-private"><img src="images/icons/visibility_private.png"></a><a href="#" id="show-inherited"><span class="attribute">inherited</span></a>
+</div>
+</div>
+<a name="top" class="anchor"></a><div id="file-description">
+<p class="short-description">RouterOS API client implementation.</p>
+<div class="long-description"><p>This package allows you to read and write information from a RouterOS host using MikroTik's RouterOS API.</p>
+
+<p>PHP version 5</p>
+</div>
+</div>
+<dl class="file-info">
+<dt>Author</dt>
+<dd>
+<a href="mailto:boen.robot@gmail.com">Vasil Rangelov</a>
+         
+    </dd>
+<dt>Category</dt>
+<dd>Net
+         
+    </dd>
+<dt>Copyright</dt>
+<dd>2011 Vasil Rangelov
+         
+    </dd>
+<dt>License</dt>
+<dd>
+<a href="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</a>
+         
+    </dd>
+<dt>Link</dt>
+<dd>
+<a href="http://netrouteros.sourceforge.net/">http://netrouteros.sourceforge.net/</a>
+         
+    </dd>
+<dt>Package</dt>
+<dd>PEAR2_Net_RouterOS
+         
+    </dd>
+<dt>Version</dt>
+<dd>1.0.0b1
+         
+    </dd>
+</dl>
+<a name="classes" class="anchor"></a><a id="\PEAR2\Net\RouterOS\Message" class="anchor"></a><h2 class="class">\PEAR2\Net\RouterOS\Message<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div class="class">
+<small class="package"><b>Package: </b>PEAR2\Net\RouterOS</small><p class="short-description">Represents a RouterOS message.</p>
+<div class="long-description">
+</div>
+<dl class="class-info">
+<dt>Children</dt>
+<dd><a href="db_Request.html#%5CPEAR2%5CNet%5CRouterOS%5CRequest">\PEAR2\Net\RouterOS\Request</a></dd>
+<dd><a href="db_Response.html#%5CPEAR2%5CNet%5CRouterOS%5CResponse">\PEAR2\Net\RouterOS\Response</a></dd>
+<dt>Author</dt>
+<dd>
+<a href="mailto:boen.robot@gmail.com">Vasil Rangelov</a>
+         
+    </dd>
+<dt>Category</dt>
+<dd>Net
+         
+    </dd>
+<dt>License</dt>
+<dd>
+<a href="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</a>
+         
+    </dd>
+<dt>Link</dt>
+<dd>
+<a href="http://netrouteros.sourceforge.net/">http://netrouteros.sourceforge.net/</a>
+         
+    </dd>
+</dl>
+<h3>Properties</h3>
+<div>
+<a id="\PEAR2\Net\RouterOS\Message::$_tag" class="anchor"></a><div class="property private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private">string
+                 <span class="highlight">$_tag</span>= 'null'
+                </code><div class="description">
+<p class="short-description"></p>An optional tag to associate the message with.</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Message::$arguments" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$arguments</span>= 'array('
+                </code><div class="description">
+<p class="short-description"></p>An array with message arguments. Keys are the names of the arguments, array values are values for the corresponding argument.</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>array(</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\PEAR2\Net\RouterOS\Message::getAllArguments()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getAllArguments</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Gets all arguments in an array.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>An array with the keys as argument names, and the array values as argument values.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\getArgument()
+         
+    </dd>
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\setArgument()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Message::getArgument()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getArgument</span><span class="nb-faded-text">(
+          string $name
+          )
+        </span>
+        :
+          string|resource</code><div class="description"><p class="short_description">Gets the value of an argument.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em><p>The name of the argument.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string|resource</td>
+<td>The value of the specified argument. Returns NULL if such an argument is not set.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\setArgument()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Message::getTag()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getTag</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Gets the tag that the message is associated with.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>The current tag or NULL if there isn't a tag.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\setTag()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Message::removeAllArguments()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">removeAllArguments</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Message.html#%5CPEAR2%5CNet%5CRouterOS%5CMessage">\PEAR2\Net\RouterOS\Message</a></code><div class="description"><p class="short_description">Removes all arguments from the message.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Message.html#%5CPEAR2%5CNet%5CRouterOS%5CMessage">\PEAR2\Net\RouterOS\Message</a></td>
+<td>The message object.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Message::sanitizeArgumentName()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">sanitizeArgumentName</span><span class="nb-faded-text">(
+          mixed $name
+          )
+        </span>
+        :
+          string</code><div class="description">
+<span class="attribute">static</span><p class="short_description">Sanitizes a name of an argument (message or query one).</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>mixed</td>
+<td><em><p>The name to sanitize.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>The sanitized name.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Message::sanitizeArgumentValue()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">sanitizeArgumentValue</span><span class="nb-faded-text">(
+          mixed $value
+          )
+        </span>
+        :
+          string</code><div class="description">
+<span class="attribute">static</span><p class="short_description">Sanitizes a value of an argument (message or query one).</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$value</th>
+<td>mixed</td>
+<td><em><p>The value to sanitize.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>The sanitized value.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Message::setArgument()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">setArgument</span><span class="nb-faded-text">(
+          string $name, string $value
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_Message.html#%5CPEAR2%5CNet%5CRouterOS%5CMessage">\PEAR2\Net\RouterOS\Message</a></code><div class="description"><p class="short_description">Sets an argument for the message.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em><p>Name of the argument.</p></em></td>
+</tr>
+<tr>
+<th>$value</th>
+<td>string</td>
+<td><em><p>Value of the argument. Setting the value to NULL removes an argument of this name.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Message.html#%5CPEAR2%5CNet%5CRouterOS%5CMessage">\PEAR2\Net\RouterOS\Message</a></td>
+<td>The message object.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\getArgument()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Message::setTag()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">setTag</span><span class="nb-faded-text">(
+          string $tag
+          )
+        </span>
+        :
+          <a href="db_Message.html#%5CPEAR2%5CNet%5CRouterOS%5CMessage">\PEAR2\Net\RouterOS\Message</a></code><div class="description"><p class="short_description">Sets the tag to associate the request with.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Sets the tag to associate the message with. Setting NULL erases the
+currently set tag.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$tag</th>
+<td>string</td>
+<td><em><p>The tag to set.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Message.html#%5CPEAR2%5CNet%5CRouterOS%5CMessage">\PEAR2\Net\RouterOS\Message</a></td>
+<td>The message object.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\getTag()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.14.1</a>.
+    </small></body></html>

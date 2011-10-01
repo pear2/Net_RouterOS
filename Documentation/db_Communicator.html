@@ -1,0 +1,874 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>PEAR2_Net_Transmitter documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/black-tie/jquery-ui-1.8.2.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script type="text/javascript" src="js/menu.js"></script><script>
+
+      function filterElements()
+      {
+        inherited = !$('a#show-inherited').hasClass('deselected');
+        public    = !$('a#show-public').hasClass('deselected');
+        protected = !$('a#show-protected').hasClass('deselected');
+        private   = !$('a#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+        $('div.file-nav').show();
+
+        $('a#show-public, a#show-protected, a#show-private, a#show-inherited').click(function(){
+            $(this).toggleClass('deselected');
+            if ($(this).hasClass('deselected')) {
+              $(this).fadeTo('fast', '0.4');
+            } else {
+              $(this).fadeTo('fast', '1.0');
+            }
+            filterElements();
+            return false;
+        });
+        $('a#show-protected, a#show-private').click();
+
+      });
+      
+    </script><h1 class="file">\Communicator.php</h1>
+<div class="file-nav">
+<ul id="file-nav">
+<li><a href="#top">Global</a></li>
+<li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                      Classes
+                  </a><ul><li><a href="#%5CPEAR2%5CNet%5CRouterOS%5CCommunicator">\PEAR2\Net\RouterOS\Communicator</a></li></ul>
+</li>
+</ul>
+<div style="float: right;padding-right: 20px;">
+              Show:
+              <a href="#" id="show-public"><img src="images/icons/visibility_public.png"></a><a href="#" id="show-protected"><img src="images/icons/visibility_protected.png"></a><a href="#" id="show-private"><img src="images/icons/visibility_private.png"></a><a href="#" id="show-inherited"><span class="attribute">inherited</span></a>
+</div>
+</div>
+<a name="top" class="anchor"></a><div id="file-description">
+<p class="short-description">RouterOS API client implementation.</p>
+<div class="long-description"><p>This package allows you to read and write information from a RouterOS host using MikroTik's RouterOS API.</p>
+
+<p>PHP version 5</p>
+</div>
+</div>
+<dl class="file-info">
+<dt>Author</dt>
+<dd>
+<a href="mailto:boen.robot@gmail.com">Vasil Rangelov</a>
+         
+    </dd>
+<dt>Category</dt>
+<dd>Net
+         
+    </dd>
+<dt>Copyright</dt>
+<dd>2011 Vasil Rangelov
+         
+    </dd>
+<dt>License</dt>
+<dd>
+<a href="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</a>
+         
+    </dd>
+<dt>Link</dt>
+<dd>
+<a href="http://netrouteros.sourceforge.net/">http://netrouteros.sourceforge.net/</a>
+         
+    </dd>
+<dt>Package</dt>
+<dd>PEAR2_Net_RouterOS
+         
+    </dd>
+<dt>Version</dt>
+<dd>1.0.0b1
+         
+    </dd>
+</dl>
+<a name="classes" class="anchor"></a><a id="\PEAR2\Net\RouterOS\Communicator" class="anchor"></a><h2 class="class">\PEAR2\Net\RouterOS\Communicator<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div class="class">
+<small class="package"><b>Package: </b>PEAR2\Net\RouterOS</small><p class="short-description">A RouterOS communicator.</p>
+<div class="long-description"><p>Implementation of the RouterOS API protocol. Unlike the other classes in this
+package, this class doesn't provide any conviniences beyond the low level
+implementation details (automatic word length encoding/decoding, charset
+translation and data integrity), and because of that, its direct usage is
+strongly discouraged.</p>
+</div>
+<dl class="class-info">
+<dt>See</dt>
+<dd>
+<a href="db_Client.html#%5CPEAR2%5CNet%5CRouterOS%5CClient">\PEAR2\Net\RouterOS\Client</a>
+         
+    </dd>
+<dt>Author</dt>
+<dd>
+<a href="mailto:boen.robot@gmail.com">Vasil Rangelov</a>
+         
+    </dd>
+<dt>Category</dt>
+<dd>Net
+         
+    </dd>
+<dt>License</dt>
+<dd>
+<a href="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</a>
+         
+    </dd>
+<dt>Link</dt>
+<dd>
+<a href="http://netrouteros.sourceforge.net/">http://netrouteros.sourceforge.net/</a>
+         
+    </dd>
+</dl>
+<h3>Constants</h3>
+<div>
+<a id="\PEAR2\Net\RouterOS\Communicator::CHARSET_ALL" class="anchor"></a><div class="constant publicC">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">CHARSET_ALL</span>
+                = -1</code><div class="description"><p class="short-description">Used when getting/setting all (default) charsets.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<dl class="constant-info"></dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Communicator::CHARSET_REMOTE" class="anchor"></a><div class="constant publicC">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">CHARSET_REMOTE</span>
+                = 0</code><div class="description"><p class="short-description">Used when getting/setting the (default) remote charset.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The remote charset is the charset in which RouterOS stores its data.
+If you want to keep compatibility with your Winbox, this charset should
+match the default charset from your Windows' regional settings.</p>
+</div>
+<dl class="constant-info"></dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Communicator::CHARSET_LOCAL" class="anchor"></a><div class="constant publicC">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">CHARSET_LOCAL</span>
+                = 1</code><div class="description"><p class="short-description">Used when getting/setting the (default) local charset.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The local charset is the charset in which the data from RouterOS will be
+returned as. This charset should match the charset of the place the data
+will eventually be written to.</p>
+</div>
+<dl class="constant-info"></dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Properties</h3>
+<div>
+<a id="\PEAR2\Net\RouterOS\Communicator::$charsets" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$charsets</span>= 'array('
+                </code><div class="description">
+<p class="short-description"></p>An array with the current charset types as keys, and the current charsets as values.</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>array(</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Communicator::$defaultCharsets" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$defaultCharsets</span>= 'array(
+        self::CHARSET_REMOTE =&gt; null'
+                </code><div class="description">
+<span class="attribute">static</span><p class="short-description"></p>An array with the default charset types as keys, and the default charsets as values.</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>array(
+        self::CHARSET_REMOTE =&gt; null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Communicator::$trans" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\PEAR2\Net\RouterOS\SocketClientTransmitter
+                 <span class="highlight">$trans</span>= ''
+                </code><div class="description">
+<p class="short-description"></p>The transmitter for the connection.</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\PEAR2\Net\RouterOS\SocketClientTransmitter</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\PEAR2\Net\RouterOS\Communicator::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          string $host, int $port
+              =
+              8728, bool $persist
+              =
+              false, float $timeout
+              =
+              null, string $key
+              =
+              '', resource $context
+              =
+              null
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Creates a new connection with the specified options.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$host</th>
+<td>string</td>
+<td><em><p>Hostname (IP or domain) of the RouterOS server.</p>
+</em></td>
+</tr>
+<tr>
+<th>$port</th>
+<td>int</td>
+<td><em><p>The port on which the RouterOS server provides the API service.</p></em></td>
+</tr>
+<tr>
+<th>$persist</th>
+<td>bool</td>
+<td><em><p>Whether or not the connection should be a persistent one.</p></em></td>
+</tr>
+<tr>
+<th>$timeout</th>
+<td>float</td>
+<td><em><p>The timeout for the connection.</p></em></td>
+</tr>
+<tr>
+<th>$key</th>
+<td>string</td>
+<td><em><p>A string that uniquely identifies the connection.</p></em></td>
+</tr>
+<tr>
+<th>$context</th>
+<td>resource</td>
+<td><em><p>A context for the socket.</p></em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\sendWord()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Communicator::close()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">close</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description">Closes the opened connection, even if it is a persistent one.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td>TRUE on success, FALSE on failure.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Communicator::decodeLength()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">decodeLength</span><span class="nb-faded-text">(
+          \PEAR2\Net\Transmitter\StreamTransmitter $trans
+          )
+        </span>
+        :
+          int</code><div class="description">
+<span class="attribute">static</span><p class="short_description">Decodes the lenght of the incoming message.</p>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>Decodes the lenght of the incoming message, as specified by the RouterOS
+API.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$trans</th>
+<td>\PEAR2\Net\Transmitter\StreamTransmitter</td>
+<td><em><p>The transmitter from which to decode the length of the incoming message.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>int</td>
+<td>The decoded length</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Communicator::encodeLength()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">encodeLength</span><span class="nb-faded-text">(
+          int $length
+          )
+        </span>
+        :
+          string</code><div class="description">
+<span class="attribute">static</span><p class="short_description">Encodes the length as requred by the RouterOS API.</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$length</th>
+<td>int</td>
+<td><em><p>The length to encode</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>The encoded length</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Communicator::getCharset()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getCharset</span><span class="nb-faded-text">(
+          int $charsetType
+          )
+        </span>
+        :
+          string|array</code><div class="description"><p class="short_description">Gets the charset(s) for this connection.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$charsetType</th>
+<td>int</td>
+<td><em><p>Which charset to get. Valid values are the CHARSET_* constants. Any other value is treated as {@link CHARSET_ALL}.</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string|array</td>
+<td>The current charset. If $charsetType is {@link CHARSET_ALL}, the current values will be returned as an array with the types as keys, and charsets as values.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\getDefaultCharset()
+         
+    </dd>
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\setCharset()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Communicator::getDefaultCharset()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getDefaultCharset</span><span class="nb-faded-text">(
+          int $charsetType
+          )
+        </span>
+        :
+          string|array</code><div class="description">
+<span class="attribute">static</span><p class="short_description">Gets the default charset(s).</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$charsetType</th>
+<td>int</td>
+<td><em><p>Which charset to get. Valid values are the CHARSET_* constants. Any other value is treated as {@link CHARSET_ALL}.</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string|array</td>
+<td>The current charset. If $charsetType is {@link CHARSET_ALL}, the current values will be returned as an array with the types as keys, and charsets as values.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\setDefaultCharset()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Communicator::getNextWord()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getNextWord</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Get the next word in queue as a string.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Get the next word in queue as a string, after automatically decoding its
+length.</p>
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>The word.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\close()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Communicator::getNextWordAsStream()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getNextWordAsStream</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          resource</code><div class="description"><p class="short_description">Get the next word in queue as a stream.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Get the next word in queue as a stream, after automatically decoding its
+length.</p>
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>resource</td>
+<td>The word, as a stream.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\close()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Communicator::getTransmitter()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getTransmitter</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          \PEAR2\Net\Transmitter\SocketClientTransmitter</code><div class="description"><p class="short_description">Gets the transmitter for this connection.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\PEAR2\Net\Transmitter\SocketClientTransmitter</td>
+<td>The transmitter for this connection.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Communicator::iconvStream()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">iconvStream</span><span class="nb-faded-text">(
+          string $in_charset, string $out_charset, resource $stream
+          )
+        </span>
+        :
+          resource</code><div class="description">
+<span class="attribute">static</span><p class="short_description">Uses iconv to convert a stream from one charset to another.</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$in_charset</th>
+<td>string</td>
+<td><em><p>The charset of the stream.</p></em></td>
+</tr>
+<tr>
+<th>$out_charset</th>
+<td>string</td>
+<td><em><p>The desired resulting charset.</p></em></td>
+</tr>
+<tr>
+<th>$stream</th>
+<td>resource</td>
+<td><em><p>The stream to convert.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>resource</td>
+<td>A new stream that uses the $out_charset. The stream is a subset from the original stream, from its current position to its end.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Communicator::sendWord()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">sendWord</span><span class="nb-faded-text">(
+          string $word
+          )
+        </span>
+        :
+          int</code><div class="description"><p class="short_description">Sends a word.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Sends a word and automatically encodes its length when doing so.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$word</th>
+<td>string</td>
+<td><em><p>The word to send.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>int</td>
+<td>The number of bytes sent.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\sendWordFromStream()
+         
+    </dd>
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\getNextWord()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Communicator::sendWordFromStream()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">sendWordFromStream</span><span class="nb-faded-text">(
+          string $prefix, resource $stream
+          )
+        </span>
+        :
+          int</code><div class="description"><p class="short_description">Sends a word based on a stream.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Sends a word based on a stream and automatically encodes its length when
+doing so. The stream is read from its current position to its end, and
+then returned to its current position. Because of those operations, the
+supplied stream must be seekable.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$prefix</th>
+<td>string</td>
+<td><em><p>A string to prepend before the stream contents.</p></em></td>
+</tr>
+<tr>
+<th>$stream</th>
+<td>resource</td>
+<td><em><p>The stream to send.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>int</td>
+<td>The number of bytes sent.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\sendWord()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Communicator::setCharset()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setCharset</span><span class="nb-faded-text">(
+          mixed $charset, int $charsetType
+              =
+              self::CHARSET_ALL
+          )
+        </span>
+        :
+          string|array</code><div class="description"><p class="short_description">Sets the charset(s) for this connection.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Sets the charset(s) for this connection. The specified charset(s) will be
+used for all future words. When sending, {@link CHARSET_LOCAL} is
+converted to {@link CHARSET_REMOTE}, and when receiving,
+{@link CHARSET_REMOTE} is converted to {@link CHARSET_LOCAL}. Setting
+NULL to either charset will disable charset convertion, and data will be
+both sent and received "as is".</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$charset</th>
+<td>mixed</td>
+<td><em><p>The charset to set. If $charsetType is {@link CHARSET_ALL}, you can supply either a string to use for all charsets, or an array with the charset types as keys, and the charsets as values.</p>
+</em></td>
+</tr>
+<tr>
+<th>$charsetType</th>
+<td>int</td>
+<td><em><p>Which charset to set. Valid values are the Communicator::CHARSET_* constants. Any other value is treated as {@link CHARSET_ALL}.</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string|array</td>
+<td>The old charset. If $charsetType is {@link CHARSET_ALL}, the old values will be returned as an array with the types as keys, and charsets as values.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\setDefaultCharset()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Communicator::setDefaultCharset()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setDefaultCharset</span><span class="nb-faded-text">(
+          mixed $charset, int $charsetType
+              =
+              self::CHARSET_ALL
+          )
+        </span>
+        :
+          string|array</code><div class="description">
+<span class="attribute">static</span><p class="short_description">Sets the default charset(s) for new connections.</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$charset</th>
+<td>mixed</td>
+<td><em><p>The charset to set. If $charsetType is {@link CHARSET_ALL}, you can supply either a string to use for all charsets, or an array with the charset types as keys, and the charsets as values.</p>
+</em></td>
+</tr>
+<tr>
+<th>$charsetType</th>
+<td>int</td>
+<td><em><p>Which charset to set. Valid values are the CHARSET_* constants. Any other value is treated as {@link CHARSET_ALL}.</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string|array</td>
+<td>The old charset. If $charsetType is {@link CHARSET_ALL}, the old values will be returned as an array with the types as keys, and charsets as values.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\setCharset()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Communicator::verifyLengthSupport()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">verifyLengthSupport</span><span class="nb-faded-text">(
+          int $length
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">static</span><p class="short_description">Verifies that the length is supported.</p>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>Verifies if the specified length is supported by the API. Throws a
+{@link LengthException} if that's not the case. Currently, RouterOS
+supports words up to 0xFFFFFFF in length, so that's the only check
+performed.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$length</th>
+<td>int</td>
+<td><em><p>The length to verify.</p></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.14.1</a>.
+    </small></body></html>

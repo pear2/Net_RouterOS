@@ -1,0 +1,1035 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>PEAR2_Net_Transmitter documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/black-tie/jquery-ui-1.8.2.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script type="text/javascript" src="js/menu.js"></script><script>
+
+      function filterElements()
+      {
+        inherited = !$('a#show-inherited').hasClass('deselected');
+        public    = !$('a#show-public').hasClass('deselected');
+        protected = !$('a#show-protected').hasClass('deselected');
+        private   = !$('a#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+        $('div.file-nav').show();
+
+        $('a#show-public, a#show-protected, a#show-private, a#show-inherited').click(function(){
+            $(this).toggleClass('deselected');
+            if ($(this).hasClass('deselected')) {
+              $(this).fadeTo('fast', '0.4');
+            } else {
+              $(this).fadeTo('fast', '1.0');
+            }
+            filterElements();
+            return false;
+        });
+        $('a#show-protected, a#show-private').click();
+
+      });
+      
+    </script><h1 class="file">\Client.php</h1>
+<div class="file-nav">
+<ul id="file-nav">
+<li><a href="#top">Global</a></li>
+<li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                      Classes
+                  </a><ul><li><a href="#%5CPEAR2%5CNet%5CRouterOS%5CClient">\PEAR2\Net\RouterOS\Client</a></li></ul>
+</li>
+</ul>
+<div style="float: right;padding-right: 20px;">
+              Show:
+              <a href="#" id="show-public"><img src="images/icons/visibility_public.png"></a><a href="#" id="show-protected"><img src="images/icons/visibility_protected.png"></a><a href="#" id="show-private"><img src="images/icons/visibility_private.png"></a><a href="#" id="show-inherited"><span class="attribute">inherited</span></a>
+</div>
+</div>
+<a name="top" class="anchor"></a><div id="file-description">
+<p class="short-description">RouterOS API client implementation.</p>
+<div class="long-description"><p>This package allows you to read and write information from a RouterOS host using MikroTik's RouterOS API.</p>
+
+<p>PHP version 5</p>
+</div>
+</div>
+<dl class="file-info">
+<dt>Author</dt>
+<dd>
+<a href="mailto:boen.robot@gmail.com">Vasil Rangelov</a>
+         
+    </dd>
+<dt>Category</dt>
+<dd>Net
+         
+    </dd>
+<dt>Copyright</dt>
+<dd>2011 Vasil Rangelov
+         
+    </dd>
+<dt>License</dt>
+<dd>
+<a href="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</a>
+         
+    </dd>
+<dt>Link</dt>
+<dd>
+<a href="http://netrouteros.sourceforge.net/">http://netrouteros.sourceforge.net/</a>
+         
+    </dd>
+<dt>Package</dt>
+<dd>PEAR2_Net_RouterOS
+         
+    </dd>
+<dt>Version</dt>
+<dd>1.0.0b1
+         
+    </dd>
+</dl>
+<a name="classes" class="anchor"></a><a id="\PEAR2\Net\RouterOS\Client" class="anchor"></a><h2 class="class">\PEAR2\Net\RouterOS\Client<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div class="class">
+<small class="package"><b>Package: </b>PEAR2\Net\RouterOS</small><p class="short-description">A RouterOS client.</p>
+<div class="long-description"><p>Provides functionality for easily communicating with a RouterOS host.</p>
+</div>
+<dl class="class-info">
+<dt>Author</dt>
+<dd>
+<a href="mailto:boen.robot@gmail.com">Vasil Rangelov</a>
+         
+    </dd>
+<dt>Category</dt>
+<dd>Net
+         
+    </dd>
+<dt>License</dt>
+<dd>
+<a href="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</a>
+         
+    </dd>
+<dt>Link</dt>
+<dd>
+<a href="http://netrouteros.sourceforge.net/">http://netrouteros.sourceforge.net/</a>
+         
+    </dd>
+</dl>
+<h3>Constants</h3>
+<div>
+<a id="\PEAR2\Net\RouterOS\Client::FILTER_CALLBACK" class="anchor"></a><div class="constant publicC">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">FILTER_CALLBACK</span>
+                = 1</code><div class="description"><p class="short-description">Used in {@link isRequestActive()} to limit search only to requests
+that have a callback.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<dl class="constant-info"></dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::FILTER_BUFFER" class="anchor"></a><div class="constant publicC">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">FILTER_BUFFER</span>
+                = 2</code><div class="description"><p class="short-description">Used in {@link isRequestActive()} to limit search only to requests
+that use the buffer.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<dl class="constant-info"></dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::FILTER_ALL" class="anchor"></a><div class="constant publicC">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">FILTER_ALL</span>
+                = 3</code><div class="description"><p class="short-description">Used in {@link isRequestActive()} to indicate no limit in search.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<dl class="constant-info"></dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Properties</h3>
+<div>
+<a id="\PEAR2\Net\RouterOS\Client::$_streamResponses" class="anchor"></a><div class="property private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private">bool
+                 <span class="highlight">$_streamResponses</span>= 'false'
+                </code><div class="description">
+<p class="short-description"></p>Whether to stream future responses.</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>false</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>bool</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::$callbacks" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$callbacks</span>= 'array('
+                </code><div class="description">
+<p class="short-description"></p>An array of callbacks to be executed as responses come. Key is the tag of the request, and the value is the callback for it.</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>array(</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::$com" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\PEAR2\Net\RouterOS\Communicator
+                 <span class="highlight">$com</span>= ''
+                </code><div class="description">
+<p class="short-description"></p>The communicator for this client.</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_Communicator.html#%5CPEAR2%5CNet%5CRouterOS%5CCommunicator">\PEAR2\Net\RouterOS\Communicator</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::$pendingRequestsCount" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">int
+                 <span class="highlight">$pendingRequestsCount</span>= '0'
+                </code><div class="description">
+<p class="short-description"></p>The number of currently pending requests.</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>0</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>int</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::$responseBuffer" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$responseBuffer</span>= 'array('
+                </code><div class="description">
+<p class="short-description"></p>An array of responses that have not yet been extracted or passed to a callback. Key is the tag of the request, and the value is an array of associated responses.</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>array(</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\PEAR2\Net\RouterOS\Client::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          string $host, string $username, string $password
+              =
+              '', int $port
+              =
+              8728, bool $persist
+              =
+              false, float $timeout
+              =
+              null, resource $context
+              =
+              null
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Opens a new instance of a RouterOS API client.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Opens a new instance of a RouterOS API client with the specified
+settings.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$host</th>
+<td>string</td>
+<td><em><p>Hostname (IP or domain) of the RouterOS server.</p>
+</em></td>
+</tr>
+<tr>
+<th>$username</th>
+<td>string</td>
+<td><em><p>The RouterOS username.</p></em></td>
+</tr>
+<tr>
+<th>$password</th>
+<td>string</td>
+<td><em><p>The RouterOS password.</p></em></td>
+</tr>
+<tr>
+<th>$port</th>
+<td>int</td>
+<td><em><p>The port on which the RouterOS server provides the API service.</p></em></td>
+</tr>
+<tr>
+<th>$persist</th>
+<td>bool</td>
+<td><em><p>Whether or not the connection should be a persistent one.</p></em></td>
+</tr>
+<tr>
+<th>$timeout</th>
+<td>float</td>
+<td><em><p>The timeout for the connection.</p></em></td>
+</tr>
+<tr>
+<th>$context</th>
+<td>resource</td>
+<td><em><p>A context for the socket.</p></em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\sendSync()
+         
+    </dd>
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\sendAsync()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::cancelRequest()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">cancelRequest</span><span class="nb-faded-text">(
+          string $tag
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_Client.html#%5CPEAR2%5CNet%5CRouterOS%5CClient">\PEAR2\Net\RouterOS\Client</a></code><div class="description"><p class="short_description">Cancels a request.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Cancels an active request. Using this function in favor of a plain call
+to the "/cancel" command is highly reccomended, as it also updates the
+counter of pending requests properly. Note that canceling a request also
+removes any responses for it that were not previously extracted with
+{@link extractNewResponses()}.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$tag</th>
+<td>string</td>
+<td><em><p>Tag of the request to cancel. Setting NULL will cancel all requests.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Client.html#%5CPEAR2%5CNet%5CRouterOS%5CClient">\PEAR2\Net\RouterOS\Client</a></td>
+<td>The client object.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\sendAsync()
+         
+    </dd>
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\close()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::close()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">close</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description">Closes the opened connection, even if it is a persistent one.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Closes the opened connection, even if it is a persistent one. Note that
+{@link extractNewResponses()} can still be used to extract responses
+collected prior to the closing.</p>
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td>TRUE on success, FALSE on failure.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::completeRequest()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">completeRequest</span><span class="nb-faded-text">(
+          string $tag
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_ResponseCollection.html#%5CPEAR2%5CNet%5CRouterOS%5CResponseCollection">\PEAR2\Net\RouterOS\ResponseCollection</a></code><div class="description"><p class="short_description">Completes a specified request.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Starts an event loop for the RouterOS callbacks and finishes when a
+specified request is completed.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$tag</th>
+<td>string</td>
+<td><em><p>The tag of the request to complete. Setting NULL completes all requests.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ResponseCollection.html#%5CPEAR2%5CNet%5CRouterOS%5CResponseCollection">\PEAR2\Net\RouterOS\ResponseCollection</a></td>
+<td>A collection of {@link Response} objects that haven't been passed to a callback function or previously extracted with {@link extractNewResponses()}. Returns an empty collection when $tag is set to NULL (responses can still be extracted).</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::dispatchNextResponse()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">dispatchNextResponse</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Response.html#%5CPEAR2%5CNet%5CRouterOS%5CResponse">\PEAR2\Net\RouterOS\Response</a></code><div class="description"><p class="short_description">Dispatches the next response in queue.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Dispatches the next response in queue, i.e. it executes the associated
+callback if there is one, or places the response in the response buffer.</p>
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Response.html#%5CPEAR2%5CNet%5CRouterOS%5CResponse">\PEAR2\Net\RouterOS\Response</a></td>
+<td>The dispatched response.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::extractNewResponses()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">extractNewResponses</span><span class="nb-faded-text">(
+          string $tag
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_ResponseCollection.html#%5CPEAR2%5CNet%5CRouterOS%5CResponseCollection">\PEAR2\Net\RouterOS\ResponseCollection</a></code><div class="description"><p class="short_description">Extracts responses for a request.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Gets all new responses for a request that haven't been passed to a
+callback and clears the buffer from them.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$tag</th>
+<td>string</td>
+<td><em><p>The tag of the request to extract new responses for. Specifying NULL with extract new responses for all requests.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ResponseCollection.html#%5CPEAR2%5CNet%5CRouterOS%5CResponseCollection">\PEAR2\Net\RouterOS\ResponseCollection</a></td>
+<td>A collection of {@link Response} objects for the specified request.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\loop()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::getCharset()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getCharset</span><span class="nb-faded-text">(
+          int $charsetType
+          )
+        </span>
+        :
+          string|array</code><div class="description"><p class="short_description">Gets the charset(s) for this connection.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$charsetType</th>
+<td>int</td>
+<td><em><p>Which charset to get. Valid values are the Communicator::CHARSET_* constants. Any other value is treated as {@link Communicator::CHARSET_ALL}.</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string|array</td>
+<td>The current charset. If $charsetType is {@link Communicator::CHARSET_ALL}, the current values will be returned as an array with the types as keys, and charsets as values.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\setCharset()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::getPendingRequestsCount()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getPendingRequestsCount</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          int</code><div class="description"><p class="short_description">Gets the number of pending requests.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>int</td>
+<td>The number of pending requests.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\isRequestActive()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::getStreamResponses()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getStreamResponses</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description">Gets response streaming setting.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Gets whether future responses are streamed.</p>
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td>The value of the setting.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\setStreamResponses()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::isRequestActive()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">isRequestActive</span><span class="nb-faded-text">(
+          string $tag, int $filter
+              =
+              self::FILTER_ALL
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description">Checks if a request is active.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Checks if a request is active. A request is considered active if it's a
+pending request and/or has responses that are not yet extracted.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$tag</th>
+<td>string</td>
+<td><em><p>The tag of the request to look for.</p></em></td>
+</tr>
+<tr>
+<th>$filter</th>
+<td>int</td>
+<td><em><p>One of the FILTER_* consntants. Limits the search to the specified places.</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td>TRUE if the request is active, FALSE otherwise.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\getPendingRequestsCount()
+         
+    </dd>
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\completeRequest()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::login()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">login</span><span class="nb-faded-text">(
+          <a href="db_Communicator.html#%5CPEAR2%5CNet%5CRouterOS%5CCommunicator">\PEAR2\Net\RouterOS\Communicator</a> $com, string $username, string $password
+              =
+              ''
+          )
+        </span>
+        :
+          bool</code><div class="description">
+<span class="attribute">static</span><p class="short_description">Login to a RouterOS connection.</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$com</th>
+<td><a href="db_Communicator.html#%5CPEAR2%5CNet%5CRouterOS%5CCommunicator">\PEAR2\Net\RouterOS\Communicator</a></td>
+<td><em><p>The communicator to attempt to login to.</p></em></td>
+</tr>
+<tr>
+<th>$username</th>
+<td>string</td>
+<td><em><p>The RouterOS username.</p></em></td>
+</tr>
+<tr>
+<th>$password</th>
+<td>string</td>
+<td><em><p>The RouterOS password.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td>TRUE on success, FALSE on failure.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::loop()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loop</span><span class="nb-faded-text">(
+          float $timeout
+              =
+              0
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description">Starts an event loop for the RouterOS callbacks.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Starts an event loop for the RouterOS callbacks and finishes when there
+are no more pending requests or when a specified timeout has passed
+(whichever comes first).</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$timeout</th>
+<td>float</td>
+<td><em><p>Timeout for the loop. If 0, there is no time limit.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td>TRUE when there are any more pending requests, FALSE otherwise.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\extractNewResponses()
+         
+    </dd>
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\getPendingRequestsCount()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::send()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">send</span><span class="nb-faded-text">(
+          <a href="db_Request.html#%5CPEAR2%5CNet%5CRouterOS%5CRequest">\PEAR2\Net\RouterOS\Request</a> $request
+          )
+        </span>
+        :
+          <a href="db_Client.html#%5CPEAR2%5CNet%5CRouterOS%5CClient">\PEAR2\Net\RouterOS\Client</a></code><div class="description"><p class="short_description">Sends a request to RouterOS.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$request</th>
+<td><a href="db_Request.html#%5CPEAR2%5CNet%5CRouterOS%5CRequest">\PEAR2\Net\RouterOS\Request</a></td>
+<td><em><p>The request to send.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Client.html#%5CPEAR2%5CNet%5CRouterOS%5CClient">\PEAR2\Net\RouterOS\Client</a></td>
+<td>The client object.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\sendSync()
+         
+    </dd>
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\sendAsync()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::sendAsync()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">sendAsync</span><span class="nb-faded-text">(
+          <a href="db_Request.html#%5CPEAR2%5CNet%5CRouterOS%5CRequest">\PEAR2\Net\RouterOS\Request</a> $request, callback $callback
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_Client.html#%5CPEAR2%5CNet%5CRouterOS%5CClient">\PEAR2\Net\RouterOS\Client</a></code><div class="description"><p class="short_description">Sends a request and waits for responses.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$request</th>
+<td><a href="db_Request.html#%5CPEAR2%5CNet%5CRouterOS%5CRequest">\PEAR2\Net\RouterOS\Request</a></td>
+<td><em><p>The request to send.</p></em></td>
+</tr>
+<tr>
+<th>$callback</th>
+<td>callback</td>
+<td><em><p>Optional. A function that is to be executed when new responses for this request are available. The callback takes two parameters. The {@link Response} object as the first, and the {@link Client} object as the second one. If the function returns TRUE, the request is canceled. Note that the callback may be executed one last time after that with a response that notifies about the canceling.</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Client.html#%5CPEAR2%5CNet%5CRouterOS%5CClient">\PEAR2\Net\RouterOS\Client</a></td>
+<td>The client object.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\completeRequest()
+         
+    </dd>
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\loop()
+         
+    </dd>
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\cancelRequest()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::sendSync()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">sendSync</span><span class="nb-faded-text">(
+          <a href="db_Request.html#%5CPEAR2%5CNet%5CRouterOS%5CRequest">\PEAR2\Net\RouterOS\Request</a> $request
+          )
+        </span>
+        :
+          <a href="db_ResponseCollection.html#%5CPEAR2%5CNet%5CRouterOS%5CResponseCollection">\PEAR2\Net\RouterOS\ResponseCollection</a></code><div class="description"><p class="short_description">Sends a request and gets the full response.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$request</th>
+<td><a href="db_Request.html#%5CPEAR2%5CNet%5CRouterOS%5CRequest">\PEAR2\Net\RouterOS\Request</a></td>
+<td><em><p>The request to send.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ResponseCollection.html#%5CPEAR2%5CNet%5CRouterOS%5CResponseCollection">\PEAR2\Net\RouterOS\ResponseCollection</a></td>
+<td>The received responses as a collection.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\sendAsync()
+         
+    </dd>
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\close()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::setCharset()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setCharset</span><span class="nb-faded-text">(
+          mixed $charset, int $charsetType
+              =
+              Communicator::CHARSET_ALL
+          )
+        </span>
+        :
+          string|array</code><div class="description"><p class="short_description">Sets the charset(s) for this connection.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Sets the charset(s) for this connection. The specified charset(s) will be
+used for all future requests and responses. When sending,
+{@link Communicator::CHARSET_LOCAL} is converted to
+{@link Communicator::HARSET_REMOTE}, and when receiving,
+{@link Communicator::CHARSET_REMOTE} is converted to
+{@link Communicator::CHARSET_LOCAL}. Setting NULL to either charset will
+disable charset convertion, and data will be both sent and received "as
+is".</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$charset</th>
+<td>mixed</td>
+<td><em><p>The charset to set. If $charsetType is {@link Communicator::CHARSET_ALL}, you can supply either a string to use for all charsets, or an array with the charset types as keys, and the charsets as values.</p>
+</em></td>
+</tr>
+<tr>
+<th>$charsetType</th>
+<td>int</td>
+<td><em><p>Which charset to set. Valid values are the Communicator::CHARSET_* constants. Any other value is treated as {@link Communicator::CHARSET_ALL}.</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string|array</td>
+<td>The old charset. If $charsetType is {@link Communicator::CHARSET_ALL}, the old values will be returned as an array with the types as keys, and charsets as values.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>
+<a href="db_Communicator.html#%5CPEAR2%5CNet%5CRouterOS%5CCommunicator::setDefaultCharset()">\PEAR2\Net\RouterOS\Communicator::setDefaultCharset()</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Client::setStreamResponses()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setStreamResponses</span><span class="nb-faded-text">(
+          bool $streamResponses
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description">Sets response streaming setting.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Sets whether future responses are streamed. If responses are streamed,
+the argument values are returned as streams instead of strings. This is
+particularly useful if you expect a response that may contain one or more
+very large words.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$streamResponses</th>
+<td>bool</td>
+<td><em><p>Whether to stream future responses.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td>The previous value of the setting.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\PEAR2\Net\RouterOS\getStreamResponses()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.14.1</a>.
+    </small></body></html>
