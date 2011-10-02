@@ -101,7 +101,22 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             '/ip arp add comment="hello world"' => '/ip/arp/add',
             '/ip arp add comment=hello world' => '/ip/arp/add',
             
+            '/ip/arp/print details=' => '/ip/arp/print',
+            '/ip/arp/add address=192.168.0.1' => '/ip/arp/add',
             '/ip/arp/add address="192.168.0.1"' => '/ip/arp/add',
+            '/ip/arp/add comment="hello world"' => '/ip/arp/add',
+            '/ip/arp/add comment=hello world' => '/ip/arp/add',
+            
+            '/ip/arp/add address=192.168.0.1 comment=hello world'
+                => '/ip/arp/add',
+            '/ip/arp/add address="192.168.0.1" comment=hello world'
+                => '/ip/arp/add',
+            '/ip/arp/add address=192.168.0.1 comment="hello world"'
+                => '/ip/arp/add',
+            '/ip/arp add address="192.168.0.1" comment="hello world"'
+                => '/ip/arp/add',
+            '/ip/arp/add comment="hello world"' => '/ip/arp/add',
+            '/ip/arp/add comment=hello world' => '/ip/arp/add',
             
             '/ping address=192.168.0.1' => '/ping',
             '/ping address="192.168.0.1"' => '/ping',
@@ -109,6 +124,104 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             '/ping address="192.168.0.1" count=2' => '/ping',
             '/ping address=192.168.0.1 count="2"' => '/ping',
             '/ping address="192.168.0.1" count="2"' => '/ping'
+        );
+        foreach ($commands as $command => $expected) {
+            $request = new Request($command);
+            $this->assertEquals(
+                $expected, $request->getCommand(),
+                "Command '{$command}' was not parsed properly."
+            );
+        }
+    }
+
+    public function testCommandArgumentParsing()
+    {
+        $commands = array(
+            '/ip arp print details=' => array('details' => ''),
+            '/ip arp add address=192.168.0.1'
+                => array('address' => '192.168.0.1'),
+            '/ip arp add address="192.168.0.1"'
+                => array('address' => '192.168.0.1'),
+            '/ip arp add comment="hello world"'
+                => array('comment' => 'hello world'),
+            '/ip arp add comment=hello world'
+                => array('comment' => 'hello', 'world' => ''),
+            
+            '/ip arp add address=192.168.0.1 comment=hello world'
+                => array(
+                    'address' => '192.168.0.1',
+                    'comment' => 'hello',
+                    'world' => ''
+                   ),
+            '/ip arp add address="192.168.0.1" comment=hello world'
+                => array(
+                    'address' => '192.168.0.1',
+                    'comment' => 'hello',
+                    'world' => ''
+                   ),
+            '/ip arp add address=192.168.0.1 comment="hello world"'
+                => array(
+                    'address' => '192.168.0.1',
+                    'comment' => 'hello world'
+                   ),
+            '/ip arp add address="192.168.0.1" comment="hello world"'
+                => array(
+                    'address' => '192.168.0.1',
+                    'comment' => 'hello world'
+                   ),
+            '/ip arp add comment="hello world"'
+                => array('comment' => 'hello world'),
+            '/ip arp add comment=hello world'
+                => array('comment' => 'hello', 'world' => ''),
+            
+            
+            '/ip/arp/print details=' => array('details' => ''),
+            '/ip/arp/add address=192.168.0.1'
+                => array('address' => '192.168.0.1'),
+            '/ip/arp/add address="192.168.0.1"'
+                => array('address' => '192.168.0.1'),
+            '/ip/arp/add comment="hello world"'
+                => array('comment' => 'hello world'),
+            '/ip/arp/add comment=hello world'
+                => array('comment' => 'hello', 'world' => ''),
+            
+            '/ip/arp/add address=192.168.0.1 comment=hello world'
+                => array(
+                    'address' => '192.168.0.1',
+                    'comment' => 'hello',
+                    'world' => ''
+                   ),
+            '/ip/arp/add address="192.168.0.1" comment=hello world'
+                => array(
+                    'address' => '192.168.0.1',
+                    'comment' => 'hello',
+                    'world' => ''
+                   ),
+            '/ip/arp/add address=192.168.0.1 comment="hello world"'
+                => array(
+                    'address' => '192.168.0.1',
+                    'comment' => 'hello world'
+                   ),
+            '/ip/arp/add address="192.168.0.1" comment="hello world"'
+                => array(
+                    'address' => '192.168.0.1',
+                    'comment' => 'hello world'
+                   ),
+            '/ip/arp/add comment="hello world"'
+                => array('comment' => 'hello world'),
+            '/ip/arp/add comment=hello world'
+                => array('comment' => 'hello', 'world' => ''),
+            
+            '/ping address=192.168.0.1' => array('address' => '192.168.0.1'),
+            '/ping address="192.168.0.1"' => array('address' => '192.168.0.1'),
+            '/ping address=192.168.0.1 count=2'
+                => array('address' => '192.168.0.1', 'count' => '2'),
+            '/ping address="192.168.0.1" count=2'
+                => array('address' => '192.168.0.1', 'count' => '2'),
+            '/ping address=192.168.0.1 count="2"'
+                => array('address' => '192.168.0.1', 'count' => '2'),
+            '/ping address="192.168.0.1" count="2"'
+                => array('address' => '192.168.0.1', 'count' => '2'),
         );
         foreach ($commands as $command => $expected) {
             $request = new Request($command);
