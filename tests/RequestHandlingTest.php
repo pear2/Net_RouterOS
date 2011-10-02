@@ -81,6 +81,44 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testCommandTranslationWithArguments()
+    {
+        $commands = array(
+            '/ip arp print details=' => '/ip/arp/print',
+            '/ip arp add address=192.168.0.1' => '/ip/arp/add',
+            '/ip arp add address="192.168.0.1"' => '/ip/arp/add',
+            '/ip arp add comment="hello world"' => '/ip/arp/add',
+            '/ip arp add comment=hello world' => '/ip/arp/add',
+            
+            '/ip arp add address=192.168.0.1 comment=hello world'
+                => '/ip/arp/add',
+            '/ip arp add address="192.168.0.1" comment=hello world'
+                => '/ip/arp/add',
+            '/ip arp add address=192.168.0.1 comment="hello world"'
+                => '/ip/arp/add',
+            '/ip arp add address="192.168.0.1" comment="hello world"'
+                => '/ip/arp/add',
+            '/ip arp add comment="hello world"' => '/ip/arp/add',
+            '/ip arp add comment=hello world' => '/ip/arp/add',
+            
+            '/ip/arp/add address="192.168.0.1"' => '/ip/arp/add',
+            
+            '/ping address=192.168.0.1' => '/ping',
+            '/ping address="192.168.0.1"' => '/ping',
+            '/ping address=192.168.0.1 count=2' => '/ping',
+            '/ping address="192.168.0.1" count=2' => '/ping',
+            '/ping address=192.168.0.1 count="2"' => '/ping',
+            '/ping address="192.168.0.1" count="2"' => '/ping'
+        );
+        foreach ($commands as $command => $expected) {
+            $request = new Request($command);
+            $this->assertEquals(
+                $expected, $request->getCommand(),
+                "Command '{$command}' was not parsed properly."
+            );
+        }
+    }
+
     public function testInvalidArgumentName()
     {
         $invalidNames = array(

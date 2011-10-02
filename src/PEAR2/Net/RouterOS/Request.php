@@ -53,6 +53,19 @@ class Request extends Message
      */
     public function __construct($command)
     {
+        /*
+         * /ip arp print deatail=
+         * /ip/arip/print detail=
+         * /ip/arp/print detail= .proplist="mac-address"
+         */
+        if (false !== $firstEquals = strpos($command, '=')
+            && false !== $spaceBeforeEquals = strrpos(
+                strstr($command, '=', true), ' '
+            )
+        ) {
+            $arguments = substr($command, $spaceBeforeEquals);
+            $command = substr($command, 0, $spaceBeforeEquals);
+        }
         $this->setCommand($command);
     }
 
