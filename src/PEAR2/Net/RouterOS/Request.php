@@ -304,6 +304,10 @@ class Request extends Message
             }
         }
         
+        if (null !== $name && ('' !== ($name = trim($name)))) {
+            $this->setArgument($name, '');
+        }
+        
     }
 
 }
