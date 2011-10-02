@@ -41,7 +41,18 @@ $srcFileTasks = array(
 $compatible->license = $package->license;
 
 $package->files['tests/bootstrap.php'] = array_merge_recursive(
-    $package->files['tests/bootstrap.php']->getArrayCopy(), $srcDirTask
+    $package->files['tests/bootstrap.php']->getArrayCopy(), $srcDirTask,
+    array(
+        'tasks:replace' => array(
+            array(
+                'attribs' => array(
+                    'from' => '../../PEAR2_Net_Transmitter.git/src/',
+                    'to' => 'php_dir',
+                    'type' => 'pear-config'
+                )
+            )
+        )
+    )
 );
 
 $package->files['docs/docblox.xml'] = array_merge_recursive(
