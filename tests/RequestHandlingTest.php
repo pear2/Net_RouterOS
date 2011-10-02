@@ -100,6 +100,16 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 => '/ip/arp/add',
             '/ip arp add comment="hello world"' => '/ip/arp/add',
             '/ip arp add comment=hello world' => '/ip/arp/add',
+            '/ip arp add address=192.168.0.1 comment=hello big world'
+                => '/ip/arp/add',
+            '/ip arp add address="192.168.0.1" comment=hello big world'
+                => '/ip/arp/add',
+            '/ip arp add address=192.168.0.1 comment="hello big world"'
+                => '/ip/arp/add',
+            '/ip arp add address="192.168.0.1" comment="hello big world"'
+                => '/ip/arp/add',
+            '/ip arp add comment="hello big world"' => '/ip/arp/add',
+            '/ip arp add comment=hello big world' => '/ip/arp/add',
             
             '/ip/arp/print details=' => '/ip/arp/print',
             '/ip/arp/add address=192.168.0.1' => '/ip/arp/add',
@@ -117,6 +127,16 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 => '/ip/arp/add',
             '/ip/arp/add comment="hello world"' => '/ip/arp/add',
             '/ip/arp/add comment=hello world' => '/ip/arp/add',
+            '/ip/arp/add address=192.168.0.1 comment=hello big world'
+                => '/ip/arp/add',
+            '/ip/arp/add address="192.168.0.1" comment=hello big world'
+                => '/ip/arp/add',
+            '/ip/arp/add address=192.168.0.1 comment="hello big world"'
+                => '/ip/arp/add',
+            '/ip/arp/add address="192.168.0.1" comment="hello big world"'
+                => '/ip/arp/add',
+            '/ip/arp/add comment="hello big world"' => '/ip/arp/add',
+            '/ip/arp/add comment=hello big world' => '/ip/arp/add',
             
             '/ping address=192.168.0.1' => '/ping',
             '/ping address="192.168.0.1"' => '/ping',
