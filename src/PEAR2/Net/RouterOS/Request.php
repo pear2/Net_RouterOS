@@ -279,7 +279,7 @@ class Request extends Message
         $name = null;
         while($string = substr($string, strlen($token))) {
             if (null === $name) {
-                if (preg_match('/^\s*([^\s=]+)/sm', $string, $matches)) {
+                if (preg_match('/^\s+([^\s=]+)/sm', $string, $matches)) {
                     $token = $matches[0];
                     $name = $matches[1];
                 }else {
@@ -287,14 +287,19 @@ class Request extends Message
                         "Parsing of argument name failed near '{$string}'", 206
                     );
                 }
-            }elseif (preg_match('/^(\s)/sm', $string, $matches)) {
+            }elseif (preg_match('/^\s/sm', $string, $matches)) {
                 //Empty argument
-                $token = $matches[0];
+                $token = '';
                 $this->setArgument($name, '');
                 $name = null;
-            }elseif (preg_match('/^="([^"]*|\\"*)"/sm', $string, $matches)
-                || preg_match('/^=(\S*)/sm', $string, $matches)
+            }elseif (preg_match('/^="(([^\\\"]|\\\")*)"/sm', $string, $matches)
             ) {
+                $token = $matches[0];
+                $this->setArgument(
+                    $name, preg_replace('/\\\"/', '"', $matches[1])
+                );
+                $name = null;
+            }elseif (preg_match('/^=([^"\s]?\S*)/sm', $string, $matches)) {
                 $token = $matches[0];
                 $this->setArgument($name, $matches[1]);
                 $name = null;
