@@ -113,7 +113,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 => '/ip/arp/add',
             '/ip/arp/add address=192.168.0.1 comment="hello world"'
                 => '/ip/arp/add',
-            '/ip/arp add address="192.168.0.1" comment="hello world"'
+            '/ip/arp/add address="192.168.0.1" comment="hello world"'
                 => '/ip/arp/add',
             '/ip/arp/add comment="hello world"' => '/ip/arp/add',
             '/ip/arp/add comment=hello world' => '/ip/arp/add',
@@ -226,7 +226,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         foreach ($commands as $command => $expected) {
             $request = new Request($command);
             $this->assertEquals(
-                $expected, $request->getCommand(),
+                $expected, $request->getAllArguments(),
                 "Command '{$command}' was not parsed properly."
             );
         }

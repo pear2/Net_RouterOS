@@ -58,13 +58,13 @@ class Request extends Message
          * /ip/arip/print detail=
          * /ip/arp/print detail= .proplist="mac-address"
          */
-        if (false !== $firstEquals = strpos($command, '=')
-            && false !== $spaceBeforeEquals = strrpos(
+        if (false !== ($firstEquals = strpos($command, '='))
+            && false !== ($spaceBeforeEquals = strrpos(
                 strstr($command, '=', true), ' '
-            )
+            ))
         ) {
-            $arguments = substr($command, $spaceBeforeEquals);
-            $command = substr($command, 0, $spaceBeforeEquals);
+            $this->parseArgumentString(substr($command, $spaceBeforeEquals));
+            $command = rtrim(substr($command, 0, $spaceBeforeEquals));
         }
         $this->setCommand($command);
     }
@@ -234,6 +234,76 @@ class Request extends Message
         }
         $bytes += $com->sendWord('');
         return $bytes;
+    }
+    
+    /**
+     * Parses the arguments of a command.
+     * 
+     * @param string $string The argument string to parse.
+     * 
+     * @return void
+     */
+    protected function parseArgumentString($string)
+    {
+        /*
+         * Grammar:
+         * 
+         * <arguments> := <explicitArgument>, (<<\s+>>, <argument>)*,
+         * <explicitArgument> := <name>, <value>
+         * <argument> := <name>, <value>?
+         * <name> := <<[^\=\s]+>>
+         * <value> := "=", (<quoted string> | <unquoted string>)
+         * <quotedString> := <<">>, <<([^"]|\\")*>>, <<">>
+         * <unquotedString> := <<\S*>>
+         */
+//        $unquotedString = '\S*';
+//        $quotedString = '"([^"]|\\")*"';
+//        $value = "=({$quotedString}|{$unquotedString})?";
+//        $name = '([^\=\s]+)';
+//        $argument = "({$name}({$value})?)";
+//        $explicitArgument = $name . $value;
+//        
+//        $argumentPattern = "/\s{$argument}\s?/sm";
+//        $argumentCount = preg_match_all(
+//            $argumentPattern, $string, $parsedArgs, PREG_PATTERN_ORDER
+//        );
+//        for ($i = 0; $i < $argumentCount; $i++) {
+//            $parsedVal = preg_match(
+//                "/^{$quotedString}$/sm", $parsedArgs[4][$i]
+//            ) ? substr($parsedArgs[4][$i], 1, strlen($parsedArgs[4][$i]) - 2)
+//              : $parsedArgs[4][$i];
+//            $this->setArgument($parsedArgs[2][$i], $parsedVal);
+//        }
+        
+        $token = '';
+        $name = null;
+        while($string = substr($string, strlen($token))) {
+            if (null === $name) {
+                if (preg_match('/^\s+([^\s=]+)/sm', $string, $matches)) {
+                    $token = $matches[0];
+                    $name = $matches[1];
+                }else {
+                    throw new InvalidArgumentException(
+                        "Parsing of argument name failed near '{$string}'", 206
+                    );
+                }
+            }elseif (preg_match('/^\s/sm', $string)) {
+                //Empty argument
+                $this->setArgument($name, '');
+                $name = null;
+            }elseif (preg_match('/^="([^"]*|\\"*)"/sm', $string, $matches)
+                || preg_match('/^=(\S*)/sm', $string, $matches)
+            ) {
+                $token = $matches[0];
+                $this->setArgument($name, $matches[1]);
+                $name = null;
+            }else {
+                throw new InvalidArgumentException(
+                    "Parsing of argument value failed near '{$string}'", 207
+                );
+            }
+        }
+        
     }
 
 }
