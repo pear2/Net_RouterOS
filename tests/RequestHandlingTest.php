@@ -193,7 +193,34 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 => array('comment' => 'hello world'),
             '/ip arp add comment=hello world'
                 => array('comment' => 'hello', 'world' => ''),
-            
+            '/ip arp add address=192.168.0.1 comment=hello big world'
+                => array(
+                    'address' => '192.168.0.1',
+                    'comment' => 'hello',
+                    'big' => '',
+                    'world' => ''
+                   ),
+            '/ip arp add address="192.168.0.1" comment=hello big world'
+                => array(
+                    'address' => '192.168.0.1',
+                    'comment' => 'hello',
+                    'big' => '',
+                    'world' => ''
+                   ),
+            '/ip arp add address=192.168.0.1 comment="hello big world"'
+                => array(
+                    'address' => '192.168.0.1',
+                    'comment' => 'hello big world'
+                   ),
+            '/ip arp add address="192.168.0.1" comment="hello big world"'
+                => array(
+                    'address' => '192.168.0.1',
+                    'comment' => 'hello big world'
+                   ),
+            '/ip arp add comment="hello big world"'
+                => array('comment' => 'hello big world'),
+            '/ip arp add comment=hello big world'
+                => array('comment' => 'hello', 'big' => '', 'world' => ''),
             
             '/ip/arp/print details=' => array('details' => ''),
             '/ip/arp/add address=192.168.0.1'
@@ -231,6 +258,34 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 => array('comment' => 'hello world'),
             '/ip/arp/add comment=hello world'
                 => array('comment' => 'hello', 'world' => ''),
+            '/ip/arp/add address=192.168.0.1 comment=hello big world'
+                => array(
+                    'address' => '192.168.0.1',
+                    'comment' => 'hello',
+                    'big' => '',
+                    'world' => ''
+                   ),
+            '/ip/arp/add address="192.168.0.1" comment=hello big world'
+                => array(
+                    'address' => '192.168.0.1',
+                    'comment' => 'hello',
+                    'big' => '',
+                    'world' => ''
+                   ),
+            '/ip/arp/add address=192.168.0.1 comment="hello big world"'
+                => array(
+                    'address' => '192.168.0.1',
+                    'comment' => 'hello big world'
+                   ),
+            '/ip/arp/add address="192.168.0.1" comment="hello big world"'
+                => array(
+                    'address' => '192.168.0.1',
+                    'comment' => 'hello big world'
+                   ),
+            '/ip/arp/add comment="hello big world"'
+                => array('comment' => 'hello big world'),
+            '/ip/arp/add comment=hello big world'
+                => array('comment' => 'hello', 'big' => '', 'world' => ''),
             
             '/ping address=192.168.0.1' => array('address' => '192.168.0.1'),
             '/ping address="192.168.0.1"' => array('address' => '192.168.0.1'),
@@ -249,6 +304,20 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 $expected, $request->getAllArguments(),
                 "Command '{$command}' was not parsed properly."
             );
+        }
+    }
+    
+    public function testCommandArgumentParsingExceptions()
+    {
+        try {
+            new Request('/ip arp add comment="""');
+        }catch(InvalidArgumentException $e) {
+            $this->assertEquals(206, $e->getCode(), 'Improper exception code');
+        }
+        try {
+            new Request('/ip arp add comment=" ""');
+        }catch(InvalidArgumentException $e) {
+            $this->assertEquals(207, $e->getCode(), 'Improper exception code');
         }
     }
 
