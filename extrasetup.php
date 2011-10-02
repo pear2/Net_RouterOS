@@ -3,7 +3,7 @@
 $transmitterPackage
     = new \PEAR2\Pyrus\Package(
         __DIR__ . DIRECTORY_SEPARATOR
-        . '../../PEAR2_Net_Transmitter@sourceforge.net/trunk/package.xml'
+        . '../../PEAR2_Net_Transmitter.git/package.xml'
     );
 unset($transmitterPackage->files['docs/docblox.xml']);
 unset($transmitterPackage->files['docs/doxygen.ini']);
