@@ -42,6 +42,27 @@ abstract class Message
      * @var string An optional tag to associate the message with.
      */
     private $_tag = null;
+    
+    /**
+     * A shorthand gateway.
+     * 
+     * This is a magic PHP method that allows you to call the object as a
+     * function. Depending on the argument given, one of the other functions in
+     * the class is invoked and its returned value is returned by this function.
+     * 
+     * @param string $name The name of an argument to get the value of, or NULL
+     * to get all arguments as an array.
+     * 
+     * @return string|array The value of the specified argument, or an array of
+     * all arguments if NULL is provided.
+     */
+    public function __invoke($name = null)
+    {
+        if (null === $name) {
+            return $this->getAllArguments();
+        }
+        return $this->getArgument($name);
+    }
 
     /**
      * Sanitizes a name of an argument (message or query one).

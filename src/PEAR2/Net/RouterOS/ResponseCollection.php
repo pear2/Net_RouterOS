@@ -77,6 +77,25 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
     }
     
     /**
+     * A shorthand gateway.
+     * 
+     * This is a magic PHP method that allows you to call the object as a
+     * function. Depending on the argument given, one of the other functions in
+     * the class is invoked and its returned value is returned by this function.
+     * 
+     * @param int $offset The offset of the desired response. Setting NULL will
+     * give the last response.
+     * 
+     * @return Response The {@link Response} at the specified index, last
+     * reponse if no index is provided or FALSE if the index is invalid or the
+     * collection is empty.
+     */
+    public function __invoke($offset = null)
+    {
+        return null === $offset ? $this->getLast() : $this[$offset];
+    }
+    
+    /**
      * Gets the whole collection as an array.
      * 
      * @return array An array with all responses, in network order.
@@ -201,6 +220,19 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
     }
 
     /**
+     * Resets the pointer to the last valid position, and returns the last
+     * response.
+     * 
+     * @return Response The last response in the collection, or FALSE if the
+     * collection is empty.
+     */
+    public function end()
+    {
+        $this->position = count($this->responses) - 1;
+        return $this->current();
+    }
+
+    /**
      * Gets the key at the current pointer position.
      * 
      * @return int The key at the current pointer position, i.e. the pointer
@@ -284,11 +316,13 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
     /**
      * Gets the last {@link Response} in the collection.
      * 
-     * @return Response The last response in the collection.
+     * @return Response The last response in the collection or FALSE if the
+     * collection is empty.
      */
     public function getLast()
     {
-        return $this->responses[count($this->responses) - 1];
+        $offset = count($this->responses) - 1;
+        return $offset > 0 ? $this->responses[$offset] : false;
     }
     
     /**

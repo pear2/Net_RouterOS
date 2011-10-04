@@ -243,62 +243,43 @@ class Request extends Message
         /*
          * Grammar:
          * 
-         * <arguments> := <explicitArgument>, (<<\s+>>, <argument>)*,
-         * <explicitArgument> := <name>, <value>
+         * <arguments> := (<<\s+>>, <argument>)*,
          * <argument> := <name>, <value>?
          * <name> := <<[^\=\s]+>>
          * <value> := "=", (<quoted string> | <unquoted string>)
          * <quotedString> := <<">>, <<([^"]|\\")*>>, <<">>
-         * <unquotedString> := <<\S*>>
+         * <unquotedString> := <<\S+>>
          */
-//        $unquotedString = '\S*';
-//        $quotedString = '"([^"]|\\")*"';
-//        $value = "=({$quotedString}|{$unquotedString})?";
-//        $name = '([^\=\s]+)';
-//        $argument = "({$name}({$value})?)";
-//        $explicitArgument = $name . $value;
-//        
-//        $argumentPattern = "/\s{$argument}\s?/sm";
-//        $argumentCount = preg_match_all(
-//            $argumentPattern, $string, $parsedArgs, PREG_PATTERN_ORDER
-//        );
-//        for ($i = 0; $i < $argumentCount; $i++) {
-//            $parsedVal = preg_match(
-//                "/^{$quotedString}$/sm", $parsedArgs[4][$i]
-//            ) ? substr($parsedArgs[4][$i], 1, strlen($parsedArgs[4][$i]) - 2)
-//              : $parsedArgs[4][$i];
-//            $this->setArgument($parsedArgs[2][$i], $parsedVal);
-//        }
         
         $token = '';
         $name = null;
-        while($string = substr($string, strlen($token))) {
+        while ($string = substr($string, strlen($token))) {
             if (null === $name) {
                 if (preg_match('/^\s+([^\s=]+)/sm', $string, $matches)) {
                     $token = $matches[0];
                     $name = $matches[1];
-                }else {
+                } else {
                     throw new InvalidArgumentException(
                         "Parsing of argument name failed near '{$string}'", 206
                     );
                 }
-            }elseif (preg_match('/^\s/sm', $string, $matches)) {
+            } elseif (preg_match('/^\s/sm', $string, $matches)) {
                 //Empty argument
                 $token = '';
                 $this->setArgument($name, '');
                 $name = null;
-            }elseif (preg_match('/^="(([^\\\"]|\\\")*)"/sm', $string, $matches)
+            } elseif (preg_match('/^="(([^\\\"]|\\\")*)"/sm', $string, $matches)
             ) {
                 $token = $matches[0];
                 $this->setArgument(
                     $name, preg_replace('/\\\"/', '"', $matches[1])
                 );
                 $name = null;
-            }elseif (preg_match('/^=(\S+)/sm', $string, $matches)) {
+            } elseif (preg_match('/^=(\S+)/sm', $string, $matches)) {
                 $token = $matches[0];
                 $this->setArgument($name, $matches[1]);
                 $name = null;
-            }else {
+            } else {
                 throw new InvalidArgumentException(
                     "Parsing of argument value failed near '{$string}'", 207
                 );
