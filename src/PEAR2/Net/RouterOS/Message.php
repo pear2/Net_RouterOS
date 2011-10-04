@@ -21,11 +21,6 @@
 namespace PEAR2\Net\RouterOS;
 
 /**
- * Using transmitters.
- */
-use PEAR2\Net\Transmitter as T;
-
-/**
  * Represents a RouterOS message.
  * 
  * @category Net
@@ -77,14 +72,8 @@ abstract class Message
      */
     public static function sanitizeArgumentValue($value)
     {
-        if (T\StreamTransmitter::isStream($value)) {
-            $meta = stream_get_meta_data($value);
-            if ($meta['seekable']) {
-                return $value;
-            }
-            throw new InvalidArgumentException(
-                'The stream must be seekable.', 201
-            );
+        if (Communicator::isSeekableStream($value)) {
+            return $value;
         } else {
             return (string) $value;
         }

@@ -354,22 +354,15 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testInvalidArgumentValue()
+    public function testNonSeekableArgumentValue()
     {
-        $invalidValues = array(
-            fopen('php://input', 'r')
-        );
-        foreach ($invalidValues as $value) {
-            try {
-                $request = new Request('/ping');
-                $request->setArgument('address', $value);
-            } catch (InvalidArgumentException $e) {
-                $this->assertEquals(
-                    201, $e->getCode(),
-                    "Improper exception thrown for the value '{$value}'."
-                );
-            }
-        }
+        $value = fopen('php://input', 'r');
+        $request = new Request('/ping');
+        $request->setArgument('address', $value);
+        $actual = $request->getArgument('address');
+        $this->assertNotSame($value, $actual);
+        $this->assertInternalType('string', $actual);
+        $this->assertStringStartsWith('Resource id #', $actual);
     }
 
     public function testInvalidQueryArgumentName()
@@ -423,21 +416,13 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testInvalidQueryArgumentValue()
+    public function testNonSeekableQueryArgumentValue()
     {
-        $invalidValues = array(
-            fopen('php://input', 'r')
-        );
-        foreach ($invalidValues as $value) {
-            try {
-                $query = Query::where('address', $value);
-            } catch (InvalidArgumentException $e) {
-                $this->assertEquals(
-                    201, $e->getCode(),
-                    "Improper exception thrown for the value '{$value}'."
-                );
-            }
-        }
+        $value = fopen('php://input', 'r');
+        $stringValue = (string) $value;
+        $query1 = Query::where('address', $stringValue);
+        $query2 = Query::where('address', $value);
+        $this->assertEquals($query1, $query2);
     }
 
     public function testArgumentRemoval()
@@ -509,7 +494,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             Communicator::encodeLength($smallLength);
         } catch (LengthException $e) {
             $this->assertEquals(
-                11, $e->getCode(),
+                12, $e->getCode(),
                 "Length '{$smallLength}' must not be encodable."
             );
             $this->assertEquals(
@@ -521,7 +506,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             Communicator::encodeLength($largeLength);
         } catch (LengthException $e) {
             $this->assertEquals(
-                12, $e->getCode(),
+                13, $e->getCode(),
                 "Length '{$largeLength}' must not be encodable."
             );
             $this->assertEquals(
@@ -557,7 +542,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 Communicator::decodeLength($trans);
             } catch (NotSupportedException $e) {
                 $this->assertEquals(
-                    13, $e->getCode(), 'Improper exception code.'
+                    14, $e->getCode(), 'Improper exception code.'
                 );
                 $this->assertEquals(
                     $controlByte, $e->getValue(), 'Improper exception value.'

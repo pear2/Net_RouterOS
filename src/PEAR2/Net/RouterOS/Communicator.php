@@ -113,6 +113,22 @@ class Communicator
     }
     
     /**
+     * Checks whether a variable is a seekable stream resource.
+     * 
+     * @param mixed $var The value to check.
+     * 
+     * @return bool TRUE if $var is a seekable stream, FALSE otherwise.
+     */
+    public static function isSeekableStream($var)
+    {
+        if (T\StreamTransmitter::isStream($var)) {
+            $meta = stream_get_meta_data($var);
+            return $meta['seekable'];
+        }
+        return false;
+    }
+    
+    /**
      * Uses iconv to convert a stream from one charset to another.
      * 
      * @param string   $in_charset  The charset of the stream.
@@ -302,6 +318,11 @@ class Communicator
      */
     public function sendWordFromStream($prefix, $stream)
     {
+        if (!self::isSeekableStream($stream)) {
+            throw new InvalidArgumentException(
+                'The stream must be seekable.', 10
+            );
+        }
         if (null !== ($remoteCharset = $this->getCharset(self::CHARSET_REMOTE))
             && null !== ($localCharset = $this->getCharset(self::CHARSET_LOCAL))
         ) {
@@ -350,7 +371,7 @@ class Communicator
     {
         if ($length > 0xFFFFFFF) {
             throw new LengthException(
-                'Words with length above 0xFFFFFFF are not supported.', 10,
+                'Words with length above 0xFFFFFFF are not supported.', 11,
                 null, $length
             );
         }
@@ -367,7 +388,7 @@ class Communicator
     {
         if ($length < 0) {
             throw new LengthException(
-                'Length must not be negative.', 11, null, $length
+                'Length must not be negative.', 12, null, $length
             );
         } elseif ($length < 0x80) {
             return chr($length);
@@ -386,7 +407,7 @@ class Communicator
                 pack('N', hexdec(substr($length, 2)));
         }
         throw new LengthException(
-            'Length must not be above 0x7FFFFFFFF.', 12, null, $length
+            'Length must not be above 0x7FFFFFFFF.', 13, null, $length
         );
     }
 
@@ -469,7 +490,7 @@ class Communicator
                     + (double) sprintf('%u', $u['~']);
             }
             throw new NotSupportedException(
-                'Unknown control byte encountered.', 13, null, $byte
+                'Unknown control byte encountered.', 14, null, $byte
             );
         } else {
             return $byte;

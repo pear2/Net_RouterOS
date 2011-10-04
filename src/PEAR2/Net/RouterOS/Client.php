@@ -112,6 +112,34 @@ class Client
             }
         }
     }
+    
+    /**
+     * A shorthand gateway.
+     * 
+     * This is a magic PHP method that allows you to call the object as a
+     * function. Depending on the argument given, one of the other functions in
+     * the class is invoked and its value is returned.
+     * 
+     * @param mixed $arg Value can be either a {@link Request} to send, which
+     * would be sent asynchoniously if it has a tag, and synchroniously if not,
+     * a number to loop with or null to complete all pending requests. Any other
+     * value is converted to string and treated as the tag of a request to
+     * complete.
+     * 
+     * @return mixed Whatever the long form function would have returned.
+     */
+    public function __invoke($arg = null)
+    {
+        if (is_int($arg) || is_double($arg)) {
+            return $this->loop($arg);
+        } elseif ($arg instanceof Request) {
+            return $arg->getTag() === null ? $this->sendSync($arg)
+                : $this->sendAsync($arg);
+        } elseif (null === $arg) {
+            return $this->completeRequest();
+        }
+        return $this->completeRequest((string) $arg);
+    }
 
     /**
      * Login to a RouterOS connection.
