@@ -118,7 +118,7 @@ class Client
      * 
      * This is a magic PHP method that allows you to call the object as a
      * function. Depending on the argument given, one of the other functions in
-     * the class is invoked and its value is returned.
+     * the class is invoked and its returned value is returned by this function.
      * 
      * @param mixed $arg Value can be either a {@link Request} to send, which
      * would be sent asynchoniously if it has a tag, and synchroniously if not,

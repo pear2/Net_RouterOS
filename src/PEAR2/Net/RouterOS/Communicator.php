@@ -113,6 +113,25 @@ class Communicator
     }
     
     /**
+     * A shorthand gateway.
+     * 
+     * This is a magic PHP method that allows you to call the object as a
+     * function. Depending on the argument given, one of the other functions in
+     * the class is invoked and its returned value is returned by this function.
+     * 
+     * @param string $string A string of the word to send, or NULL to get the
+     * next word.
+     * 
+     * @return int|string If a string is provided, returns the number of bytes
+     * sent, otherwise retuns the next word as a string.
+     */
+    public function __invoke($string = null)
+    {
+        return null === $string ? $this->getNextWord()
+            : $this->sendWord($string);
+    }
+    
+    /**
      * Checks whether a variable is a seekable stream resource.
      * 
      * @param mixed $var The value to check.
