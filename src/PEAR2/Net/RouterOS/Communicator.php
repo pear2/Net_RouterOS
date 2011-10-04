@@ -13,7 +13,7 @@
  * @copyright 2011 Vasil Rangelov
  * @license   http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
  * @version   SVN: $WCREV$
- * @link      http://netrouteros.sourceforge.net/
+ * @link      http://pear2.php.net/PEAR2_Net_RouterOS
  */
 /**
  * The namespace declaration.
@@ -38,7 +38,7 @@ use PEAR2\Net\Transmitter as T;
  * @package  PEAR2_Net_RouterOS
  * @author   Vasil Rangelov <boen.robot@gmail.com>
  * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
- * @link     http://netrouteros.sourceforge.net/
+ * @link     http://pear2.php.net/PEAR2_Net_RouterOS
  * @see      Client
  */
 class Communicator
