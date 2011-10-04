@@ -41,6 +41,11 @@ function autoload($class)
         if (is_string($file) && strpos($file, __DIR__) === 0) {
             include_once $file;
         }
+    }elseif(strpos($class, 'PEAR2\Net\Transmitter\\') === 0) {
+        $funcs = get_defined_functions();
+        if (!in_array('PEAR2\Net\Transmitter\autoload', $funcs['user'], true)) {
+            include_once 'PEAR2/Net/Transmitter/Autoload.php';
+        }
     }
 }
 
