@@ -299,7 +299,7 @@ class Request extends Message
                     $name, preg_replace('/\\\"/', '"', $matches[1])
                 );
                 $name = null;
-            }elseif (preg_match('/^=([^"\s]?\S*)/sm', $string, $matches)) {
+            }elseif (preg_match('/^=(\S+)/sm', $string, $matches)) {
                 $token = $matches[0];
                 $this->setArgument($name, $matches[1]);
                 $name = null;

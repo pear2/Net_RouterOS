@@ -84,7 +84,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
     public function testCommandTranslationWithArguments()
     {
         $commands = array(
-            '/ip arp print details=' => '/ip/arp/print',
+            '/ip arp print detail=""' => '/ip/arp/print',
             '/ip arp add address=192.168.0.1' => '/ip/arp/add',
             '/ip arp add address="192.168.0.1"' => '/ip/arp/add',
             '/ip arp add comment="hello world"' => '/ip/arp/add',
@@ -112,7 +112,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             '/ip arp add comment=hello big world' => '/ip/arp/add',
             '/ip arp add comment="\""' => '/ip/arp/add',
             
-            '/ip/arp/print details=' => '/ip/arp/print',
+            '/ip/arp/print detail=""' => '/ip/arp/print',
             '/ip/arp/add address=192.168.0.1' => '/ip/arp/add',
             '/ip/arp/add address="192.168.0.1"' => '/ip/arp/add',
             '/ip/arp/add comment="hello world"' => '/ip/arp/add',
@@ -159,7 +159,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
     public function testCommandArgumentParsing()
     {
         $commands = array(
-            '/ip arp print details=' => array('details' => ''),
+            '/ip arp print detail=""' => array('detail' => ''),
             '/ip arp add address=192.168.0.1'
                 => array('address' => '192.168.0.1'),
             '/ip arp add address="192.168.0.1"'
@@ -226,7 +226,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             '/ip arp add comment="\""'
                 => array('comment' => '"'),
             
-            '/ip/arp/print details=' => array('details' => ''),
+            '/ip/arp/print detail=""' => array('detail' => ''),
             '/ip/arp/add address=192.168.0.1'
                 => array('address' => '192.168.0.1'),
             '/ip/arp/add address="192.168.0.1"'
@@ -322,7 +322,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals(206, $e->getCode(), 'Improper exception code');
         }
         try {
-            $request = new Request('/ip arp add comment= and-then="so"me');
+            $request = new Request('/ip arp add comment= address=192.168.0.1');
             $this->fail('Command had to fail.');
         }catch(InvalidArgumentException $e) {
             $this->assertEquals(207, $e->getCode(), 'Improper exception code');
