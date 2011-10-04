@@ -322,7 +322,7 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
     public function getLast()
     {
         $offset = count($this->responses) - 1;
-        return $offset > 0 ? $this->responses[$offset] : false;
+        return $offset >= 0 ? $this->responses[$offset] : false;
     }
     
     /**

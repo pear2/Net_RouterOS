@@ -179,7 +179,7 @@ class Request extends Message
      * @return Request The request object.
      * @see getArgument()
      */
-    public function setArgument($name, $value = null)
+    public function setArgument($name, $value = '')
     {
         return parent::setArgument($name, $value);
     }
@@ -266,7 +266,7 @@ class Request extends Message
             } elseif (preg_match('/^\s/sm', $string, $matches)) {
                 //Empty argument
                 $token = '';
-                $this->setArgument($name, '');
+                $this->setArgument($name);
                 $name = null;
             } elseif (preg_match('/^="(([^\\\"]|\\\")*)"/sm', $string, $matches)
             ) {
