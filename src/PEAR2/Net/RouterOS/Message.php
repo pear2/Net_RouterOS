@@ -169,7 +169,7 @@ abstract class Message
      * @return Message The message object.
      * @see getArgument()
      */
-    protected function setArgument($name, $value = null)
+    protected function setArgument($name, $value = '')
     {
         if (null === $value) {
             unset($this->arguments[self::sanitizeArgumentName($name)]);

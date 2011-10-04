@@ -1,0 +1,7 @@
+A lot of new conviniences and a few bug fixes.
+
+* Added __invoke() at Client, Communicator, Message, Request, ResponseCollection and Query.
+* Added support for CLI argument syntax at Request constructor.
+* Added optional arguments to request constructor for a tag and a query.
+* Changed the default value of the $value of Message::setArgument from NULL to an empty string.
+* Changed ResponseCollection::getLast() to return FALSE when the collection is empty.

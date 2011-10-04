@@ -46,12 +46,15 @@ class Request extends Message
      * Creates a request to send to RouterOS.
      * 
      * @param string $command The command to send.
+     * @param string $tag     The tag for the request.
+     * @param Query  $query   A query to associate with the request.
      * 
      * @see setCommand()
      * @see setArgument()
      * @see setTag()
+     * @see setQuery()
      */
-    public function __construct($command)
+    public function __construct($command, $tag = null, Query $query = null)
     {
         if (false !== ($firstEquals = strpos($command, '='))
             && false !== ($spaceBeforeEquals = strrpos(
@@ -62,6 +65,36 @@ class Request extends Message
             $command = rtrim(substr($command, 0, $spaceBeforeEquals));
         }
         $this->setCommand($command);
+        $this->setTag($tag);
+        $this->setQuery($query);
+    }
+    
+    /**
+     * A shorthand gateway.
+     * 
+     * This is a magic PHP method that allows you to call the object as a
+     * function. Depending on the argument given, one of the other functions in
+     * the class is invoked and its returned value is returned by this function.
+     * 
+     * @param mixed $arg A {@link Query} to associate the request
+     * with, a {@link Communicator} to send the request over, or an argument to
+     * get the value of. If a second argument is provided, this becomes the name
+     * of the argument to set the value of.
+     * 
+     * @return mixed Whatever the long form function would have returned.
+     */
+    public function __invoke($arg = null)
+    {
+        if (func_num_args() > 1) {
+            return $this->setArgument(func_get_arg(0), func_get_arg(1));
+        }
+        if ($arg instanceof Query) {
+            return $this->setQuery($arg);
+        }
+        if ($arg instanceof Communicator) {
+            return $this->send($arg);
+        }
+        return parent::__invoke($arg);
     }
 
     /**
