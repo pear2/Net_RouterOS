@@ -437,6 +437,13 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         $request->removeAllArguments();
         $this->assertEmpty($request->getAllArguments());
         $this->assertEquals(null, $request->getArgument('address'));
+
+        $request->setArgument('address', HOSTNAME_INVALID);
+        $this->assertNotEmpty($request->getAllArguments());
+        $this->assertEquals(HOSTNAME_INVALID, $request->getArgument('address'));
+        $request->setArgument('address', null);
+        $this->assertEmpty($request->getAllArguments());
+        $this->assertEquals(null, $request->getArgument('address'));
     }
 
     public function testLengthEncoding()
@@ -702,6 +709,28 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             'ISO-8859-1', $com->getCharset(Communicator::CHARSET_LOCAL)
         );
         Communicator::setDefaultCharset(null);
+    }
+    
+    public function testInvokability()
+    {
+        $com = new Communicator(HOSTNAME, PORT);
+        Client::login($com, USERNAME, PASSWORD);
+        $request = new Request('/ping');
+        $request('address', HOSTNAME)->setTag('p');
+        $this->assertEquals(HOSTNAME, $request('address'));
+        $this->assertEquals('p', $request->getTag());
+        $this->assertEquals(array('address' => HOSTNAME), $request());
+        $request($com);
+        $response = new Response($com);
+        $this->assertInternalType('array', $response());
+        $this->assertEquals(HOSTNAME, $response('host'));
+        
+        $request = new Request('/queue/simple/print');
+        $query = Query::where('target-addresses', HOSTNAME_INVALID . '/32');
+        $request($query);
+        $this->assertSame($query, $request->getQuery());
+        $com('/quit');
+        $com('');
     }
 
     public function testReceivingLargeWords()

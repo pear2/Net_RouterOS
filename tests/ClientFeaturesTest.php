@@ -30,6 +30,10 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
             'string', $list[0]->getArgument('address'),
             'The address is not a string'
         );
+        $this->assertInstanceOf(
+            __NAMESPACE__ . '\Response', $list->end(),
+            'The list is empty'
+        );
     }
 
     public function testSendSyncReturningCollectionWithStreams()
@@ -79,13 +83,13 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         }
     }
     
-    public function testShortcuts()
+    public function testClientInvokability()
     {
         $obj = $this->object;
         $this->assertEquals(0, $obj->getPendingRequestsCount());
-        $obj(new Request('/ip/arp/print', 'arp'));
-        $this->assertEquals(1, $obj->getPendingRequestsCount());
         $obj(new Request('/ping address=' . HOSTNAME, 'ping'));
+        $this->assertEquals(1, $obj->getPendingRequestsCount());
+        $obj(new Request('/ip/arp/print', 'arp'));
         $this->assertEquals(2, $obj->getPendingRequestsCount());
         $obj(4);
         $pingResponses = $obj->extractNewResponses('ping');
@@ -100,6 +104,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $arpResponses2 = $obj('arp');
         $this->assertGreaterThan(0, count($arpResponses2));
         $this->assertEquals(count($arpResponses1), count($arpResponses2));
+        $this->assertInstanceOf(__NAMESPACE__ . '\Response', $arpResponses1(0));
     }
 
     public function testSendAsyncWithCallbackAndTempLoop()

@@ -220,7 +220,7 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
     }
 
     /**
-     * Resets the pointer to the last valid position, and returns the last
+     * Moves the pointer to the last valid position, and returns the last
      * response.
      * 
      * @return Response The last response in the collection, or FALSE if the
