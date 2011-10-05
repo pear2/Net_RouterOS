@@ -42,11 +42,14 @@ function autoload($class)
             include_once $file;
         }
     }elseif(strpos($class, 'PEAR2\Net\Transmitter\\') === 0) {
+        // @codeCoverageIgnoreStart
+        // Testing code explicitly includes the repository version's autoloader.
         $funcs = get_defined_functions();
         if (!in_array('PEAR2\Net\Transmitter\autoload', $funcs['user'], true)) {
             include_once 'PEAR2/Net/Transmitter/Autoload.php';
         }
     }
+    // @codeCoverageIgnoreEnd
 }
 
 spl_autoload_register(__NAMESPACE__ . '\autoload', true);
