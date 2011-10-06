@@ -3,7 +3,7 @@
     <type>org.netbeans.modules.php.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/php-project/1">
-            <name>boenrobot.github.com/PEAR2_Net_RouterOS</name>
+            <name>pear2.github.com/PEAR2_Net_RouterOS</name>
         </data>
     </configuration>
 </project>
