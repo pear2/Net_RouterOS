@@ -41,7 +41,7 @@ function autoload($class)
         if (is_string($file) && strpos($file, __DIR__) === 0) {
             include_once $file;
         }
-    }elseif(strpos($class, 'PEAR2\Net\Transmitter\\') === 0) {
+    } elseif (strpos($class, 'PEAR2\Net\Transmitter\\') === 0) {
         // @codeCoverageIgnoreStart
         // Testing code explicitly includes the repository version's autoloader.
         $funcs = get_defined_functions();
