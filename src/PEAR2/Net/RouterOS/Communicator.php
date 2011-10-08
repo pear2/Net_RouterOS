@@ -465,14 +465,14 @@ class Communicator
      */
     public function getNextWordAsStream()
     {
-        $filters = array();
+        $filters = new T\FilterCollection();
         if (null !== ($remoteCharset = $this->getCharset(self::CHARSET_REMOTE))
             && null !== ($localCharset = $this->getCharset(self::CHARSET_LOCAL))
         ) {
-            $filters[
+            $filters->append(
                 'convert.iconv.' .
                 $remoteCharset . '.' . $localCharset . '//IGNORE//TRANSLIT'
-            ] = array();
+            );
         }
         $stream = $this->trans->receiveStream(
             self::decodeLength($this->trans), $filters, 'stream word'

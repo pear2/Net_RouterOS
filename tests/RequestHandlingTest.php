@@ -416,6 +416,19 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testNonSeekableCommunicatorWord()
+    {
+        $value = fopen('php://input', 'r');
+        $com = new Communicator(HOSTNAME, PORT);
+        Client::login($com, USERNAME, PASSWORD);
+        try {
+            $com->sendWordFromStream('', $value);
+            $this->fail('Call had to fail.');
+        }catch(InvalidArgumentException $e) {
+            $this->assertEquals(10, $e->getCode(), 'Improper exception code.');
+        }
+    }
+
     public function testNonSeekableQueryArgumentValue()
     {
         $value = fopen('php://input', 'r');
