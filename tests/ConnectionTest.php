@@ -5,7 +5,10 @@ use PEAR2\Net\Transmitter as T;
 
 class ConnectionTest extends \PHPUnit_Framework_TestCase
 {
-
+    
+    /**
+     * @var int
+     */
     public static $defaultSocketTimeout;
 
     public static function setUpBeforeClass()
