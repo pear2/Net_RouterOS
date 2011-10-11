@@ -34,6 +34,12 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
             __NAMESPACE__ . '\Response', $list->end(),
             'The list is empty'
         );
+        $this->assertEquals(Response::TYPE_FINAL, $list->current()->getType());
+        $this->assertInstanceOf(
+            __NAMESPACE__ . '\Response', $list->prev(),
+            'The list is empty'
+        );
+        $this->assertEquals(Response::TYPE_DATA, $list->current()->getType());
     }
 
     public function testSendSyncReturningCollectionWithStreams()

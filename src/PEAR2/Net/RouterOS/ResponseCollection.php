@@ -220,6 +220,18 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
     }
 
     /**
+     * Moves the pointer backwards by 1, and gets the previous response.
+     * 
+     * @return Response The next {@link Response} object, or FALSE if the
+     * position is not valid.
+     */
+    public function prev()
+    {
+        --$this->position;
+        return $this->current();
+    }
+
+    /**
      * Moves the pointer to the last valid position, and returns the last
      * response.
      * 
