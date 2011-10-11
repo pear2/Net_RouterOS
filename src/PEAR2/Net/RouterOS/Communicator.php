@@ -82,7 +82,7 @@ class Communicator
     protected $charsets = array();
 
     /**
-     * @var SocketClientTransmitter The transmitter for the connection.
+     * @var TcpClient The transmitter for the connection.
      */
     protected $trans;
 
@@ -104,7 +104,7 @@ class Communicator
     public function __construct($host, $port = 8728, $persist = false,
         $timeout = null, $key = '', $context = null
     ) {
-        $this->trans = new T\SocketClientTransmitter(
+        $this->trans = new T\TcpClient(
             $host, $port, $persist, $timeout, $key, $context
         );
         $this->setCharset(
@@ -140,7 +140,7 @@ class Communicator
      */
     public static function isSeekableStream($var)
     {
-        if (T\StreamTransmitter::isStream($var)) {
+        if (T\Stream::isStream($var)) {
             $meta = stream_get_meta_data($var);
             return $meta['seekable'];
         }
@@ -286,8 +286,7 @@ class Communicator
     /**
      * Gets the transmitter for this connection.
      * 
-     * @return PEAR2\Net\Transmitter\SocketClientTransmitter The transmitter for
-     * this connection.
+     * @return T\TcpClient The transmitter for this connection.
      */
     public function getTransmitter()
     {
@@ -486,12 +485,12 @@ class Communicator
      * Decodes the lenght of the incoming message, as specified by the RouterOS
      * API.
      * 
-     * @param PEAR2\Net\Transmitter\StreamTransmitter $trans The transmitter
-     * from which to decode the length of the incoming message.
+     * @param T\Stream $trans The transmitter from which to decode the length of
+     * the incoming message.
      * 
      * @return int The decoded length
      */
-    public static function decodeLength(T\StreamTransmitter $trans)
+    public static function decodeLength(T\Stream $trans)
     {
         $byte = ord($trans->receive(1, 'initial length byte'));
         if ($byte & 0x80) {

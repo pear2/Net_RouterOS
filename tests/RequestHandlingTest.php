@@ -555,7 +555,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             fwrite($stream, chr($controlByte));
         }
         rewind($stream);
-        $trans = new T\StreamTransmitter($stream);
+        $trans = new T\Stream($stream);
 
         foreach ($controlBytes as $controlByte) {
             try {
@@ -612,7 +612,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             fwrite($stream, Communicator::encodeLength($length));
         }
         rewind($stream);
-        $trans = new T\StreamTransmitter($stream);
+        $trans = new T\Stream($stream);
 
         foreach ($lengths as $length => $expected) {
             $this->assertEquals(
