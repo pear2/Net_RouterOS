@@ -17,11 +17,11 @@
                 margin: 0 auto;
                 width: 700px;
             }
-            h1 { font-size: 3.8em; color: #FFFFFF; margin-bottom: 3px; }
-            h1 .small { font-size: 0.4em; }
-            h1 a { text-decoration: none }
-            h2 { font-size: 1.5em; color: #FFFFFF; }
-            h3 { text-align: center; color: #FFFFFF; }
+            #container > h1 { font-size: 3.8em; color: #FFFFFF; margin-bottom: 3px; }
+            #container > h1 .small { font-size: 0.4em; }
+            #container > h1 a { text-decoration: none }
+            #container > div > h2 { font-size: 1.5em; color: #FFFFFF; }
+            #container > div > div > h3 { text-align: center; color: #FFFFFF; }
             a { color: #FFFFFF; }
             .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
             .download { float: right; }
@@ -29,7 +29,11 @@
             hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
             .footer { text-align:center; padding-top:30px; font-style: italic; }
             img {border:0;}
-            #container div {background:rgb(100, 159, 67)}
+            #container > div {background:rgb(100, 159, 67)}
+            .gadget, .ohloh {background-color:#FFFFFF; color:#000000;}
+            .ohloh {overflow:hidden;}
+            .ohloh > * {width:400px;height:80%;float:left;}
+            .gadget a {color:#0000FF;}
         </style>
     </head>
 
@@ -86,6 +90,11 @@
 
             <div class="footer">
                 get the source code on GitHub : <a href="http://github.com/pear2/PEAR2_Net_RouterOS">pear2/PEAR2_Net_RouterOS</a>
+            </div>
+            <div class="ohloh">
+                <p>PEAR2_Net_RouterOS at Ohloh:</p>
+                <script type="text/javascript" src="http://www.ohloh.net/p/586575/widgets/project_basic_stats.js"></script>
+                <script type="text/javascript" src="http://www.ohloh.net/p/586575/widgets/project_users.js?style=green"></script>
             </div>
 
         </div>
