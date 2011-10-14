@@ -367,7 +367,7 @@ class Communicator
         static::verifyLengthSupport($totalLength);
 
         $bytes = $this->trans->send(self::encodeLength($totalLength) . $prefix);
-        $bytes += $this->trans->sendStream($stream);
+        $bytes += $this->trans->send($stream);
         
         flock($stream, LOCK_UN);
         return $bytes;
