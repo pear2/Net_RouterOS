@@ -66,4 +66,15 @@ The {@link Query} class uses a "fluent" interface, i.e. it always returns the qu
         </para>
         <programlisting role="php">$query = Query::where('address', '192.168.0.100', Query::ACTION_GREATHER_THAN)->orWhere('address', '192.168.0.100');</programlisting>
     </refsect1>
+    <refsect1 id="{@id limiting-returned-properties}">
+        <title>Limiting returned properties</title>
+
+        <para>The query works a little like the "WHERE" clause in an SQL statement - it limits the amount of responses returned (which can be thought of as a "record" in DB terms) - but it doesn't limit the arguments of each response (which can be thought of as "fields" in DB terms, and are often reffered to as "properties" in the RouterOS documentation).</para>
+
+        <para>To do that, you need to set an API specific argument called ".proplist". The value is a comma separated list of arguments to be listed in the responses. For example, if you were only interested in the MAC addresses, you can do:</para>
+ 
+        <programlisting role="php">$request->setArgument('.proplist', 'mac-address');</programlisting>
+        <para>or if you wanted MAC addresses and comments</para>
+        <programlisting role="php">$request->setArgument('.proplist', 'mac-address,comment');</programlisting>
+    </refsect1>
 </refentry>

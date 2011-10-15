@@ -17,7 +17,7 @@
         <para>
 RouterOS is the flag product of the company {@link http://mikrotik.com/ MikroTik}
 and is a powerful router software. One of its many abilities is to allow control over it via an API.
-This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.
+This package provides a client for {@link http://wiki.mikrotik.com/wiki/Manual:API that API}, in turn allowing you to use PHP to control RouterOS hosts.
         </para>
     </refsect1>
     <refsect1 id="{@id requirements}">
@@ -26,39 +26,42 @@ This package provides a client for that API, in turn allowing you to use PHP to 
             <listitem>PHP 5.3.0 or later.</listitem>
             <listitem>A host with RouterOS v3 or later.</listitem>
             <listitem>Enabled API service on the RouterOS host.</listitem>
+            <listitem>The PCRE extension (bundled and enabled by default in PHP).</listitem>
+            <listitem>The iconv extension (optional; bundled and enabled by default in PHP; required only if you want to use automatic charset convertion)</listitem>
+            <listitem>PEAR2_Net_Transmitter (bundled with the PEAR2_Net_RouterOS archive; installed automatically by Pyrus)</listitem>
         </itemizedlist>
         <para>
-There are no dependencies from extensions that are not bundled with PHP.
-The only dependency is the PCRE (Pearl Compatible Regular Expressions) extension, which is bundled and enabled by default in PHP.
-        </para>
-        <para>
 The API service is disabled by default. To enable it, you need to execute
-<programlisting role="cmd">/ip service set numbers="api" address="0.0.0.0/0" disabled="no"</programlisting>
+<programlisting role="sh">/ip service set numbers="api" address="0.0.0.0/0" disabled="no"</programlisting>
 at a RouterOS terminal. The "address" argument in the command above allows you to limit access to this service only to certain IP addresses. For security's sake, it's better that you limit connections only to the IP address with which PHP will access RouterOS.
         </para>
     </refsect1>
     <refsect1 id="{@id install}">
         <title>Installation</title>
+        <refsect2 id="{@id pyrus-install}">
+            <title>Installation with {@link http://pear2.php.net Pyrus/PEAR2}</title>
+
+            <para>Assuming you have {@link http://pear.php.net/manual/en/installationpyrus.introduction.php installed Pyrus}, you can install PEAR2_Net_RouterOS from the PEAR2 channel with</para>
+            <programlisting role="sh">pyrus install PEAR2_Net_RouterOS-alpha</programlisting>
+ 
+            <para>You might notice that the version number of PEAR2_Net_RouterOS suggests it's a beta, and yet we use "-alpha" in the command above. Well, yes, PEAR2_Net_RouterOS is a beta, but it has a dependency to another package - PEAR2_Net_Transmitter - which is an alpha. To avoid getting errors, you need to use "-alpha" until that package reaches a beta.</para>
+
+            <para>If you've decided to not use the PEAR2 channel, but instead install directly from the archive distributed at the project page, you can use</para>
+            <programlisting role="sh">pyrus install /path/to/downloaded/archive.tgz</programlisting>
+            <para>If you haven't installed PEAR_Net_Transmitter previously, Pyrus will install the one at the PEAR2 channel (not the bundled version, although the two are equivalent at the time of this writing).</para>
+        </refsect2>
         <refsect2 id="{@id pear-install}">
-            <title>Installation with the PEAR installer.</title>
-            <para>
-If you don't already have the pear installer, see the
-{@link http://pear.php.net/manual/en/installation.php installation instructions in the PEAR manual}. The version of the PEAR installer that is bundled with PHP 5.3.0 should be sufficient.
-            </para>
-            <para>
-To use the PEAR installer, you must have the TGZ version of the file.
-Installation is as easy as opening up a command prompt, going to the pear installer's folder and typing
-            <programlisting role="cmd">pear install "%tgz%"</programlisting>
-Replacing <emphasis>%tgz%</emphasis> with the location of the archive.
-            </para>
+            <title>Installation with PEAR.</title>
+            <para>Like most PEAR2 packages, PEAR2_Net_RouterOS is compatible with the PEAR installer. However, you have to first discover the PEAR2 channel with</para>
+            <programlisting role="sh">pear channel-discover pear2.php.net</programlisting>
+            <para>and only then install PEAR2_Net_RouterOS with</para> 
+            <programlisting role="sh">pear install pear2/PEAR2_Net_RouterOS-alpha</programlisting>
         </refsect2>
         <refsect2 id="{@id manual-install}">
             <title>Manual installation.</title>
-            <para>
-Instead of using the PEAR installer, you can also just extract the files into any directory in your include_path.
-To emulate the PEAR installer, you can simply extract the contents of the folder "src" in that folder.
-Note that the examples in the rest of the documentation assume installation with the PEAR installer.
-            </para>
+            <para>The archive includes a version of PEAR2_Net_Transmitter, so if you've downloaded the archive, instead of using the PEAR(2) installer, you can just extract the contents of the "src" folder wherever you like. To emulate the PEAR(2) installer, you can place the files in a folder that's within your include_path.</para>
+
+            <para>If you're installing from the respository, you'll have to also install PEAR2_Net_Transmitter in one way or another before you can use this package.</para>
         </refsect2>
     </refsect1>
     <refsect1 id="{@id usage}">

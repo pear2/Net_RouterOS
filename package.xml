@@ -129,7 +129,7 @@
                 <file name="bootstrap.php" role="test">
                     <tasks:replace type="pear-config" from="../src" to="php_dir" />
                 </file>
-                <file name="configuration.xml" role="test" />
+                <file name="phpunit.xml" role="test" />
             </dir>
             <dir name="examples">
                 <file name="callback-and-loop.php" role="doc" />
@@ -164,6 +164,7 @@
             <package>
                 <name>PEAR2_Net_Transmitter</name>
                 <channel>pear2.php.net</channel>
+                <min>1.0.0a2</min>
             </package>
             <extension>
                 <name>PCRE</name>
@@ -259,8 +260,8 @@
                 as="PseudoServer.php"
             />
             <install
-                name="tests/configuration.xml"
-                as="configuration.xml"
+                name="tests/phpunit.xml"
+                as="phpunit.xml"
             />
             <install
                 name="tests/bootstrap.php"
