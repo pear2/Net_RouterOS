@@ -15,12 +15,13 @@
             }
             #container {
                 margin: 0 auto;
-                width: 700px;
+                min-width: 500px;
+                width:80%;
             }
             #container > h1 { font-size: 3.8em; color: #FFFFFF; margin-bottom: 3px; }
             #container > h1 .small { font-size: 0.4em; }
             #container > h1 a { text-decoration: none }
-            #container > div > h2 { font-size: 1.5em; color: #FFFFFF; }
+            #container > div > h2 { font-size: 1.5em; color: #FFFFFF;}
             #container > div > div > h3 { text-align: center; color: #FFFFFF; }
             a { color: #FFFFFF; }
             .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
@@ -29,7 +30,11 @@
             hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
             .footer { text-align:center; padding-top:30px; font-style: italic; }
             img {border:0;}
-            #container > div {background:rgb(100, 159, 67)}
+            #container > div {background:rgb(100, 159, 67);padding:1%;border-top-left-radius:2% 8%;border-bottom-right-radius:2% 8%;border-bottom-left-radius:2% 8%;border-top-right-radius:2% 8%;border:2px solid rgb(175, 213, 223)}
+            
+            .version, .date {font-style:italic;}
+            .version {font-weight:bold;}
+            
             .gadget, .ohloh {background-color:#FFFFFF; color:#000000;}
             .ohloh {overflow:hidden;}
             .ohloh > * {width:400px;height:80%;float:left;}
@@ -45,12 +50,13 @@
             </a>
 
             <div class="download">
-                <a href="https://github.com/downloads/pear2/PEAR2_Net_RouterOS/PEAR2_Net_RouterOS-1.0.0b2.zip"><img alt="ZIP" width="90" src="http://github.com/images/modules/download/zip.png" /></a>
                 <a href="https://github.com/downloads/pear2/PEAR2_Net_RouterOS/PEAR2_Net_RouterOS-1.0.0b2.tgz"><img alt="TGZ" width="90" src="http://github.com/images/modules/download/tar.png" /></a>
+                <a href="https://github.com/downloads/pear2/PEAR2_Net_RouterOS/PEAR2_Net_RouterOS-1.0.0b2.zip"><img alt="ZIP" width="90" src="http://github.com/images/modules/download/zip.png" /></a>
             </div>
 
             <h1><a href="http://github.com/pear2/PEAR2_Net_RouterOS">PEAR2_Net_RouterOS</a>
-                <span class="small">by <a href="http://github.com/boenrobot">boenrobot</a></span></h1>
+                <span class="small">by <a href="http://github.com/boenrobot">boenrobot</a></span>
+            </h1>
 
             <div class="description">
                 This package allows you to read and write information from a RouterOS host using MikroTik's RouterOS API. Notable features include:
@@ -64,12 +70,16 @@
                 </ul>
             </div>
             <div>
+                <h2>Latest version</h2>
+                <p><span class="version">1.0.0b2</span> released on <span class="date">16 October 2011</span></p>
+            </div>
+            <div>
                 <h2>Install</h2>
-                <p>Without downloading anything, if you have Pyrus:</p>
+                <p>If you have <a href="http://pear2.php.net/">Pyrus</a>, without downloading anything:</p>
                 <pre>pyrus install PEAR2_Net_RouterOS-alpha</pre>
-                <p>Or if you download the archive from this page:</p>
+                <p>Or if you download the tgz archive from this page:</p>
                 <pre>pyrus install /path/to/downloaded/archive.tgz</pre>
-                <p>See <a href="https://github.com/pear2/PEAR2_Net_RouterOS/wiki/Getting-started">the page in the project's wiki</a> for details and further documentation.</p>
+                <p>See <a href="https://github.com/pear2/PEAR2_Net_RouterOS/wiki/Getting-started">the page in the project's wiki</a> for details and other ways of installation.</p>
             </div>
             <div>
                 <h2>License</h2>
@@ -92,7 +102,7 @@
                 get the source code on GitHub : <a href="http://github.com/pear2/PEAR2_Net_RouterOS">pear2/PEAR2_Net_RouterOS</a>
             </div>
             <div class="ohloh">
-                <p>PEAR2_Net_RouterOS at Ohloh:</p>
+                <h2>PEAR2_Net_RouterOS at Ohloh</h2>
                 <script type="text/javascript" src="http://www.ohloh.net/p/586575/widgets/project_basic_stats.js"></script>
                 <script type="text/javascript" src="http://www.ohloh.net/p/586575/widgets/project_users.js?style=green"></script>
             </div>
