@@ -3,5 +3,6 @@ Bug fixes on edge cases.
 * (GH #4) Client::completeRequest() now works with requests that use a callback.
 * Client::sendSync() now accepts requests with a tag.
 * ResponseCollection::__invoke() now seeks instead of getting.
+* At Request::__construct(), a backslash can now be escaped in an argument value.
 * Added support for non ASCII passwords.
 * Documentation fixes.

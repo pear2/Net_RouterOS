@@ -39,7 +39,7 @@
     <file role="doc" name="docblox.xsd"/>
     <file role="doc" name="doxygen.ini">
      <tasks:replace from="../src" to="php_dir" type="pear-config"/>
-     <tasks:replace from="SVN: $WCREV$" to="version" type="package-info"/>
+     <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
     </file>
    </dir>
    <dir name="examples">
@@ -57,77 +57,77 @@
        <file role="php" name="Autoload.php">
         <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
         <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="SVN: $WCREV$" to="version" type="package-info"/>
+        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
        </file>
        <file role="php" name="Client.php">
         <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
         <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="SVN: $WCREV$" to="version" type="package-info"/>
+        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
        </file>
        <file role="php" name="Communicator.php">
         <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
         <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="SVN: $WCREV$" to="version" type="package-info"/>
+        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
        </file>
        <file role="php" name="DataFlowException.php">
         <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
         <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="SVN: $WCREV$" to="version" type="package-info"/>
+        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
        </file>
        <file role="php" name="Exception.php">
         <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
         <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="SVN: $WCREV$" to="version" type="package-info"/>
+        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
        </file>
        <file role="php" name="InvalidArgumentException.php">
         <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
         <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="SVN: $WCREV$" to="version" type="package-info"/>
+        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
        </file>
        <file role="php" name="LengthException.php">
         <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
         <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="SVN: $WCREV$" to="version" type="package-info"/>
+        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
        </file>
        <file role="php" name="Message.php">
         <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
         <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="SVN: $WCREV$" to="version" type="package-info"/>
+        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
        </file>
        <file role="php" name="NotSupportedException.php">
         <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
         <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="SVN: $WCREV$" to="version" type="package-info"/>
+        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
        </file>
        <file role="php" name="Query.php">
         <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
         <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="SVN: $WCREV$" to="version" type="package-info"/>
+        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
        </file>
        <file role="php" name="Request.php">
         <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
         <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="SVN: $WCREV$" to="version" type="package-info"/>
+        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
        </file>
        <file role="php" name="Response.php">
         <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
         <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="SVN: $WCREV$" to="version" type="package-info"/>
+        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
        </file>
        <file role="php" name="ResponseCollection.php">
         <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
         <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="SVN: $WCREV$" to="version" type="package-info"/>
+        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
        </file>
        <file role="php" name="SocketException.php">
         <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
         <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="SVN: $WCREV$" to="version" type="package-info"/>
+        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
        </file>
        <file role="php" name="UnexpectedValueException.php">
         <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
         <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="SVN: $WCREV$" to="version" type="package-info"/>
+        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
        </file>
       </dir>
      </dir>
