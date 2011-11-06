@@ -21,25 +21,57 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
 
     public function testSendSyncReturningCollection()
     {
-        $list = $this->object->sendSync(new Request('/ip/arp/print'));
+        $list1 = $this->object->sendSync(new Request('/ip/arp/print'));
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection', $list,
+            __NAMESPACE__ . '\ResponseCollection', $list1,
             'The list is not a collection'
         );
+        $this->assertEquals(
+            $list1->getAllTagged(null)->toArray(), $list1->toArray(),
+            "The collection should contain only responses without a tag."
+        );
         $this->assertInternalType(
-            'string', $list[0]->getArgument('address'),
+            'string', $list1[0]->getArgument('address'),
             'The address is not a string'
         );
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\Response', $list->end(),
+            __NAMESPACE__ . '\Response', $list1->end(),
             'The list is empty'
         );
-        $this->assertEquals(Response::TYPE_FINAL, $list->current()->getType());
+        $this->assertEquals(Response::TYPE_FINAL, $list1->current()->getType());
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\Response', $list->prev(),
+            __NAMESPACE__ . '\Response', $list1->prev(),
             'The list is empty'
         );
-        $this->assertEquals(Response::TYPE_DATA, $list->current()->getType());
+        $this->assertEquals(Response::TYPE_DATA, $list1->current()->getType());
+        
+        $list2 = $this->object->sendSync(new Request('/ip/arp/print', 't'));
+        $this->assertInstanceOf(
+            __NAMESPACE__ . '\ResponseCollection', $list2,
+            'The list is not a collection'
+        );
+        $this->assertEquals(
+            $list2->getAllTagged('t')->toArray(), $list2->toArray(),
+            "The collection should contain only responses with tag 't'"
+        );
+        $this->assertInternalType(
+            'string', $list2[0]->getArgument('address'),
+            'The address is not a string'
+        );
+        $this->assertInstanceOf(
+            __NAMESPACE__ . '\Response', $list2->end(),
+            'The list is empty'
+        );
+        $this->assertEquals(Response::TYPE_FINAL, $list2->current()->getType());
+        $this->assertInstanceOf(
+            __NAMESPACE__ . '\Response', $list2->prev(),
+            'The list is empty'
+        );
+        $this->assertEquals(Response::TYPE_DATA, $list2->current()->getType());
+        
+        $this->assertEquals(
+            count($list1), count($list2)
+        );
     }
 
     public function testSendSyncReturningCollectionWithStreams()
