@@ -151,6 +151,16 @@ class Client
      */
     public static function login(Communicator $com, $username, $password = '')
     {
+        if (null !== ($remoteCharset = $com->getCharset($com::CHARSET_REMOTE))
+            && null !== ($localCharset = $com->getCharset($com::CHARSET_LOCAL))
+        ) {
+            $password = iconv(
+                $localCharset,
+                $remoteCharset . '//IGNORE//TRANSLIT',
+                $password
+            );
+        }
+        
         try {
             $request = new Request('/login');
             $request->send($com);

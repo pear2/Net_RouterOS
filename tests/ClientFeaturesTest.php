@@ -120,30 +120,6 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals(103, $e->getCode(), 'Improper exception code.');
         }
     }
-    
-    public function testClientInvokability()
-    {
-        $obj = $this->object;
-        $this->assertEquals(0, $obj->getPendingRequestsCount());
-        $obj(new Request('/ping address=' . HOSTNAME, 'ping'));
-        $this->assertEquals(1, $obj->getPendingRequestsCount());
-        $obj(new Request('/ip/arp/print', 'arp'));
-        $this->assertEquals(2, $obj->getPendingRequestsCount());
-        $obj(4);
-        $pingResponses = $obj->extractNewResponses('ping');
-        $this->assertGreaterThan(0, count($pingResponses));
-        $obj->cancelRequest('ping');
-        $arpResponses1 = $obj('arp');
-        $this->assertEquals(0, $obj->getPendingRequestsCount());
-        $this->assertGreaterThan(0, count($arpResponses1));
-        $obj(new Request('/ip/arp/print', 'arp'));
-        $this->assertEquals(1, $obj->getPendingRequestsCount());
-        $obj();
-        $arpResponses2 = $obj('arp');
-        $this->assertGreaterThan(0, count($arpResponses2));
-        $this->assertEquals(count($arpResponses1), count($arpResponses2));
-        $this->assertInstanceOf(__NAMESPACE__ . '\Response', $arpResponses1(0));
-    }
 
     public function testSendAsyncWithCallbackAndTempLoop()
     {
@@ -552,6 +528,30 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
             'There should be only data responses.'
         );
         $this->object->cancelRequest('ping');
+    }
+    
+    public function testClientInvokability()
+    {
+        $obj = $this->object;
+        $this->assertEquals(0, $obj->getPendingRequestsCount());
+        $obj(new Request('/ping address=' . HOSTNAME, 'ping'));
+        $this->assertEquals(1, $obj->getPendingRequestsCount());
+        $obj(new Request('/ip/arp/print', 'arp'));
+        $this->assertEquals(2, $obj->getPendingRequestsCount());
+        $obj(4);
+        $pingResponses = $obj->extractNewResponses('ping');
+        $this->assertGreaterThan(0, count($pingResponses));
+        $obj->cancelRequest('ping');
+        $arpResponses1 = $obj('arp');
+        $this->assertEquals(0, $obj->getPendingRequestsCount());
+        $this->assertGreaterThan(0, count($arpResponses1));
+        $obj(new Request('/ip/arp/print', 'arp'));
+        $this->assertEquals(1, $obj->getPendingRequestsCount());
+        $obj();
+        $arpResponses2 = $obj('arp');
+        $this->assertGreaterThan(0, count($arpResponses2));
+        $this->assertEquals(count($arpResponses1), count($arpResponses2));
+        $this->assertInstanceOf(__NAMESPACE__ . '\Response', $arpResponses1(0));
     }
 
     public function testStreamEquality()

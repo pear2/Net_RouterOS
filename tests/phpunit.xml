@@ -59,6 +59,23 @@
         <const name="PASSWORD2" value="api" />
         
         <!--
+        A RouterOS username and password that uses non ASCII characters.
+        Does not need to have any privileges beyond accessing the router.
+        
+        RouterOS forbids non ASCII usernames, but does not forbid non ASCII
+        passwords, which is why these credentials are required for a special
+        test.
+        -->
+        <const name="UNICODE_USERNAME" value="api-unicode" />
+        <const name="UNICODE_PASSWORD" value="апи" />
+        
+        <!--
+        The ANSI charset of the password. Should match the charset for the
+        locale of the device the password was defined from.
+        -->
+        <const name="UNICODE_PASSWORD_CHARSET" value="windows-1251" />
+        
+        <!--
         A RouterOS username that doesn't exist.
         -->
         <const name="USERNAME_INVALID" value="tester" />

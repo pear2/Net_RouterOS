@@ -89,6 +89,27 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testNormalUnicodeConnection()
+    {
+        $oldCharsets = Communicator::setDefaultCharset(array(
+            Communicator::CHARSET_LOCAL => 'UTF-8',
+            Communicator::CHARSET_REMOTE => UNICODE_PASSWORD_CHARSET
+        ));
+        try {
+            $routerOS = new Client(
+                HOSTNAME, UNICODE_USERNAME, UNICODE_PASSWORD, PORT
+            );
+            $this->assertInstanceOf(
+                __NAMESPACE__ . '\Client', $routerOS,
+                'Object initialization failed.'
+            );
+            Communicator::setDefaultCharset($oldCharsets);
+        } catch (Exception $e) {
+            Communicator::setDefaultCharset($oldCharsets);
+            $this->fail('Unable to connect normally:' . (string) $e);
+        }
+    }
+
     public function testNormalContextConnection()
     {
         try {
