@@ -468,6 +468,38 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testSendAsyncAndCompleteRequestWithCallback()
+    {
+
+
+        $arpPrint = new Request('/ip/arp/print');
+        $arpPrint->setTag('arp');
+        $list1 = $this->object->sendSync($arpPrint);
+        $list2 = array();
+        $this->object->sendAsync(
+            $arpPrint, 
+            function($response, $client) use (&$list2) {
+                \PHPUnit_Framework_TestCase::assertInstanceOf(
+                    __NAMESPACE__ . '\Response', $response,
+                    'A callback must receive a single response per call'
+                );
+                \PHPUnit_Framework_TestCase::assertInstanceOf(
+                    __NAMESPACE__ . '\Client', $client,
+                    'A callback must receive a copy of the client object'
+                );
+
+                \PHPUnit_Framework_TestCase::assertEquals(
+                    'arp', $response->getTag(),
+                    'The callback must only receive responses meant for it.'
+                );
+                $list2[] = $response;
+            }
+        );
+
+        $this->assertEmpty($this->object->completeRequest('arp')->toArray());
+        $this->assertEquals($list1->toArray(), $list2);
+    }
+
     public function testCompleteRequestEmptyQueue()
     {
         try {

@@ -353,7 +353,9 @@ class Client
                     if (!$isTagNull) {
                         $result = array_merge(
                             $result,
-                            $this->extractNewResponses($tag)->toArray()
+                            $this->isRequestActive($tag)
+                            ? $this->extractNewResponses($tag)->toArray()
+                            : array()
                         );
                     }
                     break;
