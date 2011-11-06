@@ -12,7 +12,7 @@
  * @author    Vasil Rangelov <boen.robot@gmail.com>
  * @copyright 2011 Vasil Rangelov
  * @license   http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
- * @version   SVN: $WCREV$
+ * @version   GIT: $Id$
  * @link      http://pear2.php.net/PEAR2_Net_RouterOS
  */
 /**
