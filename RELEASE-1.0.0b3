@@ -1,0 +1,5 @@
+Bug fixes on edge cases.
+
+* Client::sendSync() now accepts requests with a tag.
+* ResponseCollection::__invoke() now seeks instead of getting.
+* Documentation fixes.

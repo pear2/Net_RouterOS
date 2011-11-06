@@ -83,8 +83,8 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
      * function. Depending on the argument given, one of the other functions in
      * the class is invoked and its returned value is returned by this function.
      * 
-     * @param int $offset The offset of the desired response. Setting NULL will
-     * give the last response.
+     * @param int $offset The offset of the response to seek to. Setting NULL
+     * will seek to the last response.
      * 
      * @return Response The {@link Response} at the specified index, last
      * reponse if no index is provided or FALSE if the index is invalid or the
@@ -92,7 +92,7 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
      */
     public function __invoke($offset = null)
     {
-        return null === $offset ? $this->getLast() : $this[$offset];
+        return null === $offset ? $this->end() : $this->seek($offset);
     }
     
     /**

@@ -45,7 +45,8 @@ class Request extends Message
     /**
      * Creates a request to send to RouterOS.
      * 
-     * @param string $command The command to send.
+     * @param string $command The command to send. Can also contain arguments
+     * expressed in a shell-like syntax.
      * @param string $tag     The tag for the request.
      * @param Query  $query   A query to associate with the request.
      * 

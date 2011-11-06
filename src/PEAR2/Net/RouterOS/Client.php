@@ -77,15 +77,14 @@ class Client
     private $_streamResponses = false;
 
     /**
-     * Opens a new instance of a RouterOS API client.
+     * Creates a new instance of a RouterOS API client.
      * 
-     * Opens a new instance of a RouterOS API client with the specified
+     * Creates a new instance of a RouterOS API client with the specified
      * settings.
      * 
      * @param string   $host     Hostname (IP or domain) of the RouterOS server.
      * @param string   $username The RouterOS username.
      * @param string   $password The RouterOS password.
-     * 
      * @param int      $port     The port on which the RouterOS server provides
      * the API service.
      * @param bool     $persist  Whether or not the connection should be a

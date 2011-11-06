@@ -119,11 +119,11 @@ class Communicator
      * function. Depending on the argument given, one of the other functions in
      * the class is invoked and its returned value is returned by this function.
      * 
-     * @param string $string A string of the word to send, or NULL to get the
-     * next word.
+     * @param string $string A string or stream of the word to send, or NULL to
+     * get the next word as a string.
      * 
-     * @return int|string If a string is provided, returns the number of bytes
-     * sent, otherwise retuns the next word as a string.
+     * @return int|string If a string or stream is provided, returns the number
+     * of bytes sent, otherwise retuns the next word as a string.
      */
     public function __invoke($string = null)
     {
