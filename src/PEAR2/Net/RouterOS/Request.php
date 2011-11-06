@@ -302,11 +302,15 @@ class Request extends Message
                 $token = '';
                 $this->setArgument($name);
                 $name = null;
-            } elseif (preg_match('/^="(([^\\\"]|\\\")*)"/sm', $string, $matches)
+            } elseif (
+                preg_match('/^="(([^\\\"]|\\\"|\\\\)*)"/sm', $string, $matches)
             ) {
                 $token = $matches[0];
                 $this->setArgument(
-                    $name, preg_replace('/\\\"/', '"', $matches[1])
+                    $name,
+                    str_replace(
+                        array('\\"', '\\\\'), array('"', '\\'), $matches[1]
+                    )
                 );
                 $name = null;
             } elseif (preg_match('/^=(\S+)/sm', $string, $matches)) {
