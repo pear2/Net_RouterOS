@@ -304,8 +304,13 @@ class Client
      */
     public function sendSync(Request $request)
     {
-        $this->send($request);
-        return $this->completeRequest($request->getTag());
+        $tag = $request->getTag();
+        if (null === $tag) {
+            $this->send($request);
+        } else {
+            $this->sendAsync($request);
+        }
+        return $this->completeRequest($tag);
     }
 
     /**
