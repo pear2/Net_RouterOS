@@ -74,7 +74,7 @@ class Client
     /**
      * @var bool Whether to stream future responses.
      */
-    private $_streamResponses = false;
+    private $_streamingResponses = false;
 
     /**
      * Creates a new instance of a RouterOS API client.
@@ -393,9 +393,7 @@ class Client
         } elseif ($this->isRequestActive($tag, self::FILTER_BUFFER)) {
             $result = $this->responseBuffer[$tag];
             if (!empty($result)) {
-                if ($result[count($result) - 1]->getType()
-                    === Response::TYPE_FINAL
-                ) {
+                if (end($result)->getType() === Response::TYPE_FINAL) {
                     unset($this->responseBuffer[$tag]);
                 } else {
                     $this->responseBuffer[$tag] = array();
@@ -502,16 +500,16 @@ class Client
      * particularly useful if you expect a response that may contain one or more
      * very large words.
      * 
-     * @param bool $streamResponses Whether to stream future responses.
+     * @param bool $streamingResponses Whether to stream future responses.
      * 
      * @return bool The previous value of the setting.
-     * @see getStreamResponses()
+     * @see isStreamingResponses()
      */
-    public function setStreamResponses($streamResponses)
+    public function setStreamingResponses($streamingResponses)
     {
-        $oldStreamResponses = $this->_streamResponses;
-        $this->_streamResponses = (bool) $streamResponses;
-        return $oldStreamResponses;
+        $oldValue = $this->_streamingResponses;
+        $this->_streamingResponses = (bool) $streamingResponses;
+        return $oldValue;
     }
 
     /**
@@ -520,11 +518,11 @@ class Client
      * Gets whether future responses are streamed.
      * 
      * @return bool The value of the setting.
-     * @see setStreamResponses()
+     * @see setStreamingResponses()
      */
-    public function getStreamResponses()
+    public function isStreamingResponses()
     {
-        return $this->_streamResponses;
+        return $this->_streamingResponses;
     }
 
     /**
@@ -577,7 +575,7 @@ class Client
      */
     protected function dispatchNextResponse()
     {
-        $response = new Response($this->com, $this->_streamResponses);
+        $response = new Response($this->com, $this->_streamingResponses);
         if ($response->getType() === Response::TYPE_FATAL) {
             $this->pendingRequestsCount = 0;
             $this->com->close();

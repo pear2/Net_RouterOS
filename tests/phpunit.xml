@@ -24,13 +24,13 @@
         "/queue/simple" and "/ip/arp", with those being HOSTNAME_INVALID and
         HOSTNAME_SILENT.
         -->
-        <const name="HOSTNAME" value="192.168.0.1" />
+        <const name="HOSTNAME" value="ros.example.com" />
         <const name="PORT" value="8728" />
         
         <!--
-        A server with a service at the API port, but a different one.
+        A server with a different service at the API port.
         -->
-        <const name="HOSTNAME_INVALID" value="192.168.0.254" />
+        <const name="HOSTNAME_INVALID" value="client.ros.example.com" />
         <!--
         A port on which there's a service for all HOSTNAME_* addresses,
         but never the API one.
@@ -40,7 +40,7 @@
         <!--
         A device that doesn't answer at the API or the invalid port.
         -->
-        <const name="HOSTNAME_SILENT" value="192.168.0.100" />
+        <const name="HOSTNAME_SILENT" value="silent.ros.example.com" />
         <!--
         A port on which none of the hosts answers.
         -->

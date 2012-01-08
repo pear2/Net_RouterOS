@@ -11,7 +11,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
     
     protected function setUp()
     {
-        $this->object = new Client(HOSTNAME, USERNAME, PASSWORD, PORT);
+        $this->object = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT);
     }
     
     protected function tearDown()
@@ -76,9 +76,9 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
 
     public function testSendSyncReturningCollectionWithStreams()
     {
-        $this->assertFalse($this->object->getStreamResponses());
-        $this->assertFalse($this->object->setStreamResponses(true));
-        $this->assertTrue($this->object->getStreamResponses());
+        $this->assertFalse($this->object->isStreamingResponses());
+        $this->assertFalse($this->object->setStreamingResponses(true));
+        $this->assertTrue($this->object->isStreamingResponses());
         $list = $this->object->sendSync(new Request('/ip/arp/print'));
         $this->assertInstanceOf(
             __NAMESPACE__ . '\ResponseCollection', $list,
@@ -446,9 +446,9 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $arpPrint = new Request('/ip/arp/print');
         $arpPrint->setTag('arp');
         $this->object->sendAsync($arpPrint);
-        $this->assertFalse($this->object->getStreamResponses());
-        $this->assertFalse($this->object->setStreamResponses(true));
-        $this->assertTrue($this->object->getStreamResponses());
+        $this->assertFalse($this->object->isStreamingResponses());
+        $this->assertFalse($this->object->setStreamingResponses(true));
+        $this->assertTrue($this->object->isStreamingResponses());
 
         $list = $this->object->completeRequest('arp');
 
@@ -600,7 +600,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
             'The list is not a collection'
         );
 
-        $this->object->setStreamResponses(true);
+        $this->object->setStreamingResponses(true);
         $streamList = $this->object->sendSync($request);
         $this->assertInstanceOf(
             __NAMESPACE__ . '\ResponseCollection', $streamList,

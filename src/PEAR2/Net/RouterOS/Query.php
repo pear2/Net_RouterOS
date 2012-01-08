@@ -206,7 +206,7 @@ class Query
     protected function addWhere($name, $value, $action)
     {
         $this->words[] = array(
-            self::sanitizeAction($action)
+            static::sanitizeAction($action)
             . Message::sanitizeArgumentName($name),
             (null === $value ? null : Message::sanitizeArgumentValue($value))
         );

@@ -24,7 +24,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testNormalConnection()
     {
         try {
-            $routerOS = new Client(HOSTNAME, USERNAME, PASSWORD, PORT);
+            $routerOS = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT);
             $this->assertInstanceOf(
                 __NAMESPACE__ . '\Client', $routerOS,
                 'Object initialization failed.'
@@ -37,7 +37,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testNormalPersistentConnection()
     {
         try {
-            $routerOS = new Client(HOSTNAME, USERNAME, PASSWORD, PORT, true);
+            $routerOS = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT, true);
             $this->assertInstanceOf(
                 __NAMESPACE__ . '\Client', $routerOS,
                 'Object initialization failed.'
@@ -51,13 +51,13 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testMultipleNormalConnection()
     {
         try {
-            $routerOS1 = new Client(HOSTNAME, USERNAME, PASSWORD, PORT);
+            $routerOS1 = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT);
             $this->assertInstanceOf(
                 __NAMESPACE__ . '\Client', $routerOS1,
                 'Object initialization failed.'
             );
 
-            $routerOS2 = new Client(HOSTNAME, USERNAME, PASSWORD, PORT);
+            $routerOS2 = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT);
             $this->assertInstanceOf(
                 __NAMESPACE__ . '\Client', $routerOS2,
                 'Object initialization failed.'
@@ -70,13 +70,13 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testMultiplePersistentConnection()
     {
         try {
-            $routerOS1 = new Client(HOSTNAME, USERNAME, PASSWORD, PORT, true);
+            $routerOS1 = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT, true);
             $this->assertInstanceOf(
                 __NAMESPACE__ . '\Client', $routerOS1,
                 'Object initialization failed.'
             );
 
-            $routerOS2 = new Client(HOSTNAME, USERNAME, PASSWORD, PORT, true);
+            $routerOS2 = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT, true);
             $this->assertInstanceOf(
                 __NAMESPACE__ . '\Client', $routerOS2,
                 'Object initialization failed.'
@@ -97,7 +97,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         ));
         try {
             $routerOS = new Client(
-                HOSTNAME, UNICODE_USERNAME, UNICODE_PASSWORD, PORT
+                \HOSTNAME, UNICODE_USERNAME, UNICODE_PASSWORD, PORT
             );
             $this->assertInstanceOf(
                 __NAMESPACE__ . '\Client', $routerOS,
@@ -122,7 +122,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 'Failed to create proper context.'
             );
             $routerOS = new Client(
-                HOSTNAME, USERNAME, PASSWORD, PORT, false, null, $context
+                \HOSTNAME, USERNAME, PASSWORD, PORT, false, null, $context
             );
         } catch (SocketException $e) {
             $this->fail('Unable to connect normally.');
@@ -132,7 +132,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testInvalidUsername()
     {
         try {
-            $routerOS = new Client(HOSTNAME, USERNAME_INVALID, PASSWORD, PORT);
+            $routerOS = new Client(\HOSTNAME, USERNAME_INVALID, PASSWORD, PORT);
 
             $this->fail(
                 'No proper connection with the username "'
@@ -147,7 +147,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testInvalidPassword()
     {
         try {
-            $routerOS = new Client(HOSTNAME, USERNAME, PASSWORD_INVALID, PORT);
+            $routerOS = new Client(\HOSTNAME, USERNAME, PASSWORD_INVALID, PORT);
 
             $this->fail(
                 'No proper connection with the password "'
@@ -163,7 +163,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     {
         try {
             $routerOS = new Client(
-                HOSTNAME, USERNAME_INVALID, PASSWORD_INVALID, PORT
+                \HOSTNAME, USERNAME_INVALID, PASSWORD_INVALID, PORT
             );
 
             $this->fail(
@@ -181,11 +181,11 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testInvalidHost()
     {
         try {
-            $routerOS = new Client(HOSTNAME_INVALID, USERNAME, PASSWORD, PORT);
+            $routerOS = new Client(\HOSTNAME_INVALID, USERNAME, PASSWORD, PORT);
 
             $this->fail(
                 'No proper connection over hostname "'
-                . HOSTNAME_INVALID
+                . \HOSTNAME_INVALID
                 . '" should be available.'
             );
         } catch (SocketException $e) {
@@ -196,11 +196,11 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testSilentHost()
     {
         try {
-            $routerOS = new Client(HOSTNAME_SILENT, USERNAME, PASSWORD, PORT);
+            $routerOS = new Client(\HOSTNAME_SILENT, USERNAME, PASSWORD, PORT);
 
             $this->fail(
                 'No proper connection over hostname "'
-                . HOSTNAME_SILENT
+                . \HOSTNAME_SILENT
                 . '" should be available.'
             );
         } catch (T\SocketException $e) {
@@ -212,7 +212,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testInvalidPort()
     {
         try {
-            $routerOS = new Client(HOSTNAME, USERNAME, PASSWORD, PORT_INVALID);
+            $routerOS = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT_INVALID);
 
             $this->fail(
                 'No proper connection over port "'
@@ -227,7 +227,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testSilentPort()
     {
         try {
-            $routerOS = new Client(HOSTNAME, USERNAME, PASSWORD, PORT_SILENT);
+            $routerOS = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT_SILENT);
 
             $this->fail(
                 'No proper connection over port "'
@@ -244,7 +244,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     {
         try {
             $routerOS = new Client(
-                HOSTNAME, USERNAME, PASSWORD, PORT, false, 'invalidTimeout'
+                \HOSTNAME, USERNAME, PASSWORD, PORT, false, 'invalidTimeout'
             );
 
             $this->fail('No proper connection should be available.');
@@ -257,7 +257,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     {
         try {
             $routerOS = new Client(
-                HOSTNAME, USERNAME, PASSWORD, PORT_SILENT, false, null,
+                \HOSTNAME, USERNAME, PASSWORD, PORT_SILENT, false, null,
                 'notContext'
             );
 
@@ -271,7 +271,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     {
         try {
             $routerOS = new Client(
-                HOSTNAME, USERNAME, PASSWORD, PORT_SILENT, false, null,
+                \HOSTNAME, USERNAME, PASSWORD, PORT_SILENT, false, null,
                 fopen(__FILE__, 'a+')
             );
 
@@ -284,7 +284,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testInvalidSocketOnClose()
     {
         try {
-            $com = new Communicator(HOSTNAME, PORT);
+            $com = new Communicator(\HOSTNAME, PORT);
             Client::login($com, USERNAME, PASSWORD);
 
             $com->close();
@@ -298,7 +298,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testInvalidSocketOnReceive()
     {
         try {
-            $com = new Communicator(HOSTNAME, PORT);
+            $com = new Communicator(\HOSTNAME, PORT);
             Client::login($com, USERNAME, PASSWORD);
 
             new Response($com);
@@ -311,7 +311,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testInvalidSocketOnStreamReceive()
     {
         try {
-            $com = new Communicator(HOSTNAME, PORT);
+            $com = new Communicator(\HOSTNAME, PORT);
             Client::login($com, USERNAME, PASSWORD);
 
             new Response($com, true);
@@ -323,7 +323,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidQuerySending()
     {
-        $com = new Communicator(HOSTNAME, PORT);
+        $com = new Communicator(\HOSTNAME, PORT);
         Client::login($com, USERNAME, PASSWORD);
 
         $com->sendWord('/ip/arp/print');

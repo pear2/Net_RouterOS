@@ -11,7 +11,7 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
     
     protected function setUp()
     {
-        $this->object = new Client(HOSTNAME, USERNAME, PASSWORD, PORT);
+        $this->object = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT);
     }
     
     protected function tearDown()
@@ -23,13 +23,13 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
     {
         try {
 
-            $routerOS1 = new Client(HOSTNAME, USERNAME2, PASSWORD2, PORT, true);
+            $routerOS1 = new Client(\HOSTNAME, USERNAME2, PASSWORD2, PORT, true);
             $this->assertInstanceOf(
                 __NAMESPACE__ . '\Client', $routerOS1,
                 'Object initialization failed.'
             );
 
-            $routerOS2 = new Client(HOSTNAME, USERNAME, PASSWORD, PORT, true);
+            $routerOS2 = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT, true);
             $this->assertInstanceOf(
                 __NAMESPACE__ . '\Client', $routerOS2,
                 'Object initialization failed.'
@@ -376,7 +376,7 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
                 'ПРИМЕР', $responses[0]->getArgument('comment')
             );
             
-            $this->object->setStreamResponses(true);
+            $this->object->setStreamingResponses(true);
             $responses = $this->object->sendSync($printRequest);
             $this->assertEquals(
                 'ПРИМЕР', stream_get_contents(

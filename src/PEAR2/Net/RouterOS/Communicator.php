@@ -497,15 +497,15 @@ class Communicator
             if (($byte & 0xC0) === 0x80) {
                 return (($byte & 077) << 8 ) + ord($trans->receive(1));
             } elseif (($byte & 0xE0) === 0xC0) {
-                $u = unpack('n~', $trans->receive(2));
-                return (($byte & 037) << 16 ) + $u['~'];
+                $rem = unpack('n~', $trans->receive(2));
+                return (($byte & 037) << 16 ) + $rem['~'];
             } elseif (($byte & 0xF0) === 0xE0) {
-                $u = unpack('n~/C~~', $trans->receive(3));
-                return (($byte & 017) << 24 ) + ($u['~'] << 8) + $u['~~'];
+                $rem = unpack('n~/C~~', $trans->receive(3));
+                return (($byte & 017) << 24 ) + ($rem['~'] << 8) + $rem['~~'];
             } elseif (($byte & 0xF8) === 0xF0) {
-                $u = unpack('N~', $trans->receive(4));
+                $rem = unpack('N~', $trans->receive(4));
                 return (($byte & 007) * 0x100000000/* '<< 32' or '2^32' */)
-                    + (double) sprintf('%u', $u['~']);
+                    + (double) sprintf('%u', $rem['~']);
             }
             throw new NotSupportedException(
                 'Unknown control byte encountered.', 14, null, $byte
