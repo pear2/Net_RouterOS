@@ -66,14 +66,14 @@
         passwords, which is why these credentials are required for a special
         test.
         -->
-        <const name="UNICODE_USERNAME" value="api-unicode" />
-        <const name="UNICODE_PASSWORD" value="апи" />
+        <const name="ANSI_USERNAME" value="api-ANSI" />
+        <const name="ANSI_PASSWORD" value="апи" />
         
         <!--
         The ANSI charset of the password. Should match the charset for the
         locale of the device the password was defined from.
         -->
-        <const name="UNICODE_PASSWORD_CHARSET" value="windows-1251" />
+        <const name="ANSI_PASSWORD_CHARSET" value="windows-1251" />
         
         <!--
         A RouterOS username that doesn't exist.

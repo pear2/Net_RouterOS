@@ -89,15 +89,15 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testNormalUnicodeConnection()
+    public function testNormalAnsiConnection()
     {
         $oldCharsets = Communicator::setDefaultCharset(array(
             Communicator::CHARSET_LOCAL => 'UTF-8',
-            Communicator::CHARSET_REMOTE => UNICODE_PASSWORD_CHARSET
+            Communicator::CHARSET_REMOTE => ANSI_PASSWORD_CHARSET
         ));
         try {
             $routerOS = new Client(
-                \HOSTNAME, UNICODE_USERNAME, UNICODE_PASSWORD, PORT
+                \HOSTNAME, ANSI_USERNAME, ANSI_PASSWORD, PORT
             );
             $this->assertInstanceOf(
                 __NAMESPACE__ . '\Client', $routerOS,

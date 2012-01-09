@@ -14,8 +14,7 @@ foreach ($constants as $constant) {
         case 'AAAA':
         case 'A6':
             $newConstant = __NAMESPACE__ . '\\' . $constant;
-            var_dump(define($newConstant, $hostname['ip']));
-            var_dump(defined($newConstant));
+            define($newConstant, $hostname['ip']);
             continue 3;
         }
     }
