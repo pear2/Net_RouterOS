@@ -103,7 +103,7 @@ class Client
         );
         //Login the user if necessary
         if ($this->com->getTransmitter()->isFresh()) {
-            if (!self::login($this->com, $username, $password)) {
+            if (!static::login($this->com, $username, $password)) {
                 $this->com->close();
                 throw new DataFlowException(
                     'Invalid username or password supplied.', 100
@@ -253,7 +253,7 @@ class Client
     {
         //Error checking
         $tag = $request->getTag();
-        if (null === $tag) {
+        if ('' == $tag) {
             throw new DataFlowException(
                 'Asynchonous commands must have a tag.', 102
             );
@@ -314,7 +314,7 @@ class Client
     public function sendSync(Request $request)
     {
         $tag = $request->getTag();
-        if (null === $tag) {
+        if ('' == $tag) {
             $this->send($request);
         } else {
             $this->sendAsync($request);
@@ -338,19 +338,19 @@ class Client
      */
     public function completeRequest($tag = null)
     {
-        $isTagNull = null === $tag;
-        $result = $isTagNull ? array()
+        $hasNoTag = '' == $tag;
+        $result = $hasNoTag ? array()
             : $this->extractNewResponses($tag)->toArray();
-        while ((!$isTagNull && $this->isRequestActive($tag))
-        || ($isTagNull && 0 !== $this->getPendingRequestsCount())
+        while ((!$hasNoTag && $this->isRequestActive($tag))
+        || ($hasNoTag && 0 !== $this->getPendingRequestsCount())
         ) {
             $newReply = $this->dispatchNextResponse();
             if ($newReply->getTag() === $tag) {
-                if ($isTagNull) {
+                if ($hasNoTag) {
                     $result[] = $newReply;
                 }
                 if ($newReply->getType() === Response::TYPE_FINAL) {
-                    if (!$isTagNull) {
+                    if (!$hasNoTag) {
                         $result = array_merge(
                             $result,
                             $this->isRequestActive($tag)
@@ -380,7 +380,7 @@ class Client
      */
     public function extractNewResponses($tag = null)
     {
-        if (null === $tag) {
+        if ('' == $tag) {
             $result = array();
             foreach (array_keys($this->responseBuffer) as $tag) {
                 $result = array_merge(
@@ -465,8 +465,8 @@ class Client
     public function cancelRequest($tag = null)
     {
         $cancelRequest = new Request('/cancel');
-        $tagIsNotNull = !(null === $tag);
-        if ($tagIsNotNull) {
+        $hasTag = !('' == $tag);
+        if ($hasTag) {
             if ($this->isRequestActive($tag)) {
                 $cancelRequest->setArgument('tag', $tag);
             } else {
@@ -477,7 +477,7 @@ class Client
         }
         $this->sendSync($cancelRequest);
 
-        if ($tagIsNotNull) {
+        if ($hasTag) {
             if ($this->isRequestActive($tag, self::FILTER_BUFFER)) {
                 unset($this->responseBuffer[$tag]);
             } elseif ($this->isRequestActive($tag, self::FILTER_CALLBACK)) {
@@ -588,7 +588,7 @@ class Client
             $this->pendingRequestsCount--;
         }
 
-        if (null !== $tag) {
+        if ('' != $tag) {
             if ($this->isRequestActive($tag, self::FILTER_CALLBACK)) {
                 if ($this->callbacks[$tag]($response, $this)) {
                     $this->cancelRequest($tag);

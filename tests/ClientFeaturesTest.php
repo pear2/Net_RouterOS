@@ -101,6 +101,14 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         } catch (DataFlowException $e) {
             $this->assertEquals(102, $e->getCode(), 'Improper exception code.');
         }
+        try {
+            $ping->setTag('');
+            $this->object->sendAsync($ping);
+
+            $this->fail('The call had to fail.');
+        } catch (DataFlowException $e) {
+            $this->assertEquals(102, $e->getCode(), 'Improper exception code.');
+        }
     }
 
     public function testSendAsyncUniqueTagRequirement()
