@@ -47,15 +47,15 @@ class Request extends Message
      * 
      * @param string $command The command to send. Can also contain arguments
      * expressed in a shell-like syntax.
-     * @param string $tag     The tag for the request.
      * @param Query  $query   A query to associate with the request.
+     * @param string $tag     The tag for the request.
      * 
      * @see setCommand()
      * @see setArgument()
      * @see setTag()
      * @see setQuery()
      */
-    public function __construct($command, $tag = null, Query $query = null)
+    public function __construct($command, Query $query = null, $tag = null)
     {
         if (false !== ($firstEquals = strpos($command, '='))
             && false !== ($spaceBeforeEquals = strrpos(
@@ -66,8 +66,8 @@ class Request extends Message
             $command = rtrim(substr($command, 0, $spaceBeforeEquals));
         }
         $this->setCommand($command);
-        $this->setTag($tag);
         $this->setQuery($query);
+        $this->setTag($tag);
     }
     
     /**

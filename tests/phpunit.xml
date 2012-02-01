@@ -30,7 +30,7 @@
         <!--
         A server with a different service at the API port.
         -->
-        <const name="HOSTNAME_INVALID" value="client.ros.example.com" />
+        <const name="HOSTNAME_INVALID" value="invalid.ros.example.com" />
         <!--
         A port on which there's a service for all HOSTNAME_* addresses,
         but never the API one.

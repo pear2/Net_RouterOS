@@ -111,7 +111,7 @@ class Query
     public static function where(
         $name, $value = null, $action = self::ACTION_EXIST
     ) {
-        $query = new self;
+        $query = new static;
         return $query->addWhere($name, $value, $action);
     }
 

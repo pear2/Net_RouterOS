@@ -45,7 +45,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(Response::TYPE_DATA, $list1->current()->getType());
         
-        $list2 = $this->object->sendSync(new Request('/ip/arp/print', 't'));
+        $list2 = $this->object->sendSync(new Request('/ip/arp/print', null, 't'));
         $this->assertInstanceOf(
             __NAMESPACE__ . '\ResponseCollection', $list2,
             'The list is not a collection'
@@ -566,9 +566,9 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
     {
         $obj = $this->object;
         $this->assertEquals(0, $obj->getPendingRequestsCount());
-        $obj(new Request('/ping address=' . HOSTNAME, 'ping'));
+        $obj(new Request('/ping address=' . HOSTNAME, null, 'ping'));
         $this->assertEquals(1, $obj->getPendingRequestsCount());
-        $obj(new Request('/ip/arp/print', 'arp'));
+        $obj(new Request('/ip/arp/print', null, 'arp'));
         $this->assertEquals(2, $obj->getPendingRequestsCount());
         $obj(4);
         $pingResponses = $obj->extractNewResponses('ping');
@@ -577,7 +577,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $arpResponses1 = $obj('arp');
         $this->assertEquals(0, $obj->getPendingRequestsCount());
         $this->assertGreaterThan(0, count($arpResponses1));
-        $obj(new Request('/ip/arp/print', 'arp'));
+        $obj(new Request('/ip/arp/print', null, 'arp'));
         $this->assertEquals(1, $obj->getPendingRequestsCount());
         $obj();
         $arpResponses2 = $obj('arp');
