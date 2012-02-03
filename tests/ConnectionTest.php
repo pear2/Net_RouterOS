@@ -302,7 +302,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             $this->fail('Receiving had to fail.');
         } catch (SocketException $e) {
             $this->assertEquals(
-                206, $e->getCode(), 'Improper exception code.'
+                50000, $e->getCode(), 'Improper exception code.'
             );
         }
     }
@@ -345,7 +345,9 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             $com->sendWord('');
             $this->fail('The query had to fail.');
         } catch (SocketException $e) {
-            $this->assertEquals(209, $e->getCode(), 'Improper exception code.');
+            $this->assertEquals(
+                30600, $e->getCode(), 'Improper exception code.'
+            );
         }
     }
 

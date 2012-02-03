@@ -78,7 +78,7 @@ class Response extends Message
     {
         if (!$com->getTransmitter()->isDataAwaiting()) {
             throw new SocketException(
-                'No data awaiting. Receiving aborted.', 206
+                'No data awaiting. Receiving aborted.', 50000
             );
         }
         $this->setType($com->getNextWord());
@@ -150,7 +150,7 @@ class Response extends Message
             return $this;
         default:
             throw new UnexpectedValueException(
-                'Unrecognized response type.', 207, null, $type
+                'Unrecognized response type.', 50100, null, $type
             );
         }
     }

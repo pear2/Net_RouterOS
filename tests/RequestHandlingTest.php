@@ -19,7 +19,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 $invalidCommand = new Request($command);
             } catch (InvalidArgumentException $e) {
                 $this->assertEquals(
-                    202, $e->getCode(),
+                    40200, $e->getCode(),
                     "Improper exception thrown for the command '{$command}'."
                 );
             }
@@ -37,7 +37,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 $invalidCommand = new Request($command);
             } catch (InvalidArgumentException $e) {
                 $this->assertEquals(
-                    203, $e->getCode(),
+                    40201, $e->getCode(),
                     "Improper exception thrown for the command '{$command}'."
                 );
             }
@@ -56,7 +56,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 $invalidCommand = new Request($command);
             } catch (InvalidArgumentException $e) {
                 $this->assertEquals(
-                    204, $e->getCode(),
+                    40202, $e->getCode(),
                     "Improper exception thrown for the command '{$command}'."
                 );
             }
@@ -343,13 +343,17 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             $request = new Request('/ip arp add comment="""');
             $this->fail('Command had to fail.');
         }catch(InvalidArgumentException $e) {
-            $this->assertEquals(206, $e->getCode(), 'Improper exception code');
+            $this->assertEquals(
+                41000, $e->getCode(), 'Improper exception code'
+            );
         }
         try {
             $request = new Request('/ip arp add comment= address=192.168.0.1');
             $this->fail('Command had to fail.');
         }catch(InvalidArgumentException $e) {
-            $this->assertEquals(207, $e->getCode(), 'Improper exception code');
+            $this->assertEquals(
+                41001, $e->getCode(), 'Improper exception code'
+            );
         }
     }
 
@@ -371,7 +375,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 $request->setArgument($name);
             } catch (InvalidArgumentException $e) {
                 $this->assertEquals(
-                    200, $e->getCode(),
+                    20100, $e->getCode(),
                     "Improper exception thrown for the name '{$name}'."
                 );
             }
@@ -406,7 +410,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 $query = Query::where($name);
             } catch (InvalidArgumentException $e) {
                 $this->assertEquals(
-                    200, $e->getCode(),
+                    20100, $e->getCode(),
                     "Improper exception thrown for the name '{$name}'."
                 );
             }
@@ -432,7 +436,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 $query = Query::where('address', null, $action);
             } catch (UnexpectedValueException $e) {
                 $this->assertEquals(
-                    208, $e->getCode(),
+                    30100, $e->getCode(),
                     "Improper exception thrown for the action '{$action}'."
                 );
                 $this->assertEquals($action, $e->getValue());
@@ -449,7 +453,9 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             $com->sendWordFromStream('', $value);
             $this->fail('Call had to fail.');
         }catch(InvalidArgumentException $e) {
-            $this->assertEquals(10, $e->getCode(), 'Improper exception code.');
+            $this->assertEquals(
+                1100, $e->getCode(), 'Improper exception code.'
+            );
         }
     }
 
@@ -538,7 +544,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             Communicator::encodeLength($smallLength);
         } catch (LengthException $e) {
             $this->assertEquals(
-                12, $e->getCode(),
+                1300, $e->getCode(),
                 "Length '{$smallLength}' must not be encodable."
             );
             $this->assertEquals(
@@ -550,7 +556,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             Communicator::encodeLength($largeLength);
         } catch (LengthException $e) {
             $this->assertEquals(
-                13, $e->getCode(),
+                1301, $e->getCode(),
                 "Length '{$largeLength}' must not be encodable."
             );
             $this->assertEquals(
@@ -586,7 +592,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 Communicator::decodeLength($trans);
             } catch (NotSupportedException $e) {
                 $this->assertEquals(
-                    14, $e->getCode(), 'Improper exception code.'
+                    1600, $e->getCode(), 'Improper exception code.'
                 );
                 $this->assertEquals(
                     $controlByte, $e->getValue(), 'Improper exception value.'

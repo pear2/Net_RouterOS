@@ -78,7 +78,7 @@ abstract class Message
             || !preg_match('/[^=\s]/s', $name)
         ) {
             throw new InvalidArgumentException(
-                'Invalid name of argument supplied.', 200
+                'Invalid name of argument supplied.', 20100
             );
         }
         return $name;

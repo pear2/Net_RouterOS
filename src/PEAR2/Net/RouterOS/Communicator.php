@@ -338,7 +338,7 @@ class Communicator
     {
         if (!self::isSeekableStream($stream)) {
             throw new InvalidArgumentException(
-                'The stream must be seekable.', 10
+                'The stream must be seekable.', 1100
             );
         }
         if (null !== ($remoteCharset = $this->getCharset(self::CHARSET_REMOTE))
@@ -389,7 +389,7 @@ class Communicator
     {
         if ($length > 0xFFFFFFF) {
             throw new LengthException(
-                'Words with length above 0xFFFFFFF are not supported.', 11,
+                'Words with length above 0xFFFFFFF are not supported.', 1200,
                 null, $length
             );
         }
@@ -406,7 +406,7 @@ class Communicator
     {
         if ($length < 0) {
             throw new LengthException(
-                'Length must not be negative.', 12, null, $length
+                'Length must not be negative.', 1300, null, $length
             );
         } elseif ($length < 0x80) {
             return chr($length);
@@ -425,7 +425,7 @@ class Communicator
                 pack('N', hexdec(substr($length, 2)));
         }
         throw new LengthException(
-            'Length must not be above 0x7FFFFFFFF.', 13, null, $length
+            'Length must not be above 0x7FFFFFFFF.', 1301, null, $length
         );
     }
 
@@ -508,7 +508,7 @@ class Communicator
                     + (double) sprintf('%u', $rem['~']);
             }
             throw new NotSupportedException(
-                'Unknown control byte encountered.', 14, null, $byte
+                'Unknown control byte encountered.', 1600, null, $byte
             );
         } else {
             return $byte;
