@@ -21,7 +21,7 @@
 namespace PEAR2\Net\RouterOS;
 
 /**
- * Exception thrown when there's something wrong with message parts.
+ * Exception thrown when there's something wrong with message arguments.
  * 
  * @category Net
  * @package  PEAR2_Net_RouterOS

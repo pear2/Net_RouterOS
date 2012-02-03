@@ -106,7 +106,7 @@ class Client
             if (!static::login($this->com, $username, $password)) {
                 $this->com->close();
                 throw new DataFlowException(
-                    'Invalid username or password supplied.', 100
+                    'Invalid username or password supplied.', 10000
                 );
             }
         }
@@ -180,7 +180,7 @@ class Client
             throw ($e instanceof NotSupportedException
             || $e instanceof UnexpectedValueException
             || !$com->getTransmitter()->isDataAwaiting()) ? new SocketException(
-                'This is not a compatible RouterOS service', 101, $e
+                'This is not a compatible RouterOS service', 10200, $e
             ) : $e;
         }
     }
@@ -255,12 +255,13 @@ class Client
         $tag = $request->getTag();
         if ('' == $tag) {
             throw new DataFlowException(
-                'Asynchonous commands must have a tag.', 102
+                'Asynchonous commands must have a tag.', 10500
             );
         }
         if ($this->isRequestActive($tag)) {
             throw new DataFlowException(
-                'There must not be multiple active requests sharing a tag.', 103
+                'There must not be multiple active requests sharing a tag.',
+                10501
             );
         }
         
@@ -269,9 +270,13 @@ class Client
         if (null === $callback) {
             //Register the request at the buffer
             $this->responseBuffer[$tag] = array();
-        } else {
+        } elseif (is_callable($callback, true)) {
             //Prepare the callback
             $this->callbacks[$tag] = $callback;
+        } else {
+            throw new UnexpectedValueException(
+                'Invalid callback provided.', 10502
+            );
         }
         return $this;
     }
@@ -293,10 +298,10 @@ class Client
     public function isRequestActive($tag, $filter = self::FILTER_ALL)
     {
         $result = 0;
-        if (self::FILTER_CALLBACK === ($filter & self::FILTER_CALLBACK)) {
+        if ($filter & self::FILTER_CALLBACK) {
             $result |= (int) array_key_exists($tag, $this->callbacks);
         }
-        if (self::FILTER_BUFFER === ($filter & self::FILTER_BUFFER)) {
+        if ($filter & self::FILTER_BUFFER) {
             $result |= (int) array_key_exists($tag, $this->responseBuffer);
         }
         return 0 !== $result;
@@ -402,7 +407,7 @@ class Client
             return new ResponseCollection($result);
         } else {
             throw new DataFlowException(
-                'No such request, or the request has already finished.', 104
+                'No such request, or the request has already finished.', 10900
             );
         }
     }
@@ -471,7 +476,7 @@ class Client
                 $cancelRequest->setArgument('tag', $tag);
             } else {
                 throw new DataFlowException(
-                    'No such request. Canceling aborted.', 105
+                    'No such request. Canceling aborted.', 11200
                 );
             }
         }

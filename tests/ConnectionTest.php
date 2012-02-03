@@ -140,7 +140,9 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 . '" should be available.'
             );
         } catch (DataFlowException $e) {
-            $this->assertEquals(100, $e->getCode(), 'Improper exception code.');
+            $this->assertEquals(
+                10000, $e->getCode(), 'Improper exception code.'
+            );
         }
     }
 
@@ -155,7 +157,9 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 . '" should be available.'
             );
         } catch (DataFlowException $e) {
-            $this->assertEquals(100, $e->getCode(), 'Improper exception code.');
+            $this->assertEquals(
+                10000, $e->getCode(), 'Improper exception code.'
+            );
         }
     }
 
@@ -174,7 +178,9 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 . '" should be available.'
             );
         } catch (DataFlowException $e) {
-            $this->assertEquals(100, $e->getCode(), 'Improper exception code.');
+            $this->assertEquals(
+                10000, $e->getCode(), 'Improper exception code.'
+            );
         }
     }
 
@@ -189,7 +195,9 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 . '" should be available.'
             );
         } catch (SocketException $e) {
-            $this->assertEquals(101, $e->getCode(), 'Improper exception code.');
+            $this->assertEquals(
+                10200, $e->getCode(), 'Improper exception code.'
+            );
         }
     }
 
@@ -220,7 +228,9 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 . '" should be available.'
             );
         } catch (SocketException $e) {
-            $this->assertEquals(101, $e->getCode(), 'Improper exception code.');
+            $this->assertEquals(
+                10200, $e->getCode(), 'Improper exception code.'
+            );
         }
     }
 
@@ -291,7 +301,9 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             new Response($com);
             $this->fail('Receiving had to fail.');
         } catch (SocketException $e) {
-            $this->assertEquals(206, $e->getCode(), 'Improper exception code.');
+            $this->assertEquals(
+                206, $e->getCode(), 'Improper exception code.'
+            );
         }
     }
 
