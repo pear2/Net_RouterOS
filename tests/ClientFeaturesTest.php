@@ -135,6 +135,22 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testSendAsyncValidCallbackRequirement()
+    {
+        $ping = new Request('/ping');
+        $ping->setArgument('address', HOSTNAME_INVALID);
+        $ping->setTag('ping');
+        try {
+            $this->object->sendAsync($ping, 3);
+
+            $this->fail('The call had to fail.');
+        } catch (UnexpectedValueException $e) {
+            $this->assertEquals(
+                10502, $e->getCode(), 'Improper exception code.'
+            );
+        }
+    }
+
     public function testSendAsyncWithCallbackAndTempLoop()
     {
         $ping = new Request('/ping');

@@ -264,19 +264,20 @@ class Client
                 10501
             );
         }
+        if (null !== $callback && !is_callable($callback, true)) {
+            throw new UnexpectedValueException(
+                'Invalid callback provided.', 10502
+            );
+        }
         
         $this->send($request);
 
         if (null === $callback) {
             //Register the request at the buffer
             $this->responseBuffer[$tag] = array();
-        } elseif (is_callable($callback, true)) {
+        } else {
             //Prepare the callback
             $this->callbacks[$tag] = $callback;
-        } else {
-            throw new UnexpectedValueException(
-                'Invalid callback provided.', 10502
-            );
         }
         return $this;
     }
