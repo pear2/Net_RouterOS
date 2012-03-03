@@ -82,7 +82,7 @@ class Communicator
     protected $charsets = array();
 
     /**
-     * @var TcpClient The transmitter for the connection.
+     * @var T\TcpClient The transmitter for the connection.
      */
     protected $trans;
 
@@ -317,6 +317,12 @@ class Communicator
         }
         $length = strlen($word);
         static::verifyLengthSupport($length);
+        if ($this->trans->isPersistent()) {
+            $old = $this->trans->lock(T\Stream::DIRECTION_SEND);
+            $bytes = $this->trans->send(self::encodeLength($length) . $word);
+            $this->trans->lock($old, true);
+            return $bytes;
+        }
         return $this->trans->send(self::encodeLength($length) . $word);
     }
 
@@ -440,7 +446,18 @@ class Communicator
      */
     public function getNextWord()
     {
-        $word = $this->trans->receive(self::decodeLength($this->trans), 'word');
+        if ($this->trans->isPersistent()) {
+            $old = $this->trans->lock(T\Stream::DIRECTION_RECEIVE);
+            $word = $this->trans->receive(
+                self::decodeLength($this->trans), 'word'
+            );
+            $this->trans->lock($old, true);
+        } else {
+            $word = $this->trans->receive(
+                self::decodeLength($this->trans), 'word'
+            );
+        }
+        
         if (null !== ($remoteCharset = $this->getCharset(self::CHARSET_REMOTE))
             && null !== ($localCharset = $this->getCharset(self::CHARSET_LOCAL))
         ) {
@@ -450,6 +467,7 @@ class Communicator
                 $word
             );
         }
+        
         return $word;
     }
 
@@ -473,9 +491,19 @@ class Communicator
                 $remoteCharset . '.' . $localCharset . '//IGNORE//TRANSLIT'
             );
         }
-        $stream = $this->trans->receiveStream(
-            self::decodeLength($this->trans), $filters, 'stream word'
-        );
+        
+        if ($this->trans->isPersistent()) {
+            $old = $this->trans->lock(T\Stream::DIRECTION_RECEIVE);
+            $stream = $this->trans->receiveStream(
+                self::decodeLength($this->trans), $filters, 'stream word'
+            );
+            $this->trans->lock($old, true);
+        } else {
+            $stream = $this->trans->receiveStream(
+                self::decodeLength($this->trans), $filters, 'stream word'
+            );
+        }
+        
         return $stream;
     }
 
@@ -491,6 +519,31 @@ class Communicator
      * @return int The decoded length
      */
     public static function decodeLength(T\Stream $trans)
+    {
+        if ($trans->isPersistent()) {
+            $old = $trans->lock($trans::DIRECTION_RECEIVE);
+            $length = self::_decodeLength($trans);
+            $trans->lock($old, true);
+            return $length;
+        }
+        return self::_decodeLength($trans);
+    }
+
+    /**
+     * Decodes the lenght of the incoming message.
+     * 
+     * Decodes the lenght of the incoming message, as specified by the RouterOS
+     * API.
+     * 
+     * Difference with the non private function is that this one doesn't perform
+     * locking if the connection is a persistent one.
+     * 
+     * @param T\Stream $trans The transmitter from which to decode the length of
+     * the incoming message.
+     * 
+     * @return int The decoded length
+     */
+    private static function _decodeLength(T\Stream $trans)
     {
         $byte = ord($trans->receive(1, 'initial length byte'));
         if ($byte & 0x80) {
@@ -508,7 +561,7 @@ class Communicator
                     + (double) sprintf('%u', $rem['~']);
             }
             throw new NotSupportedException(
-                'Unknown control byte encountered.', 1600, null, $byte
+                'Unknown control byte encountered.', 1601, null, $byte
             );
         } else {
             return $byte;

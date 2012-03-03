@@ -592,7 +592,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 Communicator::decodeLength($trans);
             } catch (NotSupportedException $e) {
                 $this->assertEquals(
-                    1600, $e->getCode(), 'Improper exception code.'
+                    1601, $e->getCode(), 'Improper exception code.'
                 );
                 $this->assertEquals(
                     $controlByte, $e->getValue(), 'Improper exception value.'

@@ -21,6 +21,11 @@
 namespace PEAR2\Net\RouterOS;
 
 /**
+ * Refers to transmitter direction constants.
+ */
+use PEAR2\Net\Transmitter as T;
+
+/**
  * A RouterOS client.
  * 
  * Provides functionality for easily communicating with a RouterOS host.
@@ -160,29 +165,44 @@ class Client
                 $password
             );
         }
-        
+        $old = null;
         try {
-            $request = new Request('/login');
-            $request->send($com);
-            $response = new Response($com);
-            $request->setArgument('name', $username);
-            $request->setArgument(
-                'response', '00' . md5(
-                    chr(0) . $password
-                    . pack('H*', $response->getArgument('ret'))
-                )
-            );
-            $request->send($com);
-            $response = new Response($com);
-            return $response->getType() === Response::TYPE_FINAL
-                && null === $response->getArgument('ret');
+            if ($com->getTransmitter()->isPersistent()) {
+                $old = $com->getTransmitter()->lock(T\Stream::DIRECTION_ALL);
+                $result = self::_performLogin($com, $username, $password);
+                $com->getTransmitter()->lock($old, true);
+                return $result;
+            }
+            return self::_performLogin($com, $username, $password);
         } catch (\Exception $e) {
+            if ($com->getTransmitter()->isPersistent() && null !== $old) {
+                $com->getTransmitter()->lock($old, true);
+            }
             throw ($e instanceof NotSupportedException
             || $e instanceof UnexpectedValueException
             || !$com->getTransmitter()->isDataAwaiting()) ? new SocketException(
                 'This is not a compatible RouterOS service', 10200, $e
             ) : $e;
         }
+    }
+    
+    private static function _performLogin(
+        Communicator $com, $username, $password
+    ) {
+        $request = new Request('/login');
+        $request->send($com);
+        $response = new Response($com);
+        $request->setArgument('name', $username);
+        $request->setArgument(
+            'response', '00' . md5(
+                chr(0) . $password
+                . pack('H*', $response->getArgument('ret'))
+            )
+        );
+        $request->send($com);
+        $response = new Response($com);
+        return $response->getType() === Response::TYPE_FINAL
+            && null === $response->getArgument('ret');
     }
     
     /**

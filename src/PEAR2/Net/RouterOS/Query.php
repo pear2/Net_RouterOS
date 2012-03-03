@@ -21,6 +21,11 @@
 namespace PEAR2\Net\RouterOS;
 
 /**
+ * Refers to transmitter direction constants.
+ */
+use PEAR2\Net\Transmitter as T;
+
+/**
  * Represents a query for RouterOS requests.
  * 
  * @category Net
@@ -168,6 +173,17 @@ class Query
      * @return int The number of bytes sent.
      */
     public function send(Communicator $com)
+    {
+        if ($com->getTransmitter()->isPersistent()) {
+            $old = $com->getTransmitter()->lock(T\Stream::DIRECTION_SEND);
+            $bytes = $this->_send($com);
+            $com->getTransmitter()->lock($old, true);
+            return $bytes;
+        }
+        return $this->_send($com);
+    }
+    
+    private function _send(Communicator $com)
     {
         if (!$com->getTransmitter()->isAcceptingData()) {
             throw new SocketException(

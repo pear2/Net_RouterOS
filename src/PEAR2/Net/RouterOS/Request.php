@@ -21,6 +21,11 @@
 namespace PEAR2\Net\RouterOS;
 
 /**
+ * Refers to transmitter direction constants.
+ */
+use PEAR2\Net\Transmitter as T;
+
+/**
  * Represents a RouterOS request.
  * 
  * @category Net
@@ -238,6 +243,29 @@ class Request extends Message
      * @see Client::sendAsync()
      */
     public function send(Communicator $com)
+    {
+        if ($com->getTransmitter()->isPersistent()) {
+            $old = $com->getTransmitter()->lock(T\Stream::DIRECTION_SEND);
+            $bytes = $this->_send($com);
+            $com->getTransmitter()->lock($old, true);
+            return $bytes;
+        }
+        return $this->_send($com);
+    }
+
+    /**
+     * Sends a request over a communicator.
+     * 
+     * The only difference with the non private equivalent is that this one does
+     * not do locking.
+     * 
+     * @param Communicator $com The communicator to send the request over.
+     * 
+     * @return int The number of bytes sent.
+     * @see Client::sendSync()
+     * @see Client::sendAsync()
+     */
+    private function _send(Communicator $com)
     {
         if (!$com->getTransmitter()->isAcceptingData()) {
             throw new SocketException(
