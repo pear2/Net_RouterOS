@@ -182,7 +182,17 @@ class Query
         }
         return $this->_send($com);
     }
-    
+
+    /**
+     * Sends the query over a communicator.
+     * 
+     * The only difference with the non private equivalent is that this one does
+     * not do locking.
+     * 
+     * @param Communicator $com The communicator to send the query over.
+     * 
+     * @return int The number of bytes sent.
+     */
     private function _send(Communicator $com)
     {
         if (!$com->getTransmitter()->isAcceptingData()) {

@@ -26,6 +26,11 @@ namespace PEAR2\Net\RouterOS;
 use PEAR2\Net\Transmitter as T;
 
 /**
+ * Uses shared memory to keep responses in when using persistent connections.
+ */
+use PEAR2\Cache\SHM;
+
+/**
  * A RouterOS client.
  * 
  * Provides functionality for easily communicating with a RouterOS host.
@@ -75,6 +80,12 @@ class Client
      * Key is the tag of the request, and the value is the callback for it.
      */
     protected $callbacks = array();
+    
+    /**
+     * @var SHM Handler for shared response buffer. Remains NULL when the
+     * connection is not a persistent one.
+     */
+    protected $shmHandler = null;
 
     /**
      * @var bool Whether to stream future responses.
@@ -114,6 +125,13 @@ class Client
                     'Invalid username or password supplied.', 10000
                 );
             }
+        }
+        
+        if ($persist) {
+            $this->shmHandler = new SHM(
+                'PEAR2\Net\RouterOS\Client tcp://' .
+                "{$host}:{$port}/{$username}"
+            );
         }
     }
     
@@ -185,7 +203,20 @@ class Client
             ) : $e;
         }
     }
-    
+
+    /**
+     * Login to a RouterOS connection.
+     * 
+     * This is the actual login procedure, applied regardless of persistence and
+     * charset settings.
+     * 
+     * @param Communicator $com      The communicator to attempt to login to.
+     * @param string       $username The RouterOS username.
+     * @param string       $password The RouterOS password. Potentially parsed
+     * already by iconv.
+     * 
+     * @return bool TRUE on success, FALSE on failure.
+     */
     private static function _performLogin(
         Communicator $com, $username, $password
     ) {
