@@ -108,6 +108,7 @@
             <file>ConnectionTest.php</file>
             <file>RequestHandlingTest.php</file>
             <file>ClientFeaturesTest.php</file>
+            <file>ClientPersistentFeaturesTest.php</file>
             <file>StateAlteringFeaturesTest.php</file>
         </testsuite>
     </testsuites>

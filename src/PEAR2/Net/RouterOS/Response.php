@@ -20,6 +20,8 @@
  */
 namespace PEAR2\Net\RouterOS;
 
+use PEAR2\Net\Transmitter as T;
+
 /**
  * Represents a RouterOS response.
  * 
@@ -70,11 +72,67 @@ class Response extends Message
      * new response.
      * @param bool         $asStream Whether to populate the argument values
      * with streams instead of strings.
+     * @param Registry     $reg      An optional registry to sync the
+     * response with.
      * 
      * @see getType()
      * @see getArgument()
      */
-    public function __construct(Communicator $com, $asStream = false)
+    public function __construct(
+        Communicator $com, $asStream = false, Registry $reg = null
+    ) {
+        if (null === $reg) {
+            if ($com->getTransmitter()->isPersistent()) {
+                $old = $com->getTransmitter()
+                    ->lock(T\Stream::DIRECTION_RECEIVE);
+                $this->_receive($com, $asStream);
+                $com->getTransmitter()->lock($old, true);
+            } else {
+                $this->_receive($com, $asStream);
+            }
+        } else {
+            while (null === ($response = $reg->getNextResponse())) {
+                $newResponse = new self($com, true);
+                $tagInfo = $reg::parseTag($newResponse->getTag());
+                $newResponse->setTag($tagInfo[1]);
+                if (!$reg->add($newResponse, $tagInfo[0])) {
+                    $response = $newResponse;
+                    break;
+                }
+            }
+            
+            $this->_type = $response->_type;
+            $this->arguments = $response->arguments;
+            $this->unrecognizedWords = $response->unrecognizedWords;
+            $this->setTag($response->getTag());
+            
+            if (!$asStream) {
+                foreach ($this->arguments as $name => $value) {
+                    $this->setArgument(
+                        $name, stream_get_contents($value)
+                    );
+                }
+                foreach ($response->unrecognizedWords as $i => $value) {
+                    $this->unrecognizedWords[$i] = stream_get_contents($value);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Extracts a new response from a communicator.
+     * 
+     * This is the function that performs the actual receiving, while the
+     * constructor is also involved in locks and registry sync.
+     * 
+     * @param Communicator $com      The communicator from which to extract the
+     * new response.
+     * @param bool         $asStream Whether to populate the argument values
+     * with streams instead of strings.
+     * 
+     * @return void
+     */
+    private function _receive(Communicator $com, $asStream = false)
     {
         if (!$com->getTransmitter()->isDataAwaiting()) {
             throw new SocketException(

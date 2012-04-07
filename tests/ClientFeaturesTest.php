@@ -333,9 +333,10 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
             0, $responseCount,
             "No responses for '" . HOSTNAME . "' in 2 seconds."
         );
-        $this->assertEquals(
+        $this->assertGreaterThanOrEqual(
+            $responseCount,
             $finalRepliesCount + 1/* The !trap */,
-            $responseCount, "Extra callbacks were executed during second loop."
+            "Insufficient callbacks during second loop."
         );
     }
 

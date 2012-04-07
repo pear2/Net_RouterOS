@@ -82,10 +82,10 @@ class Client
     protected $callbacks = array();
     
     /**
-     * @var SHM Handler for shared response buffer. Remains NULL when the
-     * connection is not a persistent one.
+     * @var Registry A registry for the operations. Particularly helpful at
+     * persistent connections.
      */
-    protected $shmHandler = null;
+    protected $registry = null;
 
     /**
      * @var bool Whether to stream future responses.
@@ -118,20 +118,21 @@ class Client
             $host, $port, $persist, $timeout, $username, $context
         );
         //Login the user if necessary
-        if ($this->com->getTransmitter()->isFresh()) {
+        if ((!$persist
+            || 0 == $this->com->getTransmitter()->lock(T\Stream::DIRECTION_ALL))
+            && $this->com->getTransmitter()->isFresh()
+        ) {
             if (!static::login($this->com, $username, $password)) {
                 $this->com->close();
                 throw new DataFlowException(
                     'Invalid username or password supplied.', 10000
                 );
             }
+            $this->com->getTransmitter()->lock(T\Stream::DIRECTION_NONE, true);
         }
         
         if ($persist) {
-            $this->shmHandler = new SHM(
-                'PEAR2\Net\RouterOS\Client tcp://' .
-                "{$host}:{$port}/{$username}"
-            );
+            $this->registry = new Registry("{$host}:{$port}/{$username}");
         }
     }
     
@@ -155,7 +156,7 @@ class Client
         if (is_int($arg) || is_double($arg)) {
             return $this->loop($arg);
         } elseif ($arg instanceof Request) {
-            return $arg->getTag() === null ? $this->sendSync($arg)
+            return '' == $arg->getTag() ? $this->sendSync($arg)
                 : $this->sendAsync($arg);
         } elseif (null === $arg) {
             return $this->completeRequest();
@@ -523,16 +524,37 @@ class Client
     {
         $cancelRequest = new Request('/cancel');
         $hasTag = !('' == $tag);
+        $hasReg = null !== $this->registry;
+        if ($hasReg && !$hasTag) {
+            $tags = array_merge(
+                array_keys($this->responseBuffer), array_keys($this->callbacks)
+            );
+            foreach ($tags as $t) {
+                $this->cancelRequest($t);
+            }
+            return $this;
+        }
+        
         if ($hasTag) {
             if ($this->isRequestActive($tag)) {
-                $cancelRequest->setArgument('tag', $tag);
+                if ($hasReg) {
+                    $cancelRequest->setArgument(
+                        'tag', $this->registry->getOwnershipTag() . $tag
+                    );
+                } else {
+                    $cancelRequest->setArgument('tag', $tag);
+                }
             } else {
                 throw new DataFlowException(
                     'No such request. Canceling aborted.', 11200
                 );
             }
         }
+        
+        $regBackup = $this->registry;
+        $this->registry = null;
         $this->sendSync($cancelRequest);
+        $this->registry = $regBackup;
 
         if ($hasTag) {
             if ($this->isRequestActive($tag, self::FILTER_BUFFER)) {
@@ -603,7 +625,20 @@ class Client
         }
         $this->callbacks = array();
         $this->pendingRequestsCount = 0;
+        if (null !== $this->registry) {
+            $this->registry->close();
+        }
         return $result;
+    }
+    
+    /**
+     * Closes the connection, unless it's a persistent one.
+     */
+    public function __destruct()
+    {
+        if (!$this->com->getTransmitter()->isPersistent()) {
+            $this->close();
+        }
     }
 
     /**
@@ -617,7 +652,7 @@ class Client
      */
     protected function send(Request $request)
     {
-        $request->send($this->com);
+        $request->send($this->com, $this->registry);
         $this->pendingRequestsCount++;
         return $this;
     }
@@ -632,7 +667,9 @@ class Client
      */
     protected function dispatchNextResponse()
     {
-        $response = new Response($this->com, $this->_streamingResponses);
+        $response = new Response(
+            $this->com, $this->_streamingResponses, $this->registry
+        );
         if ($response->getType() === Response::TYPE_FATAL) {
             $this->pendingRequestsCount = 0;
             $this->com->close();

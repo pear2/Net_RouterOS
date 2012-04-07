@@ -237,13 +237,21 @@ class Request extends Message
      * Sends a request over a communicator.
      * 
      * @param Communicator $com The communicator to send the request over.
+     * @param Registry     $reg An optional registry to sync the request with.
      * 
      * @return int The number of bytes sent.
      * @see Client::sendSync()
      * @see Client::sendAsync()
      */
-    public function send(Communicator $com)
+    public function send(Communicator $com, Registry $reg = null)
     {
+        if (null !== $reg) {
+            $originalTag = $this->getTag();
+            $this->setTag($reg->getOwnershipTag() . $originalTag);
+            $bytes = $this->send($com);
+            $this->setTag($originalTag);
+            return $bytes;
+        }
         if ($com->getTransmitter()->isPersistent()) {
             $old = $com->getTransmitter()->lock(T\Stream::DIRECTION_SEND);
             $bytes = $this->_send($com);
