@@ -41,7 +41,7 @@ abstract class Message
     /**
      * @var string An optional tag to associate the message with.
      */
-    private $_tag = null;
+    protected $_tag = null;
     
     /**
      * A shorthand gateway.

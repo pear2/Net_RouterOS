@@ -2,13 +2,4 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <coverage xmlns="http://www.netbeans.org/ns/code-coverage/1" enabled="true"/>
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1"/>
-    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
-        <file>file:/D:/Projects/PEAR2_Net_RouterOS.git/src/PEAR2/Net/RouterOS/SocketException.php</file>
-        <file>file:/D:/Projects/PEAR2_Net_RouterOS.git/src/PEAR2/Net/RouterOS/Client.php</file>
-        <file>file:/D:/Projects/PEAR2_Net_RouterOS.git/src/PEAR2/Net/RouterOS/Communicator.php</file>
-        <file>file:/D:/Projects/PEAR2_Net_RouterOS.git/src/PEAR2/Net/RouterOS/Query.php</file>
-        <file>file:/D:/Projects/PEAR2_Net_RouterOS.git/src/PEAR2/Net/RouterOS/Request.php</file>
-        <file>file:/D:/Projects/PEAR2_Net_RouterOS.git/src/PEAR2/Net/RouterOS/Registry.php</file>
-        <file>file:/D:/Projects/PEAR2_Net_RouterOS.git/src/PEAR2/Net/RouterOS/PersistentRegistry.php</file>
-    </open-files>
 </project-private>

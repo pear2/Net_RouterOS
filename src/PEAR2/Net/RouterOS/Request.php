@@ -245,7 +245,9 @@ class Request extends Message
      */
     public function send(Communicator $com, Registry $reg = null)
     {
-        if (null !== $reg) {
+        if (null !== $reg
+            && (null != $this->getTag() || !$reg->isTaglessModeOwner())
+        ) {
             $originalTag = $this->getTag();
             $this->setTag($reg->getOwnershipTag() . $originalTag);
             $bytes = $this->send($com);

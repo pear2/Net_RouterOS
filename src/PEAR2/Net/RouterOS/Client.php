@@ -438,7 +438,7 @@ class Client
      */
     public function extractNewResponses($tag = null)
     {
-        if ('' == $tag) {
+        if (null === $tag) {
             $result = array();
             foreach (array_keys($this->responseBuffer) as $tag) {
                 $result = array_merge(
@@ -529,40 +529,43 @@ class Client
             $tags = array_merge(
                 array_keys($this->responseBuffer), array_keys($this->callbacks)
             );
+            $this->registry->setTaglessMode(true);
             foreach ($tags as $t) {
-                $this->cancelRequest($t);
-            }
-            return $this;
-        }
-        
-        if ($hasTag) {
-            if ($this->isRequestActive($tag)) {
-                if ($hasReg) {
-                    $cancelRequest->setArgument(
-                        'tag', $this->registry->getOwnershipTag() . $tag
-                    );
-                } else {
-                    $cancelRequest->setArgument('tag', $tag);
-                }
-            } else {
-                throw new DataFlowException(
-                    'No such request. Canceling aborted.', 11200
+                $cancelRequest->setArgument(
+                    'tag', $this->registry->getOwnershipTag() . $t
                 );
+                $this->sendSync($cancelRequest);
+            }
+            $this->registry->setTaglessMode(false);
+        } else {
+            if ($hasTag) {
+                if ($this->isRequestActive($tag)) {
+                    if ($hasReg) {
+                        $this->registry->setTaglessMode(true);
+                        $cancelRequest->setArgument(
+                            'tag', $this->registry->getOwnershipTag() . $tag
+                        );
+                    } else {
+                        $cancelRequest->setArgument('tag', $tag);
+                    }
+                } else {
+                    throw new DataFlowException(
+                        'No such request. Canceling aborted.', 11200
+                    );
+                }
+            }
+            $this->sendSync($cancelRequest);
+            if ($hasReg) {
+                $this->registry->setTaglessMode(false);
             }
         }
-        
-        $regBackup = $this->registry;
-        $this->registry = null;
-        $this->sendSync($cancelRequest);
-        $this->registry = $regBackup;
 
         if ($hasTag) {
             if ($this->isRequestActive($tag, self::FILTER_BUFFER)) {
-                unset($this->responseBuffer[$tag]);
-            } elseif ($this->isRequestActive($tag, self::FILTER_CALLBACK)) {
-                unset($this->callbacks[$tag]);
+                $this->responseBuffer[$tag] = $this->completeRequest($tag);
+            } else {
+                $this->completeRequest($tag);
             }
-            $this->pendingRequestsCount--;
         } else {
             $this->responseBuffer = array();
             $this->callbacks = array();
@@ -615,19 +618,27 @@ class Client
      */
     public function close()
     {
-        $result = false;
+        $result = true;
         try {
-            $response = $this->sendSync(new Request('/quit'));
-            $result = $this->com->close()
-                && $response->getType() === Response::TYPE_FATAL;
+            if (0 !== $this->pendingRequestsCount) {
+                if (null !== $this->registry) {
+                    $this->registry->setTaglessMode(true);
+                }
+                $response = $this->sendSync(new Request('/quit'));
+                if (null !== $this->registry) {
+                    $this->registry->setTaglessMode(false);
+                }
+                $result = $response->getType() === Response::TYPE_FATAL;
+            }
+            $result = $result && $this->com->close();
         } catch (SocketException $e) {
             $result = $e->getCode() === 205;
         }
         $this->callbacks = array();
         $this->pendingRequestsCount = 0;
-        if (null !== $this->registry) {
-            $this->registry->close();
-        }
+        //if (null !== $this->registry) {
+        //    $this->registry->close();
+        //}
         return $result;
     }
     
@@ -636,7 +647,11 @@ class Client
      */
     public function __destruct()
     {
-        if (!$this->com->getTransmitter()->isPersistent()) {
+        if ($this->com->getTransmitter()->isPersistent()) {
+            if (0 !== $this->pendingRequestsCount) {
+                $this->cancelRequest();
+            }
+        } else {
             $this->close();
         }
     }

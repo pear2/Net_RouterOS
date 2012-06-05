@@ -99,6 +99,49 @@ class Registry
     }
     
     /**
+     * Checks if any instance is in tagless mode right now.
+     * 
+     * @return bool TRUE if an instance is in tagless mode, FALSE otherwise.
+     */
+    public function isTaglessModeOwner()
+    {
+        $this->shm->lock('taglessModeOwner');
+        $result = $this->shm->exists('taglessModeOwner')
+            && $this->getOwnershipTag() === $this->shm->get('taglessModeOwner');
+        $this->shm->unlock('taglessModeOwner');
+        return $result;
+    }
+    
+    /**
+     * Sets the "tagless mode" setting.
+     * 
+     * While in tagless mode, this instance will claim owhership of any
+     * responses without a tag. While not in this mode, any requests without a
+     * tag will be given to all instances.
+     * 
+     * Regardless of mode, if the type of the response is
+     * {@link Response::TYPE_FATAL}, it will be given to all instances.
+     * 
+     * @param bool $taglessMode TRUE to claim tagless ownership, FALSE to
+     * release such ownership, if taken.
+     * 
+     * @return bool TRUE on success, FALSE on failure. 
+     */
+    public function setTaglessMode($taglessMode)
+    {
+        return $taglessMode 
+            ?   ($this->shm->lock('taglessMode')
+                && $this->shm->lock('taglessModeOwner')
+                && $this->shm->add('taglessModeOwner', $this->getOwnershipTag())
+                && $this->shm->unlock('taglessModeOwner'))
+            :   ($this->isTaglessModeOwner()
+                && $this->shm->lock('taglessModeOwner')
+                && $this->shm->delete('taglessModeOwner')
+                && $this->shm->unlock('taglessModeOwner')
+                && $this->shm->unlock('taglessMode'));
+    }
+    
+    /**
      * Get the ownership tag for this instance.
      * 
      * @return string The ownership tag for this registry instance. 
@@ -123,16 +166,28 @@ class Registry
      */
     public function add(Response $response, $ownershipTag)
     {
-        if ($this->getOwnershipTag() === $ownershipTag) {
+        if ($this->getOwnershipTag() === $ownershipTag
+            || ($this->isTaglessModeOwner()
+            && $response->getType() !== Response::TYPE_FATAL)
+        ) {
             return false;
         }
         
         if (null === $ownershipTag) {
-            foreach ($this->shm->getIterator('/^(responseBuffer\_)/', true)
-                as $targetBufferName) {
-                $this->_add($response, $targetBufferName);
+            $this->shm->lock('taglessModeOwner');
+            if ($this->shm->exists('taglessModeOwner')
+                && $response->getType() !== Response::TYPE_FATAL
+            ) {
+                $ownershipTag = $this->shm->get('taglessModeOwner');
+                $this->shm->unlock('taglessModeOwner');
+            } else {
+                $this->shm->unlock('taglessModeOwner');
+                foreach ($this->shm->getIterator('/^(responseBuffer\_)/', true)
+                    as $targetBufferName) {
+                    $this->_add($response, $targetBufferName);
+                }
+                return true;
             }
-            return true;
         }
         
         $this->_add($response, 'responseBuffer_' . $ownershipTag);
@@ -189,10 +244,14 @@ class Registry
      */
     public function close()
     {
-        foreach ($this->shm->getIterator('/^(responseBuffer\_)/', true)
-            as $targetBufferName) {
-            $this->_close($targetBufferName);
-        }
+        self::$requestId = -1;
+        self::$instanceIdSeed = -1;
+        $this->shm->clear();
+        
+        //foreach ($this->shm->getIterator('/^(responseBuffer\_)/', true)
+        //    as $targetBufferName) {
+        //    $this->_close($targetBufferName);
+        //}
     }
     
     /**

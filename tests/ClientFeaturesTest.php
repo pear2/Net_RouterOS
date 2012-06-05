@@ -334,8 +334,8 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
             "No responses for '" . HOSTNAME . "' in 2 seconds."
         );
         $this->assertGreaterThanOrEqual(
+            $finalRepliesCount + 2/* The !trap and !done */,
             $responseCount,
-            $finalRepliesCount + 1/* The !trap */,
             "Insufficient callbacks during second loop."
         );
     }
@@ -370,7 +370,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
 
         $this->object->loop();
         $this->assertEquals(
-            $limit + 1/* The !trap */, $repliesCount,
+            $limit + 2/* The !trap and !done*/, $repliesCount,
             "Extra callbacks were executed during second loop."
         );
     }
@@ -435,12 +435,12 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
                 $repliesCount++;
             }
         );
+        sleep(1);
 
 
         $arpPrint = new Request('/ip/arp/print');
         $arpPrint->setTag('arp');
         $this->object->sendAsync($arpPrint);
-
         $list = $this->object->completeRequest('arp');
 
         
@@ -513,8 +513,12 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
 
         $arpPrint = new Request('/ip/arp/print');
         $arpPrint->setTag('arp');
-        $list1 = $this->object->sendSync($arpPrint);
-        $list2 = array();
+        $list1 = $list2 = array();
+        foreach ($this->object->sendSync($arpPrint) as $response) {
+            $list1[(string) $response->getArgument('.id')] = $response;
+        }
+        ksort($list1);
+        
         $this->object->sendAsync(
             $arpPrint, 
             function($response, $client) use (&$list2) {
@@ -531,12 +535,13 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
                     'arp', $response->getTag(),
                     'The callback must only receive responses meant for it.'
                 );
-                $list2[] = $response;
+                $list2[(string) $response->getArgument('.id')] = $response;
             }
         );
 
         $this->assertEmpty($this->object->completeRequest('arp')->toArray());
-        $this->assertEquals($list1->toArray(), $list2);
+        ksort($list2);
+        $this->assertEquals($list1, $list2);
     }
 
     public function testCompleteRequestEmptyQueue()
@@ -623,7 +628,10 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $obj(new Request('/ip/arp/print', null, 'arp'));
         $this->assertEquals(1, $obj->getPendingRequestsCount());
         $obj();
-        $arpResponses2 = $obj('arp');
+        $this->assertEquals(0, $obj->getPendingRequestsCount());
+        $arpResponses2 = $obj->extractNewResponses('arp');
+        //$arpResponses2 = $obj('arp');
+        $this->assertEquals(0, $obj->getPendingRequestsCount());
         $this->assertGreaterThan(0, count($arpResponses2));
         $this->assertEquals(count($arpResponses1), count($arpResponses2));
         $this->assertInstanceOf(__NAMESPACE__ . '\Response', $arpResponses1(0));
