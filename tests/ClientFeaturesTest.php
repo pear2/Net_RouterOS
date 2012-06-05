@@ -196,22 +196,17 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->object->sendAsync($ping2);
         $this->object->loop(2);
         $this->object->cancelRequest();
-        try {
-            $this->object->extractNewResponses('ping1');
-            $this->fail('The call had to fail.');
-        } catch (DataFlowException $e) {
-            $this->assertEquals(
-                10900, $e->getCode(), 'Improper exception code.'
-            );
-        }
-        try {
-            $this->object->extractNewResponses('ping2');
-            $this->fail('The call had to fail.');
-        } catch (DataFlowException $e) {
-            $this->assertEquals(
-                10900, $e->getCode(), 'Improper exception code.'
-            );
-        }
+        
+        $ping1responses = $this->object->extractNewResponses('ping1');
+        
+        $ping1responses->end();
+        $ping1responses->prev();
+        $this->assertEquals(Response::TYPE_ERROR, $ping1responses->getType());
+        
+        $ping2responses = $this->object->extractNewResponses('ping2');
+        $ping2responses->end();
+        $ping2responses->prev();
+        $this->assertEquals(Response::TYPE_ERROR, $ping2responses->getType());
     }
 
     public function testInvalidCancel()

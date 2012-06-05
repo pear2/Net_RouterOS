@@ -23,7 +23,7 @@ namespace PEAR2\Net\RouterOS;
 /**
  * Refers to transmitter direction constants.
  */
-use PEAR2\Net\Transmitter as T;
+use PEAR2\Net\Transmitter\Stream as S;
 
 /**
  * Uses shared memory to keep responses in when using persistent connections.
@@ -115,11 +115,12 @@ class Client
         $persist = false, $timeout = null, $context = null
     ) {
         $this->com = new Communicator(
-            $host, $port, $persist, $timeout, $username, $context
+            $host, $port, $persist, $timeout, $username . '/' . $password,
+            $context
         );
         //Login the user if necessary
         if ((!$persist
-            || 0 == $this->com->getTransmitter()->lock(T\Stream::DIRECTION_ALL))
+            || !($old = $this->com->getTransmitter()->lock(S::DIRECTION_ALL)))
             && $this->com->getTransmitter()->isFresh()
         ) {
             if (!static::login($this->com, $username, $password)) {
@@ -128,7 +129,10 @@ class Client
                     'Invalid username or password supplied.', 10000
                 );
             }
-            $this->com->getTransmitter()->lock(T\Stream::DIRECTION_NONE, true);
+        }
+        
+        if (isset($old)) {
+            $this->com->getTransmitter()->lock($old, true);
         }
         
         if ($persist) {
@@ -187,12 +191,12 @@ class Client
         $old = null;
         try {
             if ($com->getTransmitter()->isPersistent()) {
-                $old = $com->getTransmitter()->lock(T\Stream::DIRECTION_ALL);
-                $result = self::_performLogin($com, $username, $password);
+                $old = $com->getTransmitter()->lock(S::DIRECTION_ALL);
+                $result = self::_login($com, $username, $password);
                 $com->getTransmitter()->lock($old, true);
                 return $result;
             }
-            return self::_performLogin($com, $username, $password);
+            return self::_login($com, $username, $password);
         } catch (\Exception $e) {
             if ($com->getTransmitter()->isPersistent() && null !== $old) {
                 $com->getTransmitter()->lock($old, true);
@@ -218,7 +222,7 @@ class Client
      * 
      * @return bool TRUE on success, FALSE on failure.
      */
-    private static function _performLogin(
+    private static function _login(
         Communicator $com, $username, $password
     ) {
         $request = new Request('/login');
@@ -567,9 +571,7 @@ class Client
                 $this->completeRequest($tag);
             }
         } else {
-            $this->responseBuffer = array();
-            $this->callbacks = array();
-            $this->pendingRequestsCount = 0;
+            $this->loop();
         }
         return $this;
     }
@@ -618,7 +620,7 @@ class Client
      */
     public function close()
     {
-        $result = true;
+        $result = false;
         try {
             if (0 !== $this->pendingRequestsCount) {
                 if (null !== $this->registry) {
@@ -630,15 +632,11 @@ class Client
                 }
                 $result = $response->getType() === Response::TYPE_FATAL;
             }
-            $result = $result && $this->com->close();
         } catch (SocketException $e) {
             $result = $e->getCode() === 205;
         }
         $this->callbacks = array();
         $this->pendingRequestsCount = 0;
-        //if (null !== $this->registry) {
-        //    $this->registry->close();
-        //}
         return $result;
     }
     

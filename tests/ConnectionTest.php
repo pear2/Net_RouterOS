@@ -144,12 +144,44 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 10000, $e->getCode(), 'Improper exception code.'
             );
         }
+        
+        try {
+            $routerOS = new Client(
+                \HOSTNAME, USERNAME_INVALID, PASSWORD, PORT, true
+            );
+
+            $this->fail(
+                'No proper connection with the username "'
+                . USERNAME_INVALID
+                . '" should be available.'
+            );
+        } catch (DataFlowException $e) {
+            $this->assertEquals(
+                10000, $e->getCode(), 'Improper exception code.'
+            );
+        }
     }
 
     public function testInvalidPassword()
     {
         try {
             $routerOS = new Client(\HOSTNAME, USERNAME, PASSWORD_INVALID, PORT);
+
+            $this->fail(
+                'No proper connection with the password "'
+                . PASSWORD_INVALID
+                . '" should be available.'
+            );
+        } catch (DataFlowException $e) {
+            $this->assertEquals(
+                10000, $e->getCode(), 'Improper exception code.'
+            );
+        }
+        
+        try {
+            $routerOS = new Client(
+                \HOSTNAME, USERNAME, PASSWORD_INVALID, PORT, true
+            );
 
             $this->fail(
                 'No proper connection with the password "'
@@ -182,12 +214,46 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 10000, $e->getCode(), 'Improper exception code.'
             );
         }
+        
+        try {
+            $routerOS = new Client(
+                \HOSTNAME, USERNAME_INVALID, PASSWORD_INVALID, PORT, true
+            );
+
+            $this->fail(
+                'No proper connection with the username "'
+                . USERNAME_INVALID
+                . '" and password "'
+                . PASSWORD_INVALID
+                . '" should be available.'
+            );
+        } catch (DataFlowException $e) {
+            $this->assertEquals(
+                10000, $e->getCode(), 'Improper exception code.'
+            );
+        }
     }
 
     public function testInvalidHost()
     {
         try {
             $routerOS = new Client(\HOSTNAME_INVALID, USERNAME, PASSWORD, PORT);
+
+            $this->fail(
+                'No proper connection over hostname "'
+                . \HOSTNAME_INVALID
+                . '" should be available.'
+            );
+        } catch (SocketException $e) {
+            $this->assertEquals(
+                10200, $e->getCode(), 'Improper exception code.'
+            );
+        }
+        
+        try {
+            $routerOS = new Client(
+                \HOSTNAME_INVALID, USERNAME, PASSWORD, PORT, true
+            );
 
             $this->fail(
                 'No proper connection over hostname "'
@@ -215,6 +281,21 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals(7, $e->getCode());
             $this->assertEquals(10060, $e->getSocketErrorNumber());
         }
+        
+        try {
+            $routerOS = new Client(
+                \HOSTNAME_SILENT, USERNAME, PASSWORD, PORT, true
+             );
+
+            $this->fail(
+                'No proper connection over hostname "'
+                . \HOSTNAME_SILENT
+                . '" should be available.'
+            );
+        } catch (T\SocketException $e) {
+            $this->assertEquals(7, $e->getCode());
+            $this->assertEquals(10060, $e->getSocketErrorNumber());
+        }
     }
 
     public function testInvalidPort()
@@ -232,12 +313,43 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 10200, $e->getCode(), 'Improper exception code.'
             );
         }
+        
+        try {
+            $routerOS = new Client(
+                \HOSTNAME, USERNAME, PASSWORD, PORT_INVALID, true
+            );
+
+            $this->fail(
+                'No proper connection over port "'
+                . PORT_INVALID
+                . '" should be available.'
+            );
+        } catch (SocketException $e) {
+            $this->assertEquals(
+                10200, $e->getCode(), 'Improper exception code.'
+            );
+        }
     }
 
     public function testSilentPort()
     {
         try {
             $routerOS = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT_SILENT);
+
+            $this->fail(
+                'No proper connection over port "'
+                . PORT_SILENT
+                . '" should be available.'
+            );
+        } catch (T\SocketException $e) {
+            $this->assertEquals(7, $e->getCode());
+            $this->assertEquals(10061, $e->getSocketErrorNumber());
+        }
+        
+        try {
+            $routerOS = new Client(
+                \HOSTNAME, USERNAME, PASSWORD, PORT_SILENT, true
+            );
 
             $this->fail(
                 'No proper connection over port "'
