@@ -176,9 +176,9 @@ class Response extends Message
             for ($word = $com->getNextWord(); '' !== $word;
                     $word = $com->getNextWord()
             ) {
-                if (preg_match('/^=([^=]+)=(.*)$/sm', $word, $matches)) {
+                if (preg_match('/^=([^=]+)=(.*)$/sS', $word, $matches)) {
                     $this->setArgument($matches[1], $matches[2]);
-                } elseif (preg_match('/^\.tag=(.*)$/sm', $word, $matches)) {
+                } elseif (preg_match('/^\.tag=(.*)$/sS', $word, $matches)) {
                     $this->setTag($matches[1]);
                 } else {
                     $this->unrecognizedWords[] = $word;

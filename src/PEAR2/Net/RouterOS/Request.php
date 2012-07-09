@@ -327,7 +327,7 @@ class Request extends Message
         $name = null;
         while ($string = substr($string, strlen($token))) {
             if (null === $name) {
-                if (preg_match('/^\s+([^\s=]+)/sm', $string, $matches)) {
+                if (preg_match('/^\s+([^\s=]+)/sS', $string, $matches)) {
                     $token = $matches[0];
                     $name = $matches[1];
                 } else {
@@ -336,13 +336,13 @@ class Request extends Message
                         41000
                     );
                 }
-            } elseif (preg_match('/^\s/sm', $string, $matches)) {
+            } elseif (preg_match('/^\s/s', $string, $matches)) {
                 //Empty argument
                 $token = '';
                 $this->setArgument($name);
                 $name = null;
             } elseif (
-                preg_match('/^="(([^\\\"]|\\\"|\\\\)*)"/sm', $string, $matches)
+                preg_match('/^="(([^\\\"]|\\\"|\\\\)*)"/sS', $string, $matches)
             ) {
                 $token = $matches[0];
                 $this->setArgument(
@@ -352,7 +352,7 @@ class Request extends Message
                     )
                 );
                 $name = null;
-            } elseif (preg_match('/^=(\S+)/sm', $string, $matches)) {
+            } elseif (preg_match('/^=(\S+)/sS', $string, $matches)) {
                 $token = $matches[0];
                 $this->setArgument($name, $matches[1]);
                 $name = null;

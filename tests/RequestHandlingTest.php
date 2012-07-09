@@ -153,7 +153,11 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             '/ping address=192.168.0.1 count=2' => '/ping',
             '/ping address="192.168.0.1" count=2' => '/ping',
             '/ping address=192.168.0.1 count="2"' => '/ping',
-            '/ping address="192.168.0.1" count="2"' => '/ping'
+            '/ping address="192.168.0.1" count="2"' => '/ping',
+            '/ping address=192.168.0.1
+                count="2"' => '/ping',
+            '/ping address="192.168.0.1"
+                count="2"' => '/ping'
         );
         foreach ($commands as $command => $expected) {
             $request = new Request($command);
@@ -326,6 +330,12 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             '/ping address=192.168.0.1 count="2"'
                 => array('address' => '192.168.0.1', 'count' => '2'),
             '/ping address="192.168.0.1" count="2"'
+                => array('address' => '192.168.0.1', 'count' => '2'),
+            '/ping address=192.168.0.1
+                count="2"'
+                => array('address' => '192.168.0.1', 'count' => '2'),
+            '/ping address="192.168.0.1"
+                count="2"'
                 => array('address' => '192.168.0.1', 'count' => '2'),
         );
         foreach ($commands as $command => $expected) {
