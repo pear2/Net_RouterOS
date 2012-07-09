@@ -622,18 +622,20 @@ class Client
     {
         $result = false;
         try {
-            if (0 !== $this->pendingRequestsCount) {
-                if (null !== $this->registry) {
-                    $this->registry->setTaglessMode(true);
-                }
-                $response = $this->sendSync(new Request('/quit'));
-                if (null !== $this->registry) {
-                    $this->registry->setTaglessMode(false);
-                }
-                $result = $response->getType() === Response::TYPE_FATAL;
+            if (null !== $this->registry) {
+                $this->registry->setTaglessMode(true);
             }
+            $response = $this->sendSync(new Request('/quit'));
+            if (null !== $this->registry) {
+                $this->registry->setTaglessMode(false);
+            }
+            $result = $response->getType() === Response::TYPE_FATAL;
+            $result = $result && $this->com->close();
         } catch (SocketException $e) {
-            $result = $e->getCode() === 205;
+            $result = $e->getCode() === 40900;
+            if (null !== $this->registry) {
+                $this->registry->setTaglessMode(false);
+            }
         }
         $this->callbacks = array();
         $this->pendingRequestsCount = 0;

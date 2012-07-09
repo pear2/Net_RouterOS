@@ -988,5 +988,48 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
             Communicator::getDefaultCharset(Communicator::CHARSET_LOCAL)
         );
     }
+    
+    public function testSendSyncReturningResponseLargeDataException()
+    {
+        //Required for this test
+        $memoryLimit = ini_set('memory_limit', -1);
+        try {
 
+            $comment = fopen('php://temp', 'r+b');
+            $fillerString = str_repeat('t', 0xFFFFFF);
+            //fwrite($comment, $fillerString);
+            for ($i = 0; $i < 16; $i++) {
+                fwrite($comment, $fillerString);
+            }
+            unset($fillerString);
+            fwrite(
+                $comment,
+                str_repeat('t', 0xF/* - strlen('=comment=') */)
+            );
+            rewind($comment);
+
+            $commentString = stream_get_contents($comment);
+            $maxArgL = 0xFFFFFFF - strlen('=comment=');
+            $this->assertGreaterThan(
+                $maxArgL, strlen($commentString), '$comment is not long enough.'
+            );
+            unset($commentString);
+            rewind($comment);
+            $printRequest = new Request('/ip/arp/print');
+            $printRequest->setQuery(Query::where('comment', $comment));
+            $this->object->sendSync($printRequest);
+            fclose($comment);
+            //Clearing out for other tests.
+            ini_set('memory_limit', $memoryLimit);
+            $this->fail('Lengths above 0xFFFFFFF should not be supported.');
+        } catch (LengthException $e) {
+            fclose($comment);
+            $this->assertEquals(
+                1200, $e->getCode(), 'Improper exception thrown.'
+            );
+        }
+
+        //Clearing out for other tests.
+        ini_set('memory_limit', $memoryLimit);
+    }
 }

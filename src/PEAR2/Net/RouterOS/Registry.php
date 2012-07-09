@@ -99,9 +99,10 @@ class Registry
     }
     
     /**
-     * Checks if any instance is in tagless mode right now.
+     * Checks if this instance is the tagless mode owner.
      * 
-     * @return bool TRUE if an instance is in tagless mode, FALSE otherwise.
+     * @return bool TRUE if this instance is the tagless mode owner, FALSE
+     * otherwise.
      */
     public function isTaglessModeOwner()
     {
@@ -247,11 +248,6 @@ class Registry
         self::$requestId = -1;
         self::$instanceIdSeed = -1;
         $this->shm->clear();
-        
-        //foreach ($this->shm->getIterator('/^(responseBuffer\_)/', true)
-        //    as $targetBufferName) {
-        //    $this->_close($targetBufferName);
-        //}
     }
     
     /**

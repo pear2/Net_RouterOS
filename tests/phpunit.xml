@@ -2,7 +2,7 @@
 <phpunit
     bootstrap="bootstrap.php"
     colors="false"
-    stopOnFailure="false"
+    stopOnFailure="true"
     verbose="true"
     strict="true"
     

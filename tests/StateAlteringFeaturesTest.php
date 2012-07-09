@@ -224,18 +224,21 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
 
     public function testSendSyncReturningResponseLargeDataException()
     {
+        $this->markTestIncomplete(
+            'TODO: A known issue; Requests with excessively long words "leak".'
+        );
         //Required for this test
         $memoryLimit = ini_set('memory_limit', -1);
         try {
 
             $comment = fopen('php://temp', 'r+b');
-            fwrite($comment, str_pad('t', 0xFFFFFF, 't'));
+            fwrite($comment, str_repeat('t', 0xFFFFFF));
             for ($i = 0; $i < 14; $i++) {
-                fwrite($comment, str_pad('t', 0xFFFFFF, 't'));
+                fwrite($comment, str_repeat('t', 0xFFFFFF));
             }
             fwrite(
                 $comment,
-                str_pad('t', 0xFFFFFF + 0xF/* - strlen('=comment=') */, 't')
+                str_repeat('t', 0xFFFFFF + 0xF/* - strlen('=comment=') */)
             );
             rewind($comment);
 
@@ -244,9 +247,11 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
             $this->assertGreaterThan(
                 $maxArgL, strlen($commentString), '$comment is not long enough.'
             );
+            unset($commentString);
+            rewind($comment);
             $addRequest = new Request('/queue/simple/add');
             $addRequest->setArgument('name', TEST_QUEUE_NAME);
-            $addRequest->setArgument('comment', $commentString);
+            $addRequest->setArgument('comment', $comment);
             $responses = $this->object->sendSync($addRequest);
             if (count($responses) === 1
                 && $responses->getLast()->getType() === Response::TYPE_FINAL
@@ -255,7 +260,9 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
                 $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
                 $response = $this->object->sendSync($removeRequest);
             }
-
+            
+            //Clearing out for other tests.
+            ini_set('memory_limit', $memoryLimit);
             $this->fail('Lengths above 0xFFFFFFF should not be supported.');
         } catch (LengthException $e) {
             $this->assertEquals(
