@@ -55,8 +55,8 @@ $package->files['tests/bootstrap.php'] = array_merge_recursive(
     )
 );
 
-$package->files['docs/docblox.xml'] = array_merge_recursive(
-    $package->files['docs/docblox.xml']->getArrayCopy(), $srcDirTask
+$package->files['docs/phpdoc.dist.xml'] = array_merge_recursive(
+    $package->files['docs/phpdoc.dist.xml']->getArrayCopy(), $srcDirTask
 );
 
 $package->files['docs/doxygen.ini'] = array_merge_recursive(
@@ -82,10 +82,10 @@ $compatible->files[
         ]->getArrayCopy(), $srcDirTask
 );
 
-$compatible->files["doc/{$package->channel}/{$package->name}/docblox.xml"]
+$compatible->files["doc/{$package->channel}/{$package->name}/phpdoc.dist.xml"]
     = array_merge_recursive(
         $compatible->files[
-        "doc/{$package->channel}/{$package->name}/docblox.xml"
+        "doc/{$package->channel}/{$package->name}/phpdoc.dist.xml"
         ]->getArrayCopy(), $srcDirTask
 );
 
@@ -130,5 +130,3 @@ foreach (
         );
 }
 chdir($oldCwd);
-
-?>

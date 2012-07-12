@@ -277,9 +277,13 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 . \HOSTNAME_SILENT
                 . '" should be available.'
             );
-        } catch (T\SocketException $e) {
-            $this->assertEquals(7, $e->getCode());
-            $this->assertEquals(10060, $e->getSocketErrorNumber());
+        } catch (SocketException $e) {
+            $this->assertEquals(100, $e->getCode());
+            $this->assertTrue($e->getPrevious() instanceof T\SocketException);
+            $this->assertEquals(7, $e->getPrevious()->getCode());
+            $this->assertEquals(
+                10060, $e->getPrevious()->getSocketErrorNumber()
+            );
         }
         
         try {
@@ -292,9 +296,13 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 . \HOSTNAME_SILENT
                 . '" should be available.'
             );
-        } catch (T\SocketException $e) {
-            $this->assertEquals(7, $e->getCode());
-            $this->assertEquals(10060, $e->getSocketErrorNumber());
+        } catch (SocketException $e) {
+            $this->assertEquals(100, $e->getCode());
+            $this->assertTrue($e->getPrevious() instanceof T\SocketException);
+            $this->assertEquals(7, $e->getPrevious()->getCode());
+            $this->assertEquals(
+                10060, $e->getPrevious()->getSocketErrorNumber()
+            );
         }
     }
 
@@ -341,9 +349,13 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 . PORT_SILENT
                 . '" should be available.'
             );
-        } catch (T\SocketException $e) {
-            $this->assertEquals(7, $e->getCode());
-            $this->assertEquals(10061, $e->getSocketErrorNumber());
+        } catch (SocketException $e) {
+            $this->assertEquals(100, $e->getCode());
+            $this->assertTrue($e->getPrevious() instanceof T\SocketException);
+            $this->assertEquals(7, $e->getPrevious()->getCode());
+            $this->assertEquals(
+                10061, $e->getPrevious()->getSocketErrorNumber()
+            );
         }
         
         try {
@@ -356,9 +368,13 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 . PORT_SILENT
                 . '" should be available.'
             );
-        } catch (T\SocketException $e) {
-            $this->assertEquals(7, $e->getCode());
-            $this->assertEquals(10061, $e->getSocketErrorNumber());
+        } catch (SocketException $e) {
+            $this->assertEquals(100, $e->getCode());
+            $this->assertTrue($e->getPrevious() instanceof T\SocketException);
+            $this->assertEquals(7, $e->getPrevious()->getCode());
+            $this->assertEquals(
+                10061, $e->getPrevious()->getSocketErrorNumber()
+            );
         }
     }
 
@@ -370,8 +386,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
 
             $this->fail('No proper connection should be available.');
-        } catch (T\SocketException $e) {
-            $this->assertEquals(7, $e->getCode());
+        } catch (SocketException $e) {
+            $this->assertEquals(100, $e->getCode());
+            $this->assertTrue($e->getPrevious() instanceof T\SocketException);
+            $this->assertEquals(7, $e->getPrevious()->getCode());
         }
     }
 
@@ -384,8 +402,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
 
             $this->fail('No proper connection should be available.');
-        } catch (T\SocketException $e) {
-            $this->assertEquals(6, $e->getCode());
+        } catch (SocketException $e) {
+            $this->assertEquals(100, $e->getCode());
+            $this->assertTrue($e->getPrevious() instanceof T\SocketException);
+            $this->assertEquals(6, $e->getPrevious()->getCode());
         }
     }
 
@@ -398,8 +418,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
 
             $this->fail('No proper connection should be available.');
-        } catch (T\SocketException $e) {
-            $this->assertEquals(6, $e->getCode());
+        } catch (SocketException $e) {
+            $this->assertEquals(100, $e->getCode());
+            $this->assertTrue($e->getPrevious() instanceof T\SocketException);
+            $this->assertEquals(6, $e->getPrevious()->getCode());
         }
     }
 

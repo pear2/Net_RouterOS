@@ -9,4 +9,5 @@ Bug fixes on edge cases, and some API changes
 * (GH #4) Client::completeRequest() now works with requests that use a callback.
 * Client::sendSync() now accepts requests with a tag.
 * Added support for non ASCII passwords.
+* Client now throws this package's SocketException on connection errors. The originating Transmitter exception is available in the trace.
 * Documentation fixes.

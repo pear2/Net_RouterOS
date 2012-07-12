@@ -11,8 +11,8 @@
   <email>boen.robot@gmail.com</email>
   <active>yes</active>
  </lead>
- <date>2011-10-16</date>
- <time>01:52:36</time>
+ <date>2012-07-11</date>
+ <time>00:44:34</time>
  <version>
   <release>1.0.0b3</release>
   <api>1.0.0</api>
@@ -22,7 +22,19 @@
   <api>stable</api>
  </stability>
  <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</license>
- <notes></notes>
+ <notes>Bug fixes on edge cases, and some API changes
+
+* Persistent connections are now properly supported. Added a new Registry class to facilitate this.
+* The second and third argument of Request::__construct() have been swapped.
+* At Request::__construct(), a backslash can now be escaped in an argument value, and arguments can be spread across multiple lines.
+* Client::getStreamResponses() and Client::setStreamResponses() are now Client::isStreamingResponses() and Client::setStreamingResponses(), respectively.
+* Query now uses things statically, allowing extensions in the process.
+* ResponseCollection::__invoke() now seeks instead of getting.
+* (GH #4) Client::completeRequest() now works with requests that use a callback.
+* Client::sendSync() now accepts requests with a tag.
+* Added support for non ASCII passwords.
+* Client now throws this package's SocketException on connection errors. The originating Transmitter exception is available in the trace.
+* Documentation fixes.</notes>
  <contents>
   <dir name="/">
    <dir name="docs" baseinstalldir="/">
@@ -33,13 +45,12 @@
       <file role="doc" name="Query.cls"/>
      </dir>
     </dir>
-    <file role="doc" name="docblox.xml">
-     <tasks:replace from="../src" to="php_dir" type="pear-config"/>
-    </file>
-    <file role="doc" name="docblox.xsd"/>
     <file role="doc" name="doxygen.ini">
      <tasks:replace from="../src" to="php_dir" type="pear-config"/>
      <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+    </file>
+    <file role="doc" name="phpdoc.dist.xml">
+     <tasks:replace from="../src" to="php_dir" type="pear-config"/>
     </file>
    </dir>
    <dir name="examples">
@@ -54,11 +65,6 @@
     <dir name="PEAR2">
      <dir name="Net">
       <dir name="RouterOS">
-       <file role="php" name="Autoload.php">
-        <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
-        <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
-       </file>
        <file role="php" name="Client.php">
         <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
         <tasks:replace from="~~description~~" to="description" type="package-info"/>
@@ -104,6 +110,11 @@
         <tasks:replace from="~~description~~" to="description" type="package-info"/>
         <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
        </file>
+       <file role="php" name="Registry.php">
+        <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
+        <tasks:replace from="~~description~~" to="description" type="package-info"/>
+        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+       </file>
        <file role="php" name="Request.php">
         <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
         <tasks:replace from="~~description~~" to="description" type="package-info"/>
@@ -139,6 +150,7 @@
      <tasks:replace from="../../PEAR2_Net_Transmitter.git/src/" to="php_dir" type="pear-config"/>
     </file>
     <file role="test" name="ClientFeaturesTest.php"/>
+    <file role="test" name="ClientPersistentFeaturesTest.php"/>
     <file role="test" name="ConnectionTest.php"/>
     <file role="test" name="phpunit.xml"/>
     <file role="test" name="PseudoServer.php"/>
@@ -158,13 +170,23 @@
    <package>
     <name>PEAR2_Net_Transmitter</name>
     <channel>pear2.php.net</channel>
-    <min>1.0.0a2</min>
+    <min>1.0.0a3</min>
    </package>
    <extension>
     <name>PCRE</name>
    </extension>
   </required>
   <optional>
+   <package>
+    <name>PEAR2_Cache_SHM</name>
+    <channel>pear2.php.net</channel>
+    <min>1.0.0a1</min>
+   </package>
+   <package>
+    <name>PEAR2_Autoload</name>
+    <channel>pear2.php.net</channel>
+    <min>0.2.4</min>
+   </package>
    <extension>
     <name>iconv</name>
    </extension>
@@ -172,12 +194,11 @@
  </dependencies>
  <phprelease>
   <filelist>
-   <install name="docs/docblox.xml" as="docblox.xml"/>
    <install name="docs/doxygen.ini" as="doxygen.ini"/>
+   <install name="docs/phpdoc.dist.xml" as="phpdoc.dist.xml"/>
    <install name="docs/tutorials/PEAR2_Net_RouterOS/Client.cls" as="tutorials/PEAR2_Net_RouterOS/Client.cls"/>
    <install name="docs/tutorials/PEAR2_Net_RouterOS/PEAR2_Net_RouterOS.pkg" as="tutorials/PEAR2_Net_RouterOS/PEAR2_Net_RouterOS.pkg"/>
    <install name="docs/tutorials/PEAR2_Net_RouterOS/Query.cls" as="tutorials/PEAR2_Net_RouterOS/Query.cls"/>
-   <install name="src/PEAR2/Net/RouterOS/Autoload.php" as="PEAR2/Net/RouterOS/Autoload.php"/>
    <install name="src/PEAR2/Net/RouterOS/Client.php" as="PEAR2/Net/RouterOS/Client.php"/>
    <install name="src/PEAR2/Net/RouterOS/Communicator.php" as="PEAR2/Net/RouterOS/Communicator.php"/>
    <install name="src/PEAR2/Net/RouterOS/DataFlowException.php" as="PEAR2/Net/RouterOS/DataFlowException.php"/>
@@ -194,6 +215,7 @@
    <install name="src/PEAR2/Net/RouterOS/UnexpectedValueException.php" as="PEAR2/Net/RouterOS/UnexpectedValueException.php"/>
    <install name="tests/bootstrap.php" as="bootstrap.php"/>
    <install name="tests/ClientFeaturesTest.php" as="ClientFeaturesTest.php"/>
+   <install name="tests/ClientPersistentFeaturesTest.php" as="ClientPersistentFeaturesTest.php"/>
    <install name="tests/ConnectionTest.php" as="ConnectionTest.php"/>
    <install name="tests/phpunit.xml" as="phpunit.xml"/>
    <install name="tests/PseudoServer.php" as="PseudoServer.php"/>

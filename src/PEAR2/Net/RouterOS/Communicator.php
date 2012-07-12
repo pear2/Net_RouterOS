@@ -104,9 +104,13 @@ class Communicator
     public function __construct($host, $port = 8728, $persist = false,
         $timeout = null, $key = '', $context = null
     ) {
-        $this->trans = new T\TcpClient(
-            $host, $port, $persist, $timeout, $key, $context
-        );
+        try {
+            $this->trans = new T\TcpClient(
+                $host, $port, $persist, $timeout, $key, $context
+            );
+        } catch(T\Exception $e) {
+            throw new SocketException('Error connecting to RouterOS', 100, $e);
+        }
         $this->setCharset(
             self::getDefaultCharset(self::CHARSET_ALL), self::CHARSET_ALL
         );
