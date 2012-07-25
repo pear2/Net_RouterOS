@@ -111,7 +111,7 @@ class Query
      * @param string $action One of the ACTION_* constants. Describes the
      * operation to perform.
      * 
-     * @return Query The query object.
+     * @return self|Query The query object.
      */
     public static function where(
         $name, $value = null, $action = self::ACTION_EXIST
@@ -123,7 +123,7 @@ class Query
     /**
      * Negates the query.
      * 
-     * @return Query The query object.
+     * @return self|Query The query object.
      */
     public function not()
     {
@@ -140,7 +140,7 @@ class Query
      * @param string $action One of the ACTION_* constants. Describes the
      * operation to perform.
      * 
-     * @return Query The query object.
+     * @return self|Query The query object.
      */
     public function orWhere($name, $value = null, $action = self::ACTION_EXIST)
     {
@@ -157,7 +157,7 @@ class Query
      * @param string $action One of the ACTION_* constants. Describes the
      * operation to perform.
      * 
-     * @return Query The query object.
+     * @return self|Query The query object.
      */
     public function andWhere($name, $value = null, $action = self::ACTION_EXIST)
     {
@@ -227,7 +227,7 @@ class Query
      * @param string $action One of the ACTION_* constants. Describes the
      * operation to perform.
      * 
-     * @return Query The query object.
+     * @return self|Query The query object.
      */
     protected function addWhere($name, $value, $action)
     {

@@ -149,7 +149,7 @@ class Client
      * 
      * @param mixed $arg Value can be either a {@link Request} to send, which
      * would be sent asynchoniously if it has a tag, and synchroniously if not,
-     * a number to loop with or null to complete all pending requests. Any other
+     * a number to loop with or NULL to complete all pending requests. Any other
      * value is converted to string and treated as the tag of a request to
      * complete.
      * 
@@ -300,7 +300,7 @@ class Client
      * the request is canceled. Note that the callback may be executed one last
      * time after that with a response that notifies about the canceling.
      * 
-     * @return Client The client object.
+     * @return self|Client The client object.
      * @see completeRequest()
      * @see loop()
      * @see cancelRequest()
@@ -520,7 +520,7 @@ class Client
      * @param string $tag Tag of the request to cancel. Setting NULL will cancel
      * all requests.
      * 
-     * @return Client The client object.
+     * @return self|Client The client object.
      * @see sendAsync()
      * @see close()
      */
@@ -661,7 +661,7 @@ class Client
      * 
      * @param Request $request The request to send.
      * 
-     * @return Client The client object.
+     * @return self|Client The client object.
      * @see sendSync()
      * @see sendAsync()
      */

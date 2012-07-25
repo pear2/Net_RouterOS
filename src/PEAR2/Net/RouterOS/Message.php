@@ -119,7 +119,7 @@ abstract class Message
      * 
      * @param string $tag The tag to set.
      * 
-     * @return Message The message object.
+     * @return self|Message The message object.
      * @see getTag()
      */
     protected function setTag($tag)
@@ -166,7 +166,7 @@ abstract class Message
      * @param string $value Value of the argument. Setting the value to NULL
      * removes an argument of this name.
      * 
-     * @return Message The message object.
+     * @return self|Message The message object.
      * @see getArgument()
      */
     protected function setArgument($name, $value = '')
@@ -183,7 +183,7 @@ abstract class Message
     /**
      * Removes all arguments from the message.
      * 
-     * @return Message The message object.
+     * @return self|Message The message object.
      */
     protected function removeAllArguments()
     {

@@ -66,7 +66,7 @@ class Registry
      */
     public function __construct($uri)
     {
-        $this->shm = new SHM('PEAR2\Net\RouterOS\Registry ' . $uri);
+        $this->shm = new SHM(__CLASS__ . ' ' . $uri);
         if (-1 === self::$requestId) {
             self::$requestId = $this->shm->add('requestId', 0)
                 ? 0 : $this->shm->inc('requestId');
@@ -161,7 +161,7 @@ class Registry
      * response.
      * @param string   $ownershipTag The ownership tag that the response had.
      * 
-     * @return boolean TRUE if the request was added to its buffer, FALSE if
+     * @return bool TRUE if the request was added to its buffer, FALSE if
      * this instance owns the response, and therefore doesn't need to add the
      * response to its buffer.
      */

@@ -91,17 +91,6 @@
         -->
         <const name="TEST_QUEUE_NAME" value="TEST_QUEUE" />
         
-        <!--
-        The port for the preudo server.
-        The preudo server is a small utility in the tests folder that needs to
-        be started from the command line right before running the tests. It
-        simulates harsh network conditions.
-        
-        The selected port must not be any of the ports above, and must not be in
-        use by other applications or blocked by a local firewall application.
-        -->
-        <const name="PSEUDO_SERVER_PORT" value="6666" />
-        
     </php>
     <testsuites>
         <testsuite name="All tests">

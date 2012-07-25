@@ -14,11 +14,12 @@ require_once 'PEAR2/Autoload.php';
  * Resolves a hostname to an IP address. Used instead of gethostbyname() in
  * order to enable resolutions to IPv6 hosts.
  * 
- * @param $hostname Hostname to resolve.
+ * @param string $hostname Hostname to resolve.
  * 
  * @return string An IP (v4 or v6) for this hostname.
  */
-function resolve($hostname) {
+function resolve($hostname)
+{
     $info = dns_get_record($hostname);
     foreach ($info as $entry) {
         switch($entry['type']) {

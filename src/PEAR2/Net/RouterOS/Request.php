@@ -83,9 +83,10 @@ class Request extends Message
      * the class is invoked and its returned value is returned by this function.
      * 
      * @param mixed $arg A {@link Query} to associate the request
-     * with, a {@link Communicator} to send the request over, or an argument to
-     * get the value of. If a second argument is provided, this becomes the name
-     * of the argument to set the value of.
+     * with, a {@link Communicator} to send the request over, an argument to
+     * get the value of, or NULL to get all arguments as an array. If a second
+     * argument is provided, this becomes the name of the argument to set the
+     * value of, and the second argument is the value to set.
      * 
      * @return mixed Whatever the long form function would have returned.
      */
@@ -112,7 +113,7 @@ class Request extends Message
      * 
      * @param string $command The command to send.
      * 
-     * @return Request The request object.
+     * @return self|Request The request object.
      * @see getCommand()
      * @see setArgument()
      */
@@ -172,7 +173,7 @@ class Request extends Message
      * @param Query $query The query to be set. Setting NULL will remove the
      * currently associated query.
      * 
-     * @return Request The request object.
+     * @return self|Request The request object.
      * @see getQuery()
      */
     public function setQuery(Query $query = null)
@@ -200,7 +201,7 @@ class Request extends Message
      * 
      * @param string $tag The tag to set.
      * 
-     * @return Request The request object.
+     * @return self|Request The request object.
      * @see getTag()
      */
     public function setTag($tag)
@@ -215,7 +216,7 @@ class Request extends Message
      * @param string $value Value of the argument. Setting the value to NULL
      * removes an argument of this name.
      * 
-     * @return Request The request object.
+     * @return self|Request The request object.
      * @see getArgument()
      */
     public function setArgument($name, $value = '')
@@ -226,7 +227,7 @@ class Request extends Message
     /**
      * Removes all arguments from the request.
      * 
-     * @return Request The request object.
+     * @return self|Request The request object.
      */
     public function removeAllArguments()
     {
@@ -319,7 +320,7 @@ class Request extends Message
          * <argument> := <name>, <value>?
          * <name> := <<[^\=\s]+>>
          * <value> := "=", (<quoted string> | <unquoted string>)
-         * <quotedString> := <<">>, <<([^"]|\\")*>>, <<">>
+         * <quotedString> := <<">>, <<([^"]|\\"|\\\\)*>>, <<">>
          * <unquotedString> := <<\S+>>
          */
         
