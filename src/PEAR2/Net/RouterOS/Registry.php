@@ -66,7 +66,7 @@ class Registry
      */
     public function __construct($uri)
     {
-        $this->shm = new SHM(__CLASS__ . ' ' . $uri);
+        $this->shm = SHM::factory(__CLASS__ . ' ' . $uri);
         if (-1 === self::$requestId) {
             self::$requestId = $this->shm->add('requestId', 0)
                 ? 0 : $this->shm->inc('requestId');
