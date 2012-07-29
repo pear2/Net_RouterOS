@@ -45,7 +45,7 @@ class Request extends Message
     /**
      * @var Query A query for the command.
      */
-    private $_query = null;
+    private $_query;
 
     /**
      * Creates a request to send to RouterOS.

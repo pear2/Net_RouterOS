@@ -34,24 +34,24 @@ class LengthException extends \LengthException implements Exception
 
     /**
      *
-     * @var mixed The unsuppported value.
+     * @var mixed The problematic length.
      */
-    private $_length = null;
+    private $_length;
 
     /**
      * Creates a new LengthException.
      * 
-     * @param string    $message  The Exception message to throw.
-     * @param int       $code     The Exception code.
-     * @param Exception $previous The previous exception used for the exception
+     * @param string     $message  The Exception message to throw.
+     * @param int        $code     The Exception code.
+     * @param \Exception $previous The previous exception used for the exception
      * chaining.
-     * @param number    $value    The length.
+     * @param number     $length    The length.
      */
     public function __construct($message, $code = 0, $previous = null,
-        $value = null
+        $length = null
     ) {
         parent::__construct($message, $code, $previous);
-        $this->_length = $value;
+        $this->_length = $length;
     }
 
     /**
@@ -74,7 +74,7 @@ class LengthException extends \LengthException implements Exception
      */
     public function __toString()
     {
-        return parent::__toString() . "\nValue:{$this->_length}";
+        return parent::__toString() . "\nLength:{$this->_length}";
     }
 
     // @codeCoverageIgnoreEnd

@@ -37,16 +37,16 @@ class NotSupportedException extends \Exception implements Exception
      *
      * @var mixed The unsuppported value.
      */
-    private $_value = null;
+    private $_value;
 
     /**
      * Creates a new NotSupportedException.
      * 
-     * @param string    $message  The Exception message to throw.
-     * @param int       $code     The Exception code.
-     * @param Exception $previous The previous exception used for the exception
+     * @param string     $message  The Exception message to throw.
+     * @param int        $code     The Exception code.
+     * @param \Exception $previous The previous exception used for the exception
      * chaining.
-     * @param mixed     $value    The unsupported value.
+     * @param mixed      $value    The unsupported value.
      */
     public function __construct($message, $code = 0, $previous = null,
         $value = null

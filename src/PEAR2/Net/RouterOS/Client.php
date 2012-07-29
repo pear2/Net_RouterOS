@@ -247,7 +247,7 @@ class Client
      * Sets the charset(s) for this connection. The specified charset(s) will be
      * used for all future requests and responses. When sending,
      * {@link Communicator::CHARSET_LOCAL} is converted to
-     * {@link Communicator::HARSET_REMOTE}, and when receiving,
+     * {@link Communicator::CHARSET_REMOTE}, and when receiving,
      * {@link Communicator::CHARSET_REMOTE} is converted to
      * {@link Communicator::CHARSET_LOCAL}. Setting NULL to either charset will
      * disable charset convertion, and data will be both sent and received "as

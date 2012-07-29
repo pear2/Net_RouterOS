@@ -20,6 +20,9 @@
  */
 namespace PEAR2\Net\RouterOS;
 
+/**
+ * Refers to transmitter direction constants.
+ */
 use PEAR2\Net\Transmitter as T;
 
 /**
@@ -63,7 +66,7 @@ class Response extends Message
     /**
      * @var string The response type.
      */
-    private $_type = null;
+    private $_type;
 
     /**
      * Extracts a new response from a communicator.

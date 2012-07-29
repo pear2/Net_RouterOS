@@ -37,7 +37,7 @@ class UnexpectedValueException extends \UnexpectedValueException
      *
      * @var mixed The unexpected value.
      */
-    private $_value = null;
+    private $_value;
 
     /**
      * Creates a new UnexpectedValueException.

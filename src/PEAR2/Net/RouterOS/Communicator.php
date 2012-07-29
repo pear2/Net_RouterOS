@@ -408,9 +408,9 @@ class Communicator
     /**
      * Encodes the length as requred by the RouterOS API.
      * 
-     * @param int $length The length to encode
+     * @param int $length The length to encode.
      * 
-     * @return string The encoded length
+     * @return string The encoded length.
      */
     public static function encodeLength($length)
     {
@@ -520,7 +520,7 @@ class Communicator
      * @param T\Stream $trans The transmitter from which to decode the length of
      * the incoming message.
      * 
-     * @return int The decoded length
+     * @return int The decoded length.
      */
     public static function decodeLength(T\Stream $trans)
     {
@@ -545,7 +545,7 @@ class Communicator
      * @param T\Stream $trans The transmitter from which to decode the length of
      * the incoming message.
      * 
-     * @return int The decoded length
+     * @return int The decoded length.
      */
     private static function _decodeLength(T\Stream $trans)
     {
