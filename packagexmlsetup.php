@@ -38,8 +38,6 @@ $srcFileTasks = array(
     )
 );
 
-$compatible->license = $package->license;
-
 $package->files['tests/bootstrap.php'] = array_merge_recursive(
     $package->files['tests/bootstrap.php']->getArrayCopy(), $srcDirTask,
     array(
@@ -73,39 +71,43 @@ $package->files['docs/doxygen.ini'] = array_merge_recursive(
         )
     )
 );
-
-$compatible->files[
-    "test/{$package->channel}/{$package->name}/bootstrap.php"
-    ] = array_merge_recursive(
-        $compatible->files[
+$hasCompatible = isset($compatible);
+if ($hasCompatible) {
+    $compatible->license = $package->license;
+    $compatible->files[
         "test/{$package->channel}/{$package->name}/bootstrap.php"
-        ]->getArrayCopy(), $srcDirTask
-);
+        ] = array_merge_recursive(
+            $compatible->files[
+            "test/{$package->channel}/{$package->name}/bootstrap.php"
+            ]->getArrayCopy(), $srcDirTask
+    );
 
-$compatible->files["doc/{$package->channel}/{$package->name}/phpdoc.dist.xml"]
-    = array_merge_recursive(
-        $compatible->files[
+    $compatible->files[
         "doc/{$package->channel}/{$package->name}/phpdoc.dist.xml"
-        ]->getArrayCopy(), $srcDirTask
-);
+        ] = array_merge_recursive(
+            $compatible->files[
+            "doc/{$package->channel}/{$package->name}/phpdoc.dist.xml"
+            ]->getArrayCopy(), $srcDirTask
+    );
 
-$compatible->files["doc/{$package->channel}/{$package->name}/doxygen.ini"]
-    = array_merge_recursive(
-        $compatible->files[
-        "doc/{$package->channel}/{$package->name}/doxygen.ini"
-        ]->getArrayCopy(), $srcDirTask,
-        array(
-            'tasks:replace' => array(
-                array(
-                    'attribs' => array(
-                        'from' => 'GIT: $Id$',
-                        'to' => 'version',
-                        'type' => 'package-info'
+    $compatible->files["doc/{$package->channel}/{$package->name}/doxygen.ini"]
+        = array_merge_recursive(
+            $compatible->files[
+            "doc/{$package->channel}/{$package->name}/doxygen.ini"
+            ]->getArrayCopy(), $srcDirTask,
+            array(
+                'tasks:replace' => array(
+                    array(
+                        'attribs' => array(
+                            'from' => 'GIT: $Id$',
+                            'to' => 'version',
+                            'type' => 'package-info'
+                        )
                     )
                 )
             )
-        )
-);
+    );
+}
 
 $oldCwd = getcwd();
 chdir(__DIR__);
@@ -123,10 +125,12 @@ foreach (
             $package->files[$filename]->getArrayCopy(), $srcFileTasks
         );
         
-        $compatibleFilename = str_replace('src/', 'php/', $filename);
-        $compatible->files[$compatibleFilename] = array_merge_recursive(
-            $compatible->files[$compatibleFilename]->getArrayCopy(),
-            $srcFileTasks
-        );
+        if ($hasCompatible) {
+            $compatibleFilename = str_replace('src/', 'php/', $filename);
+            $compatible->files[$compatibleFilename] = array_merge_recursive(
+                $compatible->files[$compatibleFilename]->getArrayCopy(),
+                $srcFileTasks
+            );
+        }
 }
 chdir($oldCwd);
