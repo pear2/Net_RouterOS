@@ -11,8 +11,8 @@
   <email>boen.robot@gmail.com</email>
   <active>yes</active>
  </lead>
- <date>2012-07-11</date>
- <time>00:44:34</time>
+ <date>2012-08-03</date>
+ <time>02:50:03</time>
  <version>
   <release>1.0.0b3</release>
   <api>1.0.0</api>
@@ -24,7 +24,7 @@
  <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</license>
  <notes>Bug fixes on edge cases, and some API changes
 
-* Persistent connections are now properly supported. Added a new Registry class to facilitate this.
+* (GH #6) Persistent connections are now properly supported. Added a new Registry class to facilitate this.
 * The second and third argument of Request::__construct() have been swapped.
 * At Request::__construct(), a backslash can now be escaped in an argument value, and arguments can be spread across multiple lines.
 * Client::getStreamResponses() and Client::setStreamResponses() are now Client::isStreamingResponses() and Client::setStreamingResponses(), respectively.
@@ -177,14 +177,14 @@
   </required>
   <optional>
    <package>
-    <name>PEAR2_Cache_SHM</name>
-    <channel>pear2.php.net</channel>
-    <min>1.0.0a1</min>
-   </package>
-   <package>
     <name>PEAR2_Autoload</name>
     <channel>pear2.php.net</channel>
     <min>0.2.4</min>
+   </package>
+   <package>
+    <name>PEAR2_Cache_SHM</name>
+    <channel>pear2.php.net</channel>
+    <min>0.1.0</min>
    </package>
    <extension>
     <name>iconv</name>

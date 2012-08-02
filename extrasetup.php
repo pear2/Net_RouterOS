@@ -1,28 +1,28 @@
 <?php
 $extrafiles = array();
-
-$phpDir = Pyrus\Config::current()->php_dir . DIRECTORY_SEPARATOR;
+$phpDir = Pyrus\Config::current()->php_dir;
 $packages = array('PEAR2/Autoload', 'PEAR2/Cache/SHM', 'PEAR2/Net/Transmitter');
 
+$oldCwd = getcwd();
+chdir($phpDir);
 foreach ($packages as $pkg) {
-    $prefix = $phpDir . $pkg;
-    
-    if (is_dir($prefix)) {
+    if (is_dir($pkg)) {
         foreach (
             new RecursiveIteratorIterator(
                 new RecursiveDirectoryIterator(
-                    $prefix,
+                    $pkg,
                     RecursiveDirectoryIterator::UNIX_PATHS
                 ),
                 RecursiveIteratorIterator::LEAVES_ONLY
             ) as $path
         ) {
-            $pathname = $path->getPathname();
-            $extrafiles['src/' . $pathname] = $pathname;
+            $extrafiles['src/' . $path->getPathname()] = $path->getRealPath();
         }
     }
     
-    if (is_file($prefix . '.php')) {
-        $extrafiles['src/' . $pkg . '.php'] = $prefix . '.php';
+    if (is_file($pkg . '.php')) {
+        $extrafiles['src/' . $pkg . '.php']
+            = $phpDir . DIRECTORY_SEPARATOR . $pkg . '.php';
     }
 }
+chdir($oldCwd);
