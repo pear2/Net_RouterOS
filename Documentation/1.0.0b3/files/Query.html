@@ -1,0 +1,390 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>PEAR2_Net_RouterOS documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="../css/template.css" type="text/css"></link><script type="text/javascript" src="../js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="../js/jquery.tools.min.js"></script><script type="text/javascript" src="../js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="../js/template.js"></script></head><body><div xmlns="" id="content">
+<h1 class="file">Query.php</h1>
+<div id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="../images/icons/visibility_public.png" id="show-public"><img src="../images/icons/visibility_protected.png" id="show-protected"><img src="../images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="../images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5CPEAR2%5CNet%5CRouterOS%5CQuery">\PEAR2\Net\RouterOS\Query</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a name="top" class="anchor"></a><div id="file-description">
+<div xmlns="http://www.w3.org/1999/xhtml" class="short-description">RouterOS API client implementation.</div><div xmlns="http://www.w3.org/1999/xhtml" class="long-description"><p>RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.</p>
+
+<p>PHP version 5</p></div>
+</div>
+<dl class="file-info">
+<dt xmlns="http://www.w3.org/1999/xhtml">Author</dt><dd xmlns="http://www.w3.org/1999/xhtml"><a href="mailto:boen.robot@gmail.com">Vasil Rangelov</a>
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">Category</dt><dd xmlns="http://www.w3.org/1999/xhtml">Net
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">Copyright</dt><dd xmlns="http://www.w3.org/1999/xhtml">2011 Vasil Rangelov
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">License</dt><dd xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</a>
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">Link</dt><dd xmlns="http://www.w3.org/1999/xhtml"><a href="http://pear2.php.net/PEAR2_Net_RouterOS">http://pear2.php.net/PEAR2_Net_RouterOS</a>
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">Package</dt><dd xmlns="http://www.w3.org/1999/xhtml">PEAR2_Net_RouterOS
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">Version</dt><dd xmlns="http://www.w3.org/1999/xhtml">1.0.0b3
+         
+    </dd>
+</dl>
+<a name="classes" class="anchor"></a><a id="\PEAR2\Net\RouterOS\Query" class="anchor"></a><h2 class="class">\PEAR2\Net\RouterOS\Query<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div class="class">
+<small class="package"><b>Package: </b>PEAR2\Net\RouterOS</small><div xmlns="http://www.w3.org/1999/xhtml" class="short-description">Represents a query for RouterOS requests.</div><div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><dl class="class-info">
+<dt xmlns="http://www.w3.org/1999/xhtml">Author</dt><dd xmlns="http://www.w3.org/1999/xhtml"><a href="mailto:boen.robot@gmail.com">Vasil Rangelov</a>
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">Category</dt><dd xmlns="http://www.w3.org/1999/xhtml">Net
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">License</dt><dd xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</a>
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">Link</dt><dd xmlns="http://www.w3.org/1999/xhtml"><a href="http://pear2.php.net/PEAR2_Net_RouterOS">http://pear2.php.net/PEAR2_Net_RouterOS</a>
+         
+    </dd>
+</dl>
+<h3>Constants</h3>
+<div>
+<a id="\PEAR2\Net\RouterOS\Query::ACTION_EXIST" class="anchor"></a><div class="constant publicC">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">ACTION_EXIST</span>
+                = ''</code><div class="description"><div xmlns="http://www.w3.org/1999/xhtml" class="short-description">Checks if the property exists.</div></div>
+<div class="code-tabs"><div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div></div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Query::ACTION_NOT_EXIST" class="anchor"></a><div class="constant publicC">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">ACTION_NOT_EXIST</span>
+                = '-'</code><div class="description"><div xmlns="http://www.w3.org/1999/xhtml" class="short-description">Checks if the property does not exist.</div></div>
+<div class="code-tabs"><div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div></div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Query::ACTION_EQUALS" class="anchor"></a><div class="constant publicC">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">ACTION_EQUALS</span>
+                = '='</code><div class="description"><div xmlns="http://www.w3.org/1999/xhtml" class="short-description">Checks if the property equals a certain value.</div></div>
+<div class="code-tabs"><div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div></div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Query::ACTION_LESS_THAN" class="anchor"></a><div class="constant publicC">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">ACTION_LESS_THAN</span>
+                = '&lt;'</code><div class="description"><div xmlns="http://www.w3.org/1999/xhtml" class="short-description">Checks if the property is less than a certain value.</div></div>
+<div class="code-tabs"><div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div></div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Query::ACTION_GREATHER_THAN" class="anchor"></a><div class="constant publicC">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">ACTION_GREATHER_THAN</span>
+                = '&gt;'</code><div class="description"><div xmlns="http://www.w3.org/1999/xhtml" class="short-description">Checks if the property is greather than a certain value.</div></div>
+<div class="code-tabs"><div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div></div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Properties</h3>
+<div>
+<a id="\PEAR2\Net\RouterOS\Query::$words" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/property.png" alt="Property"><img src="../images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array <span class="highlight">$words</span> = array()</code><div class="description"><div xmlns="http://www.w3.org/1999/xhtml" class="short-description"><p>An array of the words forming the query. Each value is an array with the first member being the predicate (action and name), and the second member being the value for the predicate.</p>
+</div></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\PEAR2\Net\RouterOS\Query::__construct()" class="anchor"></a><div class="method private">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">__construct</span><span class="nb-faded-text">()</span> : void</code><div class="description"><p class="short_description">This class is not to be instantiated normally, but by static methods
+instead.</p></div>
+<div class="code-tabs"><div xmlns="http://www.w3.org/1999/xhtml" class="long-description"><p>Use <a href="where()">where()</a> to create an instance of it.</p></div></div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Query::_send()" class="anchor"></a><div class="method private">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">_send</span><span class="nb-faded-text">(<a xmlns="http://www.w3.org/1999/xhtml" href="../files/Communicator.html#\PEAR2\Net\RouterOS\Communicator">\PEAR2\Net\RouterOS\Communicator</a> $com)</span> : int</code><div class="description"><p class="short_description">Sends the query over a communicator.</p></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"><p>The only difference with the non private equivalent is that this one does
+not do locking.</p></div><strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$com</th>
+<td><a xmlns="http://www.w3.org/1999/xhtml" href="../files/Communicator.html#\PEAR2\Net\RouterOS\Communicator">\PEAR2\Net\RouterOS\Communicator</a></td>
+<td><em><p>The communicator to send the query over.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>int</td>
+<td>The number of bytes sent.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Query::addWhere()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">addWhere</span><span class="nb-faded-text">(string $name, string $value, string $action)</span> : \PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Query.html#\PEAR2\Net\RouterOS\Query">\PEAR2\Net\RouterOS\Query</a></code><div class="description"><p class="short_description">Adds a condition.</p></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em><p>The name of the property to test.</p></em></td>
+</tr>
+<tr>
+<th>$value</th>
+<td>string</td>
+<td><em><p>The value to test against. Not required for existence tests.</p></em></td>
+</tr>
+<tr>
+<th>$action</th>
+<td>string</td>
+<td><em><p>One of the ACTION_* constants. Describes the operation to perform.</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Query.html#\PEAR2\Net\RouterOS\Query">\PEAR2\Net\RouterOS\Query</a>
+</td>
+<td>The query object.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Query::andWhere()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">andWhere</span><span class="nb-faded-text">(string $name, string $value = null, string $action = self::ACTION_EXIST)</span> : \PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Query.html#\PEAR2\Net\RouterOS\Query">\PEAR2\Net\RouterOS\Query</a></code><div class="description"><p class="short_description">Adds a condition in addition to the query.</p></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em><p>The name of the property to test.</p></em></td>
+</tr>
+<tr>
+<th>$value</th>
+<td>string</td>
+<td><em><p>The value to test against. Not required for existence tests.</p></em></td>
+</tr>
+<tr>
+<th>$action</th>
+<td>string</td>
+<td><em><p>One of the ACTION_* constants. Describes the operation to perform.</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Query.html#\PEAR2\Net\RouterOS\Query">\PEAR2\Net\RouterOS\Query</a>
+</td>
+<td>The query object.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Query::not()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">not</span><span class="nb-faded-text">()</span> : \PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Query.html#\PEAR2\Net\RouterOS\Query">\PEAR2\Net\RouterOS\Query</a></code><div class="description"><p class="short_description">Negates the query.</p></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Query.html#\PEAR2\Net\RouterOS\Query">\PEAR2\Net\RouterOS\Query</a>
+</td>
+<td>The query object.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Query::orWhere()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">orWhere</span><span class="nb-faded-text">(string $name, string $value = null, string $action = self::ACTION_EXIST)</span> : \PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Query.html#\PEAR2\Net\RouterOS\Query">\PEAR2\Net\RouterOS\Query</a></code><div class="description"><p class="short_description">Adds a condition as an alternative to the query.</p></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em><p>The name of the property to test.</p></em></td>
+</tr>
+<tr>
+<th>$value</th>
+<td>string</td>
+<td><em><p>The value to test against. Not required for existence tests.</p></em></td>
+</tr>
+<tr>
+<th>$action</th>
+<td>string</td>
+<td><em><p>One of the ACTION_* constants. Describes the operation to perform.</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Query.html#\PEAR2\Net\RouterOS\Query">\PEAR2\Net\RouterOS\Query</a>
+</td>
+<td>The query object.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Query::sanitizeAction()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">sanitizeAction</span><span class="nb-faded-text">(string $action)</span> : string</code><div class="description">
+<span class="attribute">static</span><p class="short_description">Sanitizes the action of a condition.</p>
+</div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$action</th>
+<td>string</td>
+<td><em><p>The action to sanitize.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>The sanitized action.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Query::send()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">send</span><span class="nb-faded-text">(<a xmlns="http://www.w3.org/1999/xhtml" href="../files/Communicator.html#\PEAR2\Net\RouterOS\Communicator">\PEAR2\Net\RouterOS\Communicator</a> $com)</span> : int</code><div class="description"><p class="short_description">Sends the query over a communicator.</p></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$com</th>
+<td><a xmlns="http://www.w3.org/1999/xhtml" href="../files/Communicator.html#\PEAR2\Net\RouterOS\Communicator">\PEAR2\Net\RouterOS\Communicator</a></td>
+<td><em><p>The communicator to send the query over.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>int</td>
+<td>The number of bytes sent.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Query::where()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">where</span><span class="nb-faded-text">(string $name, string $value = null, string $action = self::ACTION_EXIST)</span> : \PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Query.html#\PEAR2\Net\RouterOS\Query">\PEAR2\Net\RouterOS\Query</a></code><div class="description">
+<span class="attribute">static</span><p class="short_description">Creates a new query with an initial condition.</p>
+</div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em><p>The name of the property to test.</p></em></td>
+</tr>
+<tr>
+<th>$value</th>
+<td>string</td>
+<td><em><p>The value to test against. Not required for existence tests.</p></em></td>
+</tr>
+<tr>
+<th>$action</th>
+<td>string</td>
+<td><em><p>One of the ACTION_* constants. Describes the operation to perform.</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Query.html#\PEAR2\Net\RouterOS\Query">\PEAR2\Net\RouterOS\Query</a>
+</td>
+<td>The query object.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">
+            Documentation was generated by
+            <a href="http://phpdoc.org">phpDocumentor
+                2.0.0a8</a>.
+        </small></body></html>

@@ -1,0 +1,3346 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project version="2.0.0a8" title="PEAR2_Net_RouterOS documentation">
+  <file path="Client.php" hash="4998412995ef3d1c542015a35e76a6fa" package="PEAR2\Net\RouterOS">
+    <docblock line="3">
+      <description><![CDATA[RouterOS API client implementation.]]></description>
+      <long-description><![CDATA[<p>RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.</p>
+
+<p>PHP version 5</p>]]></long-description>
+      <tag line="3" name="category" description="Net"/>
+      <tag line="3" name="package" description="PEAR2_Net_RouterOS"/>
+      <tag line="3" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+      <tag line="3" name="copyright" description="2011 Vasil Rangelov"/>
+      <tag line="3" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+      <tag line="3" name="version" description="1.0.0b3"/>
+      <tag line="3" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+    </docblock>
+    <namespace-alias name="S">PEAR2\Net\Transmitter\Stream</namespace-alias>
+    <namespace-alias name="SHM">PEAR2\Cache\SHM</namespace-alias>
+    <class final="false" abstract="false" namespace="PEAR2\Net\RouterOS" line="45" package="PEAR2\Net\RouterOS">
+      <extends/>
+      <name>Client</name>
+      <full_name>\PEAR2\Net\RouterOS\Client</full_name>
+      <docblock line="34">
+        <description><![CDATA[A RouterOS client.]]></description>
+        <long-description><![CDATA[<p>Provides functionality for easily communicating with a RouterOS host.</p>]]></long-description>
+        <tag line="34" name="category" description="Net"/>
+        <tag line="34" name="package" description="PEAR2_Net_RouterOS"/>
+        <tag line="34" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+        <tag line="34" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+        <tag line="34" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+      </docblock>
+      <constant namespace="PEAR2\Net\RouterOS" line="51" package="PEAR2\Net\RouterOS">
+        <name>FILTER_CALLBACK</name>
+        <full_name>FILTER_CALLBACK</full_name>
+        <value><![CDATA[1]]></value>
+        <docblock line="47">
+          <description><![CDATA[Used in {@link isRequestActive()} to limit search only to requests
+that have a callback.]]></description>
+          <long-description><![CDATA[]]></long-description>
+        </docblock>
+      </constant>
+      <constant namespace="PEAR2\Net\RouterOS" line="56" package="PEAR2\Net\RouterOS">
+        <name>FILTER_BUFFER</name>
+        <full_name>FILTER_BUFFER</full_name>
+        <value><![CDATA[2]]></value>
+        <docblock line="52">
+          <description><![CDATA[Used in {@link isRequestActive()} to limit search only to requests
+that use the buffer.]]></description>
+          <long-description><![CDATA[]]></long-description>
+        </docblock>
+      </constant>
+      <constant namespace="PEAR2\Net\RouterOS" line="60" package="PEAR2\Net\RouterOS">
+        <name>FILTER_ALL</name>
+        <full_name>FILTER_ALL</full_name>
+        <value><![CDATA[3]]></value>
+        <docblock line="57">
+          <description><![CDATA[Used in {@link isRequestActive()} to indicate no limit in search.]]></description>
+          <long-description><![CDATA[]]></long-description>
+        </docblock>
+      </constant>
+      <property final="false" static="false" visibility="protected" line="65" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$com</name>
+        <default><![CDATA[]]></default>
+        <docblock line="62">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="62" name="var" description="The communicator for this client." type="\PEAR2\Net\RouterOS\Communicator">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Communicator</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="protected" line="70" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$pendingRequestsCount</name>
+        <default><![CDATA[0]]></default>
+        <docblock line="67">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="67" name="var" description="The number of currently pending requests." type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="protected" line="77" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$responseBuffer</name>
+        <default><![CDATA[array()]]></default>
+        <docblock line="72">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="72" name="var" description="An array of responses that have not yet been extracted or passed to a callback. Key is the tag of the request, and the value is an array of associated responses." type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="protected" line="83" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$callbacks</name>
+        <default><![CDATA[array()]]></default>
+        <docblock line="79">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="79" name="var" description="An array of callbacks to be executed as responses come. Key is the tag of the request, and the value is the callback for it." type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="protected" line="89" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$registry</name>
+        <default><![CDATA[null]]></default>
+        <docblock line="85">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="85" name="var" description="A registry for the operations. Particularly helpful at persistent connections." type="\PEAR2\Net\RouterOS\Registry">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Registry</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="private" line="94" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$_streamingResponses</name>
+        <default><![CDATA[false]]></default>
+        <docblock line="91">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="91" name="var" description="Whether to stream future responses." type="bool">
+            <type by_reference="false">bool</type>
+          </tag>
+        </docblock>
+      </property>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="115" package="PEAR2\Net\RouterOS">
+        <name>__construct</name>
+        <full_name>__construct</full_name>
+        <docblock line="96">
+          <description><![CDATA[Creates a new instance of a RouterOS API client.]]></description>
+          <long-description><![CDATA[<p>Creates a new instance of a RouterOS API client with the specified
+settings.</p>]]></long-description>
+          <tag line="96" name="param" description="Hostname (IP or domain) of the RouterOS server." type="string" variable="$host">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="96" name="param" description="The RouterOS username." type="string" variable="$username">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="96" name="param" description="The RouterOS password." type="string" variable="$password">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="96" name="param" description="The port on which the RouterOS server provides the API service." type="int" variable="$port">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="96" name="param" description="Whether or not the connection should be a persistent one." type="bool" variable="$persist">
+            <type by_reference="false">bool</type>
+          </tag>
+          <tag line="96" name="param" description="The timeout for the connection." type="float" variable="$timeout">
+            <type by_reference="false">float</type>
+          </tag>
+          <tag line="96" name="param" description="A context for the socket." type="resource" variable="$context">
+            <type by_reference="false">resource</type>
+          </tag>
+          <tag line="96" name="see" description="\PEAR2\Net\RouterOS\sendSync()" refers="\PEAR2\Net\RouterOS\sendSync()"/>
+          <tag line="96" name="see" description="\PEAR2\Net\RouterOS\sendAsync()" refers="\PEAR2\Net\RouterOS\sendAsync()"/>
+        </docblock>
+        <argument line="115">
+          <name>$host</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="115">
+          <name>$username</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="115">
+          <name>$password</name>
+          <default><![CDATA['']]></default>
+          <type/>
+        </argument>
+        <argument line="115">
+          <name>$port</name>
+          <default><![CDATA[8728]]></default>
+          <type/>
+        </argument>
+        <argument line="116">
+          <name>$persist</name>
+          <default><![CDATA[false]]></default>
+          <type/>
+        </argument>
+        <argument line="116">
+          <name>$timeout</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+        <argument line="116">
+          <name>$context</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="159" package="PEAR2\Net\RouterOS">
+        <name>__invoke</name>
+        <full_name>__invoke</full_name>
+        <docblock line="144">
+          <description><![CDATA[A shorthand gateway.]]></description>
+          <long-description><![CDATA[<p>This is a magic PHP method that allows you to call the object as a
+function. Depending on the argument given, one of the other functions in
+the class is invoked and its returned value is returned by this function.</p>]]></long-description>
+          <tag line="144" name="param" description="Value can be either a {@link Request} to send, which would be sent asynchoniously if it has a tag, and synchroniously if not, a number to loop with or NULL to complete all pending requests. Any other value is converted to string and treated as the tag of a request to complete." type="mixed" variable="$arg">
+            <type by_reference="false">mixed</type>
+          </tag>
+          <tag line="144" name="return" description="Whatever the long form function would have returned." type="mixed">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+        <argument line="159">
+          <name>$arg</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="PEAR2\Net\RouterOS" line="181" package="PEAR2\Net\RouterOS">
+        <name>login</name>
+        <full_name>login</full_name>
+        <docblock line="172">
+          <description><![CDATA[Login to a RouterOS connection.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="172" name="param" description="The communicator to attempt to login to." type="\PEAR2\Net\RouterOS\Communicator" variable="$com">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Communicator</type>
+          </tag>
+          <tag line="172" name="param" description="The RouterOS username." type="string" variable="$username">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="172" name="param" description="The RouterOS password." type="string" variable="$password">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="172" name="return" description="TRUE on success, FALSE on failure." type="bool">
+            <type by_reference="false">bool</type>
+          </tag>
+        </docblock>
+        <argument line="181">
+          <name>$com</name>
+          <default><![CDATA[]]></default>
+          <type>\PEAR2\Net\RouterOS\Communicator</type>
+        </argument>
+        <argument line="181">
+          <name>$username</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="181">
+          <name>$password</name>
+          <default><![CDATA['']]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="private" namespace="PEAR2\Net\RouterOS" line="226" package="PEAR2\Net\RouterOS">
+        <name>_login</name>
+        <full_name>_login</full_name>
+        <docblock line="213">
+          <description><![CDATA[Login to a RouterOS connection.]]></description>
+          <long-description><![CDATA[<p>This is the actual login procedure, applied regardless of persistence and
+charset settings.</p>]]></long-description>
+          <tag line="213" name="param" description="The communicator to attempt to login to." type="\PEAR2\Net\RouterOS\Communicator" variable="$com">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Communicator</type>
+          </tag>
+          <tag line="213" name="param" description="The RouterOS username." type="string" variable="$username">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="213" name="param" description="The RouterOS password. Potentially parsed already by iconv." type="string" variable="$password">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="213" name="return" description="TRUE on success, FALSE on failure." type="bool">
+            <type by_reference="false">bool</type>
+          </tag>
+        </docblock>
+        <argument line="227">
+          <name>$com</name>
+          <default><![CDATA[]]></default>
+          <type>\PEAR2\Net\RouterOS\Communicator</type>
+        </argument>
+        <argument line="227">
+          <name>$username</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="227">
+          <name>$password</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="270" package="PEAR2\Net\RouterOS">
+        <name>setCharset</name>
+        <full_name>setCharset</full_name>
+        <docblock line="245">
+          <description><![CDATA[Sets the charset(s) for this connection.]]></description>
+          <long-description><![CDATA[<p>Sets the charset(s) for this connection. The specified charset(s) will be
+used for all future requests and responses. When sending,
+{@link Communicator::CHARSET_LOCAL} is converted to
+{@link Communicator::CHARSET_REMOTE}, and when receiving,
+{@link Communicator::CHARSET_REMOTE} is converted to
+{@link Communicator::CHARSET_LOCAL}. Setting NULL to either charset will
+disable charset convertion, and data will be both sent and received "as
+is".</p>]]></long-description>
+          <tag line="245" name="param" description="The charset to set. If $charsetType is {@link Communicator::CHARSET_ALL}, you can supply either a string to use for all charsets, or an array with the charset types as keys, and the charsets as values." type="mixed" variable="$charset">
+            <type by_reference="false">mixed</type>
+          </tag>
+          <tag line="245" name="param" description="Which charset to set. Valid values are the Communicator::CHARSET_* constants. Any other value is treated as {@link Communicator::CHARSET_ALL}." type="int" variable="$charsetType">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="245" name="return" description="The old charset. If $charsetType is {@link Communicator::CHARSET_ALL}, the old values will be returned as an array with the types as keys, and charsets as values." type="string|array">
+            <type by_reference="false">string</type>
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="245" name="see" description="\PEAR2\Net\RouterOS\Communicator::setDefaultCharset()" refers="\PEAR2\Net\RouterOS\Communicator::setDefaultCharset()"/>
+        </docblock>
+        <argument line="271">
+          <name>$charset</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="271">
+          <name>$charsetType</name>
+          <default><![CDATA[\PEAR2\Net\RouterOS\Communicator::CHARSET_ALL]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="288" package="PEAR2\Net\RouterOS">
+        <name>getCharset</name>
+        <full_name>getCharset</full_name>
+        <docblock line="276">
+          <description><![CDATA[Gets the charset(s) for this connection.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="276" name="param" description="Which charset to get. Valid values are the Communicator::CHARSET_* constants. Any other value is treated as {@link Communicator::CHARSET_ALL}." type="int" variable="$charsetType">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="276" name="return" description="The current charset. If $charsetType is {@link Communicator::CHARSET_ALL}, the current values will be returned as an array with the types as keys, and charsets as values." type="string|array">
+            <type by_reference="false">string</type>
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="276" name="see" description="\PEAR2\Net\RouterOS\setCharset()" refers="\PEAR2\Net\RouterOS\setCharset()"/>
+        </docblock>
+        <argument line="288">
+          <name>$charsetType</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="309" package="PEAR2\Net\RouterOS">
+        <name>sendAsync</name>
+        <full_name>sendAsync</full_name>
+        <docblock line="293">
+          <description><![CDATA[Sends a request and waits for responses.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="293" name="param" description="The request to send." type="\PEAR2\Net\RouterOS\Request" variable="$request">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Request</type>
+          </tag>
+          <tag line="293" name="param" description="Optional. A function that is to be executed when new responses for this request are available. The callback takes two parameters. The {@link Response} object as the first, and the {@link Client} object as the second one. If the function returns TRUE, the request is canceled. Note that the callback may be executed one last time after that with a response that notifies about the canceling." type="callback" variable="$callback">
+            <type by_reference="false">callback</type>
+          </tag>
+          <tag line="293" name="return" description="The client object." type="\PEAR2\Net\RouterOS\self|\PEAR2\Net\RouterOS\Client">
+            <type by_reference="false">\PEAR2\Net\RouterOS\self</type>
+            <type by_reference="false">\PEAR2\Net\RouterOS\Client</type>
+          </tag>
+          <tag line="293" name="see" description="\PEAR2\Net\RouterOS\completeRequest()" refers="\PEAR2\Net\RouterOS\completeRequest()"/>
+          <tag line="293" name="see" description="\PEAR2\Net\RouterOS\loop()" refers="\PEAR2\Net\RouterOS\loop()"/>
+          <tag line="293" name="see" description="\PEAR2\Net\RouterOS\cancelRequest()" refers="\PEAR2\Net\RouterOS\cancelRequest()"/>
+        </docblock>
+        <argument line="309">
+          <name>$request</name>
+          <default><![CDATA[]]></default>
+          <type>\PEAR2\Net\RouterOS\Request</type>
+        </argument>
+        <argument line="309">
+          <name>$callback</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="356" package="PEAR2\Net\RouterOS">
+        <name>isRequestActive</name>
+        <full_name>isRequestActive</full_name>
+        <docblock line="342">
+          <description><![CDATA[Checks if a request is active.]]></description>
+          <long-description><![CDATA[<p>Checks if a request is active. A request is considered active if it's a
+pending request and/or has responses that are not yet extracted.</p>]]></long-description>
+          <tag line="342" name="param" description="The tag of the request to look for." type="string" variable="$tag">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="342" name="param" description="One of the FILTER_* consntants. Limits the search to the specified places." type="int" variable="$filter">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="342" name="return" description="TRUE if the request is active, FALSE otherwise." type="bool">
+            <type by_reference="false">bool</type>
+          </tag>
+          <tag line="342" name="see" description="\PEAR2\Net\RouterOS\getPendingRequestsCount()" refers="\PEAR2\Net\RouterOS\getPendingRequestsCount()"/>
+          <tag line="342" name="see" description="\PEAR2\Net\RouterOS\completeRequest()" refers="\PEAR2\Net\RouterOS\completeRequest()"/>
+        </docblock>
+        <argument line="356">
+          <name>$tag</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="356">
+          <name>$filter</name>
+          <default><![CDATA[self::FILTER_ALL]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="377" package="PEAR2\Net\RouterOS">
+        <name>sendSync</name>
+        <full_name>sendSync</full_name>
+        <docblock line="368">
+          <description><![CDATA[Sends a request and gets the full response.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="368" name="param" description="The request to send." type="\PEAR2\Net\RouterOS\Request" variable="$request">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Request</type>
+          </tag>
+          <tag line="368" name="return" description="The received responses as a collection." type="\PEAR2\Net\RouterOS\ResponseCollection">
+            <type by_reference="false">\PEAR2\Net\RouterOS\ResponseCollection</type>
+          </tag>
+          <tag line="368" name="see" description="\PEAR2\Net\RouterOS\sendAsync()" refers="\PEAR2\Net\RouterOS\sendAsync()"/>
+          <tag line="368" name="see" description="\PEAR2\Net\RouterOS\close()" refers="\PEAR2\Net\RouterOS\close()"/>
+        </docblock>
+        <argument line="377">
+          <name>$request</name>
+          <default><![CDATA[]]></default>
+          <type>\PEAR2\Net\RouterOS\Request</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="402" package="PEAR2\Net\RouterOS">
+        <name>completeRequest</name>
+        <full_name>completeRequest</full_name>
+        <docblock line="388">
+          <description><![CDATA[Completes a specified request.]]></description>
+          <long-description><![CDATA[<p>Starts an event loop for the RouterOS callbacks and finishes when a
+specified request is completed.</p>]]></long-description>
+          <tag line="388" name="param" description="The tag of the request to complete. Setting NULL completes all requests." type="string" variable="$tag">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="388" name="return" description="A collection of {@link Response} objects that haven't been passed to a callback function or previously extracted with {@link extractNewResponses()}. Returns an empty collection when $tag is set to NULL (responses can still be extracted)." type="\PEAR2\Net\RouterOS\ResponseCollection">
+            <type by_reference="false">\PEAR2\Net\RouterOS\ResponseCollection</type>
+          </tag>
+        </docblock>
+        <argument line="402">
+          <name>$tag</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="444" package="PEAR2\Net\RouterOS">
+        <name>extractNewResponses</name>
+        <full_name>extractNewResponses</full_name>
+        <docblock line="431">
+          <description><![CDATA[Extracts responses for a request.]]></description>
+          <long-description><![CDATA[<p>Gets all new responses for a request that haven't been passed to a
+callback and clears the buffer from them.</p>]]></long-description>
+          <tag line="431" name="param" description="The tag of the request to extract new responses for. Specifying NULL with extract new responses for all requests." type="string" variable="$tag">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="431" name="return" description="A collection of {@link Response} objects for the specified request." type="\PEAR2\Net\RouterOS\ResponseCollection">
+            <type by_reference="false">\PEAR2\Net\RouterOS\ResponseCollection</type>
+          </tag>
+          <tag line="431" name="see" description="\PEAR2\Net\RouterOS\loop()" refers="\PEAR2\Net\RouterOS\loop()"/>
+        </docblock>
+        <argument line="444">
+          <name>$tag</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="487" package="PEAR2\Net\RouterOS">
+        <name>loop</name>
+        <full_name>loop</full_name>
+        <docblock line="473">
+          <description><![CDATA[Starts an event loop for the RouterOS callbacks.]]></description>
+          <long-description><![CDATA[<p>Starts an event loop for the RouterOS callbacks and finishes when there
+are no more pending requests or when a specified timeout has passed
+(whichever comes first).</p>]]></long-description>
+          <tag line="473" name="param" description="Timeout for the loop. If 0, there is no time limit." type="float" variable="$timeout">
+            <type by_reference="false">float</type>
+          </tag>
+          <tag line="473" name="return" description="TRUE when there are any more pending requests, FALSE otherwise." type="bool">
+            <type by_reference="false">bool</type>
+          </tag>
+          <tag line="473" name="see" description="\PEAR2\Net\RouterOS\extractNewResponses()" refers="\PEAR2\Net\RouterOS\extractNewResponses()"/>
+          <tag line="473" name="see" description="\PEAR2\Net\RouterOS\getPendingRequestsCount()" refers="\PEAR2\Net\RouterOS\getPendingRequestsCount()"/>
+        </docblock>
+        <argument line="487">
+          <name>$timeout</name>
+          <default><![CDATA[0]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="507" package="PEAR2\Net\RouterOS">
+        <name>getPendingRequestsCount</name>
+        <full_name>getPendingRequestsCount</full_name>
+        <docblock line="501">
+          <description><![CDATA[Gets the number of pending requests.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="501" name="return" description="The number of pending requests." type="int">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="501" name="see" description="\PEAR2\Net\RouterOS\isRequestActive()" refers="\PEAR2\Net\RouterOS\isRequestActive()"/>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="528" package="PEAR2\Net\RouterOS">
+        <name>cancelRequest</name>
+        <full_name>cancelRequest</full_name>
+        <docblock line="512">
+          <description><![CDATA[Cancels a request.]]></description>
+          <long-description><![CDATA[<p>Cancels an active request. Using this function in favor of a plain call
+to the "/cancel" command is highly reccomended, as it also updates the
+counter of pending requests properly. Note that canceling a request also
+removes any responses for it that were not previously extracted with
+{@link extractNewResponses()}.</p>]]></long-description>
+          <tag line="512" name="param" description="Tag of the request to cancel. Setting NULL will cancel all requests." type="string" variable="$tag">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="512" name="return" description="The client object." type="\PEAR2\Net\RouterOS\self|\PEAR2\Net\RouterOS\Client">
+            <type by_reference="false">\PEAR2\Net\RouterOS\self</type>
+            <type by_reference="false">\PEAR2\Net\RouterOS\Client</type>
+          </tag>
+          <tag line="512" name="see" description="\PEAR2\Net\RouterOS\sendAsync()" refers="\PEAR2\Net\RouterOS\sendAsync()"/>
+          <tag line="512" name="see" description="\PEAR2\Net\RouterOS\close()" refers="\PEAR2\Net\RouterOS\close()"/>
+        </docblock>
+        <argument line="528">
+          <name>$tag</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="593" package="PEAR2\Net\RouterOS">
+        <name>setStreamingResponses</name>
+        <full_name>setStreamingResponses</full_name>
+        <docblock line="580">
+          <description><![CDATA[Sets response streaming setting.]]></description>
+          <long-description><![CDATA[<p>Sets whether future responses are streamed. If responses are streamed,
+the argument values are returned as streams instead of strings. This is
+particularly useful if you expect a response that may contain one or more
+very large words.</p>]]></long-description>
+          <tag line="580" name="param" description="Whether to stream future responses." type="bool" variable="$streamingResponses">
+            <type by_reference="false">bool</type>
+          </tag>
+          <tag line="580" name="return" description="The previous value of the setting." type="bool">
+            <type by_reference="false">bool</type>
+          </tag>
+          <tag line="580" name="see" description="\PEAR2\Net\RouterOS\isStreamingResponses()" refers="\PEAR2\Net\RouterOS\isStreamingResponses()"/>
+        </docblock>
+        <argument line="593">
+          <name>$streamingResponses</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="608" package="PEAR2\Net\RouterOS">
+        <name>isStreamingResponses</name>
+        <full_name>isStreamingResponses</full_name>
+        <docblock line="600">
+          <description><![CDATA[Gets response streaming setting.]]></description>
+          <long-description><![CDATA[<p>Gets whether future responses are streamed.</p>]]></long-description>
+          <tag line="600" name="return" description="The value of the setting." type="bool">
+            <type by_reference="false">bool</type>
+          </tag>
+          <tag line="600" name="see" description="\PEAR2\Net\RouterOS\setStreamingResponses()" refers="\PEAR2\Net\RouterOS\setStreamingResponses()"/>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="622" package="PEAR2\Net\RouterOS">
+        <name>close</name>
+        <full_name>close</full_name>
+        <docblock line="613">
+          <description><![CDATA[Closes the opened connection, even if it is a persistent one.]]></description>
+          <long-description><![CDATA[<p>Closes the opened connection, even if it is a persistent one. Note that
+{@link extractNewResponses()} can still be used to extract responses
+collected prior to the closing.</p>]]></long-description>
+          <tag line="613" name="return" description="TRUE on success, FALSE on failure." type="bool">
+            <type by_reference="false">bool</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="649" package="PEAR2\Net\RouterOS">
+        <name>__destruct</name>
+        <full_name>__destruct</full_name>
+        <docblock line="646">
+          <description><![CDATA[Closes the connection, unless it's a persistent one.]]></description>
+          <long-description><![CDATA[]]></long-description>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="PEAR2\Net\RouterOS" line="669" package="PEAR2\Net\RouterOS">
+        <name>send</name>
+        <full_name>send</full_name>
+        <docblock line="660">
+          <description><![CDATA[Sends a request to RouterOS.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="660" name="param" description="The request to send." type="\PEAR2\Net\RouterOS\Request" variable="$request">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Request</type>
+          </tag>
+          <tag line="660" name="return" description="The client object." type="\PEAR2\Net\RouterOS\self|\PEAR2\Net\RouterOS\Client">
+            <type by_reference="false">\PEAR2\Net\RouterOS\self</type>
+            <type by_reference="false">\PEAR2\Net\RouterOS\Client</type>
+          </tag>
+          <tag line="660" name="see" description="\PEAR2\Net\RouterOS\sendSync()" refers="\PEAR2\Net\RouterOS\sendSync()"/>
+          <tag line="660" name="see" description="\PEAR2\Net\RouterOS\sendAsync()" refers="\PEAR2\Net\RouterOS\sendAsync()"/>
+        </docblock>
+        <argument line="669">
+          <name>$request</name>
+          <default><![CDATA[]]></default>
+          <type>\PEAR2\Net\RouterOS\Request</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="PEAR2\Net\RouterOS" line="684" package="PEAR2\Net\RouterOS">
+        <name>dispatchNextResponse</name>
+        <full_name>dispatchNextResponse</full_name>
+        <docblock line="676">
+          <description><![CDATA[Dispatches the next response in queue.]]></description>
+          <long-description><![CDATA[<p>Dispatches the next response in queue, i.e. it executes the associated
+callback if there is one, or places the response in the response buffer.</p>]]></long-description>
+          <tag line="676" name="return" description="The dispatched response." type="\PEAR2\Net\RouterOS\Response">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Response</type>
+          </tag>
+        </docblock>
+      </method>
+    </class>
+    <parse_markers>
+      <critical line="62" code="50019">No short description for property $com</critical>
+      <critical line="67" code="50019">No short description for property $pendingRequestsCount</critical>
+      <critical line="72" code="50019">No short description for property $responseBuffer</critical>
+      <critical line="79" code="50019">No short description for property $callbacks</critical>
+      <critical line="85" code="50019">No short description for property $registry</critical>
+      <critical line="91" code="50019">No short description for property $_streamingResponses</critical>
+    </parse_markers>
+  </file>
+  <file path="Communicator.php" hash="a420223b08821b43aba3e1b629a419c1" package="PEAR2\Net\RouterOS">
+    <docblock line="3">
+      <description><![CDATA[RouterOS API client implementation.]]></description>
+      <long-description><![CDATA[<p>RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.</p>
+
+<p>PHP version 5</p>]]></long-description>
+      <tag line="3" name="category" description="Net"/>
+      <tag line="3" name="package" description="PEAR2_Net_RouterOS"/>
+      <tag line="3" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+      <tag line="3" name="copyright" description="2011 Vasil Rangelov"/>
+      <tag line="3" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+      <tag line="3" name="version" description="1.0.0b3"/>
+      <tag line="3" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+    </docblock>
+    <namespace-alias name="T">PEAR2\Net\Transmitter</namespace-alias>
+    <class final="false" abstract="false" namespace="PEAR2\Net\RouterOS" line="45" package="PEAR2\Net\RouterOS">
+      <extends/>
+      <name>Communicator</name>
+      <full_name>\PEAR2\Net\RouterOS\Communicator</full_name>
+      <docblock line="29">
+        <description><![CDATA[A RouterOS communicator.]]></description>
+        <long-description><![CDATA[<p>Implementation of the RouterOS API protocol. Unlike the other classes in this
+package, this class doesn't provide any conviniences beyond the low level
+implementation details (automatic word length encoding/decoding, charset
+translation and data integrity), and because of that, its direct usage is
+strongly discouraged.</p>]]></long-description>
+        <tag line="29" name="category" description="Net"/>
+        <tag line="29" name="package" description="PEAR2_Net_RouterOS"/>
+        <tag line="29" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+        <tag line="29" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+        <tag line="29" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+        <tag line="29" name="see" description="\PEAR2\Net\RouterOS\Client" refers="\PEAR2\Net\RouterOS\Client"/>
+      </docblock>
+      <constant namespace="PEAR2\Net\RouterOS" line="50" package="PEAR2\Net\RouterOS">
+        <name>CHARSET_ALL</name>
+        <full_name>CHARSET_ALL</full_name>
+        <value><![CDATA[-1]]></value>
+        <docblock line="47">
+          <description><![CDATA[Used when getting/setting all (default) charsets.]]></description>
+          <long-description><![CDATA[]]></long-description>
+        </docblock>
+      </constant>
+      <constant namespace="PEAR2\Net\RouterOS" line="59" package="PEAR2\Net\RouterOS">
+        <name>CHARSET_REMOTE</name>
+        <full_name>CHARSET_REMOTE</full_name>
+        <value><![CDATA[0]]></value>
+        <docblock line="52">
+          <description><![CDATA[Used when getting/setting the (default) remote charset.]]></description>
+          <long-description><![CDATA[<p>The remote charset is the charset in which RouterOS stores its data.
+If you want to keep compatibility with your Winbox, this charset should
+match the default charset from your Windows' regional settings.</p>]]></long-description>
+        </docblock>
+      </constant>
+      <constant namespace="PEAR2\Net\RouterOS" line="68" package="PEAR2\Net\RouterOS">
+        <name>CHARSET_LOCAL</name>
+        <full_name>CHARSET_LOCAL</full_name>
+        <value><![CDATA[1]]></value>
+        <docblock line="61">
+          <description><![CDATA[Used when getting/setting the (default) local charset.]]></description>
+          <long-description><![CDATA[<p>The local charset is the charset in which the data from RouterOS will be
+returned as. This charset should match the charset of the place the data
+will eventually be written to.</p>]]></long-description>
+        </docblock>
+      </constant>
+      <property final="false" static="true" visibility="protected" line="74" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$defaultCharsets</name>
+        <default><![CDATA[array(self::CHARSET_REMOTE => null, self::CHARSET_LOCAL => null)]]></default>
+        <docblock line="70">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="70" name="var" description="An array with the default charset types as keys, and the default charsets as values." type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="protected" line="83" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$charsets</name>
+        <default><![CDATA[array()]]></default>
+        <docblock line="79">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="79" name="var" description="An array with the current charset types as keys, and the current charsets as values." type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="protected" line="88" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$trans</name>
+        <default><![CDATA[]]></default>
+        <docblock line="85">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="85" name="var" description="The transmitter for the connection." type="\PEAR2\Net\Transmitter\TcpClient">
+            <type by_reference="false">\PEAR2\Net\Transmitter\TcpClient</type>
+          </tag>
+        </docblock>
+      </property>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="105" package="PEAR2\Net\RouterOS">
+        <name>__construct</name>
+        <full_name>__construct</full_name>
+        <docblock line="90">
+          <description><![CDATA[Creates a new connection with the specified options.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="90" name="param" description="Hostname (IP or domain) of the RouterOS server." type="string" variable="$host">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="90" name="param" description="The port on which the RouterOS server provides the API service." type="int" variable="$port">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="90" name="param" description="Whether or not the connection should be a persistent one." type="bool" variable="$persist">
+            <type by_reference="false">bool</type>
+          </tag>
+          <tag line="90" name="param" description="The timeout for the connection." type="float" variable="$timeout">
+            <type by_reference="false">float</type>
+          </tag>
+          <tag line="90" name="param" description="A string that uniquely identifies the connection." type="string" variable="$key">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="90" name="param" description="A context for the socket." type="resource" variable="$context">
+            <type by_reference="false">resource</type>
+          </tag>
+          <tag line="90" name="see" description="\PEAR2\Net\RouterOS\sendWord()" refers="\PEAR2\Net\RouterOS\sendWord()"/>
+        </docblock>
+        <argument line="105">
+          <name>$host</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="105">
+          <name>$port</name>
+          <default><![CDATA[8728]]></default>
+          <type/>
+        </argument>
+        <argument line="105">
+          <name>$persist</name>
+          <default><![CDATA[false]]></default>
+          <type/>
+        </argument>
+        <argument line="106">
+          <name>$timeout</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+        <argument line="106">
+          <name>$key</name>
+          <default><![CDATA['']]></default>
+          <type/>
+        </argument>
+        <argument line="106">
+          <name>$context</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="133" package="PEAR2\Net\RouterOS">
+        <name>__invoke</name>
+        <full_name>__invoke</full_name>
+        <docblock line="120">
+          <description><![CDATA[A shorthand gateway.]]></description>
+          <long-description><![CDATA[<p>This is a magic PHP method that allows you to call the object as a
+function. Depending on the argument given, one of the other functions in
+the class is invoked and its returned value is returned by this function.</p>]]></long-description>
+          <tag line="120" name="param" description="A string of the word to send, or NULL to get the next word as a string." type="string" variable="$string">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="120" name="return" description="If a string is provided, returns the number of bytes sent, otherwise retuns the next word as a string." type="int|string">
+            <type by_reference="false">int</type>
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="133">
+          <name>$string</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="PEAR2\Net\RouterOS" line="146" package="PEAR2\Net\RouterOS">
+        <name>isSeekableStream</name>
+        <full_name>isSeekableStream</full_name>
+        <docblock line="139">
+          <description><![CDATA[Checks whether a variable is a seekable stream resource.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="139" name="param" description="The value to check." type="mixed" variable="$var">
+            <type by_reference="false">mixed</type>
+          </tag>
+          <tag line="139" name="return" description="TRUE if $var is a seekable stream, FALSE otherwise." type="bool">
+            <type by_reference="false">bool</type>
+          </tag>
+        </docblock>
+        <argument line="146">
+          <name>$var</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="PEAR2\Net\RouterOS" line="165" package="PEAR2\Net\RouterOS">
+        <name>iconvStream</name>
+        <full_name>iconvStream</full_name>
+        <docblock line="155">
+          <description><![CDATA[Uses iconv to convert a stream from one charset to another.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="155" name="param" description="The charset of the stream." type="string" variable="$in_charset">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="155" name="param" description="The desired resulting charset." type="string" variable="$out_charset">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="155" name="param" description="The stream to convert." type="resource" variable="$stream">
+            <type by_reference="false">resource</type>
+          </tag>
+          <tag line="155" name="return" description="A new stream that uses the $out_charset. The stream is a subset from the original stream, from its current position to its end." type="resource">
+            <type by_reference="false">resource</type>
+          </tag>
+        </docblock>
+        <argument line="165">
+          <name>$in_charset</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="165">
+          <name>$out_charset</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="165">
+          <name>$stream</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="PEAR2\Net\RouterOS" line="202" package="PEAR2\Net\RouterOS">
+        <name>setDefaultCharset</name>
+        <full_name>setDefaultCharset</full_name>
+        <docblock line="186">
+          <description><![CDATA[Sets the default charset(s) for new connections.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="186" name="param" description="The charset to set. If $charsetType is {@link CHARSET_ALL}, you can supply either a string to use for all charsets, or an array with the charset types as keys, and the charsets as values." type="mixed" variable="$charset">
+            <type by_reference="false">mixed</type>
+          </tag>
+          <tag line="186" name="param" description="Which charset to set. Valid values are the CHARSET_* constants. Any other value is treated as {@link CHARSET_ALL}." type="int" variable="$charsetType">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="186" name="return" description="The old charset. If $charsetType is {@link CHARSET_ALL}, the old values will be returned as an array with the types as keys, and charsets as values." type="string|array">
+            <type by_reference="false">string</type>
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="186" name="see" description="\PEAR2\Net\RouterOS\setCharset()" refers="\PEAR2\Net\RouterOS\setCharset()"/>
+        </docblock>
+        <argument line="203">
+          <name>$charset</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="203">
+          <name>$charsetType</name>
+          <default><![CDATA[self::CHARSET_ALL]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="PEAR2\Net\RouterOS" line="229" package="PEAR2\Net\RouterOS">
+        <name>getDefaultCharset</name>
+        <full_name>getDefaultCharset</full_name>
+        <docblock line="218">
+          <description><![CDATA[Gets the default charset(s).]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="218" name="param" description="Which charset to get. Valid values are the CHARSET_* constants. Any other value is treated as {@link CHARSET_ALL}." type="int" variable="$charsetType">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="218" name="return" description="The current charset. If $charsetType is {@link CHARSET_ALL}, the current values will be returned as an array with the types as keys, and charsets as values." type="string|array">
+            <type by_reference="false">string</type>
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="218" name="see" description="\PEAR2\Net\RouterOS\setDefaultCharset()" refers="\PEAR2\Net\RouterOS\setDefaultCharset()"/>
+        </docblock>
+        <argument line="229">
+          <name>$charsetType</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="258" package="PEAR2\Net\RouterOS">
+        <name>setCharset</name>
+        <full_name>setCharset</full_name>
+        <docblock line="235">
+          <description><![CDATA[Sets the charset(s) for this connection.]]></description>
+          <long-description><![CDATA[<p>Sets the charset(s) for this connection. The specified charset(s) will be
+used for all future words. When sending, {@link CHARSET_LOCAL} is
+converted to {@link CHARSET_REMOTE}, and when receiving,
+{@link CHARSET_REMOTE} is converted to {@link CHARSET_LOCAL}. Setting
+NULL to either charset will disable charset convertion, and data will be
+both sent and received "as is".</p>]]></long-description>
+          <tag line="235" name="param" description="The charset to set. If $charsetType is {@link CHARSET_ALL}, you can supply either a string to use for all charsets, or an array with the charset types as keys, and the charsets as values." type="mixed" variable="$charset">
+            <type by_reference="false">mixed</type>
+          </tag>
+          <tag line="235" name="param" description="Which charset to set. Valid values are the Communicator::CHARSET_* constants. Any other value is treated as {@link CHARSET_ALL}." type="int" variable="$charsetType">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="235" name="return" description="The old charset. If $charsetType is {@link CHARSET_ALL}, the old values will be returned as an array with the types as keys, and charsets as values." type="string|array">
+            <type by_reference="false">string</type>
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="235" name="see" description="\PEAR2\Net\RouterOS\setDefaultCharset()" refers="\PEAR2\Net\RouterOS\setDefaultCharset()"/>
+        </docblock>
+        <argument line="258">
+          <name>$charset</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="258">
+          <name>$charsetType</name>
+          <default><![CDATA[self::CHARSET_ALL]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="285" package="PEAR2\Net\RouterOS">
+        <name>getCharset</name>
+        <full_name>getCharset</full_name>
+        <docblock line="273">
+          <description><![CDATA[Gets the charset(s) for this connection.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="273" name="param" description="Which charset to get. Valid values are the CHARSET_* constants. Any other value is treated as {@link CHARSET_ALL}." type="int" variable="$charsetType">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="273" name="return" description="The current charset. If $charsetType is {@link CHARSET_ALL}, the current values will be returned as an array with the types as keys, and charsets as values." type="string|array">
+            <type by_reference="false">string</type>
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="273" name="see" description="\PEAR2\Net\RouterOS\getDefaultCharset()" refers="\PEAR2\Net\RouterOS\getDefaultCharset()"/>
+          <tag line="273" name="see" description="\PEAR2\Net\RouterOS\setCharset()" refers="\PEAR2\Net\RouterOS\setCharset()"/>
+        </docblock>
+        <argument line="285">
+          <name>$charsetType</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="296" package="PEAR2\Net\RouterOS">
+        <name>getTransmitter</name>
+        <full_name>getTransmitter</full_name>
+        <docblock line="291">
+          <description><![CDATA[Gets the transmitter for this connection.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="291" name="return" description="The transmitter for this connection." type="\PEAR2\Net\Transmitter\TcpClient">
+            <type by_reference="false">\PEAR2\Net\Transmitter\TcpClient</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="312" package="PEAR2\Net\RouterOS">
+        <name>sendWord</name>
+        <full_name>sendWord</full_name>
+        <docblock line="301">
+          <description><![CDATA[Sends a word.]]></description>
+          <long-description><![CDATA[<p>Sends a word and automatically encodes its length when doing so.</p>]]></long-description>
+          <tag line="301" name="param" description="The word to send." type="string" variable="$word">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="301" name="return" description="The number of bytes sent." type="int">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="301" name="see" description="\PEAR2\Net\RouterOS\sendWordFromStream()" refers="\PEAR2\Net\RouterOS\sendWordFromStream()"/>
+          <tag line="301" name="see" description="\PEAR2\Net\RouterOS\getNextWord()" refers="\PEAR2\Net\RouterOS\getNextWord()"/>
+        </docblock>
+        <argument line="312">
+          <name>$word</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="348" package="PEAR2\Net\RouterOS">
+        <name>sendWordFromStream</name>
+        <full_name>sendWordFromStream</full_name>
+        <docblock line="334">
+          <description><![CDATA[Sends a word based on a stream.]]></description>
+          <long-description><![CDATA[<p>Sends a word based on a stream and automatically encodes its length when
+doing so. The stream is read from its current position to its end, and
+then returned to its current position. Because of those operations, the
+supplied stream must be seekable.</p>]]></long-description>
+          <tag line="334" name="param" description="A string to prepend before the stream contents." type="string" variable="$prefix">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="334" name="param" description="The stream to send." type="resource" variable="$stream">
+            <type by_reference="false">resource</type>
+          </tag>
+          <tag line="334" name="return" description="The number of bytes sent." type="int">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="334" name="see" description="\PEAR2\Net\RouterOS\sendWord()" refers="\PEAR2\Net\RouterOS\sendWord()"/>
+        </docblock>
+        <argument line="348">
+          <name>$prefix</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="348">
+          <name>$stream</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="protected" namespace="PEAR2\Net\RouterOS" line="399" package="PEAR2\Net\RouterOS">
+        <name>verifyLengthSupport</name>
+        <full_name>verifyLengthSupport</full_name>
+        <docblock line="387">
+          <description><![CDATA[Verifies that the length is supported.]]></description>
+          <long-description><![CDATA[<p>Verifies if the specified length is supported by the API. Throws a
+{@link LengthException} if that's not the case. Currently, RouterOS
+supports words up to 0xFFFFFFF in length, so that's the only check
+performed.</p>]]></long-description>
+          <tag line="387" name="param" description="The length to verify." type="int" variable="$length">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="387" name="return" description="" type="void">
+            <type by_reference="false">void</type>
+          </tag>
+        </docblock>
+        <argument line="399">
+          <name>$length</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="PEAR2\Net\RouterOS" line="416" package="PEAR2\Net\RouterOS">
+        <name>encodeLength</name>
+        <full_name>encodeLength</full_name>
+        <docblock line="409">
+          <description><![CDATA[Encodes the length as requred by the RouterOS API.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="409" name="param" description="The length to encode." type="int" variable="$length">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="409" name="return" description="The encoded length." type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="416">
+          <name>$length</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="452" package="PEAR2\Net\RouterOS">
+        <name>getNextWord</name>
+        <full_name>getNextWord</full_name>
+        <docblock line="443">
+          <description><![CDATA[Get the next word in queue as a string.]]></description>
+          <long-description><![CDATA[<p>Get the next word in queue as a string, after automatically decoding its
+length.</p>]]></long-description>
+          <tag line="443" name="return" description="The word." type="string">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="443" name="see" description="\PEAR2\Net\RouterOS\close()" refers="\PEAR2\Net\RouterOS\close()"/>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="488" package="PEAR2\Net\RouterOS">
+        <name>getNextWordAsStream</name>
+        <full_name>getNextWordAsStream</full_name>
+        <docblock line="479">
+          <description><![CDATA[Get the next word in queue as a stream.]]></description>
+          <long-description><![CDATA[<p>Get the next word in queue as a stream, after automatically decoding its
+length.</p>]]></long-description>
+          <tag line="479" name="return" description="The word, as a stream." type="resource">
+            <type by_reference="false">resource</type>
+          </tag>
+          <tag line="479" name="see" description="\PEAR2\Net\RouterOS\close()" refers="\PEAR2\Net\RouterOS\close()"/>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="PEAR2\Net\RouterOS" line="526" package="PEAR2\Net\RouterOS">
+        <name>decodeLength</name>
+        <full_name>decodeLength</full_name>
+        <docblock line="515">
+          <description><![CDATA[Decodes the lenght of the incoming message.]]></description>
+          <long-description><![CDATA[<p>Decodes the lenght of the incoming message, as specified by the RouterOS
+API.</p>]]></long-description>
+          <tag line="515" name="param" description="The transmitter from which to decode the length of the incoming message." type="\PEAR2\Net\Transmitter\Stream" variable="$trans">
+            <type by_reference="false">\PEAR2\Net\Transmitter\Stream</type>
+          </tag>
+          <tag line="515" name="return" description="The decoded length." type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="526">
+          <name>$trans</name>
+          <default><![CDATA[]]></default>
+          <type>\PEAR2\Net\Transmitter\Stream</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="private" namespace="PEAR2\Net\RouterOS" line="551" package="PEAR2\Net\RouterOS">
+        <name>_decodeLength</name>
+        <full_name>_decodeLength</full_name>
+        <docblock line="537">
+          <description><![CDATA[Decodes the lenght of the incoming message.]]></description>
+          <long-description><![CDATA[<p>Decodes the lenght of the incoming message, as specified by the RouterOS
+API.</p>
+
+<p>Difference with the non private function is that this one doesn't perform
+locking if the connection is a persistent one.</p>]]></long-description>
+          <tag line="537" name="param" description="The transmitter from which to decode the length of the incoming message." type="\PEAR2\Net\Transmitter\Stream" variable="$trans">
+            <type by_reference="false">\PEAR2\Net\Transmitter\Stream</type>
+          </tag>
+          <tag line="537" name="return" description="The decoded length." type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="551">
+          <name>$trans</name>
+          <default><![CDATA[]]></default>
+          <type>\PEAR2\Net\Transmitter\Stream</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="581" package="PEAR2\Net\RouterOS">
+        <name>close</name>
+        <full_name>close</full_name>
+        <docblock line="576">
+          <description><![CDATA[Closes the opened connection, even if it is a persistent one.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="576" name="return" description="TRUE on success, FALSE on failure." type="bool">
+            <type by_reference="false">bool</type>
+          </tag>
+        </docblock>
+      </method>
+    </class>
+    <parse_markers>
+      <critical line="70" code="50019">No short description for property $defaultCharsets</critical>
+      <critical line="79" code="50019">No short description for property $charsets</critical>
+      <critical line="85" code="50019">No short description for property $trans</critical>
+    </parse_markers>
+  </file>
+  <file path="DataFlowException.php" hash="550704353d6603da4aa6d9010b1266df" package="PEAR2\Net\RouterOS">
+    <docblock line="3">
+      <description><![CDATA[RouterOS API client implementation.]]></description>
+      <long-description><![CDATA[<p>RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.</p>
+
+<p>PHP version 5</p>]]></long-description>
+      <tag line="3" name="category" description="Net"/>
+      <tag line="3" name="package" description="PEAR2_Net_RouterOS"/>
+      <tag line="3" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+      <tag line="3" name="copyright" description="2011 Vasil Rangelov"/>
+      <tag line="3" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+      <tag line="3" name="version" description="1.0.0b3"/>
+      <tag line="3" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+    </docblock>
+    <class final="false" abstract="false" namespace="PEAR2\Net\RouterOS" line="33" package="PEAR2\Net\RouterOS">
+      <extends>\RuntimeException</extends>
+      <implements>\PEAR2\Net\RouterOS\Exception</implements>
+      <name>DataFlowException</name>
+      <full_name>\PEAR2\Net\RouterOS\DataFlowException</full_name>
+      <docblock line="24">
+        <description><![CDATA[Exception thrown when the request/response cycle goes an unexpected way.]]></description>
+        <long-description><![CDATA[]]></long-description>
+        <tag line="24" name="category" description="Net"/>
+        <tag line="24" name="package" description="PEAR2_Net_RouterOS"/>
+        <tag line="24" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+        <tag line="24" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+        <tag line="24" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+      </docblock>
+    </class>
+  </file>
+  <file path="Exception.php" hash="305cd2cd78d200b220567edec3d55a8c" package="PEAR2\Net\RouterOS">
+    <docblock line="3">
+      <description><![CDATA[RouterOS API client implementation.]]></description>
+      <long-description><![CDATA[<p>RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.</p>
+
+<p>PHP version 5</p>]]></long-description>
+      <tag line="3" name="category" description="Net"/>
+      <tag line="3" name="package" description="PEAR2_Net_RouterOS"/>
+      <tag line="3" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+      <tag line="3" name="copyright" description="2011 Vasil Rangelov"/>
+      <tag line="3" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+      <tag line="3" name="version" description="1.0.0b3"/>
+      <tag line="3" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+    </docblock>
+    <interface namespace="PEAR2\Net\RouterOS" line="33" package="PEAR2\Net\RouterOS">
+      <name>Exception</name>
+      <full_name>\PEAR2\Net\RouterOS\Exception</full_name>
+      <docblock line="24">
+        <description><![CDATA[Generic exception class of this package.]]></description>
+        <long-description><![CDATA[]]></long-description>
+        <tag line="24" name="category" description="Net"/>
+        <tag line="24" name="package" description="PEAR2_Net_RouterOS"/>
+        <tag line="24" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+        <tag line="24" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+        <tag line="24" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+      </docblock>
+    </interface>
+  </file>
+  <file path="InvalidArgumentException.php" hash="fb8954c01ee33705507f69f802c2afef" package="PEAR2\Net\RouterOS">
+    <docblock line="3">
+      <description><![CDATA[RouterOS API client implementation.]]></description>
+      <long-description><![CDATA[<p>RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.</p>
+
+<p>PHP version 5</p>]]></long-description>
+      <tag line="3" name="category" description="Net"/>
+      <tag line="3" name="package" description="PEAR2_Net_RouterOS"/>
+      <tag line="3" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+      <tag line="3" name="copyright" description="2011 Vasil Rangelov"/>
+      <tag line="3" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+      <tag line="3" name="version" description="1.0.0b3"/>
+      <tag line="3" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+    </docblock>
+    <class final="false" abstract="false" namespace="PEAR2\Net\RouterOS" line="33" package="PEAR2\Net\RouterOS">
+      <extends>\InvalidArgumentException</extends>
+      <implements>\PEAR2\Net\RouterOS\Exception</implements>
+      <name>InvalidArgumentException</name>
+      <full_name>\PEAR2\Net\RouterOS\InvalidArgumentException</full_name>
+      <docblock line="24">
+        <description><![CDATA[Exception thrown when there's something wrong with message arguments.]]></description>
+        <long-description><![CDATA[]]></long-description>
+        <tag line="24" name="category" description="Net"/>
+        <tag line="24" name="package" description="PEAR2_Net_RouterOS"/>
+        <tag line="24" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+        <tag line="24" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+        <tag line="24" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+      </docblock>
+    </class>
+  </file>
+  <file path="LengthtException.php" hash="07eb0d03caa2ff1d60bf39dd42bb6b89" package="PEAR2\Net\RouterOS">
+    <docblock line="3">
+      <description><![CDATA[RouterOS API client implementation.]]></description>
+      <long-description><![CDATA[<p>RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.</p>
+
+<p>PHP version 5</p>]]></long-description>
+      <tag line="3" name="category" description="Net"/>
+      <tag line="3" name="package" description="PEAR2_Net_RouterOS"/>
+      <tag line="3" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+      <tag line="3" name="copyright" description="2011 Vasil Rangelov"/>
+      <tag line="3" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+      <tag line="3" name="version" description="1.0.0b3"/>
+      <tag line="3" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+    </docblock>
+    <class final="false" abstract="false" namespace="PEAR2\Net\RouterOS" line="33" package="PEAR2\Net\RouterOS">
+      <extends>\LengthException</extends>
+      <implements>\PEAR2\Net\RouterOS\Exception</implements>
+      <name>LengthException</name>
+      <full_name>\PEAR2\Net\RouterOS\LengthException</full_name>
+      <docblock line="24">
+        <description><![CDATA[Exception thrown when there is a problem with a word's length.]]></description>
+        <long-description><![CDATA[]]></long-description>
+        <tag line="24" name="category" description="Net"/>
+        <tag line="24" name="package" description="PEAR2_Net_RouterOS"/>
+        <tag line="24" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+        <tag line="24" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+        <tag line="24" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+      </docblock>
+      <property final="false" static="false" visibility="private" line="40" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$_length</name>
+        <default><![CDATA[]]></default>
+        <docblock line="36">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="36" name="var" description="The problematic length." type="mixed">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+      </property>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="51" package="PEAR2\Net\RouterOS">
+        <name>__construct</name>
+        <full_name>__construct</full_name>
+        <docblock line="42">
+          <description><![CDATA[Creates a new LengthException.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="42" name="param" description="The Exception message to throw." type="string" variable="$message">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="42" name="param" description="The Exception code." type="int" variable="$code">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="42" name="param" description="The previous exception used for the exception chaining." type="\Exception" variable="$previous">
+            <type by_reference="false">\Exception</type>
+          </tag>
+          <tag line="42" name="param" description="The length." type="\PEAR2\Net\RouterOS\number" variable="$length">
+            <type by_reference="false">\PEAR2\Net\RouterOS\number</type>
+          </tag>
+        </docblock>
+        <argument line="51">
+          <name>$message</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="51">
+          <name>$code</name>
+          <default><![CDATA[0]]></default>
+          <type/>
+        </argument>
+        <argument line="51">
+          <name>$previous</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+        <argument line="52">
+          <name>$length</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="63" package="PEAR2\Net\RouterOS">
+        <name>getLength</name>
+        <full_name>getLength</full_name>
+        <docblock line="58">
+          <description><![CDATA[Gets the length.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="58" name="return" description="The length." type="\PEAR2\Net\RouterOS\number">
+            <type by_reference="false">\PEAR2\Net\RouterOS\number</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="76" package="PEAR2\Net\RouterOS">
+        <name>__toString</name>
+        <full_name>__toString</full_name>
+        <docblock line="71">
+          <description><![CDATA[Returns a string representation of the exception.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="71" name="return" description="The exception as a string." type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+      </method>
+    </class>
+    <parse_markers>
+      <critical line="36" code="50019">No short description for property $_length</critical>
+    </parse_markers>
+  </file>
+  <file path="Message.php" hash="8a76e9f9a2946ec2b58d75129248e81b" package="PEAR2\Net\RouterOS">
+    <docblock line="3">
+      <description><![CDATA[RouterOS API client implementation.]]></description>
+      <long-description><![CDATA[<p>RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.</p>
+
+<p>PHP version 5</p>]]></long-description>
+      <tag line="3" name="category" description="Net"/>
+      <tag line="3" name="package" description="PEAR2_Net_RouterOS"/>
+      <tag line="3" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+      <tag line="3" name="copyright" description="2011 Vasil Rangelov"/>
+      <tag line="3" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+      <tag line="3" name="version" description="1.0.0b3"/>
+      <tag line="3" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+    </docblock>
+    <class final="false" abstract="false" namespace="PEAR2\Net\RouterOS" line="33" package="PEAR2\Net\RouterOS">
+      <extends/>
+      <name>Message</name>
+      <full_name>\PEAR2\Net\RouterOS\Message</full_name>
+      <docblock line="24">
+        <description><![CDATA[Represents a RouterOS message.]]></description>
+        <long-description><![CDATA[]]></long-description>
+        <tag line="24" name="category" description="Net"/>
+        <tag line="24" name="package" description="PEAR2_Net_RouterOS"/>
+        <tag line="24" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+        <tag line="24" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+        <tag line="24" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+      </docblock>
+      <property final="false" static="false" visibility="protected" line="40" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$arguments</name>
+        <default><![CDATA[array()]]></default>
+        <docblock line="36">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="36" name="var" description="An array with message arguments. Keys are the names of the arguments, array values are values for the corresponding argument." type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="private" line="45" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$_tag</name>
+        <default><![CDATA[null]]></default>
+        <docblock line="42">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="42" name="var" description="An optional tag to associate the message with." type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+      </property>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="60" package="PEAR2\Net\RouterOS">
+        <name>__invoke</name>
+        <full_name>__invoke</full_name>
+        <docblock line="47">
+          <description><![CDATA[A shorthand gateway.]]></description>
+          <long-description><![CDATA[<p>This is a magic PHP method that allows you to call the object as a
+function. Depending on the argument given, one of the other functions in
+the class is invoked and its returned value is returned by this function.</p>]]></long-description>
+          <tag line="47" name="param" description="The name of an argument to get the value of, or NULL to get all arguments as an array." type="string" variable="$name">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="47" name="return" description="The value of the specified argument, or an array of all arguments if NULL is provided." type="string|array">
+            <type by_reference="false">string</type>
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+        <argument line="60">
+          <name>$name</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="PEAR2\Net\RouterOS" line="75" package="PEAR2\Net\RouterOS">
+        <name>sanitizeArgumentName</name>
+        <full_name>sanitizeArgumentName</full_name>
+        <docblock line="68">
+          <description><![CDATA[Sanitizes a name of an argument (message or query one).]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="68" name="param" description="The name to sanitize." type="mixed" variable="$name">
+            <type by_reference="false">mixed</type>
+          </tag>
+          <tag line="68" name="return" description="The sanitized name." type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="75">
+          <name>$name</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="PEAR2\Net\RouterOS" line="95" package="PEAR2\Net\RouterOS">
+        <name>sanitizeArgumentValue</name>
+        <full_name>sanitizeArgumentValue</full_name>
+        <docblock line="88">
+          <description><![CDATA[Sanitizes a value of an argument (message or query one).]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="88" name="param" description="The value to sanitize." type="mixed" variable="$value">
+            <type by_reference="false">mixed</type>
+          </tag>
+          <tag line="88" name="return" description="The sanitized value." type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="95">
+          <name>$value</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="110" package="PEAR2\Net\RouterOS">
+        <name>getTag</name>
+        <full_name>getTag</full_name>
+        <docblock line="104">
+          <description><![CDATA[Gets the tag that the message is associated with.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="104" name="return" description="The current tag or NULL if there isn't a tag." type="string">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="104" name="see" description="\PEAR2\Net\RouterOS\setTag()" refers="\PEAR2\Net\RouterOS\setTag()"/>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="PEAR2\Net\RouterOS" line="126" package="PEAR2\Net\RouterOS">
+        <name>setTag</name>
+        <full_name>setTag</full_name>
+        <docblock line="115">
+          <description><![CDATA[Sets the tag to associate the request with.]]></description>
+          <long-description><![CDATA[<p>Sets the tag to associate the message with. Setting NULL erases the
+currently set tag.</p>]]></long-description>
+          <tag line="115" name="param" description="The tag to set." type="string" variable="$tag">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="115" name="return" description="The message object." type="\PEAR2\Net\RouterOS\self|\PEAR2\Net\RouterOS\Message">
+            <type by_reference="false">\PEAR2\Net\RouterOS\self</type>
+            <type by_reference="false">\PEAR2\Net\RouterOS\Message</type>
+          </tag>
+          <tag line="115" name="see" description="\PEAR2\Net\RouterOS\getTag()" refers="\PEAR2\Net\RouterOS\getTag()"/>
+        </docblock>
+        <argument line="126">
+          <name>$tag</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="141" package="PEAR2\Net\RouterOS">
+        <name>getArgument</name>
+        <full_name>getArgument</full_name>
+        <docblock line="132">
+          <description><![CDATA[Gets the value of an argument.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="132" name="param" description="The name of the argument." type="string" variable="$name">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="132" name="return" description="The value of the specified argument. Returns NULL if such an argument is not set." type="string|resource">
+            <type by_reference="false">string</type>
+            <type by_reference="false">resource</type>
+          </tag>
+          <tag line="132" name="see" description="\PEAR2\Net\RouterOS\setArgument()" refers="\PEAR2\Net\RouterOS\setArgument()"/>
+        </docblock>
+        <argument line="141">
+          <name>$name</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="158" package="PEAR2\Net\RouterOS">
+        <name>getAllArguments</name>
+        <full_name>getAllArguments</full_name>
+        <docblock line="150">
+          <description><![CDATA[Gets all arguments in an array.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="150" name="return" description="An array with the keys as argument names, and the array values as argument values." type="array">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="150" name="see" description="\PEAR2\Net\RouterOS\getArgument()" refers="\PEAR2\Net\RouterOS\getArgument()"/>
+          <tag line="150" name="see" description="\PEAR2\Net\RouterOS\setArgument()" refers="\PEAR2\Net\RouterOS\setArgument()"/>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="PEAR2\Net\RouterOS" line="173" package="PEAR2\Net\RouterOS">
+        <name>setArgument</name>
+        <full_name>setArgument</full_name>
+        <docblock line="163">
+          <description><![CDATA[Sets an argument for the message.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="163" name="param" description="Name of the argument." type="string" variable="$name">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="163" name="param" description="Value of the argument. Setting the value to NULL removes an argument of this name." type="string" variable="$value">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="163" name="return" description="The message object." type="\PEAR2\Net\RouterOS\self|\PEAR2\Net\RouterOS\Message">
+            <type by_reference="false">\PEAR2\Net\RouterOS\self</type>
+            <type by_reference="false">\PEAR2\Net\RouterOS\Message</type>
+          </tag>
+          <tag line="163" name="see" description="\PEAR2\Net\RouterOS\getArgument()" refers="\PEAR2\Net\RouterOS\getArgument()"/>
+        </docblock>
+        <argument line="173">
+          <name>$name</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="173">
+          <name>$value</name>
+          <default><![CDATA['']]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="PEAR2\Net\RouterOS" line="189" package="PEAR2\Net\RouterOS">
+        <name>removeAllArguments</name>
+        <full_name>removeAllArguments</full_name>
+        <docblock line="184">
+          <description><![CDATA[Removes all arguments from the message.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="184" name="return" description="The message object." type="\PEAR2\Net\RouterOS\self|\PEAR2\Net\RouterOS\Message">
+            <type by_reference="false">\PEAR2\Net\RouterOS\self</type>
+            <type by_reference="false">\PEAR2\Net\RouterOS\Message</type>
+          </tag>
+        </docblock>
+      </method>
+    </class>
+    <parse_markers>
+      <critical line="36" code="50019">No short description for property $arguments</critical>
+      <critical line="42" code="50019">No short description for property $_tag</critical>
+    </parse_markers>
+  </file>
+  <file path="NotSupportedException.php" hash="edf0686c961e295d55008d5635b8134b" package="PEAR2\Net\RouterOS">
+    <docblock line="3">
+      <description><![CDATA[RouterOS API client implementation.]]></description>
+      <long-description><![CDATA[<p>RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.</p>
+
+<p>PHP version 5</p>]]></long-description>
+      <tag line="3" name="category" description="Net"/>
+      <tag line="3" name="package" description="PEAR2_Net_RouterOS"/>
+      <tag line="3" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+      <tag line="3" name="copyright" description="2011 Vasil Rangelov"/>
+      <tag line="3" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+      <tag line="3" name="version" description="1.0.0b3"/>
+      <tag line="3" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+    </docblock>
+    <class final="false" abstract="false" namespace="PEAR2\Net\RouterOS" line="34" package="PEAR2\Net\RouterOS">
+      <extends>\Exception</extends>
+      <implements>\PEAR2\Net\RouterOS\Exception</implements>
+      <name>NotSupportedException</name>
+      <full_name>\PEAR2\Net\RouterOS\NotSupportedException</full_name>
+      <docblock line="24">
+        <description><![CDATA[Exception thrown when encountering something not supported by RouterOS or
+this package.]]></description>
+        <long-description><![CDATA[]]></long-description>
+        <tag line="24" name="category" description="Net"/>
+        <tag line="24" name="package" description="PEAR2_Net_RouterOS"/>
+        <tag line="24" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+        <tag line="24" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+        <tag line="24" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+      </docblock>
+      <property final="false" static="false" visibility="private" line="41" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$_value</name>
+        <default><![CDATA[]]></default>
+        <docblock line="37">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="37" name="var" description="The unsuppported value." type="mixed">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+      </property>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="52" package="PEAR2\Net\RouterOS">
+        <name>__construct</name>
+        <full_name>__construct</full_name>
+        <docblock line="43">
+          <description><![CDATA[Creates a new NotSupportedException.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="43" name="param" description="The Exception message to throw." type="string" variable="$message">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="43" name="param" description="The Exception code." type="int" variable="$code">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="43" name="param" description="The previous exception used for the exception chaining." type="\Exception" variable="$previous">
+            <type by_reference="false">\Exception</type>
+          </tag>
+          <tag line="43" name="param" description="The unsupported value." type="mixed" variable="$value">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+        <argument line="52">
+          <name>$message</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="52">
+          <name>$code</name>
+          <default><![CDATA[0]]></default>
+          <type/>
+        </argument>
+        <argument line="52">
+          <name>$previous</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+        <argument line="53">
+          <name>$value</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="64" package="PEAR2\Net\RouterOS">
+        <name>getValue</name>
+        <full_name>getValue</full_name>
+        <docblock line="59">
+          <description><![CDATA[Gets the unsupported value.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="59" name="return" description="The unsupported value." type="mixed">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="77" package="PEAR2\Net\RouterOS">
+        <name>__toString</name>
+        <full_name>__toString</full_name>
+        <docblock line="72">
+          <description><![CDATA[Returns a string representation of the exception.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="72" name="return" description="The exception as a string." type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+      </method>
+    </class>
+    <parse_markers>
+      <critical line="37" code="50019">No short description for property $_value</critical>
+    </parse_markers>
+  </file>
+  <file path="Query.php" hash="18aac727d4a278f97ad3f05f45b66eba" package="PEAR2\Net\RouterOS">
+    <docblock line="3">
+      <description><![CDATA[RouterOS API client implementation.]]></description>
+      <long-description><![CDATA[<p>RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.</p>
+
+<p>PHP version 5</p>]]></long-description>
+      <tag line="3" name="category" description="Net"/>
+      <tag line="3" name="package" description="PEAR2_Net_RouterOS"/>
+      <tag line="3" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+      <tag line="3" name="copyright" description="2011 Vasil Rangelov"/>
+      <tag line="3" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+      <tag line="3" name="version" description="1.0.0b3"/>
+      <tag line="3" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+    </docblock>
+    <namespace-alias name="T">PEAR2\Net\Transmitter</namespace-alias>
+    <class final="false" abstract="false" namespace="PEAR2\Net\RouterOS" line="38" package="PEAR2\Net\RouterOS">
+      <extends/>
+      <name>Query</name>
+      <full_name>\PEAR2\Net\RouterOS\Query</full_name>
+      <docblock line="29">
+        <description><![CDATA[Represents a query for RouterOS requests.]]></description>
+        <long-description><![CDATA[]]></long-description>
+        <tag line="29" name="category" description="Net"/>
+        <tag line="29" name="package" description="PEAR2_Net_RouterOS"/>
+        <tag line="29" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+        <tag line="29" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+        <tag line="29" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+      </docblock>
+      <constant namespace="PEAR2\Net\RouterOS" line="44" package="PEAR2\Net\RouterOS">
+        <name>ACTION_EXIST</name>
+        <full_name>ACTION_EXIST</full_name>
+        <value><![CDATA['']]></value>
+        <docblock line="41">
+          <description><![CDATA[Checks if the property exists.]]></description>
+          <long-description><![CDATA[]]></long-description>
+        </docblock>
+      </constant>
+      <constant namespace="PEAR2\Net\RouterOS" line="49" package="PEAR2\Net\RouterOS">
+        <name>ACTION_NOT_EXIST</name>
+        <full_name>ACTION_NOT_EXIST</full_name>
+        <value><![CDATA['-']]></value>
+        <docblock line="46">
+          <description><![CDATA[Checks if the property does not exist.]]></description>
+          <long-description><![CDATA[]]></long-description>
+        </docblock>
+      </constant>
+      <constant namespace="PEAR2\Net\RouterOS" line="54" package="PEAR2\Net\RouterOS">
+        <name>ACTION_EQUALS</name>
+        <full_name>ACTION_EQUALS</full_name>
+        <value><![CDATA['=']]></value>
+        <docblock line="51">
+          <description><![CDATA[Checks if the property equals a certain value.]]></description>
+          <long-description><![CDATA[]]></long-description>
+        </docblock>
+      </constant>
+      <constant namespace="PEAR2\Net\RouterOS" line="59" package="PEAR2\Net\RouterOS">
+        <name>ACTION_LESS_THAN</name>
+        <full_name>ACTION_LESS_THAN</full_name>
+        <value><![CDATA['<']]></value>
+        <docblock line="56">
+          <description><![CDATA[Checks if the property is less than a certain value.]]></description>
+          <long-description><![CDATA[]]></long-description>
+        </docblock>
+      </constant>
+      <constant namespace="PEAR2\Net\RouterOS" line="64" package="PEAR2\Net\RouterOS">
+        <name>ACTION_GREATHER_THAN</name>
+        <full_name>ACTION_GREATHER_THAN</full_name>
+        <value><![CDATA['>']]></value>
+        <docblock line="61">
+          <description><![CDATA[Checks if the property is greather than a certain value.]]></description>
+          <long-description><![CDATA[]]></long-description>
+        </docblock>
+      </constant>
+      <property final="false" static="false" visibility="protected" line="71" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$words</name>
+        <default><![CDATA[array()]]></default>
+        <docblock line="66">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="66" name="var" description="An array of the words forming the query. Each value is an array with the first member being the predicate (action and name), and the second member being the value for the predicate." type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+      </property>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="PEAR2\Net\RouterOS" line="77" package="PEAR2\Net\RouterOS">
+        <name>__construct</name>
+        <full_name>__construct</full_name>
+        <docblock line="73">
+          <description><![CDATA[This class is not to be instantiated normally, but by static methods
+instead.]]></description>
+          <long-description><![CDATA[<p>Use {@link where()} to create an instance of it.</p>]]></long-description>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="protected" namespace="PEAR2\Net\RouterOS" line="89" package="PEAR2\Net\RouterOS">
+        <name>sanitizeAction</name>
+        <full_name>sanitizeAction</full_name>
+        <docblock line="82">
+          <description><![CDATA[Sanitizes the action of a condition.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="82" name="param" description="The action to sanitize." type="string" variable="$action">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="82" name="return" description="The sanitized action." type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="89">
+          <name>$action</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="PEAR2\Net\RouterOS" line="117" package="PEAR2\Net\RouterOS">
+        <name>where</name>
+        <full_name>where</full_name>
+        <docblock line="106">
+          <description><![CDATA[Creates a new query with an initial condition.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="106" name="param" description="The name of the property to test." type="string" variable="$name">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="106" name="param" description="The value to test against. Not required for existence tests." type="string" variable="$value">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="106" name="param" description="One of the ACTION_* constants. Describes the operation to perform." type="string" variable="$action">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="106" name="return" description="The query object." type="\PEAR2\Net\RouterOS\self|\PEAR2\Net\RouterOS\Query">
+            <type by_reference="false">\PEAR2\Net\RouterOS\self</type>
+            <type by_reference="false">\PEAR2\Net\RouterOS\Query</type>
+          </tag>
+        </docblock>
+        <argument line="118">
+          <name>$name</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="118">
+          <name>$value</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+        <argument line="118">
+          <name>$action</name>
+          <default><![CDATA[self::ACTION_EXIST]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="129" package="PEAR2\Net\RouterOS">
+        <name>not</name>
+        <full_name>not</full_name>
+        <docblock line="124">
+          <description><![CDATA[Negates the query.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="124" name="return" description="The query object." type="\PEAR2\Net\RouterOS\self|\PEAR2\Net\RouterOS\Query">
+            <type by_reference="false">\PEAR2\Net\RouterOS\self</type>
+            <type by_reference="false">\PEAR2\Net\RouterOS\Query</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="146" package="PEAR2\Net\RouterOS">
+        <name>orWhere</name>
+        <full_name>orWhere</full_name>
+        <docblock line="135">
+          <description><![CDATA[Adds a condition as an alternative to the query.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="135" name="param" description="The name of the property to test." type="string" variable="$name">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="135" name="param" description="The value to test against. Not required for existence tests." type="string" variable="$value">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="135" name="param" description="One of the ACTION_* constants. Describes the operation to perform." type="string" variable="$action">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="135" name="return" description="The query object." type="\PEAR2\Net\RouterOS\self|\PEAR2\Net\RouterOS\Query">
+            <type by_reference="false">\PEAR2\Net\RouterOS\self</type>
+            <type by_reference="false">\PEAR2\Net\RouterOS\Query</type>
+          </tag>
+        </docblock>
+        <argument line="146">
+          <name>$name</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="146">
+          <name>$value</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+        <argument line="146">
+          <name>$action</name>
+          <default><![CDATA[self::ACTION_EXIST]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="163" package="PEAR2\Net\RouterOS">
+        <name>andWhere</name>
+        <full_name>andWhere</full_name>
+        <docblock line="152">
+          <description><![CDATA[Adds a condition in addition to the query.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="152" name="param" description="The name of the property to test." type="string" variable="$name">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="152" name="param" description="The value to test against. Not required for existence tests." type="string" variable="$value">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="152" name="param" description="One of the ACTION_* constants. Describes the operation to perform." type="string" variable="$action">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="152" name="return" description="The query object." type="\PEAR2\Net\RouterOS\self|\PEAR2\Net\RouterOS\Query">
+            <type by_reference="false">\PEAR2\Net\RouterOS\self</type>
+            <type by_reference="false">\PEAR2\Net\RouterOS\Query</type>
+          </tag>
+        </docblock>
+        <argument line="163">
+          <name>$name</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="163">
+          <name>$value</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+        <argument line="163">
+          <name>$action</name>
+          <default><![CDATA[self::ACTION_EXIST]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="176" package="PEAR2\Net\RouterOS">
+        <name>send</name>
+        <full_name>send</full_name>
+        <docblock line="169">
+          <description><![CDATA[Sends the query over a communicator.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="169" name="param" description="The communicator to send the query over." type="\PEAR2\Net\RouterOS\Communicator" variable="$com">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Communicator</type>
+          </tag>
+          <tag line="169" name="return" description="The number of bytes sent." type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="176">
+          <name>$com</name>
+          <default><![CDATA[]]></default>
+          <type>\PEAR2\Net\RouterOS\Communicator</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="PEAR2\Net\RouterOS" line="197" package="PEAR2\Net\RouterOS">
+        <name>_send</name>
+        <full_name>_send</full_name>
+        <docblock line="187">
+          <description><![CDATA[Sends the query over a communicator.]]></description>
+          <long-description><![CDATA[<p>The only difference with the non private equivalent is that this one does
+not do locking.</p>]]></long-description>
+          <tag line="187" name="param" description="The communicator to send the query over." type="\PEAR2\Net\RouterOS\Communicator" variable="$com">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Communicator</type>
+          </tag>
+          <tag line="187" name="return" description="The number of bytes sent." type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="197">
+          <name>$com</name>
+          <default><![CDATA[]]></default>
+          <type>\PEAR2\Net\RouterOS\Communicator</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="PEAR2\Net\RouterOS" line="233" package="PEAR2\Net\RouterOS">
+        <name>addWhere</name>
+        <full_name>addWhere</full_name>
+        <docblock line="222">
+          <description><![CDATA[Adds a condition.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="222" name="param" description="The name of the property to test." type="string" variable="$name">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="222" name="param" description="The value to test against. Not required for existence tests." type="string" variable="$value">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="222" name="param" description="One of the ACTION_* constants. Describes the operation to perform." type="string" variable="$action">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="222" name="return" description="The query object." type="\PEAR2\Net\RouterOS\self|\PEAR2\Net\RouterOS\Query">
+            <type by_reference="false">\PEAR2\Net\RouterOS\self</type>
+            <type by_reference="false">\PEAR2\Net\RouterOS\Query</type>
+          </tag>
+        </docblock>
+        <argument line="233">
+          <name>$name</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="233">
+          <name>$value</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="233">
+          <name>$action</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+    </class>
+    <parse_markers>
+      <critical line="66" code="50019">No short description for property $words</critical>
+    </parse_markers>
+  </file>
+  <file path="Registry.php" hash="20bba30fd4756ed1cdd2457e25697579" package="PEAR2\Net\RouterOS">
+    <docblock line="3">
+      <description><![CDATA[RouterOS API client implementation.]]></description>
+      <long-description><![CDATA[<p>RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.</p>
+
+<p>PHP version 5</p>]]></long-description>
+      <tag line="3" name="category" description="Net"/>
+      <tag line="3" name="package" description="PEAR2_Net_RouterOS"/>
+      <tag line="3" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+      <tag line="3" name="copyright" description="2011 Vasil Rangelov"/>
+      <tag line="3" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+      <tag line="3" name="version" description="1.0.0b3"/>
+      <tag line="3" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+    </docblock>
+    <namespace-alias name="SHM">PEAR2\Cache\SHM</namespace-alias>
+    <class final="false" abstract="false" namespace="PEAR2\Net\RouterOS" line="41" package="PEAR2\Net\RouterOS">
+      <extends/>
+      <name>Registry</name>
+      <full_name>\PEAR2\Net\RouterOS\Registry</full_name>
+      <docblock line="29">
+        <description><![CDATA[A RouterOS registry.]]></description>
+        <long-description><![CDATA[<p>Provides functionality for managing the request/response flow. Particularly
+useful in persistent connections.</p>]]></long-description>
+        <tag line="29" name="category" description="Net"/>
+        <tag line="29" name="package" description="PEAR2_Net_RouterOS"/>
+        <tag line="29" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+        <tag line="29" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+        <tag line="29" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+      </docblock>
+      <property final="false" static="false" visibility="protected" line="46" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$shm</name>
+        <default><![CDATA[]]></default>
+        <docblock line="43">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="43" name="var" description="The storage." type="\PEAR2\Cache\SHM">
+            <type by_reference="false">\PEAR2\Cache\SHM</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="true" visibility="protected" line="51" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$requestId</name>
+        <default><![CDATA[-1]]></default>
+        <docblock line="48">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="48" name="var" description="ID of request. Populated at first instance in request." type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="true" visibility="protected" line="56" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$instanceIdSeed</name>
+        <default><![CDATA[-1]]></default>
+        <docblock line="53">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="53" name="var" description="ID to be given to next instance, after incrementing it." type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="protected" line="61" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$instanceId</name>
+        <default><![CDATA[]]></default>
+        <docblock line="58">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="58" name="var" description="ID of instance within the request." type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+      </property>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="68" package="PEAR2\Net\RouterOS">
+        <name>__construct</name>
+        <full_name>__construct</full_name>
+        <docblock line="63">
+          <description><![CDATA[Creates a registry.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="63" name="param" description="An URI to bind the registry to." type="string" variable="$uri">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="68">
+          <name>$uri</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="PEAR2\Net\RouterOS" line="89" package="PEAR2\Net\RouterOS">
+        <name>parseTag</name>
+        <full_name>parseTag</full_name>
+        <docblock line="79">
+          <description><![CDATA[Parses a tag.]]></description>
+          <long-description><![CDATA[<p>Parses a tag to reveal the ownership part of it, and the original tag.</p>]]></long-description>
+          <tag line="79" name="param" description="The tag (as received) to parse." type="string" variable="$tag">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="79" name="return" description="An array with the first member being the ownership tag, and the second one being the original tag." type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+        <argument line="89">
+          <name>$tag</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="108" package="PEAR2\Net\RouterOS">
+        <name>isTaglessModeOwner</name>
+        <full_name>isTaglessModeOwner</full_name>
+        <docblock line="102">
+          <description><![CDATA[Checks if this instance is the tagless mode owner.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="102" name="return" description="TRUE if this instance is the tagless mode owner, FALSE otherwise." type="bool">
+            <type by_reference="false">bool</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="132" package="PEAR2\Net\RouterOS">
+        <name>setTaglessMode</name>
+        <full_name>setTaglessMode</full_name>
+        <docblock line="117">
+          <description><![CDATA[Sets the "tagless mode" setting.]]></description>
+          <long-description><![CDATA[<p>While in tagless mode, this instance will claim owhership of any
+responses without a tag. While not in this mode, any requests without a
+tag will be given to all instances.</p>
+
+<p>Regardless of mode, if the type of the response is
+{@link Response::TYPE_FATAL}, it will be given to all instances.</p>]]></long-description>
+          <tag line="117" name="param" description="TRUE to claim tagless ownership, FALSE to release such ownership, if taken." type="bool" variable="$taglessMode">
+            <type by_reference="false">bool</type>
+          </tag>
+          <tag line="117" name="return" description="TRUE on success, FALSE on failure." type="bool">
+            <type by_reference="false">bool</type>
+          </tag>
+        </docblock>
+        <argument line="132">
+          <name>$taglessMode</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="151" package="PEAR2\Net\RouterOS">
+        <name>getOwnershipTag</name>
+        <full_name>getOwnershipTag</full_name>
+        <docblock line="146">
+          <description><![CDATA[Get the ownership tag for this instance.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="146" name="return" description="The ownership tag for this registry instance." type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="169" package="PEAR2\Net\RouterOS">
+        <name>add</name>
+        <full_name>add</full_name>
+        <docblock line="156">
+          <description><![CDATA[Add a response to the registry.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="156" name="param" description="The response to add. The caller of this function is responsible for ensuring that the ownership tag and the original tag are separated, so that only the original one remains in the response." type="\PEAR2\Net\RouterOS\Response" variable="$response">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Response</type>
+          </tag>
+          <tag line="156" name="param" description="The ownership tag that the response had." type="string" variable="$ownershipTag">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="156" name="return" description="TRUE if the request was added to its buffer, FALSE if this instance owns the response, and therefore doesn't need to add the response to its buffer." type="bool">
+            <type by_reference="false">bool</type>
+          </tag>
+        </docblock>
+        <argument line="169">
+          <name>$response</name>
+          <default><![CDATA[]]></default>
+          <type>\PEAR2\Net\RouterOS\Response</type>
+        </argument>
+        <argument line="169">
+          <name>$ownershipTag</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="PEAR2\Net\RouterOS" line="208" package="PEAR2\Net\RouterOS">
+        <name>_add</name>
+        <full_name>_add</full_name>
+        <docblock line="199">
+          <description><![CDATA[Adds a response to a buffer.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="199" name="param" description="The response to add." type="\PEAR2\Net\RouterOS\Response" variable="$response">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Response</type>
+          </tag>
+          <tag line="199" name="param" description="The name of the buffer to add the response to." type="\PEAR2\Net\RouterOS\type" variable="$targetBufferName">
+            <type by_reference="false">\PEAR2\Net\RouterOS\type</type>
+          </tag>
+          <tag line="199" name="return" description="" type="void">
+            <type by_reference="false">void</type>
+          </tag>
+        </docblock>
+        <argument line="208">
+          <name>$response</name>
+          <default><![CDATA[]]></default>
+          <type>\PEAR2\Net\RouterOS\Response</type>
+        </argument>
+        <argument line="208">
+          <name>$targetBufferName</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="223" package="PEAR2\Net\RouterOS">
+        <name>getNextResponse</name>
+        <full_name>getNextResponse</full_name>
+        <docblock line="218">
+          <description><![CDATA[Gets the next response from this instance's buffer.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="218" name="return" description="The next response, or NULL if there isn't one." type="\PEAR2\Net\RouterOS\Response|null">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Response</type>
+            <type by_reference="false">null</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="247" package="PEAR2\Net\RouterOS">
+        <name>close</name>
+        <full_name>close</full_name>
+        <docblock line="240">
+          <description><![CDATA[Closes the registry.]]></description>
+          <long-description><![CDATA[<p>Closes the registry, meaning that all buffers are cleared.</p>]]></long-description>
+          <tag line="240" name="return" description="" type="void">
+            <type by_reference="false">void</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="PEAR2\Net\RouterOS" line="261" package="PEAR2\Net\RouterOS">
+        <name>_close</name>
+        <full_name>_close</full_name>
+        <docblock line="254">
+          <description><![CDATA[Removes a buffer.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="254" name="param" description="The buffer to remove." type="string" variable="$targetBufferName">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="254" name="return" description="" type="void">
+            <type by_reference="false">void</type>
+          </tag>
+        </docblock>
+        <argument line="261">
+          <name>$targetBufferName</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="272" package="PEAR2\Net\RouterOS">
+        <name>__destruct</name>
+        <full_name>__destruct</full_name>
+        <docblock line="269">
+          <description><![CDATA[Removes this instance's buffer.]]></description>
+          <long-description><![CDATA[]]></long-description>
+        </docblock>
+      </method>
+    </class>
+    <parse_markers>
+      <critical line="43" code="50019">No short description for property $shm</critical>
+      <critical line="48" code="50019">No short description for property $requestId</critical>
+      <critical line="53" code="50019">No short description for property $instanceIdSeed</critical>
+      <critical line="58" code="50019">No short description for property $instanceId</critical>
+    </parse_markers>
+  </file>
+  <file path="Request.php" hash="11ba49828bd848418484bfa76bbe2f81" package="PEAR2\Net\RouterOS">
+    <docblock line="3">
+      <description><![CDATA[RouterOS API client implementation.]]></description>
+      <long-description><![CDATA[<p>RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.</p>
+
+<p>PHP version 5</p>]]></long-description>
+      <tag line="3" name="category" description="Net"/>
+      <tag line="3" name="package" description="PEAR2_Net_RouterOS"/>
+      <tag line="3" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+      <tag line="3" name="copyright" description="2011 Vasil Rangelov"/>
+      <tag line="3" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+      <tag line="3" name="version" description="1.0.0b3"/>
+      <tag line="3" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+    </docblock>
+    <namespace-alias name="T">PEAR2\Net\Transmitter</namespace-alias>
+    <class final="false" abstract="false" namespace="PEAR2\Net\RouterOS" line="38" package="PEAR2\Net\RouterOS">
+      <extends>\PEAR2\Net\RouterOS\Message</extends>
+      <name>Request</name>
+      <full_name>\PEAR2\Net\RouterOS\Request</full_name>
+      <docblock line="29">
+        <description><![CDATA[Represents a RouterOS request.]]></description>
+        <long-description><![CDATA[]]></long-description>
+        <tag line="29" name="category" description="Net"/>
+        <tag line="29" name="package" description="PEAR2_Net_RouterOS"/>
+        <tag line="29" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+        <tag line="29" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+        <tag line="29" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+      </docblock>
+      <property final="false" static="false" visibility="private" line="44" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$_command</name>
+        <default><![CDATA[]]></default>
+        <docblock line="41">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="41" name="var" description="The command to be executed." type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="private" line="49" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$_query</name>
+        <default><![CDATA[]]></default>
+        <docblock line="46">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="46" name="var" description="A query for the command." type="\PEAR2\Net\RouterOS\Query">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Query</type>
+          </tag>
+        </docblock>
+      </property>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="64" package="PEAR2\Net\RouterOS">
+        <name>__construct</name>
+        <full_name>__construct</full_name>
+        <docblock line="51">
+          <description><![CDATA[Creates a request to send to RouterOS.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="51" name="param" description="The command to send. Can also contain arguments expressed in a shell-like syntax." type="string" variable="$command">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="51" name="param" description="A query to associate with the request." type="\PEAR2\Net\RouterOS\Query" variable="$query">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Query</type>
+          </tag>
+          <tag line="51" name="param" description="The tag for the request." type="string" variable="$tag">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="51" name="see" description="\PEAR2\Net\RouterOS\setCommand()" refers="\PEAR2\Net\RouterOS\setCommand()"/>
+          <tag line="51" name="see" description="\PEAR2\Net\RouterOS\setArgument()" refers="\PEAR2\Net\RouterOS\setArgument()"/>
+          <tag line="51" name="see" description="\PEAR2\Net\RouterOS\setTag()" refers="\PEAR2\Net\RouterOS\setTag()"/>
+          <tag line="51" name="see" description="\PEAR2\Net\RouterOS\setQuery()" refers="\PEAR2\Net\RouterOS\setQuery()"/>
+        </docblock>
+        <argument line="64">
+          <name>$command</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="64">
+          <name>$query</name>
+          <default><![CDATA[null]]></default>
+          <type>\PEAR2\Net\RouterOS\Query</type>
+        </argument>
+        <argument line="64">
+          <name>$tag</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="94" package="PEAR2\Net\RouterOS">
+        <name>__invoke</name>
+        <full_name>__invoke</full_name>
+        <docblock line="79">
+          <description><![CDATA[A shorthand gateway.]]></description>
+          <long-description><![CDATA[<p>This is a magic PHP method that allows you to call the object as a
+function. Depending on the argument given, one of the other functions in
+the class is invoked and its returned value is returned by this function.</p>]]></long-description>
+          <tag line="79" name="param" description="A {@link Query} to associate the request with, a {@link Communicator} to send the request over, an argument to get the value of, or NULL to get all arguments as an array. If a second argument is provided, this becomes the name of the argument to set the value of, and the second argument is the value to set." type="mixed" variable="$arg">
+            <type by_reference="false">mixed</type>
+          </tag>
+          <tag line="79" name="return" description="Whatever the long form function would have returned." type="mixed">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+        <argument line="94">
+          <name>$arg</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="121" package="PEAR2\Net\RouterOS">
+        <name>setCommand</name>
+        <full_name>setCommand</full_name>
+        <docblock line="108">
+          <description><![CDATA[Sets the command to send to RouterOS.]]></description>
+          <long-description><![CDATA[<p>Sets the command to send to RouterOS. The command can use the API or CLI
+syntax of RouterOS, but either way, it must be absolute (begin  with a
+"/") and without arguments.</p>]]></long-description>
+          <tag line="108" name="param" description="The command to send." type="string" variable="$command">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="108" name="return" description="The request object." type="\PEAR2\Net\RouterOS\self|\PEAR2\Net\RouterOS\Request">
+            <type by_reference="false">\PEAR2\Net\RouterOS\self</type>
+            <type by_reference="false">\PEAR2\Net\RouterOS\Request</type>
+          </tag>
+          <tag line="108" name="see" description="\PEAR2\Net\RouterOS\getCommand()" refers="\PEAR2\Net\RouterOS\getCommand()"/>
+          <tag line="108" name="see" description="\PEAR2\Net\RouterOS\setArgument()" refers="\PEAR2\Net\RouterOS\setArgument()"/>
+        </docblock>
+        <argument line="121">
+          <name>$command</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="166" package="PEAR2\Net\RouterOS">
+        <name>getCommand</name>
+        <full_name>getCommand</full_name>
+        <docblock line="158">
+          <description><![CDATA[Gets the command that will be send to RouterOS.]]></description>
+          <long-description><![CDATA[<p>Gets the command that will be send to RouterOS in its API syntax.</p>]]></long-description>
+          <tag line="158" name="return" description="The command to send." type="string">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="158" name="see" description="\PEAR2\Net\RouterOS\setCommand()" refers="\PEAR2\Net\RouterOS\setCommand()"/>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="180" package="PEAR2\Net\RouterOS">
+        <name>setQuery</name>
+        <full_name>setQuery</full_name>
+        <docblock line="171">
+          <description><![CDATA[Sets the query to send with the command.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="171" name="param" description="The query to be set. Setting NULL will remove the currently associated query." type="\PEAR2\Net\RouterOS\Query" variable="$query">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Query</type>
+          </tag>
+          <tag line="171" name="return" description="The request object." type="\PEAR2\Net\RouterOS\self|\PEAR2\Net\RouterOS\Request">
+            <type by_reference="false">\PEAR2\Net\RouterOS\self</type>
+            <type by_reference="false">\PEAR2\Net\RouterOS\Request</type>
+          </tag>
+          <tag line="171" name="see" description="\PEAR2\Net\RouterOS\getQuery()" refers="\PEAR2\Net\RouterOS\getQuery()"/>
+        </docblock>
+        <argument line="180">
+          <name>$query</name>
+          <default><![CDATA[null]]></default>
+          <type>\PEAR2\Net\RouterOS\Query</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="192" package="PEAR2\Net\RouterOS">
+        <name>getQuery</name>
+        <full_name>getQuery</full_name>
+        <docblock line="186">
+          <description><![CDATA[Gets the currently associated query]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="186" name="return" description="The currently associated query." type="\PEAR2\Net\RouterOS\Query">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Query</type>
+          </tag>
+          <tag line="186" name="see" description="\PEAR2\Net\RouterOS\setQuery()" refers="\PEAR2\Net\RouterOS\setQuery()"/>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="208" package="PEAR2\Net\RouterOS">
+        <name>setTag</name>
+        <full_name>setTag</full_name>
+        <docblock line="197">
+          <description><![CDATA[Sets the tag to associate the request with.]]></description>
+          <long-description><![CDATA[<p>Sets the tag to associate the request with. Setting NULL erases the
+currently set tag.</p>]]></long-description>
+          <tag line="197" name="param" description="The tag to set." type="string" variable="$tag">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="197" name="return" description="The request object." type="\PEAR2\Net\RouterOS\self|\PEAR2\Net\RouterOS\Request">
+            <type by_reference="false">\PEAR2\Net\RouterOS\self</type>
+            <type by_reference="false">\PEAR2\Net\RouterOS\Request</type>
+          </tag>
+          <tag line="197" name="see" description="\PEAR2\Net\RouterOS\getTag()" refers="\PEAR2\Net\RouterOS\getTag()"/>
+        </docblock>
+        <argument line="208">
+          <name>$tag</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="223" package="PEAR2\Net\RouterOS">
+        <name>setArgument</name>
+        <full_name>setArgument</full_name>
+        <docblock line="213">
+          <description><![CDATA[Sets an argument for the request.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="213" name="param" description="Name of the argument." type="string" variable="$name">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="213" name="param" description="Value of the argument. Setting the value to NULL removes an argument of this name." type="string" variable="$value">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="213" name="return" description="The request object." type="\PEAR2\Net\RouterOS\self|\PEAR2\Net\RouterOS\Request">
+            <type by_reference="false">\PEAR2\Net\RouterOS\self</type>
+            <type by_reference="false">\PEAR2\Net\RouterOS\Request</type>
+          </tag>
+          <tag line="213" name="see" description="\PEAR2\Net\RouterOS\getArgument()" refers="\PEAR2\Net\RouterOS\getArgument()"/>
+        </docblock>
+        <argument line="223">
+          <name>$name</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="223">
+          <name>$value</name>
+          <default><![CDATA['']]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="233" package="PEAR2\Net\RouterOS">
+        <name>removeAllArguments</name>
+        <full_name>removeAllArguments</full_name>
+        <docblock line="228">
+          <description><![CDATA[Removes all arguments from the request.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="228" name="return" description="The request object." type="\PEAR2\Net\RouterOS\self|\PEAR2\Net\RouterOS\Request">
+            <type by_reference="false">\PEAR2\Net\RouterOS\self</type>
+            <type by_reference="false">\PEAR2\Net\RouterOS\Request</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="248" package="PEAR2\Net\RouterOS">
+        <name>send</name>
+        <full_name>send</full_name>
+        <docblock line="238">
+          <description><![CDATA[Sends a request over a communicator.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="238" name="param" description="The communicator to send the request over." type="\PEAR2\Net\RouterOS\Communicator" variable="$com">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Communicator</type>
+          </tag>
+          <tag line="238" name="param" description="An optional registry to sync the request with." type="\PEAR2\Net\RouterOS\Registry" variable="$reg">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Registry</type>
+          </tag>
+          <tag line="238" name="return" description="The number of bytes sent." type="int">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="238" name="see" description="\PEAR2\Net\RouterOS\Client::sendSync()" refers="\PEAR2\Net\RouterOS\Client::sendSync()"/>
+          <tag line="238" name="see" description="\PEAR2\Net\RouterOS\Client::sendAsync()" refers="\PEAR2\Net\RouterOS\Client::sendAsync()"/>
+        </docblock>
+        <argument line="248">
+          <name>$com</name>
+          <default><![CDATA[]]></default>
+          <type>\PEAR2\Net\RouterOS\Communicator</type>
+        </argument>
+        <argument line="248">
+          <name>$reg</name>
+          <default><![CDATA[null]]></default>
+          <type>\PEAR2\Net\RouterOS\Registry</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="PEAR2\Net\RouterOS" line="280" package="PEAR2\Net\RouterOS">
+        <name>_send</name>
+        <full_name>_send</full_name>
+        <docblock line="268">
+          <description><![CDATA[Sends a request over a communicator.]]></description>
+          <long-description><![CDATA[<p>The only difference with the non private equivalent is that this one does
+not do locking.</p>]]></long-description>
+          <tag line="268" name="param" description="The communicator to send the request over." type="\PEAR2\Net\RouterOS\Communicator" variable="$com">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Communicator</type>
+          </tag>
+          <tag line="268" name="return" description="The number of bytes sent." type="int">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="268" name="see" description="\PEAR2\Net\RouterOS\Client::sendSync()" refers="\PEAR2\Net\RouterOS\Client::sendSync()"/>
+          <tag line="268" name="see" description="\PEAR2\Net\RouterOS\Client::sendAsync()" refers="\PEAR2\Net\RouterOS\Client::sendAsync()"/>
+        </docblock>
+        <argument line="280">
+          <name>$com</name>
+          <default><![CDATA[]]></default>
+          <type>\PEAR2\Net\RouterOS\Communicator</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="PEAR2\Net\RouterOS" line="315" package="PEAR2\Net\RouterOS">
+        <name>parseArgumentString</name>
+        <full_name>parseArgumentString</full_name>
+        <docblock line="308">
+          <description><![CDATA[Parses the arguments of a command.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="308" name="param" description="The argument string to parse." type="string" variable="$string">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="308" name="return" description="" type="void">
+            <type by_reference="false">void</type>
+          </tag>
+        </docblock>
+        <argument line="315">
+          <name>$string</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+    </class>
+    <parse_markers>
+      <critical line="41" code="50019">No short description for property $_command</critical>
+      <critical line="46" code="50019">No short description for property $_query</critical>
+    </parse_markers>
+  </file>
+  <file path="Response.php" hash="1745fe17b5055ba273080b25492c7864" package="PEAR2\Net\RouterOS">
+    <docblock line="3">
+      <description><![CDATA[RouterOS API client implementation.]]></description>
+      <long-description><![CDATA[<p>RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.</p>
+
+<p>PHP version 5</p>]]></long-description>
+      <tag line="3" name="category" description="Net"/>
+      <tag line="3" name="package" description="PEAR2_Net_RouterOS"/>
+      <tag line="3" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+      <tag line="3" name="copyright" description="2011 Vasil Rangelov"/>
+      <tag line="3" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+      <tag line="3" name="version" description="1.0.0b3"/>
+      <tag line="3" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+    </docblock>
+    <namespace-alias name="T">PEAR2\Net\Transmitter</namespace-alias>
+    <class final="false" abstract="false" namespace="PEAR2\Net\RouterOS" line="38" package="PEAR2\Net\RouterOS">
+      <extends>\PEAR2\Net\RouterOS\Message</extends>
+      <name>Response</name>
+      <full_name>\PEAR2\Net\RouterOS\Response</full_name>
+      <docblock line="29">
+        <description><![CDATA[Represents a RouterOS response.]]></description>
+        <long-description><![CDATA[]]></long-description>
+        <tag line="29" name="category" description="Net"/>
+        <tag line="29" name="package" description="PEAR2_Net_RouterOS"/>
+        <tag line="29" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+        <tag line="29" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+        <tag line="29" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+      </docblock>
+      <constant namespace="PEAR2\Net\RouterOS" line="44" package="PEAR2\Net\RouterOS">
+        <name>TYPE_FINAL</name>
+        <full_name>TYPE_FINAL</full_name>
+        <value><![CDATA['!done']]></value>
+        <docblock line="41">
+          <description><![CDATA[The last response for a request.]]></description>
+          <long-description><![CDATA[]]></long-description>
+        </docblock>
+      </constant>
+      <constant namespace="PEAR2\Net\RouterOS" line="49" package="PEAR2\Net\RouterOS">
+        <name>TYPE_DATA</name>
+        <full_name>TYPE_DATA</full_name>
+        <value><![CDATA['!re']]></value>
+        <docblock line="46">
+          <description><![CDATA[A response with data.]]></description>
+          <long-description><![CDATA[]]></long-description>
+        </docblock>
+      </constant>
+      <constant namespace="PEAR2\Net\RouterOS" line="54" package="PEAR2\Net\RouterOS">
+        <name>TYPE_ERROR</name>
+        <full_name>TYPE_ERROR</full_name>
+        <value><![CDATA['!trap']]></value>
+        <docblock line="51">
+          <description><![CDATA[A response signifying error.]]></description>
+          <long-description><![CDATA[]]></long-description>
+        </docblock>
+      </constant>
+      <constant namespace="PEAR2\Net\RouterOS" line="60" package="PEAR2\Net\RouterOS">
+        <name>TYPE_FATAL</name>
+        <full_name>TYPE_FATAL</full_name>
+        <value><![CDATA['!fatal']]></value>
+        <docblock line="56">
+          <description><![CDATA[A response signifying a fatal error, due to which the connection would be
+terminated.]]></description>
+          <long-description><![CDATA[]]></long-description>
+        </docblock>
+      </constant>
+      <property final="false" static="false" visibility="protected" line="65" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$unrecognizedWords</name>
+        <default><![CDATA[array()]]></default>
+        <docblock line="62">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="62" name="var" description="An array of unrecognized words in network order." type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="private" line="70" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$_type</name>
+        <default><![CDATA[]]></default>
+        <docblock line="67">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="67" name="var" description="The response type." type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+      </property>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="85" package="PEAR2\Net\RouterOS">
+        <name>__construct</name>
+        <full_name>__construct</full_name>
+        <docblock line="72">
+          <description><![CDATA[Extracts a new response from a communicator.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="72" name="param" description="The communicator from which to extract the new response." type="\PEAR2\Net\RouterOS\Communicator" variable="$com">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Communicator</type>
+          </tag>
+          <tag line="72" name="param" description="Whether to populate the argument values with streams instead of strings." type="bool" variable="$asStream">
+            <type by_reference="false">bool</type>
+          </tag>
+          <tag line="72" name="param" description="An optional registry to sync the response with." type="\PEAR2\Net\RouterOS\Registry" variable="$reg">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Registry</type>
+          </tag>
+          <tag line="72" name="see" description="\PEAR2\Net\RouterOS\getType()" refers="\PEAR2\Net\RouterOS\getType()"/>
+          <tag line="72" name="see" description="\PEAR2\Net\RouterOS\getArgument()" refers="\PEAR2\Net\RouterOS\getArgument()"/>
+        </docblock>
+        <argument line="86">
+          <name>$com</name>
+          <default><![CDATA[]]></default>
+          <type>\PEAR2\Net\RouterOS\Communicator</type>
+        </argument>
+        <argument line="86">
+          <name>$asStream</name>
+          <default><![CDATA[false]]></default>
+          <type/>
+        </argument>
+        <argument line="86">
+          <name>$reg</name>
+          <default><![CDATA[null]]></default>
+          <type>\PEAR2\Net\RouterOS\Registry</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="PEAR2\Net\RouterOS" line="139" package="PEAR2\Net\RouterOS">
+        <name>_receive</name>
+        <full_name>_receive</full_name>
+        <docblock line="126">
+          <description><![CDATA[Extracts a new response from a communicator.]]></description>
+          <long-description><![CDATA[<p>This is the function that performs the actual receiving, while the
+constructor is also involved in locks and registry sync.</p>]]></long-description>
+          <tag line="126" name="param" description="The communicator from which to extract the new response." type="\PEAR2\Net\RouterOS\Communicator" variable="$com">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Communicator</type>
+          </tag>
+          <tag line="126" name="param" description="Whether to populate the argument values with streams instead of strings." type="bool" variable="$asStream">
+            <type by_reference="false">bool</type>
+          </tag>
+          <tag line="126" name="return" description="" type="void">
+            <type by_reference="false">void</type>
+          </tag>
+        </docblock>
+        <argument line="139">
+          <name>$com</name>
+          <default><![CDATA[]]></default>
+          <type>\PEAR2\Net\RouterOS\Communicator</type>
+        </argument>
+        <argument line="139">
+          <name>$asStream</name>
+          <default><![CDATA[false]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="PEAR2\Net\RouterOS" line="204" package="PEAR2\Net\RouterOS">
+        <name>setType</name>
+        <full_name>setType</full_name>
+        <docblock line="194">
+          <description><![CDATA[Sets the response type.]]></description>
+          <long-description><![CDATA[<p>Sets the response type. Valid values are the TYPE_* constants.</p>]]></long-description>
+          <tag line="194" name="param" description="The new response type." type="string" variable="$type">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="194" name="return" description="The response object." type="\PEAR2\Net\RouterOS\self|\PEAR2\Net\RouterOS\Response">
+            <type by_reference="false">\PEAR2\Net\RouterOS\self</type>
+            <type by_reference="false">\PEAR2\Net\RouterOS\Response</type>
+          </tag>
+          <tag line="194" name="see" description="\PEAR2\Net\RouterOS\getType()" refers="\PEAR2\Net\RouterOS\getType()"/>
+        </docblock>
+        <argument line="204">
+          <name>$type</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="226" package="PEAR2\Net\RouterOS">
+        <name>getType</name>
+        <full_name>getType</full_name>
+        <docblock line="220">
+          <description><![CDATA[Gets the response type.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="220" name="return" description="The response type." type="string">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="220" name="see" description="\PEAR2\Net\RouterOS\setType()" refers="\PEAR2\Net\RouterOS\setType()"/>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="236" package="PEAR2\Net\RouterOS">
+        <name>getUnrecognizedWords</name>
+        <full_name>getUnrecognizedWords</full_name>
+        <docblock line="231">
+          <description><![CDATA[Gets a list of unrecognized words.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="231" name="return" description="The list of unrecognized words." type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+      </method>
+    </class>
+    <parse_markers>
+      <critical line="62" code="50019">No short description for property $unrecognizedWords</critical>
+      <critical line="67" code="50019">No short description for property $_type</critical>
+    </parse_markers>
+  </file>
+  <file path="ResponseCollection.php" hash="8c7cf28bce6a4966d5c8e0ed167c6605" package="PEAR2\Net\RouterOS">
+    <docblock line="3">
+      <description><![CDATA[RouterOS API client implementation.]]></description>
+      <long-description><![CDATA[<p>RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.</p>
+
+<p>PHP version 5</p>]]></long-description>
+      <tag line="3" name="category" description="Net"/>
+      <tag line="3" name="package" description="PEAR2_Net_RouterOS"/>
+      <tag line="3" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+      <tag line="3" name="copyright" description="2011 Vasil Rangelov"/>
+      <tag line="3" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+      <tag line="3" name="version" description="1.0.0b3"/>
+      <tag line="3" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+    </docblock>
+    <class final="false" abstract="false" namespace="PEAR2\Net\RouterOS" line="33" package="PEAR2\Net\RouterOS">
+      <extends/>
+      <implements>\ArrayAccess</implements>
+      <implements>\SeekableIterator</implements>
+      <implements>\Countable</implements>
+      <name>ResponseCollection</name>
+      <full_name>\PEAR2\Net\RouterOS\ResponseCollection</full_name>
+      <docblock line="24">
+        <description><![CDATA[Represents a collection of RouterOS responses.]]></description>
+        <long-description><![CDATA[]]></long-description>
+        <tag line="24" name="category" description="Net"/>
+        <tag line="24" name="package" description="PEAR2_Net_RouterOS"/>
+        <tag line="24" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+        <tag line="24" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+        <tag line="24" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+      </docblock>
+      <property final="false" static="false" visibility="protected" line="39" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$responses</name>
+        <default><![CDATA[array()]]></default>
+        <docblock line="36">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="36" name="var" description="An array with all {@link Response} objects." type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="protected" line="44" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$responseTypes</name>
+        <default><![CDATA[array()]]></default>
+        <docblock line="41">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="41" name="var" description="An array with each {@link Response} object's type." type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="protected" line="49" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$responseTags</name>
+        <default><![CDATA[array()]]></default>
+        <docblock line="46">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="46" name="var" description="An array with each {@link Response} object's tag." type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="protected" line="56" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$argumentMap</name>
+        <default><![CDATA[null]]></default>
+        <docblock line="51">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="51" name="var" description="An array with all distinct arguments across all {@link Response} objects. Created at the first call of {@link getArgumentMap()}." type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="protected" line="61" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$position</name>
+        <default><![CDATA[0]]></default>
+        <docblock line="58">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="58" name="var" description="A pointer, as required by SeekableIterator." type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+      </property>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="68" package="PEAR2\Net\RouterOS">
+        <name>__construct</name>
+        <full_name>__construct</full_name>
+        <docblock line="63">
+          <description><![CDATA[Creates a new collection.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="63" name="param" description="An array of responses, in network order." type="array" variable="$responses">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+        <argument line="68">
+          <name>$responses</name>
+          <default><![CDATA[]]></default>
+          <type>array</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="94" package="PEAR2\Net\RouterOS">
+        <name>__invoke</name>
+        <full_name>__invoke</full_name>
+        <docblock line="80">
+          <description><![CDATA[A shorthand gateway.]]></description>
+          <long-description><![CDATA[<p>This is a magic PHP method that allows you to call the object as a
+function. Depending on the argument given, one of the other functions in
+the class is invoked and its returned value is returned by this function.</p>]]></long-description>
+          <tag line="80" name="param" description="The offset of the response to seek to. Setting NULL will seek to the last response." type="int" variable="$offset">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="80" name="return" description="The {@link Response} at the specified index, last reponse if no index is provided or FALSE if the index is invalid or the collection is empty." type="\PEAR2\Net\RouterOS\Response">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Response</type>
+          </tag>
+        </docblock>
+        <argument line="94">
+          <name>$offset</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="104" package="PEAR2\Net\RouterOS">
+        <name>toArray</name>
+        <full_name>toArray</full_name>
+        <docblock line="99">
+          <description><![CDATA[Gets the whole collection as an array.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="99" name="return" description="An array with all responses, in network order." type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="114" package="PEAR2\Net\RouterOS">
+        <name>count</name>
+        <full_name>count</full_name>
+        <docblock line="109">
+          <description><![CDATA[Counts the responses in the collection.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="109" name="return" description="The number of responses in the collection." type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="126" package="PEAR2\Net\RouterOS">
+        <name>offsetExists</name>
+        <full_name>offsetExists</full_name>
+        <docblock line="119">
+          <description><![CDATA[Checks if an offset exists.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="119" name="param" description="The offset to check." type="int" variable="$offset">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="119" name="return" description="TRUE if the offset exists, FALSE otherwise." type="bool">
+            <type by_reference="false">bool</type>
+          </tag>
+        </docblock>
+        <argument line="126">
+          <name>$offset</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="138" package="PEAR2\Net\RouterOS">
+        <name>offsetGet</name>
+        <full_name>offsetGet</full_name>
+        <docblock line="131">
+          <description><![CDATA[Gets a {@link Response} from a specified offset.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="131" name="param" description="The offset of the desired response." type="int" variable="$offset">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="131" name="return" description="The response at the specified offset." type="\PEAR2\Net\RouterOS\Response">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Response</type>
+          </tag>
+        </docblock>
+        <argument line="138">
+          <name>$offset</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="154" package="PEAR2\Net\RouterOS">
+        <name>offsetSet</name>
+        <full_name>offsetSet</full_name>
+        <docblock line="143">
+          <description><![CDATA[N/A]]></description>
+          <long-description><![CDATA[<p>This method exists only because it is required for ArrayAccess. The
+collection is read only.</p>]]></long-description>
+          <tag line="143" name="param" description="N/A" type="int" variable="$offset">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="143" name="param" description="N/A" type="\PEAR2\Net\RouterOS\Response" variable="$value">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Response</type>
+          </tag>
+          <tag line="143" name="return" description="" type="void">
+            <type by_reference="false">void</type>
+          </tag>
+        </docblock>
+        <argument line="154">
+          <name>$offset</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="154">
+          <name>$value</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="170" package="PEAR2\Net\RouterOS">
+        <name>offsetUnset</name>
+        <full_name>offsetUnset</full_name>
+        <docblock line="160">
+          <description><![CDATA[N/A]]></description>
+          <long-description><![CDATA[<p>This method exists only because it is required for ArrayAccess. The
+collection is read only.</p>]]></long-description>
+          <tag line="160" name="param" description="N/A" type="int" variable="$offset">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="160" name="return" description="" type="void">
+            <type by_reference="false">void</type>
+          </tag>
+        </docblock>
+        <argument line="170">
+          <name>$offset</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="181" package="PEAR2\Net\RouterOS">
+        <name>rewind</name>
+        <full_name>rewind</full_name>
+        <docblock line="175">
+          <description><![CDATA[Resets the pointer to 0, and returns the first response.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="175" name="return" description="The first response in the collection, or FALSE if the collection is empty." type="\PEAR2\Net\RouterOS\Response">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Response</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="194" package="PEAR2\Net\RouterOS">
+        <name>seek</name>
+        <full_name>seek</full_name>
+        <docblock line="186">
+          <description><![CDATA[Moves the position pointer to a specified position.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="186" name="param" description="The position to move to." type="int" variable="$position">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="186" name="return" description="The {@link Response} at the specified position, or FALSE if the specified position is not valid." type="\PEAR2\Net\RouterOS\Response">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Response</type>
+          </tag>
+        </docblock>
+        <argument line="194">
+          <name>$position</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="206" package="PEAR2\Net\RouterOS">
+        <name>next</name>
+        <full_name>next</full_name>
+        <docblock line="200">
+          <description><![CDATA[Moves the pointer forward by 1, and gets the next response.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="200" name="return" description="The next {@link Response} object, or FALSE if the position is not valid." type="\PEAR2\Net\RouterOS\Response">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Response</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="218" package="PEAR2\Net\RouterOS">
+        <name>current</name>
+        <full_name>current</full_name>
+        <docblock line="212">
+          <description><![CDATA[Gets the response at the current pointer position.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="212" name="return" description="The response at the current pointer position, or FALSE if the position is not valid." type="\PEAR2\Net\RouterOS\Response">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Response</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="229" package="PEAR2\Net\RouterOS">
+        <name>prev</name>
+        <full_name>prev</full_name>
+        <docblock line="223">
+          <description><![CDATA[Moves the pointer backwards by 1, and gets the previous response.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="223" name="return" description="The next {@link Response} object, or FALSE if the position is not valid." type="\PEAR2\Net\RouterOS\Response">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Response</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="242" package="PEAR2\Net\RouterOS">
+        <name>end</name>
+        <full_name>end</full_name>
+        <docblock line="235">
+          <description><![CDATA[Moves the pointer to the last valid position, and returns the last
+response.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="235" name="return" description="The last response in the collection, or FALSE if the collection is empty." type="\PEAR2\Net\RouterOS\Response">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Response</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="254" package="PEAR2\Net\RouterOS">
+        <name>key</name>
+        <full_name>key</full_name>
+        <docblock line="248">
+          <description><![CDATA[Gets the key at the current pointer position.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="248" name="return" description="The key at the current pointer position, i.e. the pointer position itself, or FALSE if the position is not valid." type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="264" package="PEAR2\Net\RouterOS">
+        <name>valid</name>
+        <full_name>valid</full_name>
+        <docblock line="259">
+          <description><![CDATA[Checks if the pointer is still pointing to an existing offset.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="259" name="return" description="TRUE if the pointer is valid, FALSE otherwise." type="bool">
+            <type by_reference="false">bool</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="277" package="PEAR2\Net\RouterOS">
+        <name>getArgumentMap</name>
+        <full_name>getArgumentMap</full_name>
+        <docblock line="269">
+          <description><![CDATA[Gets all distinct argument names.]]></description>
+          <long-description><![CDATA[<p>Gets all distinct argument names across all responses.</p>]]></long-description>
+          <tag line="269" name="return" description="An array with all distinct argument names as keys, and the indexes at which they occur as values." type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="303" package="PEAR2\Net\RouterOS">
+        <name>getAllOfType</name>
+        <full_name>getAllOfType</full_name>
+        <docblock line="294">
+          <description><![CDATA[Gets all responses of a specified type.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="294" name="param" description="The response type to filter by. Valid values are the Response::TYPE_* constants." type="string" variable="$type">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="294" name="return" description="A new collection with responses of the specified type." type="\PEAR2\Net\RouterOS\ResponseCollection">
+            <type by_reference="false">\PEAR2\Net\RouterOS\ResponseCollection</type>
+          </tag>
+        </docblock>
+        <argument line="303">
+          <name>$type</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="320" package="PEAR2\Net\RouterOS">
+        <name>getAllTagged</name>
+        <full_name>getAllTagged</full_name>
+        <docblock line="312">
+          <description><![CDATA[Gets all responses with a specified tag.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="312" name="param" description="The tag to filter by." type="string" variable="$tag">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="312" name="return" description="A new collection with responses having the specified tag." type="\PEAR2\Net\RouterOS\ResponseCollection">
+            <type by_reference="false">\PEAR2\Net\RouterOS\ResponseCollection</type>
+          </tag>
+        </docblock>
+        <argument line="320">
+          <name>$tag</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="335" package="PEAR2\Net\RouterOS">
+        <name>getLast</name>
+        <full_name>getLast</full_name>
+        <docblock line="329">
+          <description><![CDATA[Gets the last {@link Response} in the collection.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="329" name="return" description="The last response in the collection or FALSE if the collection is empty." type="\PEAR2\Net\RouterOS\Response">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Response</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="353" package="PEAR2\Net\RouterOS">
+        <name>__call</name>
+        <full_name>__call</full_name>
+        <docblock line="341">
+          <description><![CDATA[Calls a method of the response pointed by the pointer.]]></description>
+          <long-description><![CDATA[<p>Calls a method of the response pointed by the pointer. This is a magic
+PHP method, thanks to which any function you call on the collection that
+is not defined will be redirected to the response.</p>]]></long-description>
+          <tag line="341" name="param" description="The name of the method to call." type="string" variable="$method">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="341" name="param" description="The arguments to pass to the method." type="array" variable="$args">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="341" name="return" description="Whatever the called function returns." type="mixed">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+        <argument line="353">
+          <name>$method</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="353">
+          <name>$args</name>
+          <default><![CDATA[]]></default>
+          <type>array</type>
+        </argument>
+      </method>
+    </class>
+    <parse_markers>
+      <critical line="36" code="50019">No short description for property $responses</critical>
+      <critical line="41" code="50019">No short description for property $responseTypes</critical>
+      <critical line="46" code="50019">No short description for property $responseTags</critical>
+      <critical line="51" code="50019">No short description for property $argumentMap</critical>
+      <critical line="58" code="50019">No short description for property $position</critical>
+    </parse_markers>
+  </file>
+  <file path="SocketException.php" hash="63f0c80cc630ac28cdd24c989966a713" package="PEAR2\Net\RouterOS">
+    <docblock line="3">
+      <description><![CDATA[RouterOS API client implementation.]]></description>
+      <long-description><![CDATA[<p>RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.</p>
+
+<p>PHP version 5</p>]]></long-description>
+      <tag line="3" name="category" description="Net"/>
+      <tag line="3" name="package" description="PEAR2_Net_RouterOS"/>
+      <tag line="3" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+      <tag line="3" name="copyright" description="2011 Vasil Rangelov"/>
+      <tag line="3" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+      <tag line="3" name="version" description="1.0.0b3"/>
+      <tag line="3" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+    </docblock>
+    <class final="false" abstract="false" namespace="PEAR2\Net\RouterOS" line="33" package="PEAR2\Net\RouterOS">
+      <extends>\RuntimeException</extends>
+      <implements>\PEAR2\Net\RouterOS\Exception</implements>
+      <name>SocketException</name>
+      <full_name>\PEAR2\Net\RouterOS\SocketException</full_name>
+      <docblock line="24">
+        <description><![CDATA[Exception thrown when something goes wrong with the connection.]]></description>
+        <long-description><![CDATA[]]></long-description>
+        <tag line="24" name="category" description="Net"/>
+        <tag line="24" name="package" description="PEAR2_Net_RouterOS"/>
+        <tag line="24" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+        <tag line="24" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+        <tag line="24" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+      </docblock>
+    </class>
+  </file>
+  <file path="UnexpectedValueException.php" hash="940235cd4df524c7468d2de22aa25f66" package="PEAR2\Net\RouterOS">
+    <docblock line="3">
+      <description><![CDATA[RouterOS API client implementation.]]></description>
+      <long-description><![CDATA[<p>RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.</p>
+
+<p>PHP version 5</p>]]></long-description>
+      <tag line="3" name="category" description="Net"/>
+      <tag line="3" name="package" description="PEAR2_Net_RouterOS"/>
+      <tag line="3" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+      <tag line="3" name="copyright" description="2011 Vasil Rangelov"/>
+      <tag line="3" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+      <tag line="3" name="version" description="1.0.0b3"/>
+      <tag line="3" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+    </docblock>
+    <class final="false" abstract="false" namespace="PEAR2\Net\RouterOS" line="33" package="PEAR2\Net\RouterOS">
+      <extends>\UnexpectedValueException</extends>
+      <implements>\PEAR2\Net\RouterOS\Exception</implements>
+      <name>UnexpectedValueException</name>
+      <full_name>\PEAR2\Net\RouterOS\UnexpectedValueException</full_name>
+      <docblock line="24">
+        <description><![CDATA[Exception thrown when encountering an invalid value in a function argument.]]></description>
+        <long-description><![CDATA[]]></long-description>
+        <tag line="24" name="category" description="Net"/>
+        <tag line="24" name="package" description="PEAR2_Net_RouterOS"/>
+        <tag line="24" name="author" description="Vasil Rangelov &lt;boen.robot@gmail.com&gt;"/>
+        <tag line="24" name="license" description="http://www.gnu.org/copyleft/lesser.html LGPL License 2.1"/>
+        <tag line="24" name="link" description="http://pear2.php.net/PEAR2_Net_RouterOS" link="http://pear2.php.net/PEAR2_Net_RouterOS"/>
+      </docblock>
+      <property final="false" static="false" visibility="private" line="41" namespace="PEAR2\Net\RouterOS" package="Default">
+        <name>$_value</name>
+        <default><![CDATA[]]></default>
+        <docblock line="37">
+          <description><![CDATA[]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="37" name="var" description="The unexpected value." type="mixed">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+      </property>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="52" package="PEAR2\Net\RouterOS">
+        <name>__construct</name>
+        <full_name>__construct</full_name>
+        <docblock line="43">
+          <description><![CDATA[Creates a new UnexpectedValueException.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="43" name="param" description="The Exception message to throw." type="string" variable="$message">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="43" name="param" description="The Exception code." type="int" variable="$code">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="43" name="param" description="The previous exception used for the exception chaining." type="\PEAR2\Net\RouterOS\Exception" variable="$previous">
+            <type by_reference="false">\PEAR2\Net\RouterOS\Exception</type>
+          </tag>
+          <tag line="43" name="param" description="The unexpected value." type="mixed" variable="$value">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+        <argument line="52">
+          <name>$message</name>
+          <default><![CDATA[]]></default>
+          <type/>
+        </argument>
+        <argument line="52">
+          <name>$code</name>
+          <default><![CDATA[0]]></default>
+          <type/>
+        </argument>
+        <argument line="52">
+          <name>$previous</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+        <argument line="53">
+          <name>$value</name>
+          <default><![CDATA[null]]></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="64" package="PEAR2\Net\RouterOS">
+        <name>getValue</name>
+        <full_name>getValue</full_name>
+        <docblock line="59">
+          <description><![CDATA[Gets the unexpected value.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="59" name="return" description="The unexpected value." type="mixed">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="PEAR2\Net\RouterOS" line="77" package="PEAR2\Net\RouterOS">
+        <name>__toString</name>
+        <full_name>__toString</full_name>
+        <docblock line="72">
+          <description><![CDATA[Returns a string representation of the exception.]]></description>
+          <long-description><![CDATA[]]></long-description>
+          <tag line="72" name="return" description="The exception as a string." type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+      </method>
+    </class>
+    <parse_markers>
+      <critical line="37" code="50019">No short description for property $_value</critical>
+    </parse_markers>
+  </file>
+  <package name="Default" full_name="Default"/>
+  <package name="PEAR2" full_name="PEAR2">
+    <package name="Net" full_name="PEAR2\Net">
+      <package name="RouterOS" full_name="PEAR2\Net\RouterOS"/>
+    </package>
+  </package>
+  <namespace name="PEAR2" full_name="PEAR2">
+    <namespace name="Net" full_name="PEAR2\Net">
+      <namespace name="RouterOS" full_name="PEAR2\Net\RouterOS"/>
+    </namespace>
+  </namespace>
+  <marker count="0">todo</marker>
+  <marker count="0">fixme</marker>
+  <deprecated count="0"/>
+</project>

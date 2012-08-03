@@ -1,0 +1,652 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>PEAR2_Net_RouterOS documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="../css/template.css" type="text/css"></link><script type="text/javascript" src="../js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="../js/jquery.tools.min.js"></script><script type="text/javascript" src="../js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="../js/template.js"></script></head><body><div xmlns="" id="content">
+<h1 class="file">Request.php</h1>
+<div id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="../images/icons/visibility_public.png" id="show-public"><img src="../images/icons/visibility_protected.png" id="show-protected"><img src="../images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="../images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5CPEAR2%5CNet%5CRouterOS%5CRequest">\PEAR2\Net\RouterOS\Request</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a name="top" class="anchor"></a><div id="file-description">
+<div xmlns="http://www.w3.org/1999/xhtml" class="short-description">RouterOS API client implementation.</div><div xmlns="http://www.w3.org/1999/xhtml" class="long-description"><p>RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.</p>
+
+<p>PHP version 5</p></div>
+</div>
+<dl class="file-info">
+<dt xmlns="http://www.w3.org/1999/xhtml">Author</dt><dd xmlns="http://www.w3.org/1999/xhtml"><a href="mailto:boen.robot@gmail.com">Vasil Rangelov</a>
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">Category</dt><dd xmlns="http://www.w3.org/1999/xhtml">Net
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">Copyright</dt><dd xmlns="http://www.w3.org/1999/xhtml">2011 Vasil Rangelov
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">License</dt><dd xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</a>
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">Link</dt><dd xmlns="http://www.w3.org/1999/xhtml"><a href="http://pear2.php.net/PEAR2_Net_RouterOS">http://pear2.php.net/PEAR2_Net_RouterOS</a>
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">Package</dt><dd xmlns="http://www.w3.org/1999/xhtml">PEAR2_Net_RouterOS
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">Version</dt><dd xmlns="http://www.w3.org/1999/xhtml">1.0.0b3
+         
+    </dd>
+</dl>
+<a name="classes" class="anchor"></a><a id="\PEAR2\Net\RouterOS\Request" class="anchor"></a><h2 class="class">\PEAR2\Net\RouterOS\Request<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div class="class">
+<small class="package"><b>Package: </b>PEAR2\Net\RouterOS</small><div xmlns="http://www.w3.org/1999/xhtml" class="short-description">Represents a RouterOS request.</div><div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><dl class="class-info">
+<dt>Parent(s)</dt>
+<dd><a href="../files/Message.html#%5CPEAR2%5CNet%5CRouterOS%5CMessage">\PEAR2\Net\RouterOS\Message</a></dd>
+<dt xmlns="http://www.w3.org/1999/xhtml">Author</dt><dd xmlns="http://www.w3.org/1999/xhtml"><a href="mailto:boen.robot@gmail.com">Vasil Rangelov</a>
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">Category</dt><dd xmlns="http://www.w3.org/1999/xhtml">Net
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">License</dt><dd xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</a>
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">Link</dt><dd xmlns="http://www.w3.org/1999/xhtml"><a href="http://pear2.php.net/PEAR2_Net_RouterOS">http://pear2.php.net/PEAR2_Net_RouterOS</a>
+         
+    </dd>
+</dl>
+<h3>Properties</h3>
+<div>
+<a id="\PEAR2\Net\RouterOS\Request::$_command" class="anchor"></a><div class="property private">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/property.png" alt="Property"><img src="../images/icons/visibility_private.png" style="margin-right: 5px" alt="private">string <span class="highlight">$_command</span></code><div class="description"><div xmlns="http://www.w3.org/1999/xhtml" class="short-description"><p>The command to be executed.</p></div></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Request::$_query" class="anchor"></a><div class="property private">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/property.png" alt="Property"><img src="../images/icons/visibility_private.png" style="margin-right: 5px" alt="private">\PEAR2\Net\RouterOS\Query <span class="highlight">$_query</span></code><div class="description"><div xmlns="http://www.w3.org/1999/xhtml" class="short-description"><p>A query for the command.</p></div></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a xmlns="http://www.w3.org/1999/xhtml" href="../files/Query.html#\PEAR2\Net\RouterOS\Query">\PEAR2\Net\RouterOS\Query</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Request::$_tag" class="anchor"></a><div class="property private inherited_from ">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/property.png" alt="Property"><img src="../images/icons/visibility_private.png" style="margin-right: 5px" alt="private">string <span class="highlight">$_tag</span> = null</code><div class="description">
+<span class="attribute">inherited</span><div xmlns="http://www.w3.org/1999/xhtml" class="short-description"><p>An optional tag to associate the message with.</p></div><small class="inherited_from">Inherited from:
+                        <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Message.html#\PEAR2\Net\RouterOS\Message::$$_tag">\PEAR2\Net\RouterOS\Message::$$_tag</a></small>
+</div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+<dt xmlns="http://www.w3.org/1999/xhtml">Inherited_from</dt><dd xmlns="http://www.w3.org/1999/xhtml"><a href="../files/
+                         Message.html#\PEAR2\Net\RouterOS\Message::$$_tag">\PEAR2\Net\RouterOS\Message::$$_tag</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Request::$arguments" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/property.png" alt="Property"><img src="../images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array <span class="highlight">$arguments</span> = array()</code><div class="description">
+<span class="attribute">inherited</span><div xmlns="http://www.w3.org/1999/xhtml" class="short-description"><p>An array with message arguments. Keys are the names of the arguments, array values are values for the corresponding argument.</p></div><small class="inherited_from">Inherited from:
+                        <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Message.html#\PEAR2\Net\RouterOS\Message::$$arguments">\PEAR2\Net\RouterOS\Message::$$arguments</a></small>
+</div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+<dt xmlns="http://www.w3.org/1999/xhtml">Inherited_from</dt><dd xmlns="http://www.w3.org/1999/xhtml"><a href="../files/
+                         Message.html#\PEAR2\Net\RouterOS\Message::$$arguments">\PEAR2\Net\RouterOS\Message::$$arguments</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\PEAR2\Net\RouterOS\Request::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(string $command, <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Query.html#\PEAR2\Net\RouterOS\Query">\PEAR2\Net\RouterOS\Query</a> $query = null, string $tag = null)</span> : void</code><div class="description"><p class="short_description">Creates a request to send to RouterOS.</p></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$command</th>
+<td>string</td>
+<td><em><p>The command to send. Can also contain arguments expressed in a shell-like syntax.</p>
+</em></td>
+</tr>
+<tr>
+<th>$query</th>
+<td><a xmlns="http://www.w3.org/1999/xhtml" href="../files/Query.html#\PEAR2\Net\RouterOS\Query">\PEAR2\Net\RouterOS\Query</a></td>
+<td><em><p>A query to associate with the request.</p></em></td>
+</tr>
+<tr>
+<th>$tag</th>
+<td>string</td>
+<td><em><p>The tag for the request.</p></em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt xmlns="http://www.w3.org/1999/xhtml">See</dt><dd xmlns="http://www.w3.org/1999/xhtml">\PEAR2\Net\RouterOS\setCommand()
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">See</dt><dd xmlns="http://www.w3.org/1999/xhtml">\PEAR2\Net\RouterOS\setArgument()
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">See</dt><dd xmlns="http://www.w3.org/1999/xhtml">\PEAR2\Net\RouterOS\setTag()
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">See</dt><dd xmlns="http://www.w3.org/1999/xhtml">\PEAR2\Net\RouterOS\setQuery()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Request::__invoke()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__invoke</span><span class="nb-faded-text">(mixed $arg = null)</span> : mixed</code><div class="description"><p class="short_description">A shorthand gateway.</p></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"><p>This is a magic PHP method that allows you to call the object as a
+function. Depending on the argument given, one of the other functions in
+the class is invoked and its returned value is returned by this function.</p></div><strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$arg</th>
+<td>mixed</td>
+<td><em><p>A {@link Query} to associate the request with, a {@link Communicator} to send the request over, an argument to get the value of, or NULL to get all arguments as an array. If a second argument is provided, this becomes the name of the argument to set the value of, and the second argument is the value to set.</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>mixed</td>
+<td>Whatever the long form function would have returned.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Request::_send()" class="anchor"></a><div class="method private">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">_send</span><span class="nb-faded-text">(<a xmlns="http://www.w3.org/1999/xhtml" href="../files/Communicator.html#\PEAR2\Net\RouterOS\Communicator">\PEAR2\Net\RouterOS\Communicator</a> $com)</span> : int</code><div class="description"><p class="short_description">Sends a request over a communicator.</p></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"><p>The only difference with the non private equivalent is that this one does
+not do locking.</p></div><strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$com</th>
+<td><a xmlns="http://www.w3.org/1999/xhtml" href="../files/Communicator.html#\PEAR2\Net\RouterOS\Communicator">\PEAR2\Net\RouterOS\Communicator</a></td>
+<td><em><p>The communicator to send the request over.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>int</td>
+<td>The number of bytes sent.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt xmlns="http://www.w3.org/1999/xhtml">See</dt><dd xmlns="http://www.w3.org/1999/xhtml"><a href="../files/
+                         Client.html#\PEAR2\Net\RouterOS\Client::sendSync()">\PEAR2\Net\RouterOS\Client::sendSync()</a>
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">See</dt><dd xmlns="http://www.w3.org/1999/xhtml"><a href="../files/
+                         Client.html#\PEAR2\Net\RouterOS\Client::sendAsync()">\PEAR2\Net\RouterOS\Client::sendAsync()</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Request::getAllArguments()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getAllArguments</span><span class="nb-faded-text">()</span> : array</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Gets all arguments in an array.</p>
+<small class="inherited_from">Inherited from:
+                    <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Message.html#\PEAR2\Net\RouterOS\Message::getAllArguments()">\PEAR2\Net\RouterOS\Message::getAllArguments()</a></small>
+</div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>An array with the keys as argument names, and the array values as argument values.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt xmlns="http://www.w3.org/1999/xhtml">See</dt><dd xmlns="http://www.w3.org/1999/xhtml">\PEAR2\Net\RouterOS\getArgument()
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">See</dt><dd xmlns="http://www.w3.org/1999/xhtml">\PEAR2\Net\RouterOS\setArgument()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Request::getArgument()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getArgument</span><span class="nb-faded-text">(string $name)</span> : string | resource</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Gets the value of an argument.</p>
+<small class="inherited_from">Inherited from:
+                    <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Message.html#\PEAR2\Net\RouterOS\Message::getArgument()">\PEAR2\Net\RouterOS\Message::getArgument()</a></small>
+</div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em><p>The name of the argument.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string | resource</td>
+<td>The value of the specified argument. Returns NULL if such an argument is not set.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt xmlns="http://www.w3.org/1999/xhtml">See</dt><dd xmlns="http://www.w3.org/1999/xhtml">\PEAR2\Net\RouterOS\setArgument()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Request::getCommand()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getCommand</span><span class="nb-faded-text">()</span> : string</code><div class="description"><p class="short_description">Gets the command that will be send to RouterOS.</p></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"><p>Gets the command that will be send to RouterOS in its API syntax.</p></div><strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>The command to send.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt xmlns="http://www.w3.org/1999/xhtml">See</dt><dd xmlns="http://www.w3.org/1999/xhtml">\PEAR2\Net\RouterOS\setCommand()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Request::getQuery()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getQuery</span><span class="nb-faded-text">()</span> : <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Query.html#\PEAR2\Net\RouterOS\Query">\PEAR2\Net\RouterOS\Query</a></code><div class="description"><p class="short_description">Gets the currently associated query</p></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a xmlns="http://www.w3.org/1999/xhtml" href="../files/Query.html#\PEAR2\Net\RouterOS\Query">\PEAR2\Net\RouterOS\Query</a></td>
+<td>The currently associated query.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt xmlns="http://www.w3.org/1999/xhtml">See</dt><dd xmlns="http://www.w3.org/1999/xhtml">\PEAR2\Net\RouterOS\setQuery()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Request::getTag()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getTag</span><span class="nb-faded-text">()</span> : string</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Gets the tag that the message is associated with.</p>
+<small class="inherited_from">Inherited from:
+                    <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Message.html#\PEAR2\Net\RouterOS\Message::getTag()">\PEAR2\Net\RouterOS\Message::getTag()</a></small>
+</div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>The current tag or NULL if there isn't a tag.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt xmlns="http://www.w3.org/1999/xhtml">See</dt><dd xmlns="http://www.w3.org/1999/xhtml">\PEAR2\Net\RouterOS\setTag()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Request::parseArgumentString()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">parseArgumentString</span><span class="nb-faded-text">(string $string)</span> : void</code><div class="description"><p class="short_description">Parses the arguments of a command.</p></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$string</th>
+<td>string</td>
+<td><em><p>The argument string to parse.</p></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Request::removeAllArguments()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">removeAllArguments</span><span class="nb-faded-text">()</span> : \PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Request.html#\PEAR2\Net\RouterOS\Request">\PEAR2\Net\RouterOS\Request</a></code><div class="description"><p class="short_description">Removes all arguments from the request.</p></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Request.html#\PEAR2\Net\RouterOS\Request">\PEAR2\Net\RouterOS\Request</a>
+</td>
+<td>The request object.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Request::sanitizeArgumentName()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">sanitizeArgumentName</span><span class="nb-faded-text">(mixed $name)</span> : string</code><div class="description">
+<span class="attribute">static</span><span class="attribute">inherited</span><p class="short_description">Sanitizes a name of an argument (message or query one).</p>
+<small class="inherited_from">Inherited from:
+                    <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Message.html#\PEAR2\Net\RouterOS\Message::sanitizeArgumentName()">\PEAR2\Net\RouterOS\Message::sanitizeArgumentName()</a></small>
+</div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>mixed</td>
+<td><em><p>The name to sanitize.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>The sanitized name.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Request::sanitizeArgumentValue()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">sanitizeArgumentValue</span><span class="nb-faded-text">(mixed $value)</span> : string</code><div class="description">
+<span class="attribute">static</span><span class="attribute">inherited</span><p class="short_description">Sanitizes a value of an argument (message or query one).</p>
+<small class="inherited_from">Inherited from:
+                    <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Message.html#\PEAR2\Net\RouterOS\Message::sanitizeArgumentValue()">\PEAR2\Net\RouterOS\Message::sanitizeArgumentValue()</a></small>
+</div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$value</th>
+<td>mixed</td>
+<td><em><p>The value to sanitize.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>The sanitized value.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Request::send()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">send</span><span class="nb-faded-text">(<a xmlns="http://www.w3.org/1999/xhtml" href="../files/Communicator.html#\PEAR2\Net\RouterOS\Communicator">\PEAR2\Net\RouterOS\Communicator</a> $com, <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Registry.html#\PEAR2\Net\RouterOS\Registry">\PEAR2\Net\RouterOS\Registry</a> $reg = null)</span> : int</code><div class="description"><p class="short_description">Sends a request over a communicator.</p></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$com</th>
+<td><a xmlns="http://www.w3.org/1999/xhtml" href="../files/Communicator.html#\PEAR2\Net\RouterOS\Communicator">\PEAR2\Net\RouterOS\Communicator</a></td>
+<td><em><p>The communicator to send the request over.</p></em></td>
+</tr>
+<tr>
+<th>$reg</th>
+<td><a xmlns="http://www.w3.org/1999/xhtml" href="../files/Registry.html#\PEAR2\Net\RouterOS\Registry">\PEAR2\Net\RouterOS\Registry</a></td>
+<td><em><p>An optional registry to sync the request with.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>int</td>
+<td>The number of bytes sent.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt xmlns="http://www.w3.org/1999/xhtml">See</dt><dd xmlns="http://www.w3.org/1999/xhtml"><a href="../files/
+                         Client.html#\PEAR2\Net\RouterOS\Client::sendSync()">\PEAR2\Net\RouterOS\Client::sendSync()</a>
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">See</dt><dd xmlns="http://www.w3.org/1999/xhtml"><a href="../files/
+                         Client.html#\PEAR2\Net\RouterOS\Client::sendAsync()">\PEAR2\Net\RouterOS\Client::sendAsync()</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Request::setArgument()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setArgument</span><span class="nb-faded-text">(string $name, string $value = '')</span> : \PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Request.html#\PEAR2\Net\RouterOS\Request">\PEAR2\Net\RouterOS\Request</a></code><div class="description"><p class="short_description">Sets an argument for the request.</p></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em><p>Name of the argument.</p></em></td>
+</tr>
+<tr>
+<th>$value</th>
+<td>string</td>
+<td><em><p>Value of the argument. Setting the value to NULL removes an argument of this name.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Request.html#\PEAR2\Net\RouterOS\Request">\PEAR2\Net\RouterOS\Request</a>
+</td>
+<td>The request object.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt xmlns="http://www.w3.org/1999/xhtml">See</dt><dd xmlns="http://www.w3.org/1999/xhtml">\PEAR2\Net\RouterOS\getArgument()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Request::setCommand()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setCommand</span><span class="nb-faded-text">(string $command)</span> : \PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Request.html#\PEAR2\Net\RouterOS\Request">\PEAR2\Net\RouterOS\Request</a></code><div class="description"><p class="short_description">Sets the command to send to RouterOS.</p></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"><p>Sets the command to send to RouterOS. The command can use the API or CLI
+syntax of RouterOS, but either way, it must be absolute (begin  with a
+"/") and without arguments.</p></div><strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$command</th>
+<td>string</td>
+<td><em><p>The command to send.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Request.html#\PEAR2\Net\RouterOS\Request">\PEAR2\Net\RouterOS\Request</a>
+</td>
+<td>The request object.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt xmlns="http://www.w3.org/1999/xhtml">See</dt><dd xmlns="http://www.w3.org/1999/xhtml">\PEAR2\Net\RouterOS\getCommand()
+         
+    </dd><dt xmlns="http://www.w3.org/1999/xhtml">See</dt><dd xmlns="http://www.w3.org/1999/xhtml">\PEAR2\Net\RouterOS\setArgument()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Request::setQuery()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setQuery</span><span class="nb-faded-text">(<a xmlns="http://www.w3.org/1999/xhtml" href="../files/Query.html#\PEAR2\Net\RouterOS\Query">\PEAR2\Net\RouterOS\Query</a> $query = null)</span> : \PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Request.html#\PEAR2\Net\RouterOS\Request">\PEAR2\Net\RouterOS\Request</a></code><div class="description"><p class="short_description">Sets the query to send with the command.</p></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"></div><strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$query</th>
+<td><a xmlns="http://www.w3.org/1999/xhtml" href="../files/Query.html#\PEAR2\Net\RouterOS\Query">\PEAR2\Net\RouterOS\Query</a></td>
+<td><em><p>The query to be set. Setting NULL will remove the currently associated query.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Request.html#\PEAR2\Net\RouterOS\Request">\PEAR2\Net\RouterOS\Request</a>
+</td>
+<td>The request object.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt xmlns="http://www.w3.org/1999/xhtml">See</dt><dd xmlns="http://www.w3.org/1999/xhtml">\PEAR2\Net\RouterOS\getQuery()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\PEAR2\Net\RouterOS\Request::setTag()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="../images/icons/arrow_right.png"><img src="../images/icons/arrow_down.png" style="display: none;"></a><code class="title"><img src="../images/icons/method.png" alt="method" title="method"><img src="../images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setTag</span><span class="nb-faded-text">(string $tag)</span> : \PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Request.html#\PEAR2\Net\RouterOS\Request">\PEAR2\Net\RouterOS\Request</a></code><div class="description"><p class="short_description">Sets the tag to associate the request with.</p></div>
+<div class="code-tabs">
+<div xmlns="http://www.w3.org/1999/xhtml" class="long-description"><p>Sets the tag to associate the request with. Setting NULL erases the
+currently set tag.</p></div><strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$tag</th>
+<td>string</td>
+<td><em><p>The tag to set.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\PEAR2\Net\RouterOS\self | <a xmlns="http://www.w3.org/1999/xhtml" href="../files/Request.html#\PEAR2\Net\RouterOS\Request">\PEAR2\Net\RouterOS\Request</a>
+</td>
+<td>The request object.</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt xmlns="http://www.w3.org/1999/xhtml">See</dt><dd xmlns="http://www.w3.org/1999/xhtml">\PEAR2\Net\RouterOS\getTag()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">
+            Documentation was generated by
+            <a href="http://phpdoc.org">phpDocumentor
+                2.0.0a8</a>.
+        </small></body></html>
