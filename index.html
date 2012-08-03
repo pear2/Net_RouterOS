@@ -50,8 +50,9 @@
             </a>
 
             <div class="download">
-                <a href="https://github.com/downloads/pear2/Net_RouterOS/PEAR2_Net_RouterOS-1.0.0b2.tgz"><img alt="TGZ" width="90" src="http://github.com/images/modules/download/tar.png" /></a>
-                <a href="https://github.com/downloads/pear2/Net_RouterOS/PEAR2_Net_RouterOS-1.0.0b2.zip"><img alt="ZIP" width="90" src="http://github.com/images/modules/download/zip.png" /></a>
+                <a href="https://github.com/downloads/pear2/Net_RouterOS/PEAR2_Net_RouterOS-1.0.0b3.phar"><img alt="TGZ" width="90" src="phar.png" /></a>
+                <a href="https://github.com/downloads/pear2/Net_RouterOS/PEAR2_Net_RouterOS-1.0.0b3.tgz"><img alt="TGZ" width="90" src="tgz.png" /></a>
+                <a href="https://github.com/downloads/pear2/Net_RouterOS/PEAR2_Net_RouterOS-1.0.0b3.zip"><img alt="ZIP" width="90" src="http://github.com/images/modules/download/zip.png" /></a>
             </div>
 
             <h1><a href="http://github.com/pear2/Net_RouterOS">PEAR2_Net_RouterOS</a>
@@ -62,23 +63,26 @@
                 This package allows you to read and write information from a RouterOS host using MikroTik's RouterOS API. Notable features include:
                 <ul>
                     <li>Complete support of the RouterOS API features</li>
+                    <li>Fully documented (see <a href="https://github.com/pear2/Net_RouterOS/wiki">Wiki</a>)</li>
+                    <li>Automatic translation of shell-like commands to API syntax</li>
                     <li>Many ways to deal with responses</li>
                     <li>(Relatively?) easy to use</li>
-                    <li>Fully documented (see <a href="https://github.com/pear2/Net_RouterOS/wiki">Wiki</a>)</li>
                     <li>Tested (full code coverage)</li>
-
                 </ul>
             </div>
             <div>
                 <h2>Latest version</h2>
-                <p><span class="version">1.0.0b2</span> released on <span class="date">16 October 2011</span></p>
+                <p><span class="version">1.0.0b3</span> released on <span class="date">3 August 2012</span></p>
             </div>
             <div>
                 <h2>Install</h2>
                 <p>If you have <a href="http://pear2.php.net/">Pyrus</a>, without downloading anything:</p>
-                <pre>pyrus install PEAR2_Net_RouterOS-alpha</pre>
-                <p>Or if you download the tgz archive from this page:</p>
-                <pre>pyrus install /path/to/downloaded/archive.tgz</pre>
+                <pre>pyrus install -o PEAR2_Net_RouterOS-alpha</pre>
+                <p>And in your PHP, load it with any PSR-0 compatible autoloader (e.g. PEAR2_Autoload).</p>
+                <p>Alternatively, if you download the PHAR archive from this page, you can just include it, like:</p>
+                <pre>&lt;?php
+require_once 'PEAR2_Net_RouterOS-1.0.0b3.phar';
+//Rest of your code</pre>
                 <p>See <a href="https://github.com/pear2/Net_RouterOS/wiki/Getting-started">the page in the project's wiki</a> for details and other ways of installation.</p>
             </div>
             <div>
@@ -90,6 +94,7 @@
                 <h2>Download</h2>
                 <p>
                     You can download this project in either
+                    <a href="https://github.com/downloads/pear2/Net_RouterOS/PEAR2_Net_RouterOS-1.0.0b2.phar">phar</a>, 
                     <a href="https://github.com/downloads/pear2/Net_RouterOS/PEAR2_Net_RouterOS-1.0.0b2.tgz">tgz</a> or
                     <a href="https://github.com/downloads/pear2/Net_RouterOS/PEAR2_Net_RouterOS-1.0.0b2.zip">zip</a> formats.
                 </p>
