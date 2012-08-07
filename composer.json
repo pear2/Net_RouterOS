@@ -1,0 +1,57 @@
+{
+    "name": "pear2/net_routeros",
+    "description": "This package allows you to read and write information from a RouterOS host using MikroTik's RouterOS API.",
+    "keywords": ["routeros", "package", "api", "mikrotik", "pear2", "router"],
+    "homepage": "http://pear2.github.com/Net_RouterOS/",
+    "license": "LGPL-2.1",
+    "authors": [
+        {
+            "name": "Vasil Rangelov",
+            "email": "boen.robot@gmail.com",
+            "role": "lead"
+        }
+    ],
+    "support": {
+        "issues": "http://github.com/pear2/Net_RouterOS/issues",
+        "wiki": "http://github.com/pear2/Net_RouterOS/wiki"
+    },
+    "require": {
+        "php": ">=5.3.0",
+        "pear2/net_transmitter": "@dev",
+        "pear2/cache_shm": "@dev"
+    },
+    "autoload": {
+        "psr-0": {
+            "PEAR2\\Net\\RouterOS\\": "src/",
+            "PEAR2\\Net\\Transmitter\\": "vendor/pear2/net_transmitter/src/",
+            "PEAR2\\Cache\\SHM": "vendor/pear2/cache_shm/src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "pear2/net_transmitter",
+                "version": "@dev",
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/pear2/Net_Transmitter.git",
+                    "reference": "master"
+                }
+            }
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "pear2/cache_shm",
+                "version": "@dev",
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/pear2/Cache_SHM.git",
+                    "reference": "master"
+                }
+            }
+        }
+    ]
+}
