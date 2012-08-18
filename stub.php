@@ -1,7 +1,7 @@
 <?php
 if (count(get_included_files()) > 1) {
     Phar::mapPhar();
-    require_once 'phar://' . __FILE__ . DIRECTORY_SEPARATOR .
+    include_once 'phar://' . __FILE__ . DIRECTORY_SEPARATOR .
         '@PACKAGE_NAME@-@PACKAGE_VERSION@' . DIRECTORY_SEPARATOR . 'src'
         . DIRECTORY_SEPARATOR . 'PEAR2' . DIRECTORY_SEPARATOR . 'Autoload.php';
 } else {

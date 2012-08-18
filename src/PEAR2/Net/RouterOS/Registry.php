@@ -199,7 +199,7 @@ class Registry
      * Adds a response to a buffer.
      * 
      * @param Response $response         The response to add.
-     * @param type     $targetBufferName The name of the buffer to add the
+     * @param string   $targetBufferName The name of the buffer to add the
      * response to.
      * 
      * @return void

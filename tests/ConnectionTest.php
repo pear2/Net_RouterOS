@@ -91,10 +91,12 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalAnsiConnection()
     {
-        $oldCharsets = Communicator::setDefaultCharset(array(
-            Communicator::CHARSET_LOCAL => 'UTF-8',
-            Communicator::CHARSET_REMOTE => ANSI_PASSWORD_CHARSET
-        ));
+        $oldCharsets = Communicator::setDefaultCharset(
+            array(
+                Communicator::CHARSET_LOCAL => 'UTF-8',
+                Communicator::CHARSET_REMOTE => ANSI_PASSWORD_CHARSET
+            )
+        );
         try {
             $routerOS = new Client(
                 \HOSTNAME, ANSI_USERNAME, ANSI_PASSWORD, PORT
@@ -289,7 +291,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         try {
             $routerOS = new Client(
                 \HOSTNAME_SILENT, USERNAME, PASSWORD, PORT, true
-             );
+            );
 
             $this->fail(
                 'No proper connection over hostname "'

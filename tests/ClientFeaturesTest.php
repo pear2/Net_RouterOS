@@ -159,7 +159,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $repliesCount = 0;
         $this->object->sendAsync(
             $ping,
-            function($response, $client) use (&$repliesCount) {
+            function ($response, $client) use (&$repliesCount) {
                 \PHPUnit_Framework_TestCase::assertInstanceOf(
                     __NAMESPACE__ . '\Response', $response,
                     'A callback must receive a single response per call'
@@ -297,7 +297,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $responseCount = 0;
         $this->object->sendAsync(
             $ping,
-            function($response, $client) use (&$responseCount) {
+            function ($response, $client) use (&$responseCount) {
                 \PHPUnit_Framework_TestCase::assertInstanceOf(
                     __NAMESPACE__ . '\Response', $response,
                     'A callback must receive a single response per call'
@@ -344,7 +344,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $repliesCount = 0;
         $this->object->sendAsync(
             $ping,
-            function($response, $client) use (&$repliesCount, $limit) {
+            function ($response, $client) use (&$repliesCount, $limit) {
                 \PHPUnit_Framework_TestCase::assertInstanceOf(
                     __NAMESPACE__ . '\Response', $response,
                     'A callback must receive a single response per call'
@@ -375,7 +375,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $arpPrint = new Request('/ip/arp/print');
         $arpPrint->setTag('arp');
         $repliesCount = 0;
-        $arpCallback = function($response, $client) use (&$repliesCount) {
+        $arpCallback = function ($response, $client) use (&$repliesCount) {
                 \PHPUnit_Framework_TestCase::assertInstanceOf(
                     __NAMESPACE__ . '\Response', $response,
                     'A callback must receive a single response per call'
@@ -413,7 +413,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $repliesCount = 0;
         $this->object->sendAsync(
             $ping,
-            function($response, $client) use (&$repliesCount) {
+            function ($response, $client) use (&$repliesCount) {
                 \PHPUnit_Framework_TestCase::assertInstanceOf(
                     __NAMESPACE__ . '\Response', $response,
                     'A callback must receive a single response per call'
@@ -458,7 +458,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $repliesCount = 0;
         $this->object->sendAsync(
             $ping,
-            function($response, $client) use (&$repliesCount) {
+            function ($response, $client) use (&$repliesCount) {
                 \PHPUnit_Framework_TestCase::assertInstanceOf(
                     __NAMESPACE__ . '\Response', $response,
                     'A callback must receive a single response per call'
@@ -516,7 +516,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         
         $this->object->sendAsync(
             $arpPrint, 
-            function($response, $client) use (&$list2) {
+            function ($response, $client) use (&$list2) {
                 \PHPUnit_Framework_TestCase::assertInstanceOf(
                     __NAMESPACE__ . '\Response', $response,
                     'A callback must receive a single response per call'

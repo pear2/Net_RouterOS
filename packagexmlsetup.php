@@ -80,7 +80,7 @@ if ($hasCompatible) {
             $compatible->files[
             "test/{$package->channel}/{$package->name}/bootstrap.php"
             ]->getArrayCopy(), $srcDirTask
-    );
+        );
 
     $compatible->files[
         "doc/{$package->channel}/{$package->name}/phpdoc.dist.xml"
@@ -88,7 +88,7 @@ if ($hasCompatible) {
             $compatible->files[
             "doc/{$package->channel}/{$package->name}/phpdoc.dist.xml"
             ]->getArrayCopy(), $srcDirTask
-    );
+        );
 
     $compatible->files["doc/{$package->channel}/{$package->name}/doxygen.ini"]
         = array_merge_recursive(
@@ -106,7 +106,7 @@ if ($hasCompatible) {
                     )
                 )
             )
-    );
+        );
 }
 
 $oldCwd = getcwd();
@@ -125,12 +125,12 @@ foreach (
             $package->files[$filename]->getArrayCopy(), $srcFileTasks
         );
         
-        if ($hasCompatible) {
-            $compatibleFilename = str_replace('src/', 'php/', $filename);
-            $compatible->files[$compatibleFilename] = array_merge_recursive(
-                $compatible->files[$compatibleFilename]->getArrayCopy(),
-                $srcFileTasks
-            );
-        }
+    if ($hasCompatible) {
+        $compatibleFilename = str_replace('src/', 'php/', $filename);
+        $compatible->files[$compatibleFilename] = array_merge_recursive(
+            $compatible->files[$compatibleFilename]->getArrayCopy(),
+            $srcFileTasks
+        );
+    }
 }
 chdir($oldCwd);
