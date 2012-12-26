@@ -31,5 +31,4 @@ namespace PEAR2\Net\RouterOS;
  */
 class DataFlowException extends \RuntimeException implements Exception
 {
-    
 }

@@ -25,13 +25,15 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
 
             $routerOS1 = new Client(\HOSTNAME, USERNAME2, PASSWORD2, PORT, true);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\Client', $routerOS1,
+                __NAMESPACE__ . '\Client',
+                $routerOS1,
                 'Object initialization failed.'
             );
 
             $routerOS2 = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT, true);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\Client', $routerOS2,
+                __NAMESPACE__ . '\Client',
+                $routerOS2,
                 'Object initialization failed.'
             );
 
@@ -40,7 +42,9 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
             $addRequest->setArgument('name', TEST_QUEUE_NAME);
             $responses = $routerOS2->sendSync($addRequest);
             $this->assertEquals(
-                1, count($responses), 'There should be only one response.'
+                1,
+                count($responses),
+                'There should be only one response.'
             );
             if (count($responses) === 1
                 && $responses->getType() === Response::TYPE_FINAL
@@ -49,7 +53,8 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
                 $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
                 $responses = $routerOS2->sendSync($removeRequest);
                 $this->assertInstanceOf(
-                    __NAMESPACE__ . '\ResponseCollection', $responses,
+                    __NAMESPACE__ . '\ResponseCollection',
+                    $responses,
                     'Response should be one.'
                 );
             }
@@ -67,7 +72,9 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $addRequest->setArgument('name', TEST_QUEUE_NAME);
         $responses = $this->object->sendSync($addRequest);
         $this->assertEquals(
-            1, count($responses), 'There should be only one response.'
+            1,
+            count($responses),
+            'There should be only one response.'
         );
         if (count($responses) === 1
             && $responses->getLast()->getType() === Response::TYPE_FINAL
@@ -76,21 +83,25 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
             $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
             $responses = $this->object->sendSync($removeRequest);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\ResponseCollection', $responses,
+                __NAMESPACE__ . '\ResponseCollection',
+                $responses,
                 'Responses should be a collection.'
             );
             $this->assertEquals(
-                1, count($responses),
+                1,
+                count($responses),
                 'Response should be one.'
             );
             unset($responses[0]);
             $this->assertEquals(
-                1, count($responses),
+                1,
+                count($responses),
                 'Response should be one, even after attempted unsetting.'
             );
             $responses[] = 'my attachment';
             $this->assertEquals(
-                1, count($responses),
+                1,
+                count($responses),
                 'Response should be one, even after attempted setting.'
             );
         }
@@ -108,7 +119,9 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $addRequest->setArgument('comment', $comment);
         $responses = $this->object->sendSync($addRequest);
         $this->assertEquals(
-            1, count($responses), 'There should be only one response.'
+            1,
+            count($responses),
+            'There should be only one response.'
         );
         if (count($responses) === 1
             && $responses->getLast()->getType() === Response::TYPE_FINAL
@@ -118,7 +131,8 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
             $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
             $responses = $this->object->sendSync($removeRequest);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\ResponseCollection', $responses,
+                __NAMESPACE__ . '\ResponseCollection',
+                $responses,
                 'Response should be one.'
             );
         }
@@ -147,7 +161,8 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         } else {
             $comment = fopen('php://temp', 'r+b');
             fwrite(
-                $comment, str_pad('t', 0x4000 - strlen('=comment=') + 1, 't')
+                $comment,
+                str_pad('t', 0x4000 - strlen('=comment=') + 1, 't')
             );
             rewind($comment);
 
@@ -156,7 +171,9 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
             $addRequest->setArgument('comment', $comment);
             $responses = $this->object->sendSync($addRequest);
             $this->assertEquals(
-                1, count($responses), 'There should be only one response.'
+                1,
+                count($responses),
+                'There should be only one response.'
             );
             if (count($responses) === 1
                 && $responses->getLast()->getType() === Response::TYPE_FINAL
@@ -166,7 +183,8 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
                 $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
                 $responses = $this->object->sendSync($removeRequest);
                 $this->assertInstanceOf(
-                    __NAMESPACE__ . '\ResponseCollection', $responses,
+                    __NAMESPACE__ . '\ResponseCollection',
+                    $responses,
                     'Response should be one.'
                 );
             }
@@ -196,7 +214,8 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         } else {
             $comment = fopen('php://temp', 'r+b');
             fwrite(
-                $comment, str_pad('t', 0x200000 - strlen('=comment=') + 1, 't')
+                $comment,
+                str_pad('t', 0x200000 - strlen('=comment=') + 1, 't')
             );
             rewind($comment);
 
@@ -205,7 +224,9 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
             $addRequest->setArgument('comment', $comment);
             $responses = $this->object->sendSync($addRequest);
             $this->assertEquals(
-                1, count($responses), 'There should be only one response.'
+                1,
+                count($responses),
+                'There should be only one response.'
             );
             if (count($responses) === 1
                 && $responses->getLast()->getType() === Response::TYPE_FINAL
@@ -215,7 +236,8 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
                 $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
                 $responses = $this->object->sendSync($removeRequest);
                 $this->assertInstanceOf(
-                    __NAMESPACE__ . '\ResponseCollection', $responses,
+                    __NAMESPACE__ . '\ResponseCollection',
+                    $responses,
                     'Response should be one.'
                 );
             }
@@ -245,7 +267,9 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
             $commentString = stream_get_contents($comment);
             $maxArgL = 0xFFFFFFF - strlen('=comment=');
             $this->assertGreaterThan(
-                $maxArgL, strlen($commentString), '$comment is not long enough.'
+                $maxArgL,
+                strlen($commentString),
+                '$comment is not long enough.'
             );
             unset($commentString);
             rewind($comment);
@@ -266,7 +290,9 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
             $this->fail('Lengths above 0xFFFFFFF should not be supported.');
         } catch (LengthException $e) {
             $this->assertEquals(
-                1200, $e->getCode(), 'Improper exception thrown.'
+                1200,
+                $e->getCode(),
+                'Improper exception thrown.'
             );
         }
 
@@ -325,7 +351,9 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $addRequest->setArgument('comment', 'ПРИМЕР');
         $responses = $this->object->sendSync($addRequest);
         $this->assertEquals(
-            1, count($responses), 'There should be only one response.'
+            1,
+            count($responses),
+            'There should be only one response.'
         );
         if (count($responses) === 1
             && $responses->getLast()->getType() === Response::TYPE_FINAL
@@ -341,88 +369,104 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
             $responses = $this->object->sendSync($printRequest);
             
             $this->assertEquals(
-                TEST_QUEUE_NAME, $responses[0]->getArgument('name')
+                TEST_QUEUE_NAME,
+                $responses[0]->getArgument('name')
             );
             $this->assertNotEquals(
-                'ПРИМЕР', $responses[0]->getArgument('comment')
+                'ПРИМЕР',
+                $responses[0]->getArgument('comment')
             );
             
             $this->object->setCharset($appropriateCharsets);
             $this->assertNotEquals(
-                'ПРИМЕР', $responses[0]->getArgument('comment')
+                'ПРИМЕР',
+                $responses[0]->getArgument('comment')
             );
             
             $responses = $this->object->sendSync($printRequest);
             
             $this->assertEquals(
-                TEST_QUEUE_NAME, $responses[0]->getArgument('name')
+                TEST_QUEUE_NAME,
+                $responses[0]->getArgument('name')
             );
             $this->assertEquals(
-                'ПРИМЕР', $responses[0]->getArgument('comment')
+                'ПРИМЕР',
+                $responses[0]->getArgument('comment')
             );
             
             $this->object->setCharset(
-                'ISO-8859-1', Communicator::CHARSET_REMOTE
+                'ISO-8859-1',
+                Communicator::CHARSET_REMOTE
             );
             $responses = $this->object->sendSync($printRequest);
             $this->assertNotEquals(
-                'ПРИМЕР', $responses[0]->getArgument('comment')
+                'ПРИМЕР',
+                $responses[0]->getArgument('comment')
             );
             
             $this->object->setCharset(
-                'ISO-8859-1', Communicator::CHARSET_LOCAL
+                'ISO-8859-1',
+                Communicator::CHARSET_LOCAL
             );
             $responses = $this->object->sendSync($printRequest);
             $this->assertNotEquals(
-                'ПРИМЕР', $responses[0]->getArgument('comment')
+                'ПРИМЕР',
+                $responses[0]->getArgument('comment')
             );
             
             $this->object->setCharset($appropriateCharsets);
             $responses = $this->object->sendSync($printRequest);
             $this->assertEquals(
-                'ПРИМЕР', $responses[0]->getArgument('comment')
+                'ПРИМЕР',
+                $responses[0]->getArgument('comment')
             );
             
             $this->object->setStreamingResponses(true);
             $responses = $this->object->sendSync($printRequest);
             $this->assertEquals(
-                'ПРИМЕР', stream_get_contents(
+                'ПРИМЕР',
+                stream_get_contents(
                     $responses[0]->getArgument('comment')
                 )
             );
             $this->object->setCharset(
-                'ISO-8859-1', Communicator::CHARSET_REMOTE
+                'ISO-8859-1',
+                Communicator::CHARSET_REMOTE
             );
             $responses = $this->object->sendSync($printRequest);
             $this->assertNotEquals(
-                'ПРИМЕР', stream_get_contents(
+                'ПРИМЕР',
+                stream_get_contents(
                     $responses[0]->getArgument('comment')
                 )
             );
             $this->object->setCharset('windows-1251');
             $responses = $this->object->sendSync($printRequest);
             $this->assertNotEquals(
-                'ПРИМЕР', stream_get_contents(
+                'ПРИМЕР',
+                stream_get_contents(
                     $responses[0]->getArgument('comment')
                 )
             );
             
-            $testQueueNameAsStream = fopen('php://temp', 'r+b');
-            fwrite($testQueueNameAsStream, TEST_QUEUE_NAME);
-            rewind($testQueueNameAsStream);
+            $testQueueNameStream = fopen('php://temp', 'r+b');
+            fwrite($testQueueNameStream, TEST_QUEUE_NAME);
+            rewind($testQueueNameStream);
             $printRequest->setQuery(
-                Query::where('name', $testQueueNameAsStream)
+                Query::where('name', $testQueueNameStream)
             );
             $responses = $this->object->sendSync($printRequest);
             $this->assertNotEquals(
-                'ПРИМЕР', stream_get_contents(
+                'ПРИМЕР',
+                stream_get_contents(
                     $responses[0]->getArgument('comment')
                 )
             );
             $this->object->setCharset($appropriateCharsets);
             $responses = $this->object->sendSync($printRequest);
             $this->assertEquals(
-                'ПРИМЕР', stream_get_contents(
+                'ПРИМЕР',
+                stream_get_contents(
                     $responses[0]->getArgument('comment')
                 )
             );
@@ -433,5 +477,4 @@ class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
             $responses = $this->object->sendSync($removeRequest);
         }
     }
-
 }

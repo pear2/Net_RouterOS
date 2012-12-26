@@ -31,5 +31,4 @@ namespace PEAR2\Net\RouterOS;
  */
 interface Exception
 {
-    
 }

@@ -47,7 +47,10 @@ class LengthException extends \LengthException implements Exception
      * chaining.
      * @param number     $length   The length.
      */
-    public function __construct($message, $code = 0, $previous = null,
+    public function __construct(
+        $message,
+        $code = 0,
+        $previous = null,
         $length = null
     ) {
         parent::__construct($message, $code, $previous);

@@ -32,5 +32,4 @@ namespace PEAR2\Net\RouterOS;
 class InvalidArgumentException extends \InvalidArgumentException
     implements Exception
 {
-    
 }

@@ -101,18 +101,29 @@ class Communicator
      * 
      * @see sendWord()
      */
-    public function __construct($host, $port = 8728, $persist = false,
-        $timeout = null, $key = '', $context = null
+    public function __construct(
+        $host,
+        $port = 8728,
+        $persist = false,
+        $timeout = null,
+        $key = '',
+        $context = null
     ) {
         try {
             $this->trans = new T\TcpClient(
-                $host, $port, $persist, $timeout, $key, $context
+                $host,
+                $port,
+                $persist,
+                $timeout,
+                $key,
+                $context
             );
-        } catch(T\Exception $e) {
+        } catch (T\Exception $e) {
             throw new SocketException('Error connecting to RouterOS', 100, $e);
         }
         $this->setCharset(
-            self::getDefaultCharset(self::CHARSET_ALL), self::CHARSET_ALL
+            self::getDefaultCharset(self::CHARSET_ALL),
+            self::CHARSET_ALL
         );
     }
     
@@ -166,7 +177,8 @@ class Communicator
         $bytes = 0;
         $result = fopen('php://temp', 'r+b');
         $iconvFilter = stream_filter_append(
-            $result, 'convert.iconv.' . $in_charset . '.' . $out_charset,
+            $result,
+            'convert.iconv.' . $in_charset . '.' . $out_charset,
             STREAM_FILTER_WRITE
         );
         
@@ -199,7 +211,8 @@ class Communicator
      * @see setCharset()
      */
     public static function setDefaultCharset(
-        $charset, $charsetType = self::CHARSET_ALL
+        $charset,
+        $charsetType = self::CHARSET_ALL
     ) {
         if (array_key_exists($charsetType, self::$defaultCharsets)) {
              $oldCharset = self::$defaultCharsets[$charsetType];
@@ -208,7 +221,9 @@ class Communicator
         } else {
             $oldCharsets = self::$defaultCharsets;
             self::$defaultCharsets = is_array($charset) ? $charset : array_fill(
-                0, count(self::$defaultCharsets), $charset
+                0,
+                count(self::$defaultCharsets),
+                $charset
             );
             return $oldCharsets;
         }
@@ -263,7 +278,9 @@ class Communicator
         } else {
             $oldCharsets = $this->charsets;
             $this->charsets = is_array($charset) ? $charset : array_fill(
-                0, count($this->charsets), $charset
+                0,
+                count($this->charsets),
+                $charset
             );
             return $oldCharsets;
         }
@@ -348,7 +365,8 @@ class Communicator
     {
         if (!self::isSeekableStream($stream)) {
             throw new InvalidArgumentException(
-                'The stream must be seekable.', 1100
+                'The stream must be seekable.',
+                1100
             );
         }
         if (null !== ($remoteCharset = $this->getCharset(self::CHARSET_REMOTE))
@@ -399,8 +417,10 @@ class Communicator
     {
         if ($length > 0xFFFFFFF) {
             throw new LengthException(
-                'Words with length above 0xFFFFFFF are not supported.', 1200,
-                null, $length
+                'Words with length above 0xFFFFFFF are not supported.',
+                1200,
+                null,
+                $length
             );
         }
     }
@@ -416,7 +436,10 @@ class Communicator
     {
         if ($length < 0) {
             throw new LengthException(
-                'Length must not be negative.', 1300, null, $length
+                'Length must not be negative.',
+                1300,
+                null,
+                $length
             );
         } elseif ($length < 0x80) {
             return chr($length);
@@ -435,7 +458,10 @@ class Communicator
                 pack('N', hexdec(substr($length, 2)));
         }
         throw new LengthException(
-            'Length must not be above 0x7FFFFFFFF.', 1301, null, $length
+            'Length must not be above 0x7FFFFFFFF.',
+            1301,
+            null,
+            $length
         );
     }
 
@@ -453,12 +479,14 @@ class Communicator
         if ($this->trans->isPersistent()) {
             $old = $this->trans->lock(T\Stream::DIRECTION_RECEIVE);
             $word = $this->trans->receive(
-                self::decodeLength($this->trans), 'word'
+                self::decodeLength($this->trans),
+                'word'
             );
             $this->trans->lock($old, true);
         } else {
             $word = $this->trans->receive(
-                self::decodeLength($this->trans), 'word'
+                self::decodeLength($this->trans),
+                'word'
             );
         }
         
@@ -499,12 +527,16 @@ class Communicator
         if ($this->trans->isPersistent()) {
             $old = $this->trans->lock(T\Stream::DIRECTION_RECEIVE);
             $stream = $this->trans->receiveStream(
-                self::decodeLength($this->trans), $filters, 'stream word'
+                self::decodeLength($this->trans),
+                $filters,
+                'stream word'
             );
             $this->trans->lock($old, true);
         } else {
             $stream = $this->trans->receiveStream(
-                self::decodeLength($this->trans), $filters, 'stream word'
+                self::decodeLength($this->trans),
+                $filters,
+                'stream word'
             );
         }
         
@@ -565,7 +597,10 @@ class Communicator
                     + (double) sprintf('%u', $rem['~']);
             }
             throw new NotSupportedException(
-                'Unknown control byte encountered.', 1601, null, $byte
+                'Unknown control byte encountered.',
+                1601,
+                null,
+                $byte
             );
         } else {
             return $byte;
@@ -581,5 +616,4 @@ class Communicator
     {
         return $this->trans->close();
     }
-
 }

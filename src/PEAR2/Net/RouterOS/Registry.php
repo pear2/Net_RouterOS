@@ -130,7 +130,7 @@ class Registry
      */
     public function setTaglessMode($taglessMode)
     {
-        return $taglessMode 
+        return $taglessMode
             ?   ($this->shm->lock('taglessMode')
                 && $this->shm->lock('taglessModeOwner')
                 && $this->shm->add('taglessModeOwner', $this->getOwnershipTag())

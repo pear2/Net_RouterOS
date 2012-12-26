@@ -1,12 +1,13 @@
 <?php
 namespace PEAR2\Net\RouterOS;
+
 //require_once
 //    '../../PEAR2_Net_Transmitter.git/src/PEAR2/Net/Transmitter/Autoload.php';
 //require_once '../src/PEAR2/Net/RouterOS/Autoload.php';
 require_once 'PEAR2/Autoload.php';
-\PEAR2\Autoload::initialize('../src');
-\PEAR2\Autoload::initialize('../../PEAR2_Net_Transmitter.git/src');
-\PEAR2\Autoload::initialize('../../PEAR2_Cache_SHM.git/src');
+\PEAR2\Autoload::initialize(realpath('../src'));
+\PEAR2\Autoload::initialize(realpath('../../Net_Transmitter.git/src'));
+\PEAR2\Autoload::initialize(realpath('../../Cache_SHM.git/src'));
 
 /**
  * Resolves a hostname to an IP address.

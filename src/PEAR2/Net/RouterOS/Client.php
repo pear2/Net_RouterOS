@@ -111,11 +111,21 @@ class Client
      * @see sendSync()
      * @see sendAsync()
      */
-    public function __construct($host, $username, $password = '', $port = 8728,
-        $persist = false, $timeout = null, $context = null
+    public function __construct(
+        $host,
+        $username,
+        $password = '',
+        $port = 8728,
+        $persist = false,
+        $timeout = null,
+        $context = null
     ) {
         $this->com = new Communicator(
-            $host, $port, $persist, $timeout, $username . '/' . $password,
+            $host,
+            $port,
+            $persist,
+            $timeout,
+            $username . '/' . $password,
             $context
         );
         //Login the user if necessary
@@ -126,7 +136,8 @@ class Client
             if (!static::login($this->com, $username, $password)) {
                 $this->com->close();
                 throw new DataFlowException(
-                    'Invalid username or password supplied.', 10000
+                    'Invalid username or password supplied.',
+                    10000
                 );
             }
         }
@@ -204,7 +215,9 @@ class Client
             throw ($e instanceof NotSupportedException
             || $e instanceof UnexpectedValueException
             || !$com->getTransmitter()->isDataAwaiting()) ? new SocketException(
-                'This is not a compatible RouterOS service', 10200, $e
+                'This is not a compatible RouterOS service',
+                10200,
+                $e
             ) : $e;
         }
     }
@@ -223,14 +236,17 @@ class Client
      * @return bool TRUE on success, FALSE on failure.
      */
     private static function _login(
-        Communicator $com, $username, $password
+        Communicator $com,
+        $username,
+        $password
     ) {
         $request = new Request('/login');
         $request->send($com);
         $response = new Response($com);
         $request->setArgument('name', $username);
         $request->setArgument(
-            'response', '00' . md5(
+            'response',
+            '00' . md5(
                 chr(0) . $password
                 . pack('H*', $response->getArgument('ret'))
             )
@@ -267,7 +283,8 @@ class Client
      * @see Communicator::setDefaultCharset()
      */
     public function setCharset(
-        $charset, $charsetType = Communicator::CHARSET_ALL
+        $charset,
+        $charsetType = Communicator::CHARSET_ALL
     ) {
         return $this->com->setCharset($charset, $charsetType);
     }
@@ -311,7 +328,8 @@ class Client
         $tag = $request->getTag();
         if ('' == $tag) {
             throw new DataFlowException(
-                'Asynchonous commands must have a tag.', 10500
+                'Asynchonous commands must have a tag.',
+                10500
             );
         }
         if ($this->isRequestActive($tag)) {
@@ -322,7 +340,8 @@ class Client
         }
         if (null !== $callback && !is_callable($callback, true)) {
             throw new UnexpectedValueException(
-                'Invalid callback provided.', 10502
+                'Invalid callback provided.',
+                10502
             );
         }
         
@@ -446,7 +465,8 @@ class Client
             $result = array();
             foreach (array_keys($this->responseBuffer) as $tag) {
                 $result = array_merge(
-                    $result, $this->extractNewResponses($tag)->toArray()
+                    $result,
+                    $this->extractNewResponses($tag)->toArray()
                 );
             }
             return new ResponseCollection($result);
@@ -464,7 +484,8 @@ class Client
             return new ResponseCollection($result);
         } else {
             throw new DataFlowException(
-                'No such request, or the request has already finished.', 10900
+                'No such request, or the request has already finished.',
+                10900
             );
         }
     }
@@ -531,12 +552,14 @@ class Client
         $hasReg = null !== $this->registry;
         if ($hasReg && !$hasTag) {
             $tags = array_merge(
-                array_keys($this->responseBuffer), array_keys($this->callbacks)
+                array_keys($this->responseBuffer),
+                array_keys($this->callbacks)
             );
             $this->registry->setTaglessMode(true);
             foreach ($tags as $t) {
                 $cancelRequest->setArgument(
-                    'tag', $this->registry->getOwnershipTag() . $t
+                    'tag',
+                    $this->registry->getOwnershipTag() . $t
                 );
                 $this->sendSync($cancelRequest);
             }
@@ -547,14 +570,16 @@ class Client
                     if ($hasReg) {
                         $this->registry->setTaglessMode(true);
                         $cancelRequest->setArgument(
-                            'tag', $this->registry->getOwnershipTag() . $tag
+                            'tag',
+                            $this->registry->getOwnershipTag() . $tag
                         );
                     } else {
                         $cancelRequest->setArgument('tag', $tag);
                     }
                 } else {
                     throw new DataFlowException(
-                        'No such request. Canceling aborted.', 11200
+                        'No such request. Canceling aborted.',
+                        11200
                     );
                 }
             }
@@ -683,7 +708,9 @@ class Client
     protected function dispatchNextResponse()
     {
         $response = new Response(
-            $this->com, $this->_streamingResponses, $this->registry
+            $this->com,
+            $this->_streamingResponses,
+            $this->registry
         );
         if ($response->getType() === Response::TYPE_FATAL) {
             $this->pendingRequestsCount = 0;
@@ -710,5 +737,4 @@ class Client
         }
         return $response;
     }
-
 }

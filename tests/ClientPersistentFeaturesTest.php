@@ -27,15 +27,18 @@ class ClientPersistentFeaturesTest extends ClientFeaturesTest
         $client->loop(2);
         $this->object->loop(2);
         $this->assertGreaterThan(
-            0, count($client->extractNewResponses('ping'))
+            0,
+            count($client->extractNewResponses('ping'))
         );
         $this->assertGreaterThan(
-            0, count($this->object->extractNewResponses('ping'))
+            0,
+            count($this->object->extractNewResponses('ping'))
         );
         unset($client);
         $this->object->loop(2);
         $this->assertGreaterThan(
-            0, count($this->object->extractNewResponses('ping'))
+            0,
+            count($this->object->extractNewResponses('ping'))
         );
     }
 }

@@ -48,7 +48,10 @@ class UnexpectedValueException extends \UnexpectedValueException
      * chaining.
      * @param mixed     $value    The unexpected value.
      */
-    public function __construct($message, $code = 0, $previous = null,
+    public function __construct(
+        $message,
+        $code = 0,
+        $previous = null,
         $value = null
     ) {
         parent::__construct($message, $code, $previous);

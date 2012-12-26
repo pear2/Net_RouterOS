@@ -82,7 +82,9 @@ class Response extends Message
      * @see getArgument()
      */
     public function __construct(
-        Communicator $com, $asStream = false, Registry $reg = null
+        Communicator $com,
+        $asStream = false,
+        Registry $reg = null
     ) {
         if (null === $reg) {
             if ($com->getTransmitter()->isPersistent()) {
@@ -112,7 +114,8 @@ class Response extends Message
             if (!$asStream) {
                 foreach ($this->arguments as $name => $value) {
                     $this->setArgument(
-                        $name, stream_get_contents($value)
+                        $name,
+                        stream_get_contents($value)
                     );
                 }
                 foreach ($response->unrecognizedWords as $i => $value) {
@@ -139,7 +142,8 @@ class Response extends Message
     {
         if (!$com->getTransmitter()->isDataAwaiting()) {
             throw new SocketException(
-                'No data awaiting. Receiving aborted.', 50000
+                'No data awaiting. Receiving aborted.',
+                50000
             );
         }
         $this->setType($com->getNextWord());
@@ -148,7 +152,9 @@ class Response extends Message
             $word = $com->getNextWordAsStream(), fseek($word, 0, SEEK_END);
                     ftell($word) !== 0;
                     $word = $com->getNextWordAsStream(), fseek(
-                        $word, 0, SEEK_END
+                        $word,
+                        0,
+                        SEEK_END
                     )
             ) {
                 rewind($word);
@@ -161,7 +167,10 @@ class Response extends Message
                     $bytesCopied = ftell($word);
                     while (!feof($word)) {
                         $bytesCopied += stream_copy_to_stream(
-                            $word, $value, 0xFFFFF, $bytesCopied
+                            $word,
+                            $value,
+                            0xFFFFF,
+                            $bytesCopied
                         );
                     }
                     rewind($value);
@@ -211,7 +220,10 @@ class Response extends Message
             return $this;
         default:
             throw new UnexpectedValueException(
-                'Unrecognized response type.', 50100, null, $type
+                'Unrecognized response type.',
+                50100,
+                null,
+                $type
             );
         }
     }
@@ -236,5 +248,4 @@ class Response extends Message
     {
         return $this->unrecognizedWords;
     }
-
 }

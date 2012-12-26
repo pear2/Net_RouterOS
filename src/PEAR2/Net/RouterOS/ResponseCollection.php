@@ -352,8 +352,8 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
     public function __call($method, array $args)
     {
         return call_user_func_array(
-            array($this->current(), $method), $args
+            array($this->current(), $method),
+            $args
         );
     }
-
 }

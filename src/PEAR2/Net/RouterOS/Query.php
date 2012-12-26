@@ -97,7 +97,10 @@ class Query
             return $action;
         default:
             throw new UnexpectedValueException(
-                'Unknown action specified', 30100, null, $action
+                'Unknown action specified',
+                30100,
+                null,
+                $action
             );
         }
     }
@@ -114,7 +117,9 @@ class Query
      * @return self|Query The query object.
      */
     public static function where(
-        $name, $value = null, $action = self::ACTION_EXIST
+        $name,
+        $value = null,
+        $action = self::ACTION_EXIST
     ) {
         $query = new static;
         return $query->addWhere($name, $value, $action);
@@ -197,7 +202,8 @@ class Query
     {
         if (!$com->getTransmitter()->isAcceptingData()) {
             throw new SocketException(
-                'Transmitter is invalid. Sending aborted.', 30600
+                'Transmitter is invalid. Sending aborted.',
+                30600
             );
         }
         $bytes = 0;
@@ -238,5 +244,4 @@ class Query
         );
         return $this;
     }
-
 }

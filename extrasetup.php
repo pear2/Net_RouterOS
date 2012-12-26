@@ -19,7 +19,7 @@ foreach ($packages as $pkg) {
             $extrafiles['src/' . $path->getPathname()] = $path->getRealPath();
         }
     }
-    
+
     if (is_file($pkg . '.php')) {
         $extrafiles['src/' . $pkg . '.php']
             = $phpDir . DIRECTORY_SEPARATOR . $pkg . '.php';

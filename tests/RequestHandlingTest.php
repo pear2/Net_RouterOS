@@ -19,7 +19,8 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 $invalidCommand = new Request($command);
             } catch (InvalidArgumentException $e) {
                 $this->assertEquals(
-                    40200, $e->getCode(),
+                    40200,
+                    $e->getCode(),
                     "Improper exception thrown for the command '{$command}'."
                 );
             }
@@ -37,7 +38,8 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 $invalidCommand = new Request($command);
             } catch (InvalidArgumentException $e) {
                 $this->assertEquals(
-                    40201, $e->getCode(),
+                    40201,
+                    $e->getCode(),
                     "Improper exception thrown for the command '{$command}'."
                 );
             }
@@ -56,7 +58,8 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 $invalidCommand = new Request($command);
             } catch (InvalidArgumentException $e) {
                 $this->assertEquals(
-                    40202, $e->getCode(),
+                    40202,
+                    $e->getCode(),
                     "Improper exception thrown for the command '{$command}'."
                 );
             }
@@ -75,7 +78,8 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         foreach ($commands as $command => $expected) {
             $request->setCommand($command);
             $this->assertEquals(
-                $expected, $request->getCommand(),
+                $expected,
+                $request->getCommand(),
                 "Command '{$command}' was not translated properly."
             );
         }
@@ -162,7 +166,8 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         foreach ($commands as $command => $expected) {
             $request = new Request($command);
             $this->assertEquals(
-                $expected, $request->getCommand(),
+                $expected,
+                $request->getCommand(),
                 "Command '{$command}' was not parsed properly."
             );
         }
@@ -341,7 +346,8 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         foreach ($commands as $command => $expected) {
             $request = new Request($command);
             $this->assertEquals(
-                $expected, $request->getAllArguments(),
+                $expected,
+                $request->getAllArguments(),
                 "Command '{$command}' was not parsed properly."
             );
         }
@@ -352,17 +358,21 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         try {
             $request = new Request('/ip arp add comment="""');
             $this->fail('Command had to fail.');
-        }catch(InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $this->assertEquals(
-                41000, $e->getCode(), 'Improper exception code'
+                41000,
+                $e->getCode(),
+                'Improper exception code'
             );
         }
         try {
             $request = new Request('/ip arp add comment= address=192.168.0.1');
             $this->fail('Command had to fail.');
-        }catch(InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $this->assertEquals(
-                41001, $e->getCode(), 'Improper exception code'
+                41001,
+                $e->getCode(),
+                'Improper exception code'
             );
         }
     }
@@ -385,7 +395,8 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 $request->setArgument($name);
             } catch (InvalidArgumentException $e) {
                 $this->assertEquals(
-                    20100, $e->getCode(),
+                    20100,
+                    $e->getCode(),
                     "Improper exception thrown for the name '{$name}'."
                 );
             }
@@ -420,7 +431,8 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 $query = Query::where($name);
             } catch (InvalidArgumentException $e) {
                 $this->assertEquals(
-                    20100, $e->getCode(),
+                    20100,
+                    $e->getCode(),
                     "Improper exception thrown for the name '{$name}'."
                 );
             }
@@ -446,7 +458,8 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 $query = Query::where('address', null, $action);
             } catch (UnexpectedValueException $e) {
                 $this->assertEquals(
-                    30100, $e->getCode(),
+                    30100,
+                    $e->getCode(),
                     "Improper exception thrown for the action '{$action}'."
                 );
                 $this->assertEquals($action, $e->getValue());
@@ -462,9 +475,11 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         try {
             $com->sendWordFromStream('', $value);
             $this->fail('Call had to fail.');
-        }catch(InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $this->assertEquals(
-                1100, $e->getCode(), 'Improper exception code.'
+                1100,
+                $e->getCode(),
+                'Improper exception code.'
             );
         }
     }
@@ -538,7 +553,8 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         foreach ($lengths as $expected => $length) {
             $actual = Communicator::encodeLength($length);
             $this->assertEquals(
-                $expected, $actual,
+                $expected,
+                $actual,
                 "Length '0x" . dechex($length) .
                 "' is not encoded correctly. It was encoded as '0x" .
                 bin2hex($actual) . "' instead of '0x" .
@@ -554,11 +570,14 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             Communicator::encodeLength($smallLength);
         } catch (LengthException $e) {
             $this->assertEquals(
-                1300, $e->getCode(),
+                1300,
+                $e->getCode(),
                 "Length '{$smallLength}' must not be encodable."
             );
             $this->assertEquals(
-                $smallLength, $e->getLength(), 'Exception is misleading.'
+                $smallLength,
+                $e->getLength(),
+                'Exception is misleading.'
             );
         }
         $largeLength = 0x800000000;
@@ -566,11 +585,14 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             Communicator::encodeLength($largeLength);
         } catch (LengthException $e) {
             $this->assertEquals(
-                1301, $e->getCode(),
+                1301,
+                $e->getCode(),
                 "Length '{$largeLength}' must not be encodable."
             );
             $this->assertEquals(
-                $largeLength, $e->getLength(), 'Exception is misleading.'
+                $largeLength,
+                $e->getLength(),
+                'Exception is misleading.'
             );
         }
     }
@@ -602,10 +624,14 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 Communicator::decodeLength($trans);
             } catch (NotSupportedException $e) {
                 $this->assertEquals(
-                    1601, $e->getCode(), 'Improper exception code.'
+                    1601,
+                    $e->getCode(),
+                    'Improper exception code.'
                 );
                 $this->assertEquals(
-                    $controlByte, $e->getValue(), 'Improper exception value.'
+                    $controlByte,
+                    $e->getValue(),
+                    'Improper exception value.'
                 );
             }
         }
@@ -656,7 +682,8 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
 
         foreach ($lengths as $length => $expected) {
             $this->assertEquals(
-                $expected, Communicator::decodeLength($trans),
+                $expected,
+                Communicator::decodeLength($trans),
                 "{$length} is not properly decoded."
             );
         }
@@ -671,10 +698,13 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         $quitRequest->send($com);
         $quitResponse = new Response($com);
         $this->assertEquals(
-            1, count($quitResponse->getUnrecognizedWords()), 'No message.'
+            1,
+            count($quitResponse->getUnrecognizedWords()),
+            'No message.'
         );
         $this->assertEquals(
-            0, count($quitResponse->getAllArguments()),
+            0,
+            count($quitResponse->getAllArguments()),
             'There should be no arguments.'
         );
         $com->close();
@@ -689,10 +719,13 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         $quitRequest->send($com);
         $quitResponse = new Response($com, true);
         $this->assertEquals(
-            1, count($quitResponse->getUnrecognizedWords()), 'No message.'
+            1,
+            count($quitResponse->getUnrecognizedWords()),
+            'No message.'
         );
         $this->assertEquals(
-            0, count($quitResponse->getAllArguments()),
+            0,
+            count($quitResponse->getAllArguments()),
             'There should be no arguments.'
         );
         $com->close();
@@ -709,10 +742,12 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         
         $com = new Communicator(HOSTNAME, PORT);
         $this->assertEquals(
-            'windows-1251', $com->getCharset(Communicator::CHARSET_REMOTE)
+            'windows-1251',
+            $com->getCharset(Communicator::CHARSET_REMOTE)
         );
         $this->assertEquals(
-            'windows-1251', $com->getCharset(Communicator::CHARSET_LOCAL)
+            'windows-1251',
+            $com->getCharset(Communicator::CHARSET_LOCAL)
         );
         Communicator::setDefaultCharset(
             array(
@@ -721,45 +756,55 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             )
         );
         $this->assertEquals(
-            'windows-1251', $com->getCharset(Communicator::CHARSET_REMOTE)
+            'windows-1251',
+            $com->getCharset(Communicator::CHARSET_REMOTE)
         );
         $this->assertEquals(
-            'windows-1251', $com->getCharset(Communicator::CHARSET_LOCAL)
+            'windows-1251',
+            $com->getCharset(Communicator::CHARSET_LOCAL)
         );
         
         $com = new Communicator(HOSTNAME, PORT);
         $this->assertEquals(
-            'ISO-8859-1', $com->getCharset(Communicator::CHARSET_REMOTE)
+            'ISO-8859-1',
+            $com->getCharset(Communicator::CHARSET_REMOTE)
         );
         $this->assertEquals(
-            'ISO-8859-1', $com->getCharset(Communicator::CHARSET_LOCAL)
+            'ISO-8859-1',
+            $com->getCharset(Communicator::CHARSET_LOCAL)
         );
         Communicator::setDefaultCharset(null);
         $this->assertEquals(
-            'ISO-8859-1', $com->getCharset(Communicator::CHARSET_REMOTE)
+            'ISO-8859-1',
+            $com->getCharset(Communicator::CHARSET_REMOTE)
         );
         $this->assertEquals(
-            'ISO-8859-1', $com->getCharset(Communicator::CHARSET_LOCAL)
+            'ISO-8859-1',
+            $com->getCharset(Communicator::CHARSET_LOCAL)
         );
         
         $com = new Communicator(HOSTNAME, PORT);
         $this->assertNull($com->getCharset(Communicator::CHARSET_REMOTE));
         $this->assertNull($com->getCharset(Communicator::CHARSET_LOCAL));
         Communicator::setDefaultCharset(
-            'windows-1251', Communicator::CHARSET_REMOTE
+            'windows-1251',
+            Communicator::CHARSET_REMOTE
         );
         Communicator::setDefaultCharset(
-            'ISO-8859-1', Communicator::CHARSET_LOCAL
+            'ISO-8859-1',
+            Communicator::CHARSET_LOCAL
         );
         $this->assertNull($com->getCharset(Communicator::CHARSET_REMOTE));
         $this->assertNull($com->getCharset(Communicator::CHARSET_LOCAL));
         
         $com = new Communicator(HOSTNAME, PORT);
         $this->assertEquals(
-            'windows-1251', $com->getCharset(Communicator::CHARSET_REMOTE)
+            'windows-1251',
+            $com->getCharset(Communicator::CHARSET_REMOTE)
         );
         $this->assertEquals(
-            'ISO-8859-1', $com->getCharset(Communicator::CHARSET_LOCAL)
+            'ISO-8859-1',
+            $com->getCharset(Communicator::CHARSET_LOCAL)
         );
         Communicator::setDefaultCharset(null);
     }
@@ -796,11 +841,14 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         $reg2 = new Registry('dummy');
         
         $this->assertNotEquals(
-            $reg1->getOwnershipTag(), $reg2->getOwnershipTag()
+            $reg1->getOwnershipTag(),
+            $reg2->getOwnershipTag()
         );
         
         $pingRequest1 = new Request(
-            '/ping address=' . HOSTNAME, null, 'ping'
+            '/ping address=' . HOSTNAME,
+            null,
+            'ping'
         );
         $pingRequest1->send($com1, $reg1);
         
@@ -812,7 +860,9 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         $cancelRequest->send($com1, $reg1);
         
         $pingRequest2 = new Request(
-            '/ping count=2 address=' . HOSTNAME, null, 'ping'
+            '/ping count=2 address=' . HOSTNAME,
+            null,
+            'ping'
         );
         $pingRequest2->send($com2, $reg2);
         

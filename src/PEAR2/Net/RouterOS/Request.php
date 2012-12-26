@@ -64,7 +64,8 @@ class Request extends Message
     {
         if (false !== ($firstEquals = strpos($command, '='))
             && false !== ($spaceBeforeEquals = strrpos(
-                strstr($command, '=', true), ' '
+                strstr($command, '=', true),
+                ' '
             ))
         ) {
             $this->parseArgumentString(substr($command, $spaceBeforeEquals));
@@ -122,7 +123,8 @@ class Request extends Message
         $command = (string) $command;
         if (strpos($command, '/') !== 0) {
             throw new InvalidArgumentException(
-                'Commands must be absolute.', 40200
+                'Commands must be absolute.',
+                40200
             );
         }
         if (substr_count($command, '/') === 1) {
@@ -134,7 +136,8 @@ class Request extends Message
                     $delIndex = count($cmdRes) - 1;
                     if ($delIndex < 1) {
                         throw new InvalidArgumentException(
-                            'Unable to resolve command', 40201
+                            'Unable to resolve command',
+                            40201
                         );
                     }
                     unset($cmdRes[$delIndex]);
@@ -147,7 +150,8 @@ class Request extends Message
         }
         if (!preg_match('#^/\S+$#sm', $command)) {
             throw new InvalidArgumentException(
-                'Invalid command supplied.', 40202
+                'Invalid command supplied.',
+                40202
             );
         }
         $this->_command = $command;
@@ -280,7 +284,8 @@ class Request extends Message
     {
         if (!$com->getTransmitter()->isAcceptingData()) {
             throw new SocketException(
-                'Transmitter is invalid. Sending aborted.', 40900
+                'Transmitter is invalid. Sending aborted.',
+                40900
             );
         }
         $bytes = 0;
@@ -349,7 +354,9 @@ class Request extends Message
                 $this->setArgument(
                     $name,
                     str_replace(
-                        array('\\"', '\\\\'), array('"', '\\'), $matches[1]
+                        array('\\"', '\\\\'),
+                        array('"', '\\'),
+                        $matches[1]
                     )
                 );
                 $name = null;
@@ -359,7 +366,8 @@ class Request extends Message
                 $name = null;
             } else {
                 throw new InvalidArgumentException(
-                    "Parsing of argument value failed near '{$string}'", 41001
+                    "Parsing of argument value failed near '{$string}'",
+                    41001
                 );
             }
         }
@@ -369,5 +377,4 @@ class Request extends Message
         }
         
     }
-
 }

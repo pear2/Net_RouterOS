@@ -26,7 +26,8 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         try {
             $routerOS = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\Client', $routerOS,
+                __NAMESPACE__ . '\Client',
+                $routerOS,
                 'Object initialization failed.'
             );
         } catch (Exception $e) {
@@ -39,7 +40,8 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         try {
             $routerOS = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT, true);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\Client', $routerOS,
+                __NAMESPACE__ . '\Client',
+                $routerOS,
                 'Object initialization failed.'
             );
             $routerOS->close();
@@ -53,13 +55,15 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         try {
             $routerOS1 = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\Client', $routerOS1,
+                __NAMESPACE__ . '\Client',
+                $routerOS1,
                 'Object initialization failed.'
             );
 
             $routerOS2 = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\Client', $routerOS2,
+                __NAMESPACE__ . '\Client',
+                $routerOS2,
                 'Object initialization failed.'
             );
         } catch (Exception $e) {
@@ -72,13 +76,15 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         try {
             $routerOS1 = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT, true);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\Client', $routerOS1,
+                __NAMESPACE__ . '\Client',
+                $routerOS1,
                 'Object initialization failed.'
             );
 
             $routerOS2 = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT, true);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\Client', $routerOS2,
+                __NAMESPACE__ . '\Client',
+                $routerOS2,
                 'Object initialization failed.'
             );
 
@@ -99,10 +105,14 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         );
         try {
             $routerOS = new Client(
-                \HOSTNAME, ANSI_USERNAME, ANSI_PASSWORD, PORT
+                \HOSTNAME,
+                ANSI_USERNAME,
+                ANSI_PASSWORD,
+                PORT
             );
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\Client', $routerOS,
+                __NAMESPACE__ . '\Client',
+                $routerOS,
                 'Object initialization failed.'
             );
             Communicator::setDefaultCharset($oldCharsets);
@@ -117,14 +127,23 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         try {
             $context = stream_context_create();
             $this->assertInternalType(
-                'resource', $context, 'Failed to create context.'
+                'resource',
+                $context,
+                'Failed to create context.'
             );
             $this->assertEquals(
-                'stream-context', get_resource_type($context),
+                'stream-context',
+                get_resource_type($context),
                 'Failed to create proper context.'
             );
             $routerOS = new Client(
-                \HOSTNAME, USERNAME, PASSWORD, PORT, false, null, $context
+                \HOSTNAME,
+                USERNAME,
+                PASSWORD,
+                PORT,
+                false,
+                null,
+                $context
             );
         } catch (SocketException $e) {
             $this->fail('Unable to connect normally.');
@@ -143,13 +162,19 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (DataFlowException $e) {
             $this->assertEquals(
-                10000, $e->getCode(), 'Improper exception code.'
+                10000,
+                $e->getCode(),
+                'Improper exception code.'
             );
         }
         
         try {
             $routerOS = new Client(
-                \HOSTNAME, USERNAME_INVALID, PASSWORD, PORT, true
+                \HOSTNAME,
+                USERNAME_INVALID,
+                PASSWORD,
+                PORT,
+                true
             );
 
             $this->fail(
@@ -159,7 +184,9 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (DataFlowException $e) {
             $this->assertEquals(
-                10000, $e->getCode(), 'Improper exception code.'
+                10000,
+                $e->getCode(),
+                'Improper exception code.'
             );
         }
     }
@@ -176,13 +203,19 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (DataFlowException $e) {
             $this->assertEquals(
-                10000, $e->getCode(), 'Improper exception code.'
+                10000,
+                $e->getCode(),
+                'Improper exception code.'
             );
         }
         
         try {
             $routerOS = new Client(
-                \HOSTNAME, USERNAME, PASSWORD_INVALID, PORT, true
+                \HOSTNAME,
+                USERNAME,
+                PASSWORD_INVALID,
+                PORT,
+                true
             );
 
             $this->fail(
@@ -192,7 +225,9 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (DataFlowException $e) {
             $this->assertEquals(
-                10000, $e->getCode(), 'Improper exception code.'
+                10000,
+                $e->getCode(),
+                'Improper exception code.'
             );
         }
     }
@@ -201,7 +236,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     {
         try {
             $routerOS = new Client(
-                \HOSTNAME, USERNAME_INVALID, PASSWORD_INVALID, PORT
+                \HOSTNAME,
+                USERNAME_INVALID,
+                PASSWORD_INVALID,
+                PORT
             );
 
             $this->fail(
@@ -213,13 +251,19 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (DataFlowException $e) {
             $this->assertEquals(
-                10000, $e->getCode(), 'Improper exception code.'
+                10000,
+                $e->getCode(),
+                'Improper exception code.'
             );
         }
         
         try {
             $routerOS = new Client(
-                \HOSTNAME, USERNAME_INVALID, PASSWORD_INVALID, PORT, true
+                \HOSTNAME,
+                USERNAME_INVALID,
+                PASSWORD_INVALID,
+                PORT,
+                true
             );
 
             $this->fail(
@@ -231,7 +275,9 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (DataFlowException $e) {
             $this->assertEquals(
-                10000, $e->getCode(), 'Improper exception code.'
+                10000,
+                $e->getCode(),
+                'Improper exception code.'
             );
         }
     }
@@ -248,13 +294,19 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (SocketException $e) {
             $this->assertEquals(
-                10200, $e->getCode(), 'Improper exception code.'
+                10200,
+                $e->getCode(),
+                'Improper exception code.'
             );
         }
         
         try {
             $routerOS = new Client(
-                \HOSTNAME_INVALID, USERNAME, PASSWORD, PORT, true
+                \HOSTNAME_INVALID,
+                USERNAME,
+                PASSWORD,
+                PORT,
+                true
             );
 
             $this->fail(
@@ -264,7 +316,9 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (SocketException $e) {
             $this->assertEquals(
-                10200, $e->getCode(), 'Improper exception code.'
+                10200,
+                $e->getCode(),
+                'Improper exception code.'
             );
         }
     }
@@ -282,15 +336,20 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         } catch (SocketException $e) {
             $this->assertEquals(100, $e->getCode());
             $this->assertTrue($e->getPrevious() instanceof T\SocketException);
-            $this->assertEquals(7, $e->getPrevious()->getCode());
+            $this->assertEquals(8, $e->getPrevious()->getCode());
             $this->assertEquals(
-                10060, $e->getPrevious()->getSocketErrorNumber()
+                10060,
+                $e->getPrevious()->getSocketErrorNumber()
             );
         }
         
         try {
             $routerOS = new Client(
-                \HOSTNAME_SILENT, USERNAME, PASSWORD, PORT, true
+                \HOSTNAME_SILENT,
+                USERNAME,
+                PASSWORD,
+                PORT,
+                true
             );
 
             $this->fail(
@@ -301,9 +360,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         } catch (SocketException $e) {
             $this->assertEquals(100, $e->getCode());
             $this->assertTrue($e->getPrevious() instanceof T\SocketException);
-            $this->assertEquals(7, $e->getPrevious()->getCode());
+            $this->assertEquals(8, $e->getPrevious()->getCode());
             $this->assertEquals(
-                10060, $e->getPrevious()->getSocketErrorNumber()
+                10060,
+                $e->getPrevious()->getSocketErrorNumber()
             );
         }
     }
@@ -320,13 +380,18 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (SocketException $e) {
             $this->assertEquals(
-                10200, $e->getCode(), 'Improper exception code.'
+                10200,
+                $e->getCode()
             );
         }
         
         try {
             $routerOS = new Client(
-                \HOSTNAME, USERNAME, PASSWORD, PORT_INVALID, true
+                \HOSTNAME,
+                USERNAME,
+                PASSWORD,
+                PORT_INVALID,
+                true
             );
 
             $this->fail(
@@ -336,7 +401,9 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (SocketException $e) {
             $this->assertEquals(
-                10200, $e->getCode(), 'Improper exception code.'
+                10200,
+                $e->getCode(),
+                'Improper exception code.'
             );
         }
     }
@@ -354,15 +421,20 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         } catch (SocketException $e) {
             $this->assertEquals(100, $e->getCode());
             $this->assertTrue($e->getPrevious() instanceof T\SocketException);
-            $this->assertEquals(7, $e->getPrevious()->getCode());
+            $this->assertEquals(8, $e->getPrevious()->getCode());
             $this->assertEquals(
-                10061, $e->getPrevious()->getSocketErrorNumber()
+                10061,
+                $e->getPrevious()->getSocketErrorNumber()
             );
         }
         
         try {
             $routerOS = new Client(
-                \HOSTNAME, USERNAME, PASSWORD, PORT_SILENT, true
+                \HOSTNAME,
+                USERNAME,
+                PASSWORD,
+                PORT_SILENT,
+                true
             );
 
             $this->fail(
@@ -373,9 +445,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         } catch (SocketException $e) {
             $this->assertEquals(100, $e->getCode());
             $this->assertTrue($e->getPrevious() instanceof T\SocketException);
-            $this->assertEquals(7, $e->getPrevious()->getCode());
+            $this->assertEquals(8, $e->getPrevious()->getCode());
             $this->assertEquals(
-                10061, $e->getPrevious()->getSocketErrorNumber()
+                10061,
+                $e->getPrevious()->getSocketErrorNumber()
             );
         }
     }
@@ -384,7 +457,12 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     {
         try {
             $routerOS = new Client(
-                \HOSTNAME, USERNAME, PASSWORD, PORT, false, 'invalidTimeout'
+                \HOSTNAME,
+                USERNAME,
+                PASSWORD,
+                PORT,
+                false,
+                'invalidTimeout'
             );
 
             $this->fail('No proper connection should be available.');
@@ -399,7 +477,12 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     {
         try {
             $routerOS = new Client(
-                \HOSTNAME, USERNAME, PASSWORD, PORT_SILENT, false, null,
+                \HOSTNAME,
+                USERNAME,
+                PASSWORD,
+                PORT_SILENT,
+                false,
+                null,
                 'notContext'
             );
 
@@ -415,7 +498,12 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     {
         try {
             $routerOS = new Client(
-                \HOSTNAME, USERNAME, PASSWORD, PORT_SILENT, false, null,
+                \HOSTNAME,
+                USERNAME,
+                PASSWORD,
+                PORT_SILENT,
+                false,
+                null,
                 fopen(__FILE__, 'a+')
             );
 
@@ -438,7 +526,9 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             $this->fail('Receiving had to fail.');
         } catch (SocketException $e) {
             $this->assertEquals(
-                50000, $e->getCode(), 'Improper exception code.'
+                50000,
+                $e->getCode(),
+                'Improper exception code.'
             );
         }
     }
@@ -482,9 +572,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             $this->fail('The query had to fail.');
         } catch (SocketException $e) {
             $this->assertEquals(
-                30600, $e->getCode(), 'Improper exception code.'
+                30600,
+                $e->getCode(),
+                'Improper exception code.'
             );
         }
     }
-
 }
