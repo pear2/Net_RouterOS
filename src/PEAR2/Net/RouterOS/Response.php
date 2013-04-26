@@ -140,9 +140,9 @@ class Response extends Message
      */
     private function _receive(Communicator $com, $asStream = false)
     {
-        if (!$com->getTransmitter()->isDataAwaiting()) {
+        if (!$com->getTransmitter()->isAvailable()) {
             throw new SocketException(
-                'No data awaiting. Receiving aborted.',
+                'Connection aborted by other end. Receiving aborted.',
                 50000
             );
         }

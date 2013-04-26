@@ -425,7 +425,7 @@ class Client
         while ((!$hasNoTag && $this->isRequestActive($tag))
         || ($hasNoTag && 0 !== $this->getPendingRequestsCount())
         ) {
-            $newReply = $this->dispatchNextResponse();
+            $newReply = $this->dispatchNextResponse(null);
             if ($newReply->getTag() === $tag) {
                 if ($hasNoTag) {
                     $result[] = $newReply;
@@ -497,23 +497,39 @@ class Client
      * are no more pending requests or when a specified timeout has passed
      * (whichever comes first).
      * 
-     * @param float $timeout Timeout for the loop. If 0, there is no time limit.
+     * @param int $timeout_s  Timeout for the loop. If NULL, there is no time
+     * limit.
+     * @param int $timeout_us Microseconds to add to the time limit.
      * 
      * @return bool TRUE when there are any more pending requests, FALSE
      * otherwise.
      * @see extractNewResponses()
      * @see getPendingRequestsCount()
      */
-    public function loop($timeout = 0)
+    public function loop($timeout_s = null, $timeout_us = 0)
     {
-        if ($this->getPendingRequestsCount() !== 0) {
-            $start = microtime(true);
-            do {
-                $this->dispatchNextResponse();
-            } while (
-            ((microtime(true) - $start) <= $timeout)
-            || (0 === $timeout && $this->getPendingRequestsCount() !== 0)
-            );
+        try {
+            if (null === $timeout_s) {
+                while ($this->getPendingRequestsCount() !== 0) {
+                    $this->dispatchNextResponse(null);
+                }
+            } else {
+                while ($this->getPendingRequestsCount() !== 0
+                    && ($timeout_s >= 0 || $timeout_us >= 0)
+                ) {
+                    list($start_us, $start_s) = explode(' ', microtime());
+                    $this->dispatchNextResponse($timeout_s, $timeout_us);
+                    list($end_us, $end_s) = explode(' ', microtime());
+                    $timeout_s -= ($seconds = $end_s - $start_s);
+                    if (0 === $seconds) {
+                        $timeout_us -= $end_us - $start_us;
+                    }
+                }
+            }
+        } catch(SocketException $e) {
+            if ($e->getCode() !== 11800) {
+                throw $e;
+            }
         }
         return $this->getPendingRequestsCount() !== 0;
     }
@@ -703,10 +719,25 @@ class Client
      * Dispatches the next response in queue, i.e. it executes the associated
      * callback if there is one, or places the response in the response buffer.
      * 
+     * @param int $timeout_s  If a response is not immediatly available, wait
+     * this many seconds. If NULL, wait indefinetly.
+     * @param int $timeout_us Microseconds to add to the waiting time.
+     * 
+     * @throws SocketException When there's no response within the time limit.
      * @return Response The dispatched response.
      */
-    protected function dispatchNextResponse()
+    protected function dispatchNextResponse($timeout_s = 0, $timeout_us = 0)
     {
+        if ((0 !== $timeout_s) && (0 !== $timeout_us)
+            && !$this->com->getTransmitter()->isDataAwaiting(
+                $timeout_s, $timeout_us
+            )
+        ) {
+            throw new SocketException(
+                'No responses within the time limit',
+                11800
+            );
+        }
         $response = new Response(
             $this->com,
             $this->_streamingResponses,
