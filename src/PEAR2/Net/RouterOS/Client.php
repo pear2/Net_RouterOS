@@ -529,7 +529,7 @@ class Client
                     $start_us = $end_us;
                 }
             }
-        } catch(SocketException $e) {
+        } catch (SocketException $e) {
             if ($e->getCode() !== 11800) {
                 throw $e;
             }
@@ -732,7 +732,8 @@ class Client
     protected function dispatchNextResponse($timeout_s = 0, $timeout_us = 0)
     {
         if (!$this->com->getTransmitter()->isDataAwaiting(
-            $timeout_s, $timeout_us
+            $timeout_s,
+            $timeout_us
         )
         ) {
             throw new SocketException(
