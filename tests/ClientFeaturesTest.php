@@ -678,18 +678,41 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->object->cancelRequest('ping');
     }
     
+    public function testListenOverTimeout()
+    {
+        $this->object->sendAsync(
+            new Request('/queue simple listen', null, 'l'),
+            function ($response) {
+                \PHPUnit_Framework_Assert::assertFalse($response);
+            }
+        );
+        $this->assertSame(1, $this->object->getPendingRequestsCount());
+        $this->assertTrue(
+            $this->object->loop(ini_get('default_socket_timeout') + 3)
+        );
+        $this->assertSame(1, $this->object->getPendingRequestsCount());
+        $this->assertSame(
+            array(),
+            $this->object->extractNewResponses('l')->toArray()
+        );
+    }
+    
     public function testClientInvokability()
     {
         $obj = $this->object;
         $this->assertEquals(0, $obj->getPendingRequestsCount());
-        $obj(new Request('/ping address=' . HOSTNAME, null, 'ping'));
+        $obj(new Request('/ping address=127.0.0.1', null, 'ping1'));
         $this->assertEquals(1, $obj->getPendingRequestsCount());
-        $obj(new Request('/ip/arp/print', null, 'arp'));
+        $obj(new Request('/ping address=::1', null, 'ping2'));
         $this->assertEquals(2, $obj->getPendingRequestsCount());
         $obj(4);
-        $pingResponses = $obj->extractNewResponses('ping');
-        $this->assertGreaterThan(0, count($pingResponses));
-        $obj->cancelRequest('ping');
+        $ping1Responses = $obj->extractNewResponses('ping1');
+        $this->assertGreaterThan(0, count($ping1Responses));
+        $ping2Responses = $obj->extractNewResponses('ping2');
+        $this->assertGreaterThan(0, count($ping2Responses));
+        $obj->cancelRequest();
+
+        $obj(new Request('/ip/arp/print', null, 'arp'));
         $arpResponses1 = $obj('arp');
         $this->assertEquals(0, $obj->getPendingRequestsCount());
         $this->assertGreaterThan(0, count($arpResponses1));
@@ -698,10 +721,13 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $obj();
         $this->assertEquals(0, $obj->getPendingRequestsCount());
         $arpResponses2 = $obj->extractNewResponses('arp');
-        //$arpResponses2 = $obj('arp');
         $this->assertEquals(0, $obj->getPendingRequestsCount());
         $this->assertGreaterThan(0, count($arpResponses2));
+        
+        $arpResponses3 = $obj(new Request('/ip/arp/print'));
+
         $this->assertEquals(count($arpResponses1), count($arpResponses2));
+        $this->assertEquals(count($arpResponses2), count($arpResponses3));
         $this->assertInstanceOf(__NAMESPACE__ . '\Response', $arpResponses1(0));
     }
 

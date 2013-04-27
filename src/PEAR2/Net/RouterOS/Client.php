@@ -26,11 +26,6 @@ namespace PEAR2\Net\RouterOS;
 use PEAR2\Net\Transmitter\Stream as S;
 
 /**
- * Uses shared memory to keep responses in when using persistent connections.
- */
-use PEAR2\Cache\SHM;
-
-/**
  * A RouterOS client.
  * 
  * Provides functionality for easily communicating with a RouterOS host.
@@ -514,16 +509,24 @@ class Client
                     $this->dispatchNextResponse(null);
                 }
             } else {
+                list($start_us, $start_s) = explode(' ', microtime());
                 while ($this->getPendingRequestsCount() !== 0
                     && ($timeout_s >= 0 || $timeout_us >= 0)
                 ) {
-                    list($start_us, $start_s) = explode(' ', microtime());
                     $this->dispatchNextResponse($timeout_s, $timeout_us);
                     list($end_us, $end_s) = explode(' ', microtime());
-                    $timeout_s -= ($seconds = $end_s - $start_s);
-                    if (0 === $seconds) {
-                        $timeout_us -= $end_us - $start_us;
+
+                    $timeout_s -= $end_s - $start_s;
+                    $timeout_us -= $end_us - $start_us;
+                    if ($timeout_us <= 0) {
+                        if ($timeout_s > 0) {
+                            $timeout_us = 1000000 + $timeout_us;
+                            $timeout_s--;
+                        }
                     }
+
+                    $start_s = $end_s;
+                    $start_us = $end_us;
                 }
             }
         } catch(SocketException $e) {
@@ -728,10 +731,9 @@ class Client
      */
     protected function dispatchNextResponse($timeout_s = 0, $timeout_us = 0)
     {
-        if ((0 !== $timeout_s) && (0 !== $timeout_us)
-            && !$this->com->getTransmitter()->isDataAwaiting(
-                $timeout_s, $timeout_us
-            )
+        if (!$this->com->getTransmitter()->isDataAwaiting(
+            $timeout_s, $timeout_us
+        )
         ) {
             throw new SocketException(
                 'No responses within the time limit',
