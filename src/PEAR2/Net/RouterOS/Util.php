@@ -44,6 +44,31 @@ class Util
     protected $entryCache = null;
 
     /**
+     * Escapes a string for a RouterOS scripting context.
+     * 
+     * Escapes a string for a RouterOS scripting context. The value can be
+     * surrounded with quotes at a RouterOS script, and you can be sure there
+     * won't be any code injections.
+     * 
+     * @param string $value Value to be escaped.
+     * 
+     * @return string The escaped value.
+     */
+    public static function escapeString($value)
+    {
+        $result = '';
+        for ($i = 0, $l = strlen($value); $i < $l; ++$i) {
+            $result .= '\\' . str_pad(
+                strtoupper(dechex(ord($value[$i]))),
+                2,
+                '0',
+                STR_PAD_LEFT
+            );
+        }
+        return $result;
+    }
+
+    /**
      * Creates a new Util instance.
      * 
      * Wraps around a connection to provide convinience methods.
@@ -171,10 +196,12 @@ class Util
      * Gets a value of a specified entry at the current menu.
      * 
      * @param int    $number     A number identifying the entry you're
-     * targeting.
+     * targeting. Can also be a name.
      * @param string $value_name The name of the value you want to get.
      * 
-     * @return string The value of the specified property.
+     * @return string|null|bool The value of the specified property. If the
+     * property is not set, NULL will be returned. If no such entry exists,
+     * FALSE will be returned.
      */
     public function get($number, $value_name)
     {
@@ -182,7 +209,21 @@ class Util
             $this->entryCache = null;
         }
         $this->refreshEntryCache();
-        return $this->entryCache[(int)$number]->getArgument($value_name);
+        if (is_int($number) || ((string)$number === (string)(int)$number)) {
+            if (isset($this->entryCache[(int)$number])) {
+                return $this->entryCache[(int)$number]->getArgument(
+                    $value_name
+                );
+            }
+            return false;
+        }
+
+        foreach ($this->entryCache as $entry) {
+            if ($entry->getArgument('name') === (string)$number) {
+                return $entry->getArgument($value_name);
+            }
+        }
+        return false;
     }
 
     /**
@@ -322,18 +363,48 @@ class Util
     }
 
     /**
+     * Puts a file on RouterOS's file system.
+     * 
+     * @param string $filename The filename to write data in.
+     * @param string $data     The data the file is going to have.
+     * 
+     * @return bool TRUE on success, FALSE on failure.
+     */
+    public function filePutContents($filename, $data)
+    {
+        $request = new Request(
+            '/file/print .proplist=""',
+            Query::where('name', $filename)
+        );
+        $request->setArgument('file', $filename);
+        $result = $this->client->sendSync($request);
+
+        if (0 === count($result->getAllOfType(Response::TYPE_ERROR))) {
+            $request = new Request('/file/set');
+            $request->setArgument('numbers', $filename)
+                ->setArgument('contents', $data);
+            $result = $this->client->sendSync($request);
+            if (0 === count($result->getAllOfType(Response::TYPE_ERROR))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Executes a RouterOS script.
      * 
      * Executes a RouterOS script, written as a string.
      * Note that in cases of errors, the line numbers will be off, because the
-     * script is executed at the specified menu, with the specified variables
-     * pre declared. This is achieved by prepending 1+count($params) lines
-     * before your actual script.
+     * script is executed at the current menu as context, with the specified
+     * variables pre declared. This is achieved by prepending 2+count($params)
+     * lines before your actual script.
      * 
      * @param string $source A script to execute.
      * @param array  $params An array of local variables to make available in
      * the script. Variable names are array keys, and variable values are array
-     * values. Invalid names will not be added, and silently ignored.
+     * values. Invalid names will not be added, and silently ignored. Note that
+     * the script's (generated) name is always declared at the variable "_".
      * @param string $policy Allows you to specify a policy the script must
      * follow. Accepts the same things as in terminal. If left empty, the script
      * has no restrictions.
@@ -359,6 +430,8 @@ class Util
 
         $finalSource = '/' . str_replace('/', ' ', substr($this->menu, 1))
             . "\n";
+
+        $params += array('_', $name);
         foreach ($params as $pname => $pvalue) {
             $pname = static::escapeString($pname);
             $pvalue = static::escapeString($pvalue);
@@ -378,31 +451,6 @@ class Util
             $this->client->sendSync($request);
         }
 
-        return $result;
-    }
-
-    /**
-     * Escapes a string for a RouterOS scripting context.
-     * 
-     * Escapes a string for a RouterOS scripting context. The value can be
-     * surrounded with quotes at a RouterOS script, and you can be sure there
-     * won't be any code injections.
-     * 
-     * @param string $value Value to be escaped.
-     * 
-     * @return string The escaped value.
-     */
-    public static function escapeString($value)
-    {
-        $result = '';
-        for ($i = 0, $l = strlen($value); $i < $l; ++$i) {
-            $result .= '\\' . str_pad(
-                strtoupper(dechex(ord($value[$i]))),
-                2,
-                '0',
-                STR_PAD_LEFT
-            );
-        }
         return $result;
     }
 
