@@ -322,6 +322,91 @@ class Util
     }
 
     /**
+     * Executes a RouterOS script.
+     * 
+     * Executes a RouterOS script, written as a string.
+     * Note that in cases of errors, the line numbers will be off, because the
+     * script is executed at the specified menu, with the specified variables
+     * pre declared. This is achieved by prepending 1+count($params) lines
+     * before your actual script.
+     * 
+     * @param string $source A script to execute.
+     * @param array  $params An array of local variables to make available in
+     * the script. Variable names are array keys, and variable values are array
+     * values. Invalid names will not be added, and silently ignored.
+     * @param string $policy Allows you to specify a policy the script must
+     * follow. Accepts the same things as in terminal. If left empty, the script
+     * has no restrictions.
+     * @param string $name   The script is executed after being saved in
+     * "/system script" under a random name, and is removed after execution. To
+     * eliminate any possibility of name clashes, you can specify your own name.
+     * 
+     * @return ResponseCollection returns the response collection of the run,
+     * allowing you to inspect errors, if any.
+     */
+    public function exec(
+        $source,
+        array $params = array(),
+        $policy = null,
+        $name = null
+    ) {
+        $request = new Request('/system/script/add');
+        if (null === $name) {
+            $name = uniqid(gethostname(), true);
+        }
+        $request->setArgument('name', $name);
+        $request->setArgument('policy', $policy);
+
+        $finalSource = '/' . str_replace('/', ' ', substr($this->menu, 1))
+            . "\n";
+        foreach ($params as $pname => $pvalue) {
+            $pname = static::escapeString($pname);
+            $pvalue = static::escapeString($pvalue);
+            $finalSource .= ":local \"{$pname}\" \"{$pvalue}\"\n";
+        }
+        $finalSource .= $source;
+        $request->setArgument('source', $finalSource);
+        $result = $this->client->sendSync($request);
+
+        if (0 === count($result->getAllOfType(Response::TYPE_ERROR))) {
+            $request = new Request('/system/script/run');
+            $request->setArgument('number', $name);
+            $result = $this->client->sendSync($request);
+
+            $request = new Request('/system/script/remove');
+            $request->setArgument('numbers', $name);
+            $this->client->sendSync($request);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Escapes a string for a RouterOS scripting context.
+     * 
+     * Escapes a string for a RouterOS scripting context. The value can be
+     * surrounded with quotes at a RouterOS script, and you can be sure there
+     * won't be any code injections.
+     * 
+     * @param string $value Value to be escaped.
+     * 
+     * @return string The escaped value.
+     */
+    public static function escapeString($value)
+    {
+        $result = '';
+        for ($i = 0, $l = strlen($value); $i < $l; ++$i) {
+            $result .= '\\' . str_pad(
+                strtoupper(dechex(ord($value[$i]))),
+                2,
+                '0',
+                STR_PAD_LEFT
+            );
+        }
+        return $result;
+    }
+
+    /**
      * Performs an action on a bulk of entries at the current menu.
      * 
      * @param string $what What action to perform.
