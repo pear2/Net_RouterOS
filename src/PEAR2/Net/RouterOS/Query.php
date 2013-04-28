@@ -64,8 +64,8 @@ class Query
 
     /**
      * @var array An array of the words forming the query. Each value is an
-     * array with the first member being the predicate (action and name), and
-     * the second member being the value for the predicate.
+     *     array with the first member being the predicate (action and name),
+     *     and the second member being the value for the predicate.
      */
     protected $words = array();
 
@@ -110,9 +110,9 @@ class Query
      * 
      * @param string $name   The name of the property to test.
      * @param string $value  The value to test against. Not required for
-     * existence tests.
+     *     existence tests.
      * @param string $action One of the ACTION_* constants. Describes the
-     * operation to perform.
+     *     operation to perform.
      * 
      * @return self|Query The query object.
      */
@@ -141,9 +141,9 @@ class Query
      * 
      * @param string $name   The name of the property to test.
      * @param string $value  The value to test against. Not required for
-     * existence tests.
+     *     existence tests.
      * @param string $action One of the ACTION_* constants. Describes the
-     * operation to perform.
+     *     operation to perform.
      * 
      * @return self|Query The query object.
      */
@@ -158,9 +158,9 @@ class Query
      * 
      * @param string $name   The name of the property to test.
      * @param string $value  The value to test against. Not required for
-     * existence tests.
+     *     existence tests.
      * @param string $action One of the ACTION_* constants. Describes the
-     * operation to perform.
+     *     operation to perform.
      * 
      * @return self|Query The query object.
      */
@@ -229,9 +229,9 @@ class Query
      * 
      * @param string $name   The name of the property to test.
      * @param string $value  The value to test against. Not required for
-     * existence tests.
+     *     existence tests.
      * @param string $action One of the ACTION_* constants. Describes the
-     * operation to perform.
+     *     operation to perform.
      * 
      * @return self|Query The query object.
      */

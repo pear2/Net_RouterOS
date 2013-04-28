@@ -51,7 +51,7 @@ class Request extends Message
      * Creates a request to send to RouterOS.
      * 
      * @param string $command The command to send. Can also contain arguments
-     * expressed in a shell-like syntax.
+     *     expressed in a shell-like syntax.
      * @param Query  $query   A query to associate with the request.
      * @param string $tag     The tag for the request.
      * 
@@ -84,10 +84,10 @@ class Request extends Message
      * the class is invoked and its returned value is returned by this function.
      * 
      * @param mixed $arg A {@link Query} to associate the request
-     * with, a {@link Communicator} to send the request over, an argument to
-     * get the value of, or NULL to get all arguments as an array. If a second
-     * argument is provided, this becomes the name of the argument to set the
-     * value of, and the second argument is the value to set.
+     *     with, a {@link Communicator} to send the request over, an argument to
+     *     get the value of, or NULL to get all arguments as an array. If a
+     *     second argument is provided, this becomes the name of the argument to
+     *     set the value of, and the second argument is the value to set.
      * 
      * @return mixed Whatever the long form function would have returned.
      */
@@ -175,7 +175,7 @@ class Request extends Message
      * Sets the query to send with the command.
      * 
      * @param Query $query The query to be set. Setting NULL will remove the
-     * currently associated query.
+     *     currently associated query.
      * 
      * @return self|Request The request object.
      * @see getQuery()
@@ -218,7 +218,7 @@ class Request extends Message
      * 
      * @param string $name  Name of the argument.
      * @param string $value Value of the argument. Setting the value to NULL
-     * removes an argument of this name.
+     *     removes an argument of this name.
      * 
      * @return self|Request The request object.
      * @see getArgument()

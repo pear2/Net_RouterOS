@@ -65,20 +65,20 @@ class Client
 
     /**
      * @var array An array of responses that have not yet been extracted or
-     * passed to a callback. Key is the tag of the request, and the value
-     * is an array of associated responses.
+     *     passed to a callback. Key is the tag of the request, and the value
+     *     is an array of associated responses.
      */
     protected $responseBuffer = array();
 
     /**
      * @var array An array of callbacks to be executed as responses come.
-     * Key is the tag of the request, and the value is the callback for it.
+     *     Key is the tag of the request, and the value is the callback for it.
      */
     protected $callbacks = array();
     
     /**
      * @var Registry A registry for the operations. Particularly helpful at
-     * persistent connections.
+     *     persistent connections.
      */
     protected $registry = null;
 
@@ -97,9 +97,9 @@ class Client
      * @param string   $username The RouterOS username.
      * @param string   $password The RouterOS password.
      * @param int      $port     The port on which the RouterOS server provides
-     * the API service.
+     *     the API service.
      * @param bool     $persist  Whether or not the connection should be a
-     * persistent one.
+     *     persistent one.
      * @param float    $timeout  The timeout for the connection.
      * @param resource $context  A context for the socket.
      * 
@@ -154,10 +154,10 @@ class Client
      * the class is invoked and its returned value is returned by this function.
      * 
      * @param mixed $arg Value can be either a {@link Request} to send, which
-     * would be sent asynchoniously if it has a tag, and synchroniously if not,
-     * a number to loop with or NULL to complete all pending requests. Any other
-     * value is converted to string and treated as the tag of a request to
-     * complete.
+     *     would be sent asynchoniously if it has a tag, and synchroniously if
+     *     not, a number to loop with or NULL to complete all pending requests.
+     *     Any other value is converted to string and treated as the tag of a
+     *     request to complete.
      * 
      * @return mixed Whatever the long form function would have returned.
      */
@@ -226,7 +226,7 @@ class Client
      * @param Communicator $com      The communicator to attempt to login to.
      * @param string       $username The RouterOS username.
      * @param string       $password The RouterOS password. Potentially parsed
-     * already by iconv.
+     *     already by iconv.
      * 
      * @return bool TRUE on success, FALSE on failure.
      */
@@ -265,16 +265,16 @@ class Client
      * is".
      * 
      * @param mixed $charset     The charset to set. If $charsetType is
-     * {@link Communicator::CHARSET_ALL}, you can supply either a string to use
-     * for all charsets, or an array with the charset types as keys, and the
-     * charsets as values.
+     *     {@link Communicator::CHARSET_ALL}, you can supply either a string to
+     *     use for all charsets, or an array with the charset types as keys, and
+     *     the charsets as values.
      * @param int   $charsetType Which charset to set. Valid values are the
-     * Communicator::CHARSET_* constants. Any other value is treated as
-     * {@link Communicator::CHARSET_ALL}.
+     *     Communicator::CHARSET_* constants. Any other value is treated as
+     *     {@link Communicator::CHARSET_ALL}.
      * 
      * @return string|array The old charset. If $charsetType is
-     * {@link Communicator::CHARSET_ALL}, the old values will be returned as an
-     * array with the types as keys, and charsets as values.
+     *     {@link Communicator::CHARSET_ALL}, the old values will be returned as
+     *     an array with the types as keys, and charsets as values.
      * @see Communicator::setDefaultCharset()
      */
     public function setCharset(
@@ -288,12 +288,12 @@ class Client
      * Gets the charset(s) for this connection.
      * 
      * @param int $charsetType Which charset to get. Valid values are the
-     * Communicator::CHARSET_* constants. Any other value is treated as
-     * {@link Communicator::CHARSET_ALL}.
+     *     Communicator::CHARSET_* constants. Any other value is treated as
+     *     {@link Communicator::CHARSET_ALL}.
      * 
      * @return string|array The current charset. If $charsetType is
-     * {@link Communicator::CHARSET_ALL}, the current values will be returned as
-     * an array with the types as keys, and charsets as values.
+     *     {@link Communicator::CHARSET_ALL}, the current values will be
+     *     returned as an array with the types as keys, and charsets as values.
      * @see setCharset()
      */
     public function getCharset($charsetType)
@@ -306,11 +306,12 @@ class Client
      * 
      * @param Request  $request  The request to send.
      * @param callback $callback Optional. A function that is to be executed
-     * when new responses for this request are available. The callback takes two
-     * parameters. The {@link Response} object as the first, and the
-     * {@link Client} object as the second one. If the function returns TRUE,
-     * the request is canceled. Note that the callback may be executed one last
-     * time after that with a response that notifies about the canceling.
+     *     when new responses for this request are available. The callback takes
+     *     two parameters. The {@link Response} object as the first, and the
+     *     {@link Client} object as the second one. If the function returns
+     *     TRUE, the request is canceled. Note that the callback may be executed
+     *     one last time after that with a response that notifies about the
+     *     canceling.
      * 
      * @return self|Client The client object.
      * @see completeRequest()
@@ -360,7 +361,7 @@ class Client
      * 
      * @param string $tag    The tag of the request to look for.
      * @param int    $filter One of the FILTER_* consntants. Limits the search
-     * to the specified places.
+     *     to the specified places.
      * 
      * @return bool TRUE if the request is active, FALSE otherwise.
      * @see getPendingRequestsCount()
@@ -405,12 +406,12 @@ class Client
      * specified request is completed.
      * 
      * @param string $tag The tag of the request to complete. Setting NULL
-     * completes all requests.
+     *     completes all requests.
      * 
      * @return ResponseCollection A collection of {@link Response} objects that
-     * haven't been passed to a callback function or previously extracted with
-     * {@link extractNewResponses()}. Returns an empty collection when $tag is
-     * set to NULL (responses can still be extracted).
+     *     haven't been passed to a callback function or previously extracted
+     *     with {@link extractNewResponses()}. Returns an empty collection when
+     *     $tag is set to NULL (responses can still be extracted).
      */
     public function completeRequest($tag = null)
     {
@@ -448,10 +449,10 @@ class Client
      * callback and clears the buffer from them.
      * 
      * @param string $tag The tag of the request to extract new responses for.
-     * Specifying NULL with extract new responses for all requests.
+     *     Specifying NULL with extract new responses for all requests.
      * 
      * @return ResponseCollection A collection of {@link Response} objects for
-     * the specified request.
+     *     the specified request.
      * @see loop()
      */
     public function extractNewResponses($tag = null)
@@ -493,11 +494,11 @@ class Client
      * (whichever comes first).
      * 
      * @param int $timeout_s  Timeout for the loop. If NULL, there is no time
-     * limit.
+     *     limit.
      * @param int $timeout_us Microseconds to add to the time limit.
      * 
      * @return bool TRUE when there are any more pending requests, FALSE
-     * otherwise.
+     *     otherwise.
      * @see extractNewResponses()
      * @see getPendingRequestsCount()
      */
@@ -558,7 +559,7 @@ class Client
      * {@link extractNewResponses()}.
      * 
      * @param string $tag Tag of the request to cancel. Setting NULL will cancel
-     * all requests.
+     *     all requests.
      * 
      * @return self|Client The client object.
      * @see sendAsync()
@@ -723,7 +724,7 @@ class Client
      * callback if there is one, or places the response in the response buffer.
      * 
      * @param int $timeout_s  If a response is not immediatly available, wait
-     * this many seconds. If NULL, wait indefinetly.
+     *     this many seconds. If NULL, wait indefinetly.
      * @param int $timeout_us Microseconds to add to the waiting time.
      * 
      * @throws SocketException When there's no response within the time limit.

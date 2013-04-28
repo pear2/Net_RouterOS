@@ -34,7 +34,6 @@ class NotSupportedException extends \Exception implements Exception
 {
 
     /**
-     *
      * @var mixed The unsuppported value.
      */
     private $_value;
@@ -45,7 +44,7 @@ class NotSupportedException extends \Exception implements Exception
      * @param string     $message  The Exception message to throw.
      * @param int        $code     The Exception code.
      * @param \Exception $previous The previous exception used for the exception
-     * chaining.
+     *     chaining.
      * @param mixed      $value    The unsupported value.
      */
     public function __construct(

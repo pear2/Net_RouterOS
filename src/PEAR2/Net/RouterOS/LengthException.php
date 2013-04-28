@@ -44,7 +44,7 @@ class LengthException extends \LengthException implements Exception
      * @param string     $message  The Exception message to throw.
      * @param int        $code     The Exception code.
      * @param \Exception $previous The previous exception used for the exception
-     * chaining.
+     *     chaining.
      * @param number     $length   The length.
      */
     public function __construct(

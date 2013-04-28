@@ -68,7 +68,7 @@ class Communicator
     
     /**
      * @var array An array with the default charset types as keys, and the
-     * default charsets as values.
+     *     default charsets as values.
      */
     protected static $defaultCharsets = array(
         self::CHARSET_REMOTE => null,
@@ -91,12 +91,12 @@ class Communicator
      * 
      * @param string   $host    Hostname (IP or domain) of the RouterOS server.
      * @param int      $port    The port on which the RouterOS server provides
-     * the API service.
+     *     the API service.
      * @param bool     $persist Whether or not the connection should be a
-     * persistent one.
+     *     persistent one.
      * @param float    $timeout The timeout for the connection.
      * @param string   $key     A string that uniquely identifies the
-     * connection.
+     *     connection.
      * @param resource $context A context for the socket.
      * 
      * @see sendWord()
@@ -135,10 +135,10 @@ class Communicator
      * the class is invoked and its returned value is returned by this function.
      * 
      * @param string $string A string of the word to send, or NULL to get the
-     * next word as a string.
+     *     next word as a string.
      * 
      * @return int|string If a string is provided, returns the number of bytes
-     * sent, otherwise retuns the next word as a string.
+     *     sent, otherwise retuns the next word as a string.
      */
     public function __invoke($string = null)
     {
@@ -170,7 +170,8 @@ class Communicator
      * @param resource $stream      The stream to convert.
      * 
      * @return resource A new stream that uses the $out_charset. The stream is a
-     * subset from the original stream, from its current position to its end.
+     *     subset from the original stream, from its current position to its
+     *     end.
      */
     public static function iconvStream($in_charset, $out_charset, $stream)
     {
@@ -198,16 +199,16 @@ class Communicator
      * Sets the default charset(s) for new connections.
      * 
      * @param mixed $charset     The charset to set. If $charsetType is
-     * {@link CHARSET_ALL}, you can supply either a string to use for all
-     * charsets, or an array with the charset types as keys, and the charsets as
-     * values.
+     *     {@link CHARSET_ALL}, you can supply either a string to use for all
+     *     charsets, or an array with the charset types as keys, and the
+     *     charsets as values.
      * @param int   $charsetType Which charset to set. Valid values are the
-     * CHARSET_* constants. Any other value is treated as
-     * {@link CHARSET_ALL}.
+     *     CHARSET_* constants. Any other value is treated as
+     *     {@link CHARSET_ALL}.
      * 
      * @return string|array The old charset. If $charsetType is
-     * {@link CHARSET_ALL}, the old values will be returned as an array with the
-     * types as keys, and charsets as values.
+     *     {@link CHARSET_ALL}, the old values will be returned as an array with
+     *     the types as keys, and charsets as values.
      * @see setCharset()
      */
     public static function setDefaultCharset(
@@ -233,11 +234,12 @@ class Communicator
      * Gets the default charset(s).
      * 
      * @param int $charsetType Which charset to get. Valid values are the
-     * CHARSET_* constants. Any other value is treated as {@link CHARSET_ALL}.
+     *     CHARSET_* constants. Any other value is treated as
+     *     {@link CHARSET_ALL}.
      * 
      * @return string|array The current charset. If $charsetType is
-     * {@link CHARSET_ALL}, the current values will be returned as an array with
-     * the types as keys, and charsets as values.
+     *     {@link CHARSET_ALL}, the current values will be returned as an array
+     *     with the types as keys, and charsets as values.
      * @see setDefaultCharset()
      */
     public static function getDefaultCharset($charsetType)
@@ -257,16 +259,16 @@ class Communicator
      * both sent and received "as is".
      * 
      * @param mixed $charset     The charset to set. If $charsetType is
-     * {@link CHARSET_ALL}, you can supply either a string to use for all
-     * charsets, or an array with the charset types as keys, and the charsets as
-     * values.
+     *     {@link CHARSET_ALL}, you can supply either a string to use for all
+     *     charsets, or an array with the charset types as keys, and the
+     *     charsets as values.
      * @param int   $charsetType Which charset to set. Valid values are the
-     * Communicator::CHARSET_* constants. Any other value is treated as
-     * {@link CHARSET_ALL}.
+     *     Communicator::CHARSET_* constants. Any other value is treated as
+     *     {@link CHARSET_ALL}.
      * 
      * @return string|array The old charset. If $charsetType is
-     * {@link CHARSET_ALL}, the old values will be returned as an array with the
-     * types as keys, and charsets as values.
+     *     {@link CHARSET_ALL}, the old values will be returned as an array with
+     *     the types as keys, and charsets as values.
      * @see setDefaultCharset()
      */
     public function setCharset($charset, $charsetType = self::CHARSET_ALL)
@@ -290,11 +292,12 @@ class Communicator
      * Gets the charset(s) for this connection.
      * 
      * @param int $charsetType Which charset to get. Valid values are the
-     * CHARSET_* constants. Any other value is treated as {@link CHARSET_ALL}.
+     *     CHARSET_* constants. Any other value is treated as
+     *     {@link CHARSET_ALL}.
      * 
      * @return string|array The current charset. If $charsetType is
-     * {@link CHARSET_ALL}, the current values will be returned as an array with
-     * the types as keys, and charsets as values.
+     *     {@link CHARSET_ALL}, the current values will be returned as an array
+     *     with the types as keys, and charsets as values.
      * @see getDefaultCharset()
      * @see setCharset()
      */
@@ -575,7 +578,7 @@ class Communicator
      * locking if the connection is a persistent one.
      * 
      * @param T\Stream $trans The transmitter from which to decode the length of
-     * the incoming message.
+     *     the incoming message.
      * 
      * @return int The decoded length.
      */

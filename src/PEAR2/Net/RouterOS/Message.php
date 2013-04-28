@@ -34,7 +34,7 @@ abstract class Message
 
     /**
      * @var array An array with message arguments. Keys are the names of the
-     * arguments, array values are values for the corresponding argument.
+     *     arguments, array values are values for the corresponding argument.
      */
     protected $arguments = array();
 
@@ -51,10 +51,10 @@ abstract class Message
      * the class is invoked and its returned value is returned by this function.
      * 
      * @param string $name The name of an argument to get the value of, or NULL
-     * to get all arguments as an array.
+     *     to get all arguments as an array.
      * 
      * @return string|array The value of the specified argument, or an array of
-     * all arguments if NULL is provided.
+     *     all arguments if NULL is provided.
      */
     public function __invoke($name = null)
     {
@@ -135,7 +135,7 @@ abstract class Message
      * @param string $name The name of the argument.
      * 
      * @return string|resource The value of the specified argument. Returns NULL
-     * if such an argument is not set.
+     *     if such an argument is not set.
      * @see setArgument()
      */
     public function getArgument($name)
@@ -151,7 +151,7 @@ abstract class Message
      * Gets all arguments in an array.
      * 
      * @return array An array with the keys as argument names, and the array
-     * values as argument values.
+     *     values as argument values.
      * @see getArgument()
      * @see setArgument()
      */
@@ -165,7 +165,7 @@ abstract class Message
      * 
      * @param string $name  Name of the argument.
      * @param string $value Value of the argument. Setting the value to NULL
-     * removes an argument of this name.
+     *     removes an argument of this name.
      * 
      * @return self|Message The message object.
      * @see getArgument()

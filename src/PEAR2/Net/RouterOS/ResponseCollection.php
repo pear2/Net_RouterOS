@@ -49,8 +49,8 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
     
     /**
      * @var array An array with all distinct arguments across all
-     * {@link Response} objects. Created at the first call of
-     * {@link getArgumentMap()}.
+     *     {@link Response} objects. Created at the first call of
+     *     {@link getArgumentMap()}.
      */
     protected $argumentMap = null;
     
@@ -84,11 +84,11 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
      * the class is invoked and its returned value is returned by this function.
      * 
      * @param int $offset The offset of the response to seek to. Setting NULL
-     * will seek to the last response.
+     *     will seek to the last response.
      * 
      * @return Response The {@link Response} at the specified index, last
-     * reponse if no index is provided or FALSE if the index is invalid or the
-     * collection is empty.
+     *     reponse if no index is provided or FALSE if the index is invalid or the
+     *     collection is empty.
      */
     public function __invoke($offset = null)
     {
@@ -175,7 +175,7 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
      * Resets the pointer to 0, and returns the first response.
      * 
      * @return Response The first response in the collection, or FALSE if the
-     * collection is empty.
+     *     collection is empty.
      */
     public function rewind()
     {
@@ -188,7 +188,7 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
      * @param int $position The position to move to.
      * 
      * @return Response The {@link Response} at the specified position, or FALSE
-     * if the specified position is not valid.
+     *     if the specified position is not valid.
      */
     public function seek($position)
     {
@@ -200,7 +200,7 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
      * Moves the pointer forward by 1, and gets the next response.
      * 
      * @return Response The next {@link Response} object, or FALSE if the
-     * position is not valid.
+     *     position is not valid.
      */
     public function next()
     {
@@ -212,7 +212,7 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
      * Gets the response at the current pointer position.
      * 
      * @return Response The response at the current pointer position, or FALSE
-     * if the position is not valid.
+     *     if the position is not valid.
      */
     public function current()
     {
@@ -223,7 +223,7 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
      * Moves the pointer backwards by 1, and gets the previous response.
      * 
      * @return Response The next {@link Response} object, or FALSE if the
-     * position is not valid.
+     *     position is not valid.
      */
     public function prev()
     {
@@ -236,7 +236,7 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
      * response.
      * 
      * @return Response The last response in the collection, or FALSE if the
-     * collection is empty.
+     *     collection is empty.
      */
     public function end()
     {
@@ -248,7 +248,7 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
      * Gets the key at the current pointer position.
      * 
      * @return int The key at the current pointer position, i.e. the pointer
-     * position itself, or FALSE if the position is not valid.
+     *     position itself, or FALSE if the position is not valid.
      */
     public function key()
     {
@@ -271,7 +271,7 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
      * Gets all distinct argument names across all responses.
      * 
      * @return array An array with all distinct argument names as keys, and the
-     * indexes at which they occur as values.
+     *     indexes at which they occur as values.
      */
     public function getArgumentMap()
     {
@@ -294,10 +294,10 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
      * Gets all responses of a specified type.
      * 
      * @param string $type The response type to filter by. Valid values are the
-     * Response::TYPE_* constants.
+     *     Response::TYPE_* constants.
      * 
      * @return ResponseCollection A new collection with responses of the
-     * specified type.
+     *     specified type.
      */
     public function getAllOfType($type)
     {
@@ -314,7 +314,7 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
      * @param string $tag The tag to filter by.
      * 
      * @return ResponseCollection A new collection with responses having the
-     * specified tag.
+     *     specified tag.
      */
     public function getAllTagged($tag)
     {
@@ -329,7 +329,7 @@ class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
      * Gets the last {@link Response} in the collection.
      * 
      * @return Response The last response in the collection or FALSE if the
-     * collection is empty.
+     *     collection is empty.
      */
     public function getLast()
     {

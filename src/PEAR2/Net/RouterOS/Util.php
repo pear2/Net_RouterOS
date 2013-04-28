@@ -34,13 +34,19 @@ namespace PEAR2\Net\RouterOS;
  */
 class Util
 {
-    /** @var Client The connection to wrap around. */
+    /**
+     * @var Client The connection to wrap around.
+     */
     protected $client;
 
-    /** @var string The current menu */
+    /**
+     * @var string The current menu.
+     */
     protected $menu = '/';
 
-    /** @var array The entries in the current menu. */
+    /**
+     * @var array The entries in the current menu.
+     */
     protected $entryCache = null;
 
     /**
@@ -86,11 +92,11 @@ class Util
      * Changes the current menu.
      * 
      * @param string $newMenu The menu to change to. Can be specified with API
-     * or CLI syntax and can be either absolute or relative. If relative, it's
-     * relative to the current menu.
+     *     or CLI syntax and can be either absolute or relative. If relative,
+     *     it's relative to the current menu.
      * 
      * @return string The old menu. If an empty string is given for a new menu,
-     * no change is performed, and this function returns the current menu.
+     *     no change is performed, and this function returns the current menu.
      */
     public function changeMenu($newMenu = '')
     {
@@ -130,7 +136,7 @@ class Util
      * IDs, but note that it can cause errors on other menus.
      * 
      * @return string A comma separated list of all entries matching the
-     * specified criteria.
+     *     specified criteria.
      */
     public function find()
     {
@@ -196,12 +202,12 @@ class Util
      * Gets a value of a specified entry at the current menu.
      * 
      * @param int    $number     A number identifying the entry you're
-     * targeting. Can also be a name.
+     *     targeting. Can also be a name.
      * @param string $value_name The name of the value you want to get.
      * 
      * @return string|null|bool The value of the specified property. If the
-     * property is not set, NULL will be returned. If no such entry exists,
-     * FALSE will be returned.
+     *     property is not set, NULL will be returned. If no such entry exists,
+     *     FALSE will be returned.
      */
     public function get($number, $value_name)
     {
@@ -234,7 +240,7 @@ class Util
      * See {@link find()} for a description of what criteria are accepted.
      * 
      * @return ResponseCollection returns the response collection, allowing you
-     * to inspect errors, if any.
+     *     to inspect errors, if any.
      */
     public function enable()
     {
@@ -249,7 +255,7 @@ class Util
      * See {@link find()} for a description of what criteria are accepted.
      * 
      * @return ResponseCollection returns the response collection, allowing you
-     * to inspect errors, if any.
+     *     to inspect errors, if any.
      */
     public function disable()
     {
@@ -264,7 +270,7 @@ class Util
      * See {@link find()} for a description of what criteria are accepted.
      * 
      * @return ResponseCollection returns the response collection, allowing you
-     * to inspect errors, if any.
+     *     to inspect errors, if any.
      */
     public function remove()
     {
@@ -280,12 +286,12 @@ class Util
      * which match certain criteria.
      * 
      * @param mixed $numbers   Targeted entries. Can be any criteria accepted by
-     * {@link find()}.
+     *     {@link find()}.
      * @param array $newValues An array with the names of each property to set
-     * as an array key, and the new value as an array value.
+     *     as an array key, and the new value as an array value.
      * 
      * @return ResponseCollection returns the response collection, allowing you
-     * to inspect errors, if any.
+     *     to inspect errors, if any.
      */
     public function set($numbers, array $newValues)
     {
@@ -302,12 +308,12 @@ class Util
      * Alias of {@link set()}
      * 
      * @param mixed $numbers   Targeted entries. Can be any criteria accepted by
-     * {@link find()}.
+     *     {@link find()}.
      * @param array $newValues An array with the names of each changed property
-     * as an array key, and the new value as an array value.
+     *     as an array key, and the new value as an array value.
      * 
      * @return ResponseCollection returns the response collection, allowing you
-     * to inspect errors, if any.
+     *     to inspect errors, if any.
      */
     public function edit($numbers, array $newValues)
     {
@@ -318,7 +324,7 @@ class Util
      * Adds a new entry at the current menu.
      * 
      * @param array $values An array with the names of each property as an array
-     * key, and the value as an array value.
+     *     key, and the value as an array value.
      * 
      * @return string The new entry's ID.
      */
@@ -341,14 +347,14 @@ class Util
      * be a move command on that menu. If in doubt, check from a terminal.
      * 
      * @param mixed $numbers     Targeted entries. Can be any criteria accepted
-     * by {@link find()}.
+     *     by {@link find()}.
      * @param mixed $destination Entry before which the targeted entries will be
-     * moved to. Can be any criteria accepted by {@link find()}. If multiple
-     * entries match the criteria, the targeted entries will move above the
-     * first match.
+     *     moved to. Can be any criteria accepted by {@link find()}. If multiple
+     *     entries match the criteria, the targeted entries will move above the
+     *     first match.
      * 
      * @return ResponseCollection returns the response collection, allowing you
-     * to inspect errors, if any.
+     *     to inspect errors, if any.
      */
     public function move($numbers, $destination)
     {
@@ -402,18 +408,20 @@ class Util
      * 
      * @param string $source A script to execute.
      * @param array  $params An array of local variables to make available in
-     * the script. Variable names are array keys, and variable values are array
-     * values. Invalid names will not be added, and silently ignored. Note that
-     * the script's (generated) name is always declared at the variable "_".
+     *     the script. Variable names are array keys, and variable values are
+     *     array values. Invalid names will not be added, and silently ignored.
+     *     Note that the script's (generated) name is always declared at the
+     *     variable "_".
      * @param string $policy Allows you to specify a policy the script must
-     * follow. Accepts the same things as in terminal. If left empty, the script
-     * has no restrictions.
+     *     follow. Accepts the same things as in terminal. If left empty, the
+     *     script has no restrictions.
      * @param string $name   The script is executed after being saved in
-     * "/system script" under a random name, and is removed after execution. To
-     * eliminate any possibility of name clashes, you can specify your own name.
+     *     "/system script" under a random name, and is removed after execution.
+     *     To eliminate any possibility of name clashes, you can specify your
+     *     own name.
      * 
      * @return ResponseCollection returns the response collection of the run,
-     * allowing you to inspect errors, if any.
+     *     allowing you to inspect errors, if any.
      */
     public function exec(
         $source,
@@ -459,11 +467,11 @@ class Util
      * 
      * @param string $what What action to perform.
      * @param array  $args Zero or more arguments can be specified, each being
-     * a criteria. If zero arguments are specified, removes all entries.
-     * See {@link find()} for a description of what criteria are accepted.
+     *     a criteria. If zero arguments are specified, removes all entries.
+     *     See {@link find()} for a description of what criteria are accepted.
      * 
      * @return ResponseCollection returns the response collection, allowing you
-     * to inspect errors, if any.
+     *     to inspect errors, if any.
      */
     protected function doBulk($what, array $args)
     {

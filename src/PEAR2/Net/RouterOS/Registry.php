@@ -31,6 +31,8 @@ use PEAR2\Cache\SHM;
  * Provides functionality for managing the request/response flow. Particularly
  * useful in persistent connections.
  * 
+ * Note that this class is not meant to be called directly.
+ * 
  * @category Net
  * @package  PEAR2_Net_RouterOS
  * @author   Vasil Rangelov <boen.robot@gmail.com>
@@ -83,7 +85,7 @@ class Registry
      * @param string $tag The tag (as received) to parse.
      * 
      * @return array An array with the first member being the ownership tag, and
-     * the second one being the original tag. 
+     *     the second one being the original tag. 
      */
     public static function parseTag($tag)
     {
@@ -102,7 +104,7 @@ class Registry
      * Checks if this instance is the tagless mode owner.
      * 
      * @return bool TRUE if this instance is the tagless mode owner, FALSE
-     * otherwise.
+     *     otherwise.
      */
     public function isTaglessModeOwner()
     {
@@ -124,7 +126,7 @@ class Registry
      * {@link Response::TYPE_FATAL}, it will be given to all instances.
      * 
      * @param bool $taglessMode TRUE to claim tagless ownership, FALSE to
-     * release such ownership, if taken.
+     *     release such ownership, if taken.
      * 
      * @return bool TRUE on success, FALSE on failure. 
      */
@@ -156,14 +158,14 @@ class Registry
      * Add a response to the registry.
      * 
      * @param Response $response     The response to add. The caller of this
-     * function is responsible for ensuring that the ownership tag and the
-     * original tag are separated, so that only the original one remains in the
-     * response.
+     *     function is responsible for ensuring that the ownership tag and the
+     *     original tag are separated, so that only the original one remains in
+     *     the response.
      * @param string   $ownershipTag The ownership tag that the response had.
      * 
      * @return bool TRUE if the request was added to its buffer, FALSE if
-     * this instance owns the response, and therefore doesn't need to add the
-     * response to its buffer.
+     *     this instance owns the response, and therefore doesn't need to add
+     *     the response to its buffer.
      */
     public function add(Response $response, $ownershipTag)
     {
@@ -200,7 +202,7 @@ class Registry
      * 
      * @param Response $response         The response to add.
      * @param string   $targetBufferName The name of the buffer to add the
-     * response to.
+     *     response to.
      * 
      * @return void
      */

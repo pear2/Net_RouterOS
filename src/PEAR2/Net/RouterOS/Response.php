@@ -72,11 +72,11 @@ class Response extends Message
      * Extracts a new response from a communicator.
      * 
      * @param Communicator $com      The communicator from which to extract the
-     * new response.
+     *     new response.
      * @param bool         $asStream Whether to populate the argument values
-     * with streams instead of strings.
+     *     with streams instead of strings.
      * @param Registry     $reg      An optional registry to sync the
-     * response with.
+     *     response with.
      * 
      * @see getType()
      * @see getArgument()
@@ -132,9 +132,9 @@ class Response extends Message
      * constructor is also involved in locks and registry sync.
      * 
      * @param Communicator $com      The communicator from which to extract the
-     * new response.
+     *     new response.
      * @param bool         $asStream Whether to populate the argument values
-     * with streams instead of strings.
+     *     with streams instead of strings.
      * 
      * @return void
      */
