@@ -21,6 +21,11 @@
 namespace PEAR2\Net\RouterOS;
 
 /**
+ * Used as a holder for the entry cache.
+ */
+use SplFixedArray;
+
+/**
  * Utility class.
  * 
  * Abstracts away frequently used functionality (particularly CRUD operations)
@@ -62,16 +67,31 @@ class Util
      */
     public static function escapeString($value)
     {
-        $result = '';
-        for ($i = 0, $l = strlen($value); $i < $l; ++$i) {
-            $result .= '\\' . str_pad(
-                strtoupper(dechex(ord($value[$i]))),
-                2,
-                '0',
-                STR_PAD_LEFT
-            );
-        }
-        return $result;
+        return preg_replace_callback(
+            '/[^A-Za-z0-9]/S',
+            array(self, '_escapeCharacter'),
+            $value
+        );
+    }
+    
+    /**
+     * Escapes a character for a RouterOS scripting context.
+     * 
+     * Escapes a character for a RouterOS scripting context. Intended to only be
+     * called for non-alphanumeric characters.
+     * 
+     * @param string $char The character to be escaped.
+     * 
+     * @return string The escaped character.
+     */
+    private static function _escapeCharacter($char)
+    {
+        return '\\' . str_pad(
+            strtoupper(dechex(ord($char))),
+            2,
+            '0',
+            STR_PAD_LEFT
+        );
     }
 
     /**
@@ -202,7 +222,7 @@ class Util
      * Gets a value of a specified entry at the current menu.
      * 
      * @param int    $number     A number identifying the entry you're
-     *     targeting. Can also be a name.
+     *     targeting. Can also be a name or ID.
      * @param string $value_name The name of the value you want to get.
      * 
      * @return string|null|bool The value of the specified property. If the
@@ -224,8 +244,11 @@ class Util
             return false;
         }
 
+        $number = (string)$number;
         foreach ($this->entryCache as $entry) {
-            if ($entry->getArgument('name') === (string)$number) {
+            if ($entry->getArgument('name') === $number
+                || $entry->getArgument('.id') === $number
+            ) {
                 return $entry->getArgument($value_name);
             }
         }
@@ -403,18 +426,17 @@ class Util
      * Executes a RouterOS script, written as a string.
      * Note that in cases of errors, the line numbers will be off, because the
      * script is executed at the current menu as context, with the specified
-     * variables pre declared. This is achieved by prepending 2+count($params)
+     * variables pre declared. This is achieved by prepending 1+count($params)
      * lines before your actual script.
      * 
      * @param string $source A script to execute.
      * @param array  $params An array of local variables to make available in
      *     the script. Variable names are array keys, and variable values are
-     *     array values. Invalid names will not be added, and silently ignored.
-     *     Note that the script's (generated) name is always declared at the
-     *     variable "_".
+     *     array values. Note that the script's (generated) name is always added
+     *     as the variable "_", which you can overwrite here.
      * @param string $policy Allows you to specify a policy the script must
-     *     follow. Accepts the same things as in terminal. If left empty, the
-     *     script has no restrictions.
+     *     follow. Has the same format as in terminal. If left empty, the script
+     *     has no restrictions.
      * @param string $name   The script is executed after being saved in
      *     "/system script" under a random name, and is removed after execution.
      *     To eliminate any possibility of name clashes, you can specify your
@@ -473,7 +495,7 @@ class Util
      * @return ResponseCollection returns the response collection, allowing you
      *     to inspect errors, if any.
      */
-    protected function doBulk($what, array $args)
+    protected function doBulk($what, array $args = array())
     {
         $bulkRequest = new Request($this->menu . '/' . $what);
         $bulkRequest->setArgument(
@@ -491,17 +513,17 @@ class Util
     protected function refreshEntryCache()
     {
         if (null === $this->entryCache) {
-            $this->entryCache = array();
+            $entryCache = array();
             foreach ($this->client->sendSync(
                 new Request($this->menu . '/print')
-            ) as $response) {
-                $this->entryCache[
-                    hexdec(substr($response->getAttribute('.id'), 1))
+            )->getAllOfType(Response::TYPE_DATA) as $response) {
+                $entryCache[
+                    hexdec(substr($response->getArgument('.id'), 1))
                 ] = $response;
             }
-            ksort($this->entryCache, SORT_NUMERIC);
+            ksort($entryCache, SORT_NUMERIC);
             $this->entryCache = SplFixedArray::fromArray(
-                array_values($this->entryCache)
+                array_values($entryCache)
             );
         }
     }

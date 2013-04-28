@@ -98,7 +98,7 @@
             <file>RequestHandlingTest.php</file>
             <file>ClientFeaturesTest.php</file>
             <file>ClientPersistentFeaturesTest.php</file>
-            <file>StateAlteringFeaturesTest.php</file>
+            <file>ClientStateAlteringFeaturesTest.php</file>
         </testsuite>
     </testsuites>
     <filter>
