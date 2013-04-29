@@ -1,7 +1,7 @@
 <?php
 namespace PEAR2\Net\RouterOS;
 
-class StateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
+class ClientStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
 {
 
     /**

@@ -14,14 +14,14 @@ class UtilFeaturesTest extends \PHPUnit_Framework_TestCase
      * @var Client
      */
     protected $client;
-    
+
     protected function setUp()
     {
         $this->util = new Util(
             $this->client = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT)
         );
     }
-    
+
     protected function tearDown()
     {
         unset($this->util);

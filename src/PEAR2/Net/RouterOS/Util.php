@@ -194,23 +194,18 @@ class Util
                         $idList .= $criteria . ',';
                     } else {
                         $criteriaArr = explode(',', $criteria);
-                        array_filter(
-                            $criteriaArr,
-                            function ($value) use (&$idList) {
-                                if ('' === $value) {
-                                    return false;
-                                }
-                                if ('*' === $value[0]) {
-                                    $idList .= $value . ',';
-                                    return false;
-                                }
-                                return true;
+                        for ($i = count($criteriaArr) - 1; $i >= 0; --$i) {
+                            if ('' === $criteriaArr[$i]) {
+                                unset($criteriaArr[$i]);
+                            } elseif ('*' === $criteriaArr[$i][0]) {
+                                $idList .= $criteriaArr[$i] . ',';
+                                unset($criteriaArr[$i]);
                             }
-                        );
+                        }
                         $idList .= call_user_func_array(
                             array($this, 'find'),
                             $criteriaArr
-                        );
+                        ) . ',';
                     }
                 }
             }

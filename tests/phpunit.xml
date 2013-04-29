@@ -99,6 +99,9 @@
             <file>ClientFeaturesTest.php</file>
             <file>ClientPersistentFeaturesTest.php</file>
             <file>ClientStateAlteringFeaturesTest.php</file>
+            <file>ClientStateAlteringPersistentFeaturesTest.php</file>
+            <file>UtilFeaturesTest.php</file>
+            <file>UtilStateAlteringFeaturesTest.php</file>
         </testsuite>
     </testsuites>
     <filter>
