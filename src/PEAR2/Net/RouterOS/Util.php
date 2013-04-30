@@ -26,6 +26,16 @@ namespace PEAR2\Net\RouterOS;
 use SplFixedArray;
 
 /**
+ * Values at {@link Util::exec()} can be casted from this type.
+ */
+use DateTime;
+
+/**
+ * Values at {@link Util::exec()} can be casted from this type.
+ */
+use DateInterval;
+
+/**
  * Utility class.
  * 
  * Abstracts away frequently used functionality (particularly CRUD operations)
@@ -42,7 +52,7 @@ class Util
     /**
      * @var Client The connection to wrap around.
      */
-    protected $client;
+    protected $objClient;
 
     /**
      * @var string The current menu.
@@ -50,16 +60,82 @@ class Util
     protected $menu = '/';
 
     /**
-     * @var array The entries in the current menu.
+     * @var SplFixedArray An array with the numbers of entries in the current menu as
+     *     keys, and the corresponding IDs as values.
      */
-    protected $entryCache = null;
+    protected $idCache = null;
+    
+    /**
+     * Escapes a value for a RouterOS scripting context.
+     * 
+     * Turns any PHP value into an equivalent whole value that can be inserted
+     * as part of a RouterOS script.
+     * @param mixed $value The value to be escaped.
+     * 
+     * @return string A string representation that can be directly inserted in a
+     *     script as a whole value.
+     */
+    public static function escapeValue($value)
+    {
+        switch(gettype($value)) {
+        case 'integer':
+            $value = (string)$value;
+            break;
+        case 'boolean':
+            $value = $value ? 'true' : 'false';
+            break;
+        case 'array':
+            $result = '{';
+            foreach ($value as $val) {
+                $result .= static::escapeValue($val) . ';';
+            }
+            $value = rtrim($result, ';') . '}';
+            break;
+        case 'null':
+            $value = '';
+            break;
+        case 'object':
+            if ($value instanceof DateTime) {
+                $usec = $value->format('u');
+                if ('0' === $usec) {
+                    unset($usec);
+                }
+                $unixEpoch = new DateTime('1970-01-01 00:00:00.000000');
+                $value = $unixEpoch->diff($value);
+            }
+            if ($value instanceof DateInterval) {
+                $result = '';
+                $daysTotal = $value->format('a');
+                if ($daysTotal >= 7) {
+                    $result = ($daysTotal / 7) . 'w';
+                    $daysRemaining = ($daysTotal % 7);
+                    if ($daysRemaining > 0) {
+                        $result = $daysRemaining . 'd';
+                    }
+                } else {
+                    $result = $daysTotal . 'd';
+                }
+                $value = $result . $value->format('H:I:S');
+                if (isset($usec)) {
+                    $value .= '.' . str_pad($usec, 6, '0', STR_PAD_LEFT);
+                }
+                break;
+            }
+            //break; intentionally omitted
+        default:
+            $value = '"' . static::escapeString((string)$value) . '"';
+            break;
+        }
+        return $value;
+    }
 
     /**
      * Escapes a string for a RouterOS scripting context.
      * 
      * Escapes a string for a RouterOS scripting context. The value can be
-     * surrounded with quotes at a RouterOS script, and you can be sure there
-     * won't be any code injections.
+     * surrounded with quotes at a RouterOS script (or concatenated onto a
+     * larger string first), and you can be sure there won't be any code
+     * injections coming from it.
      * 
      * @param string $value Value to be escaped.
      * 
@@ -68,8 +144,8 @@ class Util
     public static function escapeString($value)
     {
         return preg_replace_callback(
-            '/[^A-Za-z0-9]/S',
-            array(self, '_escapeCharacter'),
+            '/[^\\_A-Za-z0-9]/S',
+            array(__CLASS__, '_escapeCharacter'),
             $value
         );
     }
@@ -87,7 +163,7 @@ class Util
     private static function _escapeCharacter($char)
     {
         return '\\' . str_pad(
-            strtoupper(dechex(ord($char))),
+            strtoupper(dechex(ord($char[0]))),
             2,
             '0',
             STR_PAD_LEFT
@@ -103,7 +179,7 @@ class Util
      */
     public function __construct(Client $client)
     {
-        $this->client = $client;
+        $this->objClient = $client;
     }
     
     /**
@@ -113,7 +189,7 @@ class Util
      * 
      * @param string $newMenu The menu to change to. Can be specified with API
      *     or CLI syntax and can be either absolute or relative. If relative,
-     *     it's relative to the current menu.
+     *     it's relative to the current menu, which by default is the root.
      * 
      * @return string The old menu. If an empty string is given for a new menu,
      *     no change is performed, and this function returns the current menu.
@@ -134,8 +210,77 @@ class Util
                 str_replace('/', ' ', $newMenu)
             )->getCommand();
         }
-        $this->entryCache = null;
+        $this->idCache = null;
         return $oldMenu;
+    }
+
+    /**
+     * Executes a RouterOS script.
+     * 
+     * Executes a RouterOS script, written as a string.
+     * Note that in cases of errors, the line numbers will be off, because the
+     * script is executed at the current menu as context, with the specified
+     * variables pre declared. This is achieved by prepending 1+count($params)
+     * lines before your actual script.
+     * 
+     * @param string $source A script to execute.
+     * @param array  $params An array of local variables to make available in
+     *     the script. Variable names are array keys, and variable values are
+     *     array values. Note that the script's (generated) name is always added
+     *     as the variable "_", which you can overwrite from here.
+     *     Values that are not strings will be converted to their scripting
+     *     equivalents. DateTime and DateInterval objects will be casted to
+     *     RouterOS' "time" type.
+     * @param string $policy Allows you to specify a policy the script must
+     *     follow. Has the same format as in terminal. If left NULL, the script
+     *     has no restrictions.
+     * @param string $name   The script is executed after being saved in
+     *     "/system script" under a random name (prefixed with the computer's
+     *     name), and is removed after execution. To eliminate any possibility
+     *     of name clashes, you can specify your own name.
+     * 
+     * @return ResponseCollection returns the response collection of the run,
+     *     allowing you to inspect errors, if any. If the script was not added
+     *     successfully before execution, the ResponseCollection from the add
+     *     attempt is going to be returned.
+     */
+    public function exec(
+        $source,
+        array $params = array(),
+        $policy = null,
+        $name = null
+    ) {
+        $request = new Request('/system/script/add');
+        if (null === $name) {
+            $name = uniqid(gethostname(), true);
+        }
+        $request->setArgument('name', $name);
+        $request->setArgument('policy', $policy);
+
+        $finalSource = '/' . str_replace('/', ' ', substr($this->menu, 1))
+            . "\n";
+
+        $params += array('_' => $name);
+        foreach ($params as $pname => $pvalue) {
+            $pname = static::escapeString($pname);
+            $pvalue = static::escapeValue($pvalue);
+            $finalSource .= ":local \"{$pname}\" {$pvalue}\n";
+        }
+        $finalSource .= $source . "\n";
+        $request->setArgument('source', $finalSource);
+        $result = $this->objClient->sendSync($request);
+
+        if (0 === count($result->getAllOfType(Response::TYPE_ERROR))) {
+            $request = new Request('/system/script/run');
+            $request->setArgument('number', $name);
+            $result = $this->objClient->sendSync($request);
+
+            $request = new Request('/system/script/remove');
+            $request->setArgument('numbers', $name);
+            $this->objClient->sendSync($request);
+        }
+
+        return $result;
     }
 
     /**
@@ -162,34 +307,32 @@ class Util
     {
         $idList = '';
         if (func_num_args() === 0) {
-            $this->refreshEntryCache();
-            foreach ($this->entryCache as $entry) {
-                $idList .= $entry->getArgument('.id') . ',';
-            }
+            $this->refreshIdCache();
+            $idList .= implode(',', $this->idCache->toArray()) . ',';
         }
         foreach (func_get_args() as $criteria) {
             if ($criteria instanceof Query) {
-                foreach ($this->client->sendSync(
+                foreach ($this->objClient->sendSync(
                     new Request($this->menu . '/print .proplist=.id', $criteria)
                 ) as $response) {
                     $idList .= $response->getArgument('.id') . ',';
                 }
             } else {
-                $this->refreshEntryCache();
+                $this->refreshIdCache();
                 if (is_callable($criteria)) {
-                    foreach ($this->entryCache as $entry) {
-                        if ($criteria($entry)) {
-                            $idList .= $entry->getArgument('.id') . ',';
+                    foreach ($this->objClient->sendSync(
+                        new Request($this->menu . '/print')
+                    ) as $response) {
+                        if ($criteria($response)) {
+                            $idList .= $response->getArgument('.id') . ',';
                         }
                     }
                 } elseif (is_int($criteria)) {
-                    $idList = $this->entryCache[$criteria]->getArgument('.id')
-                        . ',';
+                    $idList = $this->idCache[$criteria] . ',';
                 } else {
                     $criteria = (string)$criteria;
                     if ($criteria === (string)(int)$criteria) {
-                        $idList .= $this->entryCache[(int)$criteria]
-                            ->getArgument('.id') . ',';
+                        $idList .= $this->idCache[(int)$criteria] . ',';
                     } elseif (false === strpos($criteria, ',')) {
                         $idList .= $criteria . ',';
                     } else {
@@ -217,7 +360,7 @@ class Util
      * Gets a value of a specified entry at the current menu.
      * 
      * @param int    $number     A number identifying the entry you're
-     *     targeting. Can also be a name or ID.
+     *     targeting. Can also be an ID or (in some menus) name.
      * @param string $value_name The name of the value you want to get.
      * 
      * @return string|null|bool The value of the specified property. If the
@@ -226,28 +369,26 @@ class Util
      */
     public function get($number, $value_name)
     {
-        if ('disabled' === $value_name) {
-            $this->entryCache = null;
-        }
-        $this->refreshEntryCache();
         if (is_int($number) || ((string)$number === (string)(int)$number)) {
-            if (isset($this->entryCache[(int)$number])) {
-                return $this->entryCache[(int)$number]->getArgument(
-                    $value_name
-                );
+            $this->refreshIdCache();
+            if (isset($this->idCache[(int)$number])) {
+                $number = $this->idCache[(int)$number];
             }
             return false;
         }
 
-        $number = (string)$number;
-        foreach ($this->entryCache as $entry) {
-            if ($entry->getArgument('name') === $number
-                || $entry->getArgument('.id') === $number
-            ) {
-                return $entry->getArgument($value_name);
-            }
+        $request = new Request(
+            $this->menu . '/print',
+            Query::where('.id', (string)$number)
+        );
+        $request->setArgument('.proplist', $value_name);
+        $responses = $this->objClient->sendSync($request)
+            ->getAllOfType(Response::TYPE_DATA);
+
+        if (0 === count($responses)) {
+            return false;
         }
-        return false;
+        return $responses->getArgument($value_name);
     }
 
     /**
@@ -293,7 +434,7 @@ class Util
     public function remove()
     {
         $result = $this->doBulk('remove', func_get_args());
-        $this->entryCache = null;
+        $this->idCache = null;
         return $result;
     }
 
@@ -318,8 +459,7 @@ class Util
             $setRequest->setArgument($name, $value);
         }
         $setRequest->setArgument('numbers', $this->find($numbers));
-        $this->entryCache = null;
-        return $this->client->sendSync($setRequest);
+        return $this->objClient->sendSync($setRequest);
     }
 
     /**
@@ -352,8 +492,8 @@ class Util
         foreach ($values as $name => $value) {
             $addRequest->setArgument($name, $value);
         }
-        $this->entryCache = null;
-        return $this->client->sendSync($addRequest)->getArgument('ret');
+        $this->idCache = null;
+        return $this->objClient->sendSync($addRequest)->getArgument('ret');
     }
 
     /**
@@ -382,8 +522,8 @@ class Util
                 'destination',
                 strstr($this->find($destination), ',', true)
             );
-        $this->entryCache = null;
-        return $this->client->sendSync($moveRequest);
+        $this->idCache = null;
+        return $this->objClient->sendSync($moveRequest);
     }
 
     /**
@@ -401,82 +541,18 @@ class Util
             Query::where('name', $filename)
         );
         $request->setArgument('file', $filename);
-        $result = $this->client->sendSync($request);
+        $result = $this->objClient->sendSync($request);
 
         if (0 === count($result->getAllOfType(Response::TYPE_ERROR))) {
             $request = new Request('/file/set');
             $request->setArgument('numbers', $filename)
                 ->setArgument('contents', $data);
-            $result = $this->client->sendSync($request);
+            $result = $this->objClient->sendSync($request);
             if (0 === count($result->getAllOfType(Response::TYPE_ERROR))) {
                 return true;
             }
         }
         return false;
-    }
-
-    /**
-     * Executes a RouterOS script.
-     * 
-     * Executes a RouterOS script, written as a string.
-     * Note that in cases of errors, the line numbers will be off, because the
-     * script is executed at the current menu as context, with the specified
-     * variables pre declared. This is achieved by prepending 1+count($params)
-     * lines before your actual script.
-     * 
-     * @param string $source A script to execute.
-     * @param array  $params An array of local variables to make available in
-     *     the script. Variable names are array keys, and variable values are
-     *     array values. Note that the script's (generated) name is always added
-     *     as the variable "_", which you can overwrite here.
-     * @param string $policy Allows you to specify a policy the script must
-     *     follow. Has the same format as in terminal. If left empty, the script
-     *     has no restrictions.
-     * @param string $name   The script is executed after being saved in
-     *     "/system script" under a random name, and is removed after execution.
-     *     To eliminate any possibility of name clashes, you can specify your
-     *     own name.
-     * 
-     * @return ResponseCollection returns the response collection of the run,
-     *     allowing you to inspect errors, if any.
-     */
-    public function exec(
-        $source,
-        array $params = array(),
-        $policy = null,
-        $name = null
-    ) {
-        $request = new Request('/system/script/add');
-        if (null === $name) {
-            $name = uniqid(gethostname(), true);
-        }
-        $request->setArgument('name', $name);
-        $request->setArgument('policy', $policy);
-
-        $finalSource = '/' . str_replace('/', ' ', substr($this->menu, 1))
-            . "\n";
-
-        $params += array('_', $name);
-        foreach ($params as $pname => $pvalue) {
-            $pname = static::escapeString($pname);
-            $pvalue = static::escapeString($pvalue);
-            $finalSource .= ":local \"{$pname}\" \"{$pvalue}\"\n";
-        }
-        $finalSource .= $source;
-        $request->setArgument('source', $finalSource);
-        $result = $this->client->sendSync($request);
-
-        if (0 === count($result->getAllOfType(Response::TYPE_ERROR))) {
-            $request = new Request('/system/script/run');
-            $request->setArgument('number', $name);
-            $result = $this->client->sendSync($request);
-
-            $request = new Request('/system/script/remove');
-            $request->setArgument('numbers', $name);
-            $this->client->sendSync($request);
-        }
-
-        return $result;
     }
 
     /**
@@ -497,29 +573,26 @@ class Util
             'numbers',
             call_user_func_array(array($this, 'find'), $args)
         );
-        return $this->client->sendSync($bulkRequest);
+        return $this->objClient->sendSync($bulkRequest);
     }
 
     /**
-     * Refresh the entry cache, if needed.
+     * Refresh the id cache, if needed.
      * 
      * @return void
      */
-    protected function refreshEntryCache()
+    protected function refreshIdCache()
     {
-        if (null === $this->entryCache) {
-            $entryCache = array();
-            foreach ($this->client->sendSync(
-                new Request($this->menu . '/print')
+        if (null === $this->idCache) {
+            $idCache = array();
+            foreach ($this->objClient->sendSync(
+                new Request($this->menu . '/print .proplist=.id')
             )->getAllOfType(Response::TYPE_DATA) as $response) {
-                $entryCache[
-                    hexdec(substr($response->getArgument('.id'), 1))
-                ] = $response;
+                $id =$response->getArgument('.id');
+                $idCache[hexdec(substr($id, 1))] = $id;
             }
-            ksort($entryCache, SORT_NUMERIC);
-            $this->entryCache = SplFixedArray::fromArray(
-                array_values($entryCache)
-            );
+            ksort($idCache, SORT_NUMERIC);
+            $this->idCache = SplFixedArray::fromArray(array_values($idCache));
         }
     }
 }

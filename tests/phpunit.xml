@@ -91,6 +91,12 @@
         -->
         <const name="TEST_QUEUE_NAME" value="TEST_QUEUE" />
         
+        <!--
+        A name for a test script It must be a name not currently in the list of
+        scripts. Also avoid any function names.
+        -->
+        <const name="TEST_SCRIPT_NAME" value="API_TEST" />
+        
     </php>
     <testsuites>
         <testsuite name="All tests">

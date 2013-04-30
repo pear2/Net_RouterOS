@@ -532,7 +532,13 @@ class Client
             }
         } catch (SocketException $e) {
             if ($e->getCode() !== 11800) {
+                // @codeCoverageIgnoreStart
+                // It's impossible to reliably cause any other SocketException.
+                // This line is only here in case the unthinkable happens:
+                // The connection terminates just after it was supposedly
+                // about to send back some data.
                 throw $e;
+                // @codeCoverageIgnoreEnd
             }
         }
         return $this->getPendingRequestsCount() !== 0;

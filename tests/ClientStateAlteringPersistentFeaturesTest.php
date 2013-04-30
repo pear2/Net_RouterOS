@@ -3,7 +3,8 @@ namespace PEAR2\Net\RouterOS;
 
 require_once 'ClientStateAlteringFeaturesTest.php';
 
-class ClientStateAlteringPersistentFeaturesTest extends ClientStateAlteringFeaturesTest
+class ClientStateAlteringPersistentFeaturesTest
+    extends ClientStateAlteringFeaturesTest
 {
     
     protected function setUp()

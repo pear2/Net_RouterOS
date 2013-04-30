@@ -9,52 +9,54 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
     /**
      * @var Util
      */
-    protected $util;
+    protected $objUtil;
     /**
      * @var Client
      */
-    protected $client;
+    protected $objClient;
 
     protected function setUp()
     {
-        $this->util = new Util(
-            $this->client = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT)
+        $this->objUtil = new Util(
+            $this->objClient = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT)
         );
     }
 
     protected function tearDown()
     {
-        unset($this->util);
-        unset($this->client);
+        unset($this->objUtil);
+        unset($this->objClient);
     }
 
     public function testAdd()
     {
         $printRequest = new Request('/queue/simple/print');
-        $beforeCount = count($this->client->sendSync($printRequest));
-        $this->util->changeMenu('/queue/simple');
+        $beforeCount = count($this->objClient->sendSync($printRequest));
+        $this->objUtil->changeMenu('/queue/simple');
         $this->assertRegExp(
             '/^' . self::REGEX_ID . '$/',
-            $id = $this->util->add(array('name' => TEST_QUEUE_NAME))
+            $id = $this->objUtil->add(array('name' => TEST_QUEUE_NAME))
         );
-        $afterCount = count($this->client->sendSync($printRequest));
+        $afterCount = count($this->objClient->sendSync($printRequest));
         $this->assertSame(1 + $beforeCount, $afterCount);
         
         $removeRequest = new Request('/queue/simple/remove');
         $removeRequest->setArgument('numbers', $id);
-        $this->client->sendSync($removeRequest);
+        $this->objClient->sendSync($removeRequest);
 
-        $postCount = count($this->client->sendSync($printRequest));
+        $postCount = count($this->objClient->sendSync($printRequest));
         $this->assertSame($beforeCount, $postCount);
     }
 
     /**
      * @depends testAdd
+     * 
+     * @return void
      */
     public function testDisableAndEnable()
     {
-        $this->util->changeMenu('/queue/simple');
-        $id = $this->util->add(
+        $this->objUtil->changeMenu('/queue/simple');
+        $id = $this->objUtil->add(
             array('name' => TEST_QUEUE_NAME, 'disabled' => 'no')
         );
         $printRequest = new Request(
@@ -64,56 +66,60 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             'false',
-            $this->client->sendSync($printRequest)->getArgument('disabled')
+            $this->objClient->sendSync($printRequest)->getArgument('disabled')
         );
 
-        $this->util->disable($id);
+        $this->objUtil->disable($id);
 
         $this->assertSame(
             'true',
-            $this->client->sendSync($printRequest)->getArgument('disabled')
+            $this->objClient->sendSync($printRequest)->getArgument('disabled')
         );
 
-        $this->util->enable($id);
+        $this->objUtil->enable($id);
 
         $this->assertSame(
             'false',
-            $this->client->sendSync($printRequest)->getArgument('disabled')
+            $this->objClient->sendSync($printRequest)->getArgument('disabled')
         );
 
         $removeRequest = new Request('/queue/simple/remove');
         $removeRequest->setArgument('numbers', $id);
-        $this->client->sendSync($removeRequest);
+        $this->objClient->sendSync($removeRequest);
     }
 
     /**
      * @depends testDisableAndEnable
+     * 
+     * @return void
      */
     public function testRemove()
     {
         $printRequest = new Request('/queue/simple/print');
-        $beforeCount = count($this->client->sendSync($printRequest));
-        $this->util->changeMenu('/queue/simple');
+        $beforeCount = count($this->objClient->sendSync($printRequest));
+        $this->objUtil->changeMenu('/queue/simple');
         $this->assertRegExp(
             '/^' . self::REGEX_ID . '$/',
-            $id = $this->util->add(array('name' => TEST_QUEUE_NAME))
+            $id = $this->objUtil->add(array('name' => TEST_QUEUE_NAME))
         );
-        $afterCount = count($this->client->sendSync($printRequest));
+        $afterCount = count($this->objClient->sendSync($printRequest));
         $this->assertSame(1 + $beforeCount, $afterCount);
         
-        $this->util->remove($id);
+        $this->objUtil->remove($id);
 
-        $postCount = count($this->client->sendSync($printRequest));
+        $postCount = count($this->objClient->sendSync($printRequest));
         $this->assertSame($beforeCount, $postCount);
     }
 
     /**
      * @depends testRemove
+     * 
+     * @return void
      */
     public function testSetAndEdit()
     {
-        $this->util->changeMenu('/queue/simple');
-        $id = $this->util->add(
+        $this->objUtil->changeMenu('/queue/simple');
+        $id = $this->objUtil->add(
             array(
                 'name' => TEST_QUEUE_NAME,
                 'target-addresses' => HOSTNAME_SILENT . '/32'
@@ -127,12 +133,12 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             HOSTNAME_SILENT . '/32',
-            $this->client->sendSync(
+            $this->objClient->sendSync(
                 $printRequest
             )->getArgument('target-addresses')
         );
 
-        $this->util->set(
+        $this->objUtil->set(
             $id,
             array(
                 'target-addresses' => HOSTNAME_INVALID . '/32'
@@ -141,12 +147,12 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             HOSTNAME_INVALID . '/32',
-            $this->client->sendSync(
+            $this->objClient->sendSync(
                 $printRequest
             )->getArgument('target-addresses')
         );
 
-        $this->util->edit(
+        $this->objUtil->edit(
             $id,
             array(
                 'target-addresses' => HOSTNAME_SILENT . '/32'
@@ -155,23 +161,26 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             HOSTNAME_SILENT . '/32',
-            $this->client->sendSync(
+            $this->objClient->sendSync(
                 $printRequest
             )->getArgument('target-addresses')
         );
 
-        $this->util->remove($id);
+        $this->objUtil->remove($id);
     }
 
     /**
      * @depends testAdd
      * @depends testRemove
+     * @depends PEAR2\Net\RouterOS\UtilFeaturesTest::testFindNoCriteria
+     * 
+     * @return void
      */
     public function testFindByNumber()
     {
-        $this->util->changeMenu('/queue/simple');
-        $itemCount = count(explode(',', $this->util->find()));
-        $id = $this->util->add(
+        $this->objUtil->changeMenu('/queue/simple');
+        $itemCount = count(explode(',', $this->objUtil->find()));
+        $id = $this->objUtil->add(
             array(
                 'name' => TEST_QUEUE_NAME,
                 'target-addresses' => HOSTNAME_SILENT . '/32'
@@ -179,11 +188,70 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertSame(
             1 + $itemCount,
-            count(explode(',', $this->util->find()))
+            count(explode(',', $this->objUtil->find()))
         );
-        $this->assertSame($id, $this->util->find($itemCount));
-        $this->assertSame($id, $this->util->find((string)$itemCount));
+        $this->assertSame($id, $this->objUtil->find($itemCount));
+        $this->assertSame($id, $this->objUtil->find((string)$itemCount));
         
-        $this->util->remove($id);
+        $this->objUtil->remove($id);
+    }
+
+    /**
+     * @depends testRemove
+     * 
+     * @return void
+     */
+    public function testExec()
+    {
+        $printRequest = new Request(
+            '/queue/simple/print',
+            Query::where('name', TEST_QUEUE_NAME)
+        );
+  
+        $this->objUtil->changeMenu('/queue/simple');
+        $this->assertCount(
+            0,
+            $this->objClient->sendSync(
+                $printRequest
+            )->getAllOfType(Response::TYPE_DATA)
+        );
+
+        $this->objUtil->exec(
+            'add name=$name',
+            array('name' => TEST_QUEUE_NAME)
+        );
+
+        $this->assertCount(
+            1,
+            $this->objClient->sendSync(
+                $printRequest
+            )->getAllOfType(Response::TYPE_DATA)
+        );
+        
+        $this->objUtil->remove(TEST_QUEUE_NAME);
+ 
+        $this->assertCount(
+            0,
+            $this->objClient->sendSync(
+                $printRequest
+            )->getAllOfType(Response::TYPE_DATA)
+        );
+
+        $this->objUtil->exec(
+            'add name=$name comment=$"_"',
+            array('name' => TEST_QUEUE_NAME),
+            null,
+            TEST_SCRIPT_NAME
+        );
+
+        $results = $this->objClient->sendSync(
+            $printRequest
+        )->getAllOfType(Response::TYPE_DATA);
+
+        $this->assertCount(1, $results);
+
+        $this->assertEquals(TEST_SCRIPT_NAME, $results->getArgument('comment'));
+
+        $this->objUtil->remove(TEST_QUEUE_NAME);
     }
 }
