@@ -5,7 +5,7 @@
     stopOnFailure="false"
     verbose="true"
     strict="true"
-    
+
     convertErrorsToExceptions="true"
     convertNoticesToExceptions="true"
     convertWarningsToExceptions="true"
@@ -19,14 +19,14 @@
     <php>
         <!--
         The actual RouterOS machine and the port of the API service.
-        
+
         The router is expected to contain at least two entries in
         "/queue/simple" and "/ip/arp", with those being HOSTNAME_INVALID and
         HOSTNAME_SILENT.
         -->
         <const name="HOSTNAME" value="ros.example.com" />
         <const name="PORT" value="8728" />
-        
+
         <!--
         A server with a different service at the API port.
         -->
@@ -36,7 +36,7 @@
         but never the API one.
         -->
         <const name="PORT_INVALID" value="80" />
-        
+
         <!--
         A device that doesn't answer at the API or the invalid port.
         -->
@@ -45,36 +45,36 @@
         A port on which none of the hosts answers.
         -->
         <const name="PORT_SILENT" value="65534" />
-        
+
         <!--
         A RouterOS username and password. Must have full privileges.
         -->
         <const name="USERNAME" value="apifull" />
         <const name="PASSWORD" value="apifull" />
-        
+
         <!--
         A RouterOS username and password. Must not have writing privileges.
         -->
         <const name="USERNAME2" value="api" />
         <const name="PASSWORD2" value="api" />
-        
+
         <!--
         A RouterOS username and password that uses non ASCII characters.
         Does not need to have any privileges beyond accessing the router.
-        
+
         RouterOS forbids non ASCII usernames, but does not forbid non ASCII
         passwords, which is why these credentials are required for a special
         test.
         -->
         <const name="ANSI_USERNAME" value="api-ANSI" />
         <const name="ANSI_PASSWORD" value="апи" />
-        
+
         <!--
         The ANSI charset of the password. Should match the charset for the
         locale of the device the password was defined from.
         -->
         <const name="ANSI_PASSWORD_CHARSET" value="windows-1251" />
-        
+
         <!--
         A RouterOS username that doesn't exist.
         -->
@@ -83,20 +83,32 @@
         A RouterOS password that is not used by either valid RouterOS accounts.
         -->
         <const name="PASSWORD_INVALID" value="tester" />
-        
+
         <!--
         A name for a test queue. It must be a name not currently in the list of
         simple queues. It's also a good idea to keep it ASCII compatible,
         because it's used in a charset test.
         -->
         <const name="TEST_QUEUE_NAME" value="TEST_QUEUE" />
-        
+
         <!--
-        A name for a test script It must be a name not currently in the list of
+        Another name for a test queue. It must be a name not currently in the
+        list of simple queues.
+        -->
+        <const name="TEST_QUEUE_NAME1" value="TEST_QUEUE1" />
+
+        <!--
+        A name for a test script. It must be a name not currently in the list of
         scripts. Also avoid any function names.
         -->
         <const name="TEST_SCRIPT_NAME" value="API_TEST" />
-        
+
+        <!--
+        A name for a test file. It must be a name not currently in the list of
+        files.
+        -->
+        <const name="TEST_FILE_NAME" value="API_TEST.txt" />
+
     </php>
     <testsuites>
         <testsuite name="All tests">
@@ -107,7 +119,9 @@
             <file>ClientStateAlteringFeaturesTest.php</file>
             <file>ClientStateAlteringPersistentFeaturesTest.php</file>
             <file>UtilFeaturesTest.php</file>
+            <file>UtilPersistentFeaturesTest.php</file>
             <file>UtilStateAlteringFeaturesTest.php</file>
+            <file>UtilStateAlteringPersistentFeaturesTest.php</file>
         </testsuite>
     </testsuites>
     <filter>

@@ -97,8 +97,9 @@ class UtilFeaturesTest extends \PHPUnit_Framework_TestCase
     
     public function testByCallbackName()
     {
-        include 'data://text/plain;base64,' . base64_encode(
-            <<<HEREDOC
+        if (!function_exists('isHostnameInvalid')) {
+            include 'data://text/plain;base64,' . base64_encode(
+                <<<HEREDOC
 <?php
 function isHostnameInvalid(\$entry) {
     return \$entry->getArgument(
@@ -106,7 +107,8 @@ function isHostnameInvalid(\$entry) {
     ) === \PEAR2\Net\RouterOS\HOSTNAME_INVALID . '/32';
 }
 HEREDOC
-        );
+            );
+        }
         $this->util->changeMenu('/queue/simple');
         $findResults = $this->util->find('isHostnameInvalid');
         $this->assertRegExp(
@@ -136,5 +138,23 @@ HEREDOC
             $originalResult->getArgument('.id'),
             $this->util->find($originalResult->getArgument('.id'))
         );
+    }
+    
+    public function testFindByCommaSeparatedValue()
+    {
+        $this->util->changeMenu('/queue/simple');
+        $findResults = $this->util->find('0,1');
+        $this->assertRegExp(
+            self::REGEX_IDLIST,
+            $findResults
+        );
+        $this->assertCount(2, explode(',', $findResults));
+
+        $findResults = $this->util->find('0,,1');
+        $this->assertRegExp(
+            self::REGEX_IDLIST,
+            $findResults
+        );
+        $this->assertCount(2, explode(',', $findResults));
     }
 }

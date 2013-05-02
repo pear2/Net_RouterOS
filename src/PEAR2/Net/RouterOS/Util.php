@@ -52,7 +52,7 @@ class Util
     /**
      * @var Client The connection to wrap around.
      */
-    protected $objClient;
+    protected $client;
 
     /**
      * @var string The current menu.
@@ -70,6 +70,7 @@ class Util
      * 
      * Turns any PHP value into an equivalent whole value that can be inserted
      * as part of a RouterOS script.
+     * 
      * @param mixed $value The value to be escaped.
      * 
      * @return string A string representation that can be directly inserted in a
@@ -78,6 +79,9 @@ class Util
     public static function escapeValue($value)
     {
         switch(gettype($value)) {
+        case 'NULL':
+            $value = '';
+            break;
         case 'integer':
             $value = (string)$value;
             break;
@@ -85,39 +89,31 @@ class Util
             $value = $value ? 'true' : 'false';
             break;
         case 'array':
-            $result = '{';
+            $result = '';
             foreach ($value as $val) {
-                $result .= static::escapeValue($val) . ';';
+                $result .= ';' . static::escapeValue($val);
             }
-            $value = rtrim($result, ';') . '}';
-            break;
-        case 'null':
-            $value = '';
+            $value = '{' . substr($result, 1) . '}';
             break;
         case 'object':
             if ($value instanceof DateTime) {
                 $usec = $value->format('u');
-                if ('0' === $usec) {
+                if ('000000' === $usec) {
                     unset($usec);
                 }
                 $unixEpoch = new DateTime('1970-01-01 00:00:00.000000');
                 $value = $unixEpoch->diff($value);
             }
             if ($value instanceof DateInterval) {
-                $result = '';
-                $daysTotal = $value->format('a');
-                if ($daysTotal >= 7) {
-                    $result = ($daysTotal / 7) . 'w';
-                    $daysRemaining = ($daysTotal % 7);
-                    if ($daysRemaining > 0) {
-                        $result = $daysRemaining . 'd';
-                    }
+                if (false === $value->days || $value->days < 0) {
+                    $value = $value->format('%r')
+                        . ($value->y * 365 + $value->m * 12 + $value->d)
+                        . $value->format('d%H:%I:%S');
                 } else {
-                    $result = $daysTotal . 'd';
+                    $value = $value->format('%r%ad%H:%I:%S');
                 }
-                $value = $result . $value->format('H:I:S');
                 if (isset($usec)) {
-                    $value .= '.' . str_pad($usec, 6, '0', STR_PAD_LEFT);
+                    $value .= '.' . $usec;
                 }
                 break;
             }
@@ -179,7 +175,7 @@ class Util
      */
     public function __construct(Client $client)
     {
-        $this->objClient = $client;
+        $this->client = $client;
     }
     
     /**
@@ -210,7 +206,7 @@ class Util
                 str_replace('/', ' ', $newMenu)
             )->getCommand();
         }
-        $this->idCache = null;
+        $this->clearIdCache();
         return $oldMenu;
     }
 
@@ -228,9 +224,9 @@ class Util
      *     the script. Variable names are array keys, and variable values are
      *     array values. Note that the script's (generated) name is always added
      *     as the variable "_", which you can overwrite from here.
-     *     Values that are not strings will be converted to their scripting
-     *     equivalents. DateTime and DateInterval objects will be casted to
-     *     RouterOS' "time" type.
+     *     Native PHP types will be converted to their RouterOS equivalents.
+     *     DateTime and DateInterval objects will be casted to RouterOS' "time"
+     *     type. Other types are casted to strings.
      * @param string $policy Allows you to specify a policy the script must
      *     follow. Has the same format as in terminal. If left NULL, the script
      *     has no restrictions.
@@ -250,37 +246,26 @@ class Util
         $policy = null,
         $name = null
     ) {
-        $request = new Request('/system/script/add');
-        if (null === $name) {
-            $name = uniqid(gethostname(), true);
-        }
-        $request->setArgument('name', $name);
-        $request->setArgument('policy', $policy);
-
-        $finalSource = '/' . str_replace('/', ' ', substr($this->menu, 1))
-            . "\n";
-
-        $params += array('_' => $name);
-        foreach ($params as $pname => $pvalue) {
-            $pname = static::escapeString($pname);
-            $pvalue = static::escapeValue($pvalue);
-            $finalSource .= ":local \"{$pname}\" {$pvalue}\n";
-        }
-        $finalSource .= $source . "\n";
-        $request->setArgument('source', $finalSource);
-        $result = $this->objClient->sendSync($request);
-
-        if (0 === count($result->getAllOfType(Response::TYPE_ERROR))) {
-            $request = new Request('/system/script/run');
-            $request->setArgument('number', $name);
-            $result = $this->objClient->sendSync($request);
-
-            $request = new Request('/system/script/remove');
-            $request->setArgument('numbers', $name);
-            $this->objClient->sendSync($request);
-        }
-
-        return $result;
+        return $this->_exec($source, $params, $policy, $name);
+    }
+    
+    /**
+     * Clears the ID cache.
+     * 
+     * Normally, the ID cache improves performance when targeting entries by a
+     * number. If you're using both Util's methods and other means (e.g.
+     * {@link Client} or {@link Util::exec()}) to add/move/remove entries, the
+     * cache may end up being out of date. By calling this method right before
+     * targeting an entry with a number, you can ensure number accuracy. Note
+     * that Util's add(), move() and remove() methods automatically clear the
+     * cache. A change in the menu also clears the cache.
+     * 
+     * @return $this The Util object itself.
+     */
+    public function clearIdCache()
+    {
+        $this->idCache = null;
+        return $this;
     }
 
     /**
@@ -305,29 +290,29 @@ class Util
      */
     public function find()
     {
-        $idList = '';
         if (func_num_args() === 0) {
             $this->refreshIdCache();
-            $idList .= implode(',', $this->idCache->toArray()) . ',';
+            return implode(',', $this->idCache->toArray());
         }
+        $idList = '';
         foreach (func_get_args() as $criteria) {
             if ($criteria instanceof Query) {
-                foreach ($this->objClient->sendSync(
+                foreach ($this->client->sendSync(
                     new Request($this->menu . '/print .proplist=.id', $criteria)
                 ) as $response) {
                     $idList .= $response->getArgument('.id') . ',';
                 }
+            } elseif (is_callable($criteria)) {
+                foreach ($this->client->sendSync(
+                    new Request($this->menu . '/print')
+                ) as $response) {
+                    if ($criteria($response)) {
+                        $idList .= $response->getArgument('.id') . ',';
+                    }
+                }
             } else {
                 $this->refreshIdCache();
-                if (is_callable($criteria)) {
-                    foreach ($this->objClient->sendSync(
-                        new Request($this->menu . '/print')
-                    ) as $response) {
-                        if ($criteria($response)) {
-                            $idList .= $response->getArgument('.id') . ',';
-                        }
-                    }
-                } elseif (is_int($criteria)) {
+                if (is_int($criteria)) {
                     $idList = $this->idCache[$criteria] . ',';
                 } else {
                     $criteria = (string)$criteria;
@@ -345,10 +330,12 @@ class Util
                                 unset($criteriaArr[$i]);
                             }
                         }
-                        $idList .= call_user_func_array(
-                            array($this, 'find'),
-                            $criteriaArr
-                        ) . ',';
+                        if (!empty($criteriaArr)) {
+                            $idList .= call_user_func_array(
+                                array($this, 'find'),
+                                $criteriaArr
+                            ) . ',';
+                        }
                     }
                 }
             }
@@ -373,16 +360,18 @@ class Util
             $this->refreshIdCache();
             if (isset($this->idCache[(int)$number])) {
                 $number = $this->idCache[(int)$number];
+            } else {
+                return false;
             }
-            return false;
         }
 
+        $number = (string)$number;
         $request = new Request(
             $this->menu . '/print',
-            Query::where('.id', (string)$number)
+            Query::where('.id', $number)->orWhere('name', $number)
         );
         $request->setArgument('.proplist', $value_name);
-        $responses = $this->objClient->sendSync($request)
+        $responses = $this->client->sendSync($request)
             ->getAllOfType(Response::TYPE_DATA);
 
         if (0 === count($responses)) {
@@ -434,7 +423,7 @@ class Util
     public function remove()
     {
         $result = $this->doBulk('remove', func_get_args());
-        $this->idCache = null;
+        $this->clearIdCache();
         return $result;
     }
 
@@ -459,7 +448,7 @@ class Util
             $setRequest->setArgument($name, $value);
         }
         $setRequest->setArgument('numbers', $this->find($numbers));
-        return $this->objClient->sendSync($setRequest);
+        return $this->client->sendSync($setRequest);
     }
 
     /**
@@ -481,19 +470,28 @@ class Util
     /**
      * Adds a new entry at the current menu.
      * 
-     * @param array $values An array with the names of each property as an array
-     *     key, and the value as an array value.
+     * @param array $values     Accepts one or more entries to add to the
+     *     current menu. The data about each entry is specified as an array with
+     *     the names of each property as an array key, and the value as an array
+     *     value.
+     * @param array $values,... Additional entries.
      * 
-     * @return string The new entry's ID.
+     * @return string A comma separated list of the new entries' IDs.
      */
     public function add(array $values)
     {
         $addRequest = new Request($this->menu . '/add');
-        foreach ($values as $name => $value) {
-            $addRequest->setArgument($name, $value);
+        $idList = '';
+        foreach (func_get_args() as $values) {
+            foreach ($values as $name => $value) {
+                $addRequest->setArgument($name, $value);
+            }
+            $idList .= $this->client->sendSync($addRequest)->getArgument('ret')
+                . ',';
+            $addRequest->removeAllArguments();
         }
-        $this->idCache = null;
-        return $this->objClient->sendSync($addRequest)->getArgument('ret');
+        $this->clearIdCache();
+        return rtrim($idList, ',');
     }
 
     /**
@@ -517,42 +515,93 @@ class Util
     public function move($numbers, $destination)
     {
         $moveRequest = new Request($this->menu . '/move');
-        $moveRequest->setArgument('numbers', $this->find($numbers))
-            ->setArgument(
-                'destination',
-                strstr($this->find($destination), ',', true)
-            );
-        $this->idCache = null;
-        return $this->objClient->sendSync($moveRequest);
+        $moveRequest->setArgument('numbers', $this->find($numbers));
+        $destination = $this->find($destination);
+        if (false !== strpos($destination, ',')) {
+            $destination = strstr($destination, ',', true);
+        }
+        $moveRequest->setArgument('destination', $destination);
+        $this->clearIdCache();
+        return $this->client->sendSync($moveRequest);
     }
 
     /**
      * Puts a file on RouterOS's file system.
      * 
-     * @param string $filename The filename to write data in.
-     * @param string $data     The data the file is going to have.
+     * @param string $filename  The filename to write data in.
+     * @param string $data      The data the file is going to have.
+     * @param bool   $overwrite Whether to overwrite the file if it exists.
      * 
      * @return bool TRUE on success, FALSE on failure.
      */
-    public function filePutContents($filename, $data)
+    public function filePutContents($filename, $data, $overwrite = false)
     {
-        $request = new Request(
-            '/file/print .proplist=""',
+        $printRequest = new Request(
+            '/file/print .proplist="size"',
             Query::where('name', $filename)
         );
-        $request->setArgument('file', $filename);
-        $result = $this->objClient->sendSync($request);
-
-        if (0 === count($result->getAllOfType(Response::TYPE_ERROR))) {
-            $request = new Request('/file/set');
-            $request->setArgument('numbers', $filename)
-                ->setArgument('contents', $data);
-            $result = $this->objClient->sendSync($request);
-            if (0 === count($result->getAllOfType(Response::TYPE_ERROR))) {
-                return true;
-            }
+        if (!$overwrite && count($this->client->sendSync($printRequest)) > 1) {
+            return false;
         }
-        return false;
+        $source = <<<'NEWDOC'
+/file
+print file=$filename where name=""
+NEWDOC;
+        $this->exec(
+            $source,
+            array('filename' => $filename)
+        );
+        sleep(2);
+        $source = <<<'NEWDOC'
+/file
+set numbers=$filename contents=""
+set numbers=$filename contents=$data
+NEWDOC;
+        $this->exec(
+            $source,
+            array('filename' => $filename, 'data' => $data)
+        );
+        sleep(2);
+        return strlen($data) == $this->client->sendSync(
+            $printRequest
+        )->getArgument('size');
+    }
+
+    /**
+     * Gets the contents of a specified file.
+     * 
+     * @param string $filename The name of the file to get contents of.
+     * 
+     * @return string|bool The contents of the file or FALSE if there is no such
+     *     file.
+     */
+    public function fileGetContents($filename)
+    {
+        $checkRequest = new Request(
+            '/file print',
+            Query::where('name', $filename)
+        );
+        if (1 === $this->client->sendSync($checkRequest)) {
+            return false;
+        }
+        $name = $this->_exec(
+            '/system script set $"_" source=[/file get $filename contents]',
+            array('filename' => $filename),
+            null,
+            null,
+            true
+        );
+        $printRequest = new Request(
+            '/system script print .proplist=source',
+            Query::where('name', $name)
+        );
+        $contents = $this->client->sendSync(
+            $printRequest
+        )->getArgument('source');
+        $removeRequest = new Request('/system script remove');
+        $removeRequest->setArgument('numbers', $name);
+        $this->client->sendSync($removeRequest);
+        return $contents;
     }
 
     /**
@@ -573,7 +622,7 @@ class Util
             'numbers',
             call_user_func_array(array($this, 'find'), $args)
         );
-        return $this->objClient->sendSync($bulkRequest);
+        return $this->client->sendSync($bulkRequest);
     }
 
     /**
@@ -585,14 +634,86 @@ class Util
     {
         if (null === $this->idCache) {
             $idCache = array();
-            foreach ($this->objClient->sendSync(
+            foreach ($this->client->sendSync(
                 new Request($this->menu . '/print .proplist=.id')
             )->getAllOfType(Response::TYPE_DATA) as $response) {
-                $id =$response->getArgument('.id');
+                $id = $response->getArgument('.id');
                 $idCache[hexdec(substr($id, 1))] = $id;
             }
             ksort($idCache, SORT_NUMERIC);
             $this->idCache = SplFixedArray::fromArray(array_values($idCache));
         }
+    }
+
+    /**
+     * Executes a RouterOS script.
+     * 
+     * Same as the public equivalent, with the addition of allowing you not to
+     * remove the script after you're done.
+     * 
+     * @param string $source A script to execute.
+     * @param array  $params An array of local variables to make available in
+     *     the script. Variable names are array keys, and variable values are
+     *     array values. Note that the script's (generated) name is always added
+     *     as the variable "_", which you can overwrite from here.
+     *     Native PHP types will be converted to their RouterOS equivalents.
+     *     DateTime and DateInterval objects will be casted to RouterOS' "time"
+     *     type. Other types are casted to strings.
+     * @param string $policy Allows you to specify a policy the script must
+     *     follow. Has the same format as in terminal. If left NULL, the script
+     *     has no restrictions.
+     * @param string $name   The script is executed after being saved in
+     *     "/system script" under a random name (prefixed with the computer's
+     *     name), and is removed after execution. To eliminate any possibility
+     *     of name clashes, you can specify your own name.
+     * @param bool   $keep   Whether to keep the script after execution.
+     * 
+     * @return ResponseCollection|string If the script was not added
+     *     successfully before execution, the ResponseCollection from the add
+     *     attempt is going to be returned. Otherwise, the (generated) name of
+     *     the script.
+     */
+    private function _exec(
+        $source,
+        array $params = array(),
+        $policy = null,
+        $name = null,
+        $keep = false
+    ) {
+        $request = new Request('/system/script/add');
+        if (null === $name) {
+            $name = uniqid(gethostname(), true);
+        }
+        $request->setArgument('name', $name);
+        $request->setArgument('policy', $policy);
+
+        $finalSource = '/' . str_replace('/', ' ', substr($this->menu, 1))
+            . "\n";
+
+        $params += array('_' => $name);
+        foreach ($params as $pname => $pvalue) {
+            $pname = static::escapeString($pname);
+            $pvalue = static::escapeValue($pvalue);
+            $finalSource .= ":local \"{$pname}\" {$pvalue};\n";
+        }
+        $finalSource .= $source . "\n";
+        $request->setArgument('source', $finalSource);
+        $result = $this->client->sendSync($request);
+
+        if (0 === count($result->getAllOfType(Response::TYPE_ERROR))) {
+            $request = new Request('/system/script/run');
+            $request->setArgument('number', $name);
+            $result = $this->client->sendSync($request);
+
+            if ($keep) {
+                return $name;
+            } else {
+                $request = new Request('/system/script/remove');
+                $request->setArgument('numbers', $name);
+                $this->client->sendSync($request);
+            }
+        }
+
+        return $result;
     }
 }
