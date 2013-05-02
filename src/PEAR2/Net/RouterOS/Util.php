@@ -89,6 +89,10 @@ class Util
             $value = $value ? 'true' : 'false';
             break;
         case 'array':
+            if (0 === count($value)) {
+                $value = '{}';
+                break;
+            }
             $result = '';
             foreach ($value as $val) {
                 $result .= ';' . static::escapeValue($val);
@@ -447,8 +451,9 @@ class Util
         foreach ($newValues as $name => $value) {
             $setRequest->setArgument($name, $value);
         }
-        $setRequest->setArgument('numbers', $this->find($numbers));
-        return $this->client->sendSync($setRequest);
+        return $this->client->sendSync(
+            $setRequest->setArgument('numbers', $this->find($numbers))
+        );
     }
 
     /**
@@ -465,6 +470,28 @@ class Util
     public function edit($numbers, array $newValues)
     {
         return $this->set($numbers, $newValues);
+    }
+
+    /**
+     * Unsets a value of a specified entry at the current menu.
+     * 
+     * Equivalent of scripting's "unset" command. The "Value" part in the method
+     * name is added because "unset" is a language construct, and thus a
+     * reserved word.
+     * 
+     * @param mixed  $numbers    Targeted entries. Can be any criteria accepted
+     *     by {@link find()}.
+     * @param string $value_name The name of the value you want to unset.
+     * 
+     * @return ResponseCollection
+     */
+    public function unsetValue($numbers, $value_name)
+    {
+        $unsetRequest = new Request($this->menu . '/unset');
+        return $this->client->sendSync(
+            $unsetRequest->setArgument('numbers', $this->find($numbers))
+                ->setArgument('value-name', $value_name)
+        );
     }
 
     /**
@@ -537,58 +564,59 @@ class Util
     public function filePutContents($filename, $data, $overwrite = false)
     {
         $printRequest = new Request(
-            '/file/print .proplist="size"',
+            '/file/print .proplist=""',
             Query::where('name', $filename)
         );
         if (!$overwrite && count($this->client->sendSync($printRequest)) > 1) {
             return false;
         }
-        $source = <<<'NEWDOC'
-/file
-print file=$filename where name=""
-NEWDOC;
-        $this->exec(
-            $source,
-            array('filename' => $filename)
+        $result = $this->client->sendSync(
+            $printRequest->setArgument('file', $filename)
         );
+        if (count($result->getAllOfType(Response::TYPE_ERROR)) > 0) {
+            return false;
+        }
+        //Required for RouterOS to write the initial file.
         sleep(2);
-        $source = <<<'NEWDOC'
-/file
-set numbers=$filename contents=""
-set numbers=$filename contents=$data
-NEWDOC;
-        $this->exec(
-            $source,
-            array('filename' => $filename, 'data' => $data)
-        );
+        $setRequest = new Request('/file/set contents=""');
+        $setRequest->setArgument('numbers', $filename);
+        $this->client->sendSync($setRequest);
+        $this->client->sendSync($setRequest->setArgument('contents', $data));
+        //Required for RouterOS to write the file's new contents.
         sleep(2);
         return strlen($data) == $this->client->sendSync(
-            $printRequest
+            $printRequest->setArgument('file', null)
+                ->setArgument('.proplist', 'size')
         )->getArgument('size');
     }
 
     /**
      * Gets the contents of a specified file.
      * 
-     * @param string $filename The name of the file to get contents of.
+     * @param string $filename      The name of the file to get the contents of.
+     * @param string $tmpScriptName In order to get the file's contents, a
+     *     script is created at "/system script" with a random name, the
+     *     source of which is then overwriten with the file's contents, and
+     *     finally retrieved. To eliminate any possibility of name clashes, you
+     *     can specify your own name for the script.
      * 
      * @return string|bool The contents of the file or FALSE if there is no such
      *     file.
      */
-    public function fileGetContents($filename)
+    public function fileGetContents($filename, $tmpScriptName = null)
     {
         $checkRequest = new Request(
             '/file print',
             Query::where('name', $filename)
         );
-        if (1 === $this->client->sendSync($checkRequest)) {
+        if (1 === count($this->client->sendSync($checkRequest))) {
             return false;
         }
         $name = $this->_exec(
             '/system script set $"_" source=[/file get $filename contents]',
             array('filename' => $filename),
             null,
-            null,
+            $tmpScriptName,
             true
         );
         $printRequest = new Request(

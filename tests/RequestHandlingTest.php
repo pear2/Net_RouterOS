@@ -5,7 +5,6 @@ use PEAR2\Net\Transmitter as T;
 
 class RequestHandlingTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testNonAbsoluteCommand()
     {
         $nonAbsoluteCommands = array(

@@ -10,6 +10,7 @@ class UtilFeaturesTest extends \PHPUnit_Framework_TestCase
      * @var Util
      */
     protected $util;
+
     /**
      * @var Client
      */

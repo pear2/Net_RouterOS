@@ -17,17 +17,29 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
      * @var Client
      */
     protected $client;
+    
+    /**
+     * @var bool Whether connections should be persistent ones.
+     */
+    protected $isPersistent = false;
 
     protected function setUp()
     {
         $this->util = new Util(
-            $this->client = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT)
+            $this->client = new Client(
+                \HOSTNAME,
+                USERNAME,
+                PASSWORD,
+                PORT,
+                $this->isPersistent
+            )
         );
     }
 
     protected function tearDown()
     {
         unset($this->util);
+        $this->client->close();
         unset($this->client);
     }
 
@@ -267,6 +279,30 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertNull($nameNot);
         $this->assertFalse($nameTargetNot);
+    }
+
+    /**
+     * @depends testGet
+     * 
+     * @return void
+     */
+    public function testUnsetValue()
+    {
+        $value = 'all-p2p';
+        $this->util->changeMenu('/queue/simple');
+        $id = $this->util->add(
+            array(
+                'name' => TEST_QUEUE_NAME,
+                'p2p' => $value
+            )
+        );
+        $targetBefore = $this->util->get($id, 'p2p');
+        $this->util->unsetValue($id, 'p2p');
+        $targetAfter = $this->util->get($id, 'p2p');
+        $this->util->remove($id);
+
+        $this->assertSame($value, $targetBefore);
+        $this->assertNull($targetAfter);
     }
 
     /**
@@ -511,6 +547,34 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
             'add name=$name comment=$comment',
             array(
                 'name' => TEST_QUEUE_NAME,
+                'comment' => array()
+            )
+        );
+        $results = $this->client->sendSync(
+            $printRequest
+        )->getAllOfType(Response::TYPE_DATA);
+        $this->util->remove(TEST_QUEUE_NAME);
+        $this->assertCount(1, $results);
+        $this->assertSame(null, $results->getArgument('comment'));
+
+        $this->util->exec(
+            'add name=$name comment=$comment',
+            array(
+                'name' => TEST_QUEUE_NAME,
+                'comment' => null
+            )
+        );
+        $results = $this->client->sendSync(
+            $printRequest
+        )->getAllOfType(Response::TYPE_DATA);
+        $this->util->remove(TEST_QUEUE_NAME);
+        $this->assertCount(1, $results);
+        $this->assertSame(null, $results->getArgument('comment'));
+
+        $this->util->exec(
+            'add name=$name comment=$comment',
+            array(
+                'name' => TEST_QUEUE_NAME,
                 'comment' => new DateTime('1970-01-01 00:00:00.000001')
             )
         );
@@ -622,5 +686,19 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($putResult3);
         $this->assertSame($data2, $getResult3);
         $this->assertFalse($getResult4);
+    }
+    
+    public function testFilePutContentsNoPermissions()
+    {
+        $this->util = new Util(
+            $this->client = new Client(
+                \HOSTNAME,
+                USERNAME2,
+                PASSWORD2,
+                PORT,
+                $this->isPersistent
+            )
+        );
+        $this->assertFalse($this->util->filePutContents(TEST_FILE_NAME, 'ok'));
     }
 }
