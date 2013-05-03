@@ -68,6 +68,30 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
      * 
      * @return void
      */
+    public function testAddToCache()
+    {
+        $this->util->changeMenu('/queue/simple');
+        $beforeCount = substr_count($this->util->find(), ',');
+        $this->assertRegExp(
+            '/^' . self::REGEX_ID . '$/',
+            $id = $this->util->add(array('name' => TEST_QUEUE_NAME))
+        );
+        $afterCount = substr_count($this->util->find(), ',');
+        $this->assertSame(1 + $beforeCount, $afterCount);
+        
+        $removeRequest = new Request('/queue/simple/remove');
+        $removeRequest->setArgument('numbers', $id);
+        $this->client->sendSync($removeRequest);
+
+        $postCount = substr_count($this->util->clearIdCache()->find(), ',');
+        $this->assertSame($beforeCount, $postCount);
+    }
+
+    /**
+     * @depends testAdd
+     * 
+     * @return void
+     */
     public function testDisableAndEnable()
     {
         $this->util->changeMenu('/queue/simple');

@@ -21,11 +21,6 @@
 namespace PEAR2\Net\RouterOS;
 
 /**
- * Used as a holder for the entry cache.
- */
-use SplFixedArray;
-
-/**
  * Values at {@link Util::exec()} can be casted from this type.
  */
 use DateTime;
@@ -60,7 +55,7 @@ class Util
     protected $menu = '/';
 
     /**
-     * @var SplFixedArray An array with the numbers of entries in the current menu as
+     * @var array An array with the numbers of entries in the current menu as
      *     keys, and the corresponding IDs as values.
      */
     protected $idCache = null;
@@ -260,9 +255,15 @@ class Util
      * number. If you're using both Util's methods and other means (e.g.
      * {@link Client} or {@link Util::exec()}) to add/move/remove entries, the
      * cache may end up being out of date. By calling this method right before
-     * targeting an entry with a number, you can ensure number accuracy. Note
-     * that Util's add(), move() and remove() methods automatically clear the
-     * cache. A change in the menu also clears the cache.
+     * targeting an entry with a number, you can ensure number accuracy.
+     * 
+     * Note that Util's {@link move()} and {@link remove()} methods
+     * automatically clear the cache before returning, while {@link add()} adds
+     * the new entry's ID to the cache as the next number. A change in the menu
+     * also clears the cache.
+     * 
+     * Note also that the cache is being rebuilt unconditionally every time you
+     * use {@link find()} with a callback.
      * 
      * @return $this The Util object itself.
      */
@@ -295,8 +296,16 @@ class Util
     public function find()
     {
         if (func_num_args() === 0) {
-            $this->refreshIdCache();
-            return implode(',', $this->idCache->toArray());
+            if (null === $this->idCache) {
+                $idCache = array();
+                foreach ($this->client->sendSync(
+                    new Request($this->menu . '/print .proplist=.id')
+                )->getAllOfType(Response::TYPE_DATA) as $response) {
+                    $idCache[] = $response->getArgument('.id');
+                }
+                $this->idCache = $idCache;
+            }
+            return implode(',', $this->idCache);
         }
         $idList = '';
         foreach (func_get_args() as $criteria) {
@@ -307,21 +316,28 @@ class Util
                     $idList .= $response->getArgument('.id') . ',';
                 }
             } elseif (is_callable($criteria)) {
+                $idCache = array();
                 foreach ($this->client->sendSync(
                     new Request($this->menu . '/print')
                 ) as $response) {
                     if ($criteria($response)) {
                         $idList .= $response->getArgument('.id') . ',';
                     }
+                    $idCache[] = $response->getArgument('.id');
                 }
+                $this->idCache = $idCache;
             } else {
-                $this->refreshIdCache();
+                $this->find();
                 if (is_int($criteria)) {
-                    $idList = $this->idCache[$criteria] . ',';
+                    if (isset($this->idCache[$criteria])) {
+                        $idList = $this->idCache[$criteria] . ',';
+                    }
                 } else {
                     $criteria = (string)$criteria;
                     if ($criteria === (string)(int)$criteria) {
-                        $idList .= $this->idCache[(int)$criteria] . ',';
+                        if (isset($this->idCache[(int)$criteria])) {
+                            $idList .= $this->idCache[(int)$criteria] . ',';
+                        }
                     } elseif (false === strpos($criteria, ',')) {
                         $idList .= $criteria . ',';
                     } else {
@@ -361,7 +377,7 @@ class Util
     public function get($number, $value_name)
     {
         if (is_int($number) || ((string)$number === (string)(int)$number)) {
-            $this->refreshIdCache();
+            $this->find();
             if (isset($this->idCache[(int)$number])) {
                 $number = $this->idCache[(int)$number];
             } else {
@@ -513,11 +529,13 @@ class Util
             foreach ($values as $name => $value) {
                 $addRequest->setArgument($name, $value);
             }
-            $idList .= $this->client->sendSync($addRequest)->getArgument('ret')
-                . ',';
+            $id = $this->client->sendSync($addRequest)->getArgument('ret');
+            if (null !== $this->idCache) {
+                $this->idCache[] = $id;
+            }
+            $idList .= $id . ',';
             $addRequest->removeAllArguments();
         }
-        $this->clearIdCache();
         return rtrim($idList, ',');
     }
 
@@ -554,6 +572,14 @@ class Util
 
     /**
      * Puts a file on RouterOS's file system.
+     * 
+     * Puts a file on RouterOS's file system, regardless of the current menu.
+     * Note that this is a VERY VERY VERY time consuming method - it takes a
+     * minimum of a little over 4 seconds, most of which are in sleep. It waits
+     * 2 seconds after a file is first created (required to actually start
+     * writing to the file), and another 2 seconds after its contents is written
+     * (performed in order to verify success afterwards). If you want an
+     * efficient way of transferring files, use (T)FTP.
      * 
      * @param string $filename  The filename to write data in.
      * @param string $data      The data the file is going to have.
@@ -606,29 +632,19 @@ class Util
     public function fileGetContents($filename, $tmpScriptName = null)
     {
         $checkRequest = new Request(
-            '/file print',
+            '/file/print',
             Query::where('name', $filename)
         );
         if (1 === count($this->client->sendSync($checkRequest))) {
             return false;
         }
-        $name = $this->_exec(
+        $contents = $this->_exec(
             '/system script set $"_" source=[/file get $filename contents]',
             array('filename' => $filename),
             null,
             $tmpScriptName,
             true
         );
-        $printRequest = new Request(
-            '/system script print .proplist=source',
-            Query::where('name', $name)
-        );
-        $contents = $this->client->sendSync(
-            $printRequest
-        )->getArgument('source');
-        $removeRequest = new Request('/system script remove');
-        $removeRequest->setArgument('numbers', $name);
-        $this->client->sendSync($removeRequest);
         return $contents;
     }
 
@@ -654,30 +670,10 @@ class Util
     }
 
     /**
-     * Refresh the id cache, if needed.
-     * 
-     * @return void
-     */
-    protected function refreshIdCache()
-    {
-        if (null === $this->idCache) {
-            $idCache = array();
-            foreach ($this->client->sendSync(
-                new Request($this->menu . '/print .proplist=.id')
-            )->getAllOfType(Response::TYPE_DATA) as $response) {
-                $id = $response->getArgument('.id');
-                $idCache[hexdec(substr($id, 1))] = $id;
-            }
-            ksort($idCache, SORT_NUMERIC);
-            $this->idCache = SplFixedArray::fromArray(array_values($idCache));
-        }
-    }
-
-    /**
      * Executes a RouterOS script.
      * 
-     * Same as the public equivalent, with the addition of allowing you not to
-     * remove the script after you're done.
+     * Same as the public equivalent, with the addition of allowing you to get
+     * the contents of the script post execution, instead of removing it.
      * 
      * @param string $source A script to execute.
      * @param array  $params An array of local variables to make available in
@@ -694,7 +690,7 @@ class Util
      *     "/system script" under a random name (prefixed with the computer's
      *     name), and is removed after execution. To eliminate any possibility
      *     of name clashes, you can specify your own name.
-     * @param bool   $keep   Whether to keep the script after execution.
+     * @param bool   $get    Whether to keep the script after execution.
      * 
      * @return ResponseCollection|string If the script was not added
      *     successfully before execution, the ResponseCollection from the add
@@ -706,7 +702,7 @@ class Util
         array $params = array(),
         $policy = null,
         $name = null,
-        $keep = false
+        $get = false
     ) {
         $request = new Request('/system/script/add');
         if (null === $name) {
@@ -733,13 +729,17 @@ class Util
             $request->setArgument('number', $name);
             $result = $this->client->sendSync($request);
 
-            if ($keep) {
-                return $name;
-            } else {
-                $request = new Request('/system/script/remove');
-                $request->setArgument('numbers', $name);
-                $this->client->sendSync($request);
+            if ($get) {
+                $result = $this->client->sendSync(
+                    new Request(
+                        '/system/script/print .proplist="source"',
+                        Query::where('name', $name)
+                    )
+                )->getArgument('source');
             }
+            $request = new Request('/system/script/remove');
+            $request->setArgument('numbers', $name);
+            $this->client->sendSync($request);
         }
 
         return $result;

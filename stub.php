@@ -29,10 +29,29 @@ if (count(get_included_files()) > 1) {
         exit(1);
     }
     
-    if (!in_array('phar', $missing_extensions)) {
-        $phar = new Phar(__FILE__);
-        $sig = $phar->getSignature();
-        echo "{$sig['hash_type']} hash: {$sig['hash']}\n\n";
+    if (extension_loaded('phar')) {
+        try {
+            $phar = new Phar(__FILE__);
+            $sig = $phar->getSignature();
+            echo "{$sig['hash_type']} hash: {$sig['hash']}\n\n";
+        } catch(Exception $e) {
+            echo <<<HEREDOC
+The PHAR extension is available, but was unable to read this PHAR file's hash.
+Regardless, you should not be having any trouble using the package by directly
+including the archive.
+
+Exception details:
+HEREDOC
+                . $e . "\n\n";
+        }
+    } else {
+        echo <<<HEREDOC
+If you wish to use this package directly from this archive, you need to install
+and enable the PHAR extension. Otherwise, you must instead extract this archive,
+and include the autoloader.
+
+
+HEREDOC;
     }
     
     if (function_exists('stream_socket_client')) {
