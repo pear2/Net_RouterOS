@@ -297,13 +297,11 @@ class Util
     {
         if (func_num_args() === 0) {
             if (null === $this->idCache) {
-                $idCache = array();
-                foreach ($this->client->sendSync(
-                    new Request($this->menu . '/print .proplist=.id')
-                )->getAllOfType(Response::TYPE_DATA) as $response) {
-                    $idCache[] = $response->getArgument('.id');
-                }
-                $this->idCache = $idCache;
+               $idCache = $this->client->sendSync(
+                   new Request($this->menu . '/find')
+               )->getArgument('ret');
+               $this->idCache = explode(',', $idCache);
+               return $idCache;
             }
             return implode(',', $this->idCache);
         }

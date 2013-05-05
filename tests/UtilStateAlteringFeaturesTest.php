@@ -68,7 +68,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
      * 
      * @return void
      */
-    public function testAddToCache()
+    public function testAddUpdatingCache()
     {
         $this->util->changeMenu('/queue/simple');
         $beforeCount = substr_count($this->util->find(), ',');
