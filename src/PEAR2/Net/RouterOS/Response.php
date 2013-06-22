@@ -84,20 +84,22 @@ class Response extends Message
     public function __construct(
         Communicator $com,
         $asStream = false,
+        $timeout_s = 0,
+        $timeout_us = null,
         Registry $reg = null
     ) {
         if (null === $reg) {
             if ($com->getTransmitter()->isPersistent()) {
                 $old = $com->getTransmitter()
                     ->lock(T\Stream::DIRECTION_RECEIVE);
-                $this->_receive($com, $asStream);
+                $this->_receive($com, $asStream, $timeout_s, $timeout_us);
                 $com->getTransmitter()->lock($old, true);
             } else {
-                $this->_receive($com, $asStream);
+                $this->_receive($com, $asStream, $timeout_s, $timeout_us);
             }
         } else {
             while (null === ($response = $reg->getNextResponse())) {
-                $newResponse = new self($com, true);
+                $newResponse = new self($com, true, $timeout_s, $timeout_us);
                 $tagInfo = $reg::parseTag($newResponse->getTag());
                 $newResponse->setTag($tagInfo[1]);
                 if (!$reg->add($newResponse, $tagInfo[0])) {
@@ -138,11 +140,19 @@ class Response extends Message
      * 
      * @return void
      */
-    private function _receive(Communicator $com, $asStream = false)
-    {
-        if (!$com->getTransmitter()->isAvailable()) {
+    private function _receive(
+        Communicator $com,
+        $asStream = false,
+        $timeout_s = 0,
+        $timeout_us = null
+    ) {
+        if (!$com->getTransmitter()->isDataAwaiting(
+            $timeout_s,
+            $timeout_us
+        )
+        ) {
             throw new SocketException(
-                'Connection aborted by other end. Receiving aborted.',
+                'No data within the time limit',
                 50000
             );
         }

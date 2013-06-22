@@ -123,12 +123,15 @@ class Client
             $username . '/' . $password,
             $context
         );
+        if (null == $timeout) {
+            $timeout = ini_get('default_socket_timeout');
+        }
         //Login the user if necessary
         if ((!$persist
             || !($old = $this->com->getTransmitter()->lock(S::DIRECTION_ALL)))
             && $this->com->getTransmitter()->isFresh()
         ) {
-            if (!static::login($this->com, $username, $password)) {
+            if (!static::login($this->com, $username, $password, $timeout)) {
                 $this->com->close();
                 throw new DataFlowException(
                     'Invalid username or password supplied.',
@@ -183,8 +186,12 @@ class Client
      * 
      * @return bool TRUE on success, FALSE on failure.
      */
-    public static function login(Communicator $com, $username, $password = '')
-    {
+    public static function login(
+        Communicator $com,
+        $username, 
+        $password = '',
+        $timeout = null
+    ) {
         if (null !== ($remoteCharset = $com->getCharset($com::CHARSET_REMOTE))
             && null !== ($localCharset = $com->getCharset($com::CHARSET_LOCAL))
         ) {
@@ -198,11 +205,11 @@ class Client
         try {
             if ($com->getTransmitter()->isPersistent()) {
                 $old = $com->getTransmitter()->lock(S::DIRECTION_ALL);
-                $result = self::_login($com, $username, $password);
+                $result = self::_login($com, $username, $password, $timeout);
                 $com->getTransmitter()->lock($old, true);
                 return $result;
             }
-            return self::_login($com, $username, $password);
+            return self::_login($com, $username, $password, $timeout);
         } catch (\Exception $e) {
             if ($com->getTransmitter()->isPersistent() && null !== $old) {
                 $com->getTransmitter()->lock($old, true);
@@ -233,11 +240,12 @@ class Client
     private static function _login(
         Communicator $com,
         $username,
-        $password
+        $password = '',
+        $timeout = null
     ) {
         $request = new Request('/login');
         $request->send($com);
-        $response = new Response($com);
+        $response = new Response($com, false, $timeout);
         $request->setArgument('name', $username);
         $request->setArgument(
             'response',
@@ -247,7 +255,7 @@ class Client
             )
         );
         $request->send($com);
-        $response = new Response($com);
+        $response = new Response($com, false, $timeout);
         return $response->getType() === Response::TYPE_FINAL
             && null === $response->getArgument('ret');
     }
@@ -531,7 +539,7 @@ class Client
                 }
             }
         } catch (SocketException $e) {
-            if ($e->getCode() !== 11800) {
+            if ($e->getCode() !== 50000) {
                 // @codeCoverageIgnoreStart
                 // It's impossible to reliably cause any other SocketException.
                 // This line is only here in case the unthinkable happens:
@@ -738,19 +746,11 @@ class Client
      */
     protected function dispatchNextResponse($timeout_s = 0, $timeout_us = 0)
     {
-        if (!$this->com->getTransmitter()->isDataAwaiting(
-            $timeout_s,
-            $timeout_us
-        )
-        ) {
-            throw new SocketException(
-                'No responses within the time limit',
-                11800
-            );
-        }
         $response = new Response(
             $this->com,
             $this->_streamingResponses,
+            $timeout_s,
+            $timeout_us,
             $this->registry
         );
         if ($response->getType() === Response::TYPE_FATAL) {

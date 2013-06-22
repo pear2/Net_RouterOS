@@ -541,8 +541,8 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
             new Response($com);
             $this->fail('Receiving had to fail.');
-        } catch (T\SocketException $e) {
-            $this->assertEquals(4, $e->getCode(), 'Improper exception code.');
+        } catch (SocketException $e) {
+            $this->assertEquals(50000, $e->getCode(), 'Improper exception code.');
         }
     }
 
@@ -554,8 +554,8 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
             new Response($com, true);
             $this->fail('Receiving had to fail.');
-        } catch (T\SocketException $e) {
-            $this->assertEquals(4, $e->getCode(), 'Improper exception code.');
+        } catch (SocketException $e) {
+            $this->assertEquals(50000, $e->getCode(), 'Improper exception code.');
         }
     }
 

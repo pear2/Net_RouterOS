@@ -695,7 +695,11 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
 
         $quitRequest = new Request('/quit');
         $quitRequest->send($com);
-        $quitResponse = new Response($com);
+        $quitResponse = new Response(
+            $com,
+            false,
+            ini_get('default_socket_timeout')
+        );
         $this->assertEquals(
             1,
             count($quitResponse->getUnrecognizedWords()),
@@ -716,7 +720,11 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
 
         $quitRequest = new Request('/quit');
         $quitRequest->send($com);
-        $quitResponse = new Response($com, true);
+        $quitResponse = new Response(
+            $com,
+            true,
+            ini_get('default_socket_timeout')
+        );
         $this->assertEquals(
             1,
             count($quitResponse->getUnrecognizedWords()),
@@ -818,7 +826,11 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('p', $request->getTag());
         $this->assertEquals(array('address' => HOSTNAME), $request());
         $request($com);
-        $response = new Response($com);
+        $response = new Response(
+            $com,
+            false,
+            ini_get('default_socket_timeout')
+        );
         $this->assertInternalType('array', $response());
         $this->assertEquals(HOSTNAME, $response('host'));
         
@@ -851,7 +863,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         );
         $pingRequest1->send($com1, $reg1);
         
-        $response1_1 = new Response($com1, false, $reg1);
+        $response1_1 = new Response($com1, false, null, null, $reg1);
         
         $cancelRequest = new Request('/cancel');
         $reg1->setTaglessMode(true);
@@ -865,9 +877,9 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         );
         $pingRequest2->send($com2, $reg2);
         
-        $response2_1 = new Response($com2, false, $reg2);
-        $response2_2 = new Response($com2, false, $reg2);
-        $response2_3 = new Response($com2, false, $reg2);
+        $response2_1 = new Response($com2, false, null, null, $reg2);
+        $response2_2 = new Response($com2, false, null, null, $reg2);
+        $response2_3 = new Response($com2, false, null, null, $reg2);
         $reg1->setTaglessMode(false);
         
         $com1->close();
@@ -877,8 +889,8 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Response::TYPE_DATA, $response2_2->getType());
         $this->assertEquals(Response::TYPE_FINAL, $response2_3->getType());
         
-        $response1_2 = new Response($com1, false, $reg1);
-        $response1_3 = new Response($com1, false, $reg1);
+        $response1_2 = new Response($com1, false, null, null, $reg1);
+        $response1_3 = new Response($com1, false, null, null, $reg1);
         
         $this->assertEquals(Response::TYPE_DATA, $response1_1->getType());
         $this->assertEquals(Response::TYPE_ERROR, $response1_2->getType());
