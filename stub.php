@@ -34,7 +34,7 @@ if (count(get_included_files()) > 1) {
             $phar = new Phar(__FILE__);
             $sig = $phar->getSignature();
             echo "{$sig['hash_type']} hash: {$sig['hash']}\n\n";
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             echo <<<HEREDOC
 The PHAR extension is available, but was unable to read this PHAR file's hash.
 Regardless, you should not be having any trouble using the package by directly

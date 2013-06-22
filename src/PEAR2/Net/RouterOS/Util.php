@@ -297,11 +297,11 @@ class Util
     {
         if (func_num_args() === 0) {
             if (null === $this->idCache) {
-               $idCache = $this->client->sendSync(
-                   new Request($this->menu . '/find')
-               )->getArgument('ret');
-               $this->idCache = explode(',', $idCache);
-               return $idCache;
+                $idCache = $this->client->sendSync(
+                    new Request($this->menu . '/find')
+                )->getArgument('ret');
+                $this->idCache = explode(',', $idCache);
+                return $idCache;
             }
             return implode(',', $this->idCache);
         }

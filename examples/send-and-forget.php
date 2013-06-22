@@ -16,4 +16,3 @@ $addRequest->setArgument('address', '192.168.0.101');
 $addRequest->setArgument('mac-address', '00:00:00:00:00:02');
 $addRequest->setTag('arp2');
 $client->sendAsync($addRequest);
-?>

@@ -30,4 +30,3 @@ foreach ($client->completeRequest('arp2') as $response) {
 }
 
 echo 'OK';
-?>

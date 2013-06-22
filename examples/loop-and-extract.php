@@ -32,4 +32,3 @@ foreach ($responses as $response) {
 OK with arp1
 OK with arp2
  */
-?>

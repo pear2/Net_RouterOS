@@ -309,14 +309,14 @@ class ClientStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
             && $responses->getLast()->getType() === Response::TYPE_FINAL
         ) {
             $printRequest = new Request('/queue/simple/print');
-            $printRequest->setArgument('.proplist', 'name,target-addresses');
+            $printRequest->setArgument('.proplist', 'name,target');
             $printRequest->setQuery(
                 Query::where('name', TEST_QUEUE_NAME)
-                ->orWhere('target-addresses', HOSTNAME_INVALID . '/32')
+                ->orWhere('target', HOSTNAME_INVALID . '/32')
             );
             $responses = $this->object->sendSync($printRequest);
             $this->assertEquals(
-                array('name' => array(0, 1), 'target-addresses' => array(0)),
+                array('name' => array(0, 1), 'target' => array(0)),
                 $responses->getArgumentMap(),
                 'Improper format of the returned array'
             );

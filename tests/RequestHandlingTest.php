@@ -823,7 +823,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(HOSTNAME, $response('host'));
         
         $request = new Request('/queue/simple/print');
-        $query = Query::where('target-addresses', HOSTNAME_INVALID . '/32');
+        $query = Query::where('target', HOSTNAME_INVALID . '/32');
         $request($query);
         $this->assertSame($query, $request->getQuery());
         $com('/quit');

@@ -48,7 +48,7 @@ class UtilFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp(
             '/^' . self::REGEX_ID . '$/',
             $this->util->find(
-                Query::where('target-addresses', HOSTNAME_INVALID . '/32')
+                Query::where('target', HOSTNAME_INVALID . '/32')
             )
         );
     }
@@ -77,7 +77,7 @@ class UtilFeaturesTest extends \PHPUnit_Framework_TestCase
         $findResults = $this->util->find(
             function ($entry) {
                 return $entry->getArgument(
-                    'target-addresses'
+                    'target'
                 ) === HOSTNAME_INVALID . '/32';
             }
         );
@@ -90,7 +90,7 @@ class UtilFeaturesTest extends \PHPUnit_Framework_TestCase
             $this->client->sendSync(
                 new Request(
                     '/queue/simple/print',
-                    Query::where('target-addresses', HOSTNAME_INVALID . '/32')
+                    Query::where('target', HOSTNAME_INVALID . '/32')
                 )
             )->getArgument('.id')
         );
@@ -104,7 +104,7 @@ class UtilFeaturesTest extends \PHPUnit_Framework_TestCase
 <?php
 function isHostnameInvalid(\$entry) {
     return \$entry->getArgument(
-        'target-addresses'
+        'target'
     ) === \PEAR2\Net\RouterOS\HOSTNAME_INVALID . '/32';
 }
 HEREDOC
@@ -121,7 +121,7 @@ HEREDOC
             $this->client->sendSync(
                 new Request(
                     '/queue/simple/print',
-                    Query::where('target-addresses', HOSTNAME_INVALID . '/32')
+                    Query::where('target', HOSTNAME_INVALID . '/32')
                 )
             )->getArgument('.id')
         );
@@ -132,7 +132,7 @@ HEREDOC
         $originalResult = $this->client->sendSync(
             new Request(
                 '/queue/simple/print',
-                Query::where('target-addresses', HOSTNAME_INVALID . '/32')
+                Query::where('target', HOSTNAME_INVALID . '/32')
             )
         );
         $this->assertSame(

@@ -534,6 +534,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
                 $repliesCount++;
             }
         );
+        sleep(1);
 
 
         $arpPrint = new Request('/ip/arp/print');
@@ -736,7 +737,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $request = new Request('/queue/simple/print');
 
         $request->setQuery(
-            Query::where('target-addresses', HOSTNAME_INVALID . '/32')
+            Query::where('target', HOSTNAME_INVALID . '/32')
         );
 
         $list = $this->object->sendSync($request);
@@ -778,7 +779,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $request = new Request('/queue/simple/print');
 
         $request->setQuery(
-            Query::where('target-addresses', HOSTNAME_INVALID . '/32')
+            Query::where('target', HOSTNAME_INVALID . '/32')
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
@@ -794,7 +795,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
 
         $request->setQuery(
             Query::where(
-                'target-addresses',
+                'target',
                 HOSTNAME_INVALID . '/32',
                 Query::ACTION_EQUALS
             )
@@ -816,7 +817,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         rewind($invalidAddressStream);
 
         $request->setQuery(
-            Query::where('target-addresses', $invalidAddressStream)
+            Query::where('target', $invalidAddressStream)
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
@@ -832,7 +833,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
 
         $request->setQuery(
             Query::where(
-                'target-addresses',
+                'target',
                 $invalidAddressStream,
                 Query::ACTION_EQUALS
             )
@@ -856,7 +857,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $fullList = $this->object->sendSync($request);
 
         $request->setQuery(
-            Query::where('target-addresses', HOSTNAME_INVALID . '/32')->not()
+            Query::where('target', HOSTNAME_INVALID . '/32')->not()
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
@@ -877,7 +878,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
 
         $request->setQuery(
             Query::where(
-                'target-addresses',
+                'target',
                 HOSTNAME_INVALID . '/32',
                 Query::ACTION_EQUALS
             )->not()
@@ -904,7 +905,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         rewind($invalidAddressStream);
 
         $request->setQuery(
-            Query::where('target-addresses', $invalidAddressStream)->not()
+            Query::where('target', $invalidAddressStream)->not()
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
@@ -925,7 +926,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
 
         $request->setQuery(
             Query::where(
-                'target-addresses',
+                'target',
                 $invalidAddressStream,
                 Query::ACTION_EQUALS
             )->not()
@@ -954,8 +955,8 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $fullList = $this->object->sendSync($request);
 
         $request->setQuery(
-            Query::where('target-addresses', HOSTNAME_SILENT . '/32')
-            ->orWhere('target-addresses', HOSTNAME_INVALID . '/32')
+            Query::where('target', HOSTNAME_SILENT . '/32')
+            ->orWhere('target', HOSTNAME_INVALID . '/32')
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
@@ -979,8 +980,8 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         rewind($silentAddressStream);
 
         $request->setQuery(
-            Query::where('target-addresses', $silentAddressStream)
-            ->orWhere('target-addresses', $invalidAddressStream)
+            Query::where('target', $silentAddressStream)
+            ->orWhere('target', $invalidAddressStream)
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
@@ -1002,8 +1003,8 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $fullList = $this->object->sendSync($request);
 
         $request->setQuery(
-            Query::where('target-addresses', HOSTNAME_SILENT . '/32')
-            ->orWhere('target-addresses', HOSTNAME_INVALID . '/32')
+            Query::where('target', HOSTNAME_SILENT . '/32')
+            ->orWhere('target', HOSTNAME_INVALID . '/32')
             ->not()
         );
         $list = $this->object->sendSync($request);
@@ -1032,8 +1033,8 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         rewind($silentAddressStream);
 
         $request->setQuery(
-            Query::where('target-addresses', $silentAddressStream)
-            ->orWhere('target-addresses', $invalidAddressStream)
+            Query::where('target', $silentAddressStream)
+            ->orWhere('target', $invalidAddressStream)
             ->not()
         );
         $list = $this->object->sendSync($request);

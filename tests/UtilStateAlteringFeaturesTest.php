@@ -96,7 +96,11 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
     {
         $this->util->changeMenu('/queue/simple');
         $id = $this->util->add(
-            array('name' => TEST_QUEUE_NAME, 'disabled' => 'no')
+            array(
+                'name' => TEST_QUEUE_NAME,
+                'disabled' => 'no',
+                'target' => '0.0.0.0/0'
+            )
         );
         $printRequest = new Request(
             '/queue/simple/print',
@@ -139,7 +143,12 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->util->changeMenu('/queue/simple');
         $this->assertRegExp(
             '/^' . self::REGEX_ID . '$/',
-            $id = $this->util->add(array('name' => TEST_QUEUE_NAME))
+            $id = $this->util->add(
+                array(
+                    'name' => TEST_QUEUE_NAME,
+                    'target' => '0.0.0.0/0'
+                )
+            )
         );
         $afterCount = count($this->client->sendSync($printRequest));
         $this->assertSame(1 + $beforeCount, $afterCount);
@@ -187,7 +196,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $id = $this->util->add(
             array(
                 'name' => TEST_QUEUE_NAME,
-                'target-addresses' => HOSTNAME_SILENT . '/32'
+                'target' => HOSTNAME_SILENT . '/32'
             )
         );
 
@@ -200,13 +209,13 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
             HOSTNAME_SILENT . '/32',
             $this->client->sendSync(
                 $printRequest
-            )->getArgument('target-addresses')
+            )->getArgument('target')
         );
 
         $this->util->set(
             $id,
             array(
-                'target-addresses' => HOSTNAME_INVALID . '/32'
+                'target' => HOSTNAME_INVALID . '/32'
             )
         );
 
@@ -214,13 +223,13 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
             HOSTNAME_INVALID . '/32',
             $this->client->sendSync(
                 $printRequest
-            )->getArgument('target-addresses')
+            )->getArgument('target')
         );
 
         $this->util->edit(
             $id,
             array(
-                'target-addresses' => HOSTNAME_SILENT . '/32'
+                'target' => HOSTNAME_SILENT . '/32'
             )
         );
 
@@ -228,7 +237,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
             HOSTNAME_SILENT . '/32',
             $this->client->sendSync(
                 $printRequest
-            )->getArgument('target-addresses')
+            )->getArgument('target')
         );
 
         $this->util->remove($id);
@@ -248,7 +257,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $id = $this->util->add(
             array(
                 'name' => TEST_QUEUE_NAME,
-                'target-addresses' => HOSTNAME_SILENT . '/32'
+                'target' => HOSTNAME_SILENT . '/32'
             )
         );
         $this->assertSame(
@@ -273,19 +282,19 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $id = $this->util->add(
             array(
                 'name' => TEST_QUEUE_NAME,
-                'target-addresses' => HOSTNAME_SILENT . '/32'
+                'target' => HOSTNAME_SILENT . '/32'
             )
         );
 
         $numberName = $this->util->get($itemCount, 'name');
         $numberNameNot = $this->util->get(1 + $itemCount, 'name');
         $idName = $this->util->get($id, 'name');
-        $nameTarget = $this->util->get(TEST_QUEUE_NAME, 'target-addresses');
+        $nameTarget = $this->util->get(TEST_QUEUE_NAME, 'target');
         $nameNot = $this->util->get(TEST_QUEUE_NAME, 'p2p');
         $this->util->remove($id);
         $nameTargetNot = $this->util->get(
             TEST_QUEUE_NAME,
-            'target-addresses'
+            'target'
         );
 
         $this->assertSame(
@@ -313,11 +322,13 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
     public function testUnsetValue()
     {
         $value = 'all-p2p';
-        $this->util->changeMenu('/queue/simple');
+        $this->util->changeMenu('/ip/firewall/filter');
         $id = $this->util->add(
             array(
-                'name' => TEST_QUEUE_NAME,
-                'p2p' => $value
+                'comment' => 'API TESTING',
+                'p2p'     => $value,
+                'action'  => 'passthrough',
+                'chain'   => 'forward'
             )
         );
         $targetBefore = $this->util->get($id, 'p2p');
@@ -350,7 +361,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->util->exec(
-            'add name=$name',
+            'add name=$name target=0.0.0.0/0',
             array('name' => TEST_QUEUE_NAME)
         );
 
@@ -371,7 +382,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->util->exec(
-            'add name=$name comment=$"_"',
+            'add name=$name target=0.0.0.0/0 comment=$"_"',
             array('name' => TEST_QUEUE_NAME),
             null,
             TEST_SCRIPT_NAME
@@ -397,7 +408,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->util->changeMenu('/queue/simple');
 
         $this->util->exec(
-            'add name=$name comment=[:typeof $comment]',
+            'add name=$name target=0.0.0.0/0 comment=[:typeof $comment]',
             array(
                 'name' => TEST_QUEUE_NAME,
                 'comment' => 2
@@ -411,7 +422,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('num', $results->getArgument('comment'));
 
         $this->util->exec(
-            'add name=$name comment=[:typeof $comment]',
+            'add name=$name target=0.0.0.0/0 comment=[:typeof $comment]',
             array(
                 'name' => TEST_QUEUE_NAME,
                 'comment' => 'test'
@@ -425,7 +436,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('str', $results->getArgument('comment'));
 
         $this->util->exec(
-            'add name=$name comment=[:typeof $comment]',
+            'add name=$name target=0.0.0.0/0 comment=[:typeof $comment]',
             array(
                 'name' => TEST_QUEUE_NAME,
                 'comment' => null
@@ -442,7 +453,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->util->exec(
-            'add name=$name comment=[:typeof $comment]',
+            'add name=$name target=0.0.0.0/0 comment=[:typeof $comment]',
             array(
                 'name' => TEST_QUEUE_NAME,
                 'comment' => true
@@ -456,7 +467,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('bool', $results->getArgument('comment'));
 
         $this->util->exec(
-            'add name=$name comment=[:typeof $comment]',
+            'add name=$name target=0.0.0.0/0 comment=[:typeof $comment]',
             array(
                 'name' => TEST_QUEUE_NAME,
                 'comment' => new DateTime()
@@ -470,7 +481,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('time', $results->getArgument('comment'));
 
         $this->util->exec(
-            'add name=$name comment=[:typeof $comment]',
+            'add name=$name target=0.0.0.0/0 comment=[:typeof $comment]',
             array(
                 'name' => TEST_QUEUE_NAME,
                 'comment' => new DateInterval('P8D')
@@ -484,7 +495,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('time', $results->getArgument('comment'));
 
         $this->util->exec(
-            'add name=$name comment=[:typeof $comment]',
+            'add name=$name target=0.0.0.0/0 comment=[:typeof $comment]',
             array(
                 'name' => TEST_QUEUE_NAME,
                 'comment' => array('hello', 'world')
@@ -512,7 +523,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->util->changeMenu('/queue/simple');
 
         $this->util->exec(
-            'add name=$name comment=$comment',
+            'add name=$name target=0.0.0.0/0 comment=$comment',
             array(
                 'name' => TEST_QUEUE_NAME,
                 'comment' => 2
@@ -526,7 +537,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('2', $results->getArgument('comment'));
 
         $this->util->exec(
-            'add name=$name comment=$comment',
+            'add name=$name target=0.0.0.0/0 comment=$comment',
             array(
                 'name' => TEST_QUEUE_NAME,
                 'comment' => 'test'
@@ -540,7 +551,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('test', $results->getArgument('comment'));
 
         $this->util->exec(
-            'add name=$name comment=$comment',
+            'add name=$name target=0.0.0.0/0 comment=$comment',
             array(
                 'name' => TEST_QUEUE_NAME,
                 'comment' => true
@@ -554,7 +565,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('true', $results->getArgument('comment'));
 
         $this->util->exec(
-            'add name=$name comment=$comment',
+            'add name=$name target=0.0.0.0/0 comment=$comment',
             array(
                 'name' => TEST_QUEUE_NAME,
                 'comment' => array('hello', 'world')
@@ -568,7 +579,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('hello,world', $results->getArgument('comment'));
 
         $this->util->exec(
-            'add name=$name comment=$comment',
+            'add name=$name target=0.0.0.0/0 comment=$comment',
             array(
                 'name' => TEST_QUEUE_NAME,
                 'comment' => array()
@@ -582,7 +593,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(null, $results->getArgument('comment'));
 
         $this->util->exec(
-            'add name=$name comment=$comment',
+            'add name=$name target=0.0.0.0/0 comment=$comment',
             array(
                 'name' => TEST_QUEUE_NAME,
                 'comment' => null
@@ -596,7 +607,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(null, $results->getArgument('comment'));
 
         $this->util->exec(
-            'add name=$name comment=$comment',
+            'add name=$name target=0.0.0.0/0 comment=$comment',
             array(
                 'name' => TEST_QUEUE_NAME,
                 'comment' => new DateTime('1970-01-01 00:00:00.000001')
@@ -610,7 +621,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('00:00:00.000001', $results->getArgument('comment'));
 
         $this->util->exec(
-            'add name=$name comment=$comment',
+            'add name=$name target=0.0.0.0/0 comment=$comment',
             array(
                 'name' => TEST_QUEUE_NAME,
                 'comment' => new DateTime('1970-01-02 00:00:01')
@@ -624,7 +635,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('1d00:00:01', $results->getArgument('comment'));
 
         $this->util->exec(
-            'add name=$name comment=$comment',
+            'add name=$name target=0.0.0.0/0 comment=$comment',
             array(
                 'name' => TEST_QUEUE_NAME,
                 'comment' => new DateTime('1970-01-10 01:02:03')
@@ -638,7 +649,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('1w2d01:02:03', $results->getArgument('comment'));
 
         $this->util->exec(
-            'add name=$name comment=$comment',
+            'add name=$name target=0.0.0.0/0 comment=$comment',
             array(
                 'name' => TEST_QUEUE_NAME,
                 'comment' => new DateInterval('P8D')

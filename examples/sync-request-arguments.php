@@ -20,4 +20,3 @@ if ($client->sendSync($addRequest)->getType() !== Response::TYPE_FINAL) {
 }
 
 echo 'OK';
-?>
