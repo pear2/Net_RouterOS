@@ -7,7 +7,7 @@ use DateInterval;
 class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
 {
     const REGEX_ID = '\*[A-F0-9]+';
-    const REGEX_IDLIST = '/^(\*[A-F0-9]+\,)*(\*[A-F0-9]+)?$/';
+    const REGEX_IDLIST = '/^(\*[A-F0-9]+\,)*(\*[A-F0-9]+)$/';
 
     /**
      * @var Util
@@ -167,13 +167,31 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
     public function testAddMultiple()
     {
         $printRequest = new Request('/queue/simple/print');
-        $beforeCount = count($this->client->sendSync($printRequest));
         $this->util->changeMenu('/queue/simple');
+
+        $beforeCount = count($this->client->sendSync($printRequest));
         $this->assertRegExp(
             self::REGEX_IDLIST,
             $idList = $this->util->add(
-                array('name' => TEST_QUEUE_NAME),
-                array('name' => TEST_QUEUE_NAME1)
+                array('name' => TEST_QUEUE_NAME, 'target' => '0.0.0.0/0'),
+                array('name' => TEST_QUEUE_NAME1, 'target' => '0.0.0.0/0')
+            )
+        );
+        $afterCount = count($this->client->sendSync($printRequest));
+        $this->assertSame(2 + $beforeCount, $afterCount);
+        
+        $this->util->remove($idList);
+
+        $postCount = count($this->client->sendSync($printRequest));
+        $this->assertSame($beforeCount, $postCount);
+
+        $beforeCount = count($this->client->sendSync($printRequest));
+        $this->assertRegExp(
+            self::REGEX_IDLIST,
+            $idList = $this->util->add(
+                array('name' => TEST_QUEUE_NAME, 'target' => '0.0.0.0/0'),
+                null,
+                array('name' => TEST_QUEUE_NAME1, 'target' => '0.0.0.0/0')
             )
         );
         $afterCount = count($this->client->sendSync($printRequest));

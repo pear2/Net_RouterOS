@@ -99,7 +99,7 @@
 
         <!--
         A name for a test script. It must be a name not currently in the list of
-        scripts. Also avoid any function names.
+        scripts. Also avoid any PHP function names.
         -->
         <const name="TEST_SCRIPT_NAME" value="API_TEST" />
 

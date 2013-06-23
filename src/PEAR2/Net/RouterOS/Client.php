@@ -123,9 +123,9 @@ class Client
             $username . '/' . $password,
             $context
         );
-        if (null == $timeout) {
-            $timeout = ini_get('default_socket_timeout');
-        }
+        $timeout = null == $timeout
+            ? ini_get('default_socket_timeout')
+            : (int) $timeout;
         //Login the user if necessary
         if ((!$persist
             || !($old = $this->com->getTransmitter()->lock(S::DIRECTION_ALL)))
@@ -183,6 +183,8 @@ class Client
      * @param Communicator $com      The communicator to attempt to login to.
      * @param string       $username The RouterOS username.
      * @param string       $password The RouterOS password.
+     * @param int|null     $timeout  The time to wait for each response. NULL
+     *     waits indefinetly.
      * 
      * @return bool TRUE on success, FALSE on failure.
      */
@@ -234,6 +236,8 @@ class Client
      * @param string       $username The RouterOS username.
      * @param string       $password The RouterOS password. Potentially parsed
      *     already by iconv.
+     * @param int|null     $timeout  The time to wait for each response. NULL
+     *     waits indefinetly.
      * 
      * @return bool TRUE on success, FALSE on failure.
      */

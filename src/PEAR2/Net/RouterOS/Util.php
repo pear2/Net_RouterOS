@@ -139,8 +139,8 @@ class Util
     public static function escapeString($value)
     {
         return preg_replace_callback(
-            '/[^\\_A-Za-z0-9]/S',
-            array(__CLASS__, '_escapeCharacter'),
+            '/[^\\_A-Za-z0-9]+/S',
+            array(__CLASS__, '_escapeCharacters'),
             $value
         );
     }
@@ -155,14 +155,18 @@ class Util
      * 
      * @return string The escaped character.
      */
-    private static function _escapeCharacter($char)
+    private static function _escapeCharacters($chars)
     {
-        return '\\' . str_pad(
-            strtoupper(dechex(ord($char[0]))),
-            2,
-            '0',
-            STR_PAD_LEFT
-        );
+        $result = '';
+        for ($i = 0, $l = strlen($chars[0]); $i < $l; ++$i) {
+            $result .= '\\' . str_pad(
+                strtoupper(dechex(ord($chars[0][$i]))),
+                2,
+                '0',
+                STR_PAD_LEFT
+            );
+        }
+        return $result;
     }
 
     /**
@@ -524,6 +528,9 @@ class Util
         $addRequest = new Request($this->menu . '/add');
         $idList = '';
         foreach (func_get_args() as $values) {
+            if (!is_array($values)) {
+                continue;
+            }
             foreach ($values as $name => $value) {
                 $addRequest->setArgument($name, $value);
             }
@@ -572,7 +579,7 @@ class Util
      * Puts a file on RouterOS's file system.
      * 
      * Puts a file on RouterOS's file system, regardless of the current menu.
-     * Note that this is a VERY VERY VERY time consuming method - it takes a
+     * Note that this is a **VERY VERY VERY** time consuming method - it takes a
      * minimum of a little over 4 seconds, most of which are in sleep. It waits
      * 2 seconds after a file is first created (required to actually start
      * writing to the file), and another 2 seconds after its contents is written

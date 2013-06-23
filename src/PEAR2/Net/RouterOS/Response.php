@@ -71,10 +71,13 @@ class Response extends Message
     /**
      * Extracts a new response from a communicator.
      * 
-     * @param Communicator $com      The communicator from which to extract the
-     *     new response.
-     * @param bool         $asStream Whether to populate the argument values
+     * @param Communicator $com        The communicator from which to extract
+     *     the new response.
+     * @param bool         $asStream   Whether to populate the argument values
      *     with streams instead of strings.
+     * @param int          $timeout_s  If a response is not immediatly
+     *     available, wait this many seconds. If NULL, wait indefinetly.
+     * @param int          $timeout_us Microseconds to add to the waiting time.
      * @param Registry     $reg      An optional registry to sync the
      *     response with.
      * 
@@ -92,8 +95,13 @@ class Response extends Message
             if ($com->getTransmitter()->isPersistent()) {
                 $old = $com->getTransmitter()
                     ->lock(T\Stream::DIRECTION_RECEIVE);
-                $this->_receive($com, $asStream, $timeout_s, $timeout_us);
-                $com->getTransmitter()->lock($old, true);
+                try {
+                    $this->_receive($com, $asStream, $timeout_s, $timeout_us);
+                    $com->getTransmitter()->lock($old, true);
+                } catch (SocketException $e) {
+                    $com->getTransmitter()->lock($old, true);
+                    throw $e;
+                }
             } else {
                 $this->_receive($com, $asStream, $timeout_s, $timeout_us);
             }
@@ -133,10 +141,13 @@ class Response extends Message
      * This is the function that performs the actual receiving, while the
      * constructor is also involved in locks and registry sync.
      * 
-     * @param Communicator $com      The communicator from which to extract the
-     *     new response.
-     * @param bool         $asStream Whether to populate the argument values
+     * @param Communicator $com        The communicator from which to extract
+     *     the new response.
+     * @param bool         $asStream   Whether to populate the argument values
      *     with streams instead of strings.
+     * @param int          $timeout_s  If a response is not immediatly
+     *     available, wait this many seconds. If NULL, wait indefinetly.
+     * @param int          $timeout_us Microseconds to add to the waiting time.
      * 
      * @return void
      */
