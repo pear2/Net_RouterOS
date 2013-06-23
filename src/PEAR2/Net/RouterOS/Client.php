@@ -135,7 +135,7 @@ class Client
                 $this->com->close();
                 throw new DataFlowException(
                     'Invalid username or password supplied.',
-                    10000
+                    DataFlowException::CODE_INVALID_CREDENTIALS
                 );
             }
         }
@@ -218,7 +218,7 @@ class Client
             || $e instanceof UnexpectedValueException
             || !$com->getTransmitter()->isDataAwaiting()) ? new SocketException(
                 'This is not a compatible RouterOS service',
-                10200,
+                SocketException::CODE_SERVICE_INCOMPATIBLE,
                 $e
             ) : $e;
         }
@@ -333,19 +333,19 @@ class Client
         if ('' == $tag) {
             throw new DataFlowException(
                 'Asynchonous commands must have a tag.',
-                10500
+                DataFlowException::CODE_TAG_REQUIRED
             );
         }
         if ($this->isRequestActive($tag)) {
             throw new DataFlowException(
                 'There must not be multiple active requests sharing a tag.',
-                10501
+                DataFlowException::CODE_TAG_UNIQUE
             );
         }
         if (null !== $callback && !is_callable($callback, true)) {
             throw new UnexpectedValueException(
                 'Invalid callback provided.',
-                10502
+                UnexpectedValueException::CODE_CALLBACK_INVALID
             );
         }
         
@@ -489,7 +489,7 @@ class Client
         } else {
             throw new DataFlowException(
                 'No such request, or the request has already finished.',
-                10900
+                DataFlowException::CODE_UNKNOWN_REQUEST
             );
         }
     }
@@ -613,7 +613,7 @@ class Client
                 } else {
                     throw new DataFlowException(
                         'No such request. Canceling aborted.',
-                        11200
+                        DataFlowException::CODE_CANCEL_FAIL
                     );
                 }
             }

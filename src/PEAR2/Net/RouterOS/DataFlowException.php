@@ -31,4 +31,9 @@ namespace PEAR2\Net\RouterOS;
  */
 class DataFlowException extends \RuntimeException implements Exception
 {
+    const CODE_INVALID_CREDENTIALS = 10000;
+    const CODE_TAG_REQUIRED = 10500;
+    const CODE_TAG_UNIQUE = 10501;
+    const CODE_UNKNOWN_REQUEST = 10900;
+    const CODE_CANCEL_FAIL = 11200;
 }

@@ -290,7 +290,7 @@ class ClientStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
             $this->fail('Lengths above 0xFFFFFFF should not be supported.');
         } catch (LengthException $e) {
             $this->assertEquals(
-                1200,
+                LengthException::CODE_UNSUPPORTED,
                 $e->getCode(),
                 'Improper exception thrown.'
             );

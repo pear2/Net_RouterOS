@@ -162,7 +162,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (DataFlowException $e) {
             $this->assertEquals(
-                10000,
+                DataFlowException::CODE_INVALID_CREDENTIALS,
                 $e->getCode(),
                 'Improper exception code.'
             );
@@ -184,7 +184,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (DataFlowException $e) {
             $this->assertEquals(
-                10000,
+                DataFlowException::CODE_INVALID_CREDENTIALS,
                 $e->getCode(),
                 'Improper exception code.'
             );
@@ -203,7 +203,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (DataFlowException $e) {
             $this->assertEquals(
-                10000,
+                DataFlowException::CODE_INVALID_CREDENTIALS,
                 $e->getCode(),
                 'Improper exception code.'
             );
@@ -225,7 +225,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (DataFlowException $e) {
             $this->assertEquals(
-                10000,
+                DataFlowException::CODE_INVALID_CREDENTIALS,
                 $e->getCode(),
                 'Improper exception code.'
             );
@@ -251,7 +251,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (DataFlowException $e) {
             $this->assertEquals(
-                10000,
+                DataFlowException::CODE_INVALID_CREDENTIALS,
                 $e->getCode(),
                 'Improper exception code.'
             );
@@ -275,7 +275,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (DataFlowException $e) {
             $this->assertEquals(
-                10000,
+                DataFlowException::CODE_INVALID_CREDENTIALS,
                 $e->getCode(),
                 'Improper exception code.'
             );
@@ -294,7 +294,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (SocketException $e) {
             $this->assertEquals(
-                10200,
+                SocketException::CODE_SERVICE_INCOMPATIBLE,
                 $e->getCode(),
                 'Improper exception code.'
             );
@@ -316,7 +316,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (SocketException $e) {
             $this->assertEquals(
-                10200,
+                SocketException::CODE_SERVICE_INCOMPATIBLE,
                 $e->getCode(),
                 'Improper exception code.'
             );
@@ -334,7 +334,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 . '" should be available.'
             );
         } catch (SocketException $e) {
-            $this->assertEquals(100, $e->getCode());
+            $this->assertEquals(
+                SocketException::CODE_CONNECTION_FAIL,
+                $e->getCode()
+            );
             $this->assertTrue($e->getPrevious() instanceof T\SocketException);
             $this->assertEquals(8, $e->getPrevious()->getCode());
             $this->assertEquals(
@@ -358,7 +361,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 . '" should be available.'
             );
         } catch (SocketException $e) {
-            $this->assertEquals(100, $e->getCode());
+            $this->assertEquals(
+                SocketException::CODE_CONNECTION_FAIL,
+                $e->getCode()
+            );
             $this->assertTrue($e->getPrevious() instanceof T\SocketException);
             $this->assertEquals(8, $e->getPrevious()->getCode());
             $this->assertEquals(
@@ -380,7 +386,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (SocketException $e) {
             $this->assertEquals(
-                10200,
+                SocketException::CODE_SERVICE_INCOMPATIBLE,
                 $e->getCode()
             );
         }
@@ -401,7 +407,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             );
         } catch (SocketException $e) {
             $this->assertEquals(
-                10200,
+                SocketException::CODE_SERVICE_INCOMPATIBLE,
                 $e->getCode(),
                 'Improper exception code.'
             );
@@ -419,7 +425,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 . '" should be available.'
             );
         } catch (SocketException $e) {
-            $this->assertEquals(100, $e->getCode());
+            $this->assertEquals(
+                SocketException::CODE_CONNECTION_FAIL,
+                $e->getCode()
+            );
             $this->assertTrue($e->getPrevious() instanceof T\SocketException);
             $this->assertEquals(8, $e->getPrevious()->getCode());
             $this->assertEquals(
@@ -443,7 +452,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 . '" should be available.'
             );
         } catch (SocketException $e) {
-            $this->assertEquals(100, $e->getCode());
+            $this->assertEquals(
+                SocketException::CODE_CONNECTION_FAIL,
+                $e->getCode()
+            );
             $this->assertTrue($e->getPrevious() instanceof T\SocketException);
             $this->assertEquals(8, $e->getPrevious()->getCode());
             $this->assertEquals(
@@ -467,7 +479,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
             $this->fail('No proper connection should be available.');
         } catch (SocketException $e) {
-            $this->assertEquals(100, $e->getCode());
+            $this->assertEquals(
+                SocketException::CODE_CONNECTION_FAIL,
+                $e->getCode()
+            );
             $this->assertTrue($e->getPrevious() instanceof T\SocketException);
             $this->assertEquals(7, $e->getPrevious()->getCode());
         }
@@ -488,7 +503,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
             $this->fail('No proper connection should be available.');
         } catch (SocketException $e) {
-            $this->assertEquals(100, $e->getCode());
+            $this->assertEquals(
+                SocketException::CODE_CONNECTION_FAIL,
+                $e->getCode()
+            );
             $this->assertTrue($e->getPrevious() instanceof T\SocketException);
             $this->assertEquals(6, $e->getPrevious()->getCode());
         }
@@ -509,7 +527,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
             $this->fail('No proper connection should be available.');
         } catch (SocketException $e) {
-            $this->assertEquals(100, $e->getCode());
+            $this->assertEquals(
+                SocketException::CODE_CONNECTION_FAIL,
+                $e->getCode()
+            );
             $this->assertTrue($e->getPrevious() instanceof T\SocketException);
             $this->assertEquals(6, $e->getPrevious()->getCode());
         }
@@ -526,7 +547,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             $this->fail('Receiving had to fail.');
         } catch (SocketException $e) {
             $this->assertEquals(
-                50000,
+                SocketException::CODE_NO_DATA,
                 $e->getCode(),
                 'Improper exception code.'
             );
@@ -542,7 +563,11 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             new Response($com);
             $this->fail('Receiving had to fail.');
         } catch (SocketException $e) {
-            $this->assertEquals(50000, $e->getCode(), 'Improper exception code.');
+            $this->assertEquals(
+                SocketException::CODE_NO_DATA,
+                $e->getCode(),
+                'Improper exception code.'
+            );
         }
     }
 
@@ -555,7 +580,11 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             new Response($com, true);
             $this->fail('Receiving had to fail.');
         } catch (SocketException $e) {
-            $this->assertEquals(50000, $e->getCode(), 'Improper exception code.');
+            $this->assertEquals(
+                SocketException::CODE_NO_DATA,
+                $e->getCode(),
+                'Improper exception code.'
+            );
         }
     }
 
@@ -572,7 +601,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             $this->fail('The query had to fail.');
         } catch (SocketException $e) {
             $this->assertEquals(
-                30600,
+                SocketException::CODE_UNACCEPTING_QUERY,
                 $e->getCode(),
                 'Improper exception code.'
             );

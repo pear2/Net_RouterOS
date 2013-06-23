@@ -32,6 +32,10 @@ namespace PEAR2\Net\RouterOS;
 class UnexpectedValueException extends \UnexpectedValueException
     implements Exception
 {
+    
+    const CODE_CALLBACK_INVALID = 10502;
+    const CODE_ACTION_UNKNOWN = 30100;
+    const CODE_RESPONSE_TYPE_UNKNOWN = 50100;
 
     /**
      * @var mixed The unexpected value.

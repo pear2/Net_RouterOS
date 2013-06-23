@@ -33,6 +33,8 @@ namespace PEAR2\Net\RouterOS;
 class NotSupportedException extends \Exception implements Exception
 {
 
+    const CODE_CONTROL_BYTE = 1601;
+
     /**
      * @var mixed The unsuppported value.
      */

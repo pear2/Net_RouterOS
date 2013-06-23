@@ -32,4 +32,12 @@ namespace PEAR2\Net\RouterOS;
 class InvalidArgumentException extends \InvalidArgumentException
     implements Exception
 {
+    const CODE_SEEKABLE_REQUIRED = 1100;
+    const CODE_NAME_INVALID = 20100;
+    const CODE_ABSOLUTE_REQUIRED = 40200;
+    const CODE_CMD_UNRESOLVABLE = 40201;
+    const CODE_CMD_INVALID = 40202;
+    const CODE_NAME_UNPARSABLE = 41000;
+    const CODE_VALUE_UNPARSABLE = 41001;
+    
 }

@@ -115,7 +115,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
             $this->fail('The call had to fail.');
         } catch (DataFlowException $e) {
             $this->assertEquals(
-                10500,
+                DataFlowException::CODE_TAG_REQUIRED,
                 $e->getCode(),
                 'Improper exception code.'
             );
@@ -127,7 +127,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
             $this->fail('The call had to fail.');
         } catch (DataFlowException $e) {
             $this->assertEquals(
-                10500,
+                DataFlowException::CODE_TAG_REQUIRED,
                 $e->getCode(),
                 'Improper exception code.'
             );
@@ -149,7 +149,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
             $this->fail('The call had to fail.');
         } catch (DataFlowException $e) {
             $this->assertEquals(
-                10501,
+                DataFlowException::CODE_TAG_UNIQUE,
                 $e->getCode(),
                 'Improper exception code.'
             );
@@ -167,7 +167,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
             $this->fail('The call had to fail.');
         } catch (UnexpectedValueException $e) {
             $this->assertEquals(
-                10502,
+                UnexpectedValueException::CODE_CALLBACK_INVALID,
                 $e->getCode(),
                 'Improper exception code.'
             );
@@ -247,7 +247,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
             $this->object->cancelRequest('ping1');
         } catch (DataFlowException $e) {
             $this->assertEquals(
-                11200,
+                DataFlowException::CODE_CANCEL_FAIL,
                 $e->getCode(),
                 'Improper exception code.'
             );
@@ -279,7 +279,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
             $this->object->cancelRequest('ping3');
         } catch (DataFlowException $e) {
             $this->assertEquals(
-                11200,
+                DataFlowException::CODE_CANCEL_FAIL,
                 $e->getCode(),
                 'Improper exception code.'
             );
@@ -613,7 +613,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
             $this->fail('No exception was thrown.');
         } catch (DataFlowException $e) {
             $this->assertEquals(
-                10900,
+                DataFlowException::CODE_UNKNOWN_REQUEST,
                 $e->getCode(),
                 'Improper exception code.'
             );
@@ -631,7 +631,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
             $this->fail('No exception was thrown.');
         } catch (DataFlowException $e) {
             $this->assertEquals(
-                10900,
+                DataFlowException::CODE_UNKNOWN_REQUEST,
                 $e->getCode(),
                 'Improper exception code.'
             );
@@ -1183,7 +1183,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         } catch (LengthException $e) {
             fclose($comment);
             $this->assertEquals(
-                1200,
+                LengthException::CODE_UNSUPPORTED,
                 $e->getCode(),
                 'Improper exception thrown.'
             );

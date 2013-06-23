@@ -119,7 +119,11 @@ class Communicator
                 $context
             );
         } catch (T\Exception $e) {
-            throw new SocketException('Error connecting to RouterOS', 100, $e);
+            throw new SocketException(
+                'Error connecting to RouterOS',
+                SocketException::CODE_CONNECTION_FAIL,
+                $e
+            );
         }
         $this->setCharset(
             self::getDefaultCharset(self::CHARSET_ALL),
@@ -369,7 +373,7 @@ class Communicator
         if (!self::isSeekableStream($stream)) {
             throw new InvalidArgumentException(
                 'The stream must be seekable.',
-                1100
+                InvalidArgumentException::CODE_SEEKABLE_REQUIRED
             );
         }
         if (null !== ($remoteCharset = $this->getCharset(self::CHARSET_REMOTE))
@@ -421,7 +425,7 @@ class Communicator
         if ($length > 0xFFFFFFF) {
             throw new LengthException(
                 'Words with length above 0xFFFFFFF are not supported.',
-                1200,
+                LengthException::CODE_UNSUPPORTED,
                 null,
                 $length
             );
@@ -440,7 +444,7 @@ class Communicator
         if ($length < 0) {
             throw new LengthException(
                 'Length must not be negative.',
-                1300,
+                LengthException::CODE_INVALID,
                 null,
                 $length
             );
@@ -462,7 +466,7 @@ class Communicator
         }
         throw new LengthException(
             'Length must not be above 0x7FFFFFFFF.',
-            1301,
+            LengthException::CODE_BEYOND_SHEME,
             null,
             $length
         );
@@ -601,7 +605,7 @@ class Communicator
             }
             throw new NotSupportedException(
                 'Unknown control byte encountered.',
-                1601,
+                NotSupportedException::CODE_CONTROL_BYTE,
                 null,
                 $byte
             );

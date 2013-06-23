@@ -153,7 +153,7 @@ class Response extends Message
         ) {
             throw new SocketException(
                 'No data within the time limit',
-                50000
+                SocketException::CODE_NO_DATA
             );
         }
         $this->setType($com->getNextWord());
@@ -231,7 +231,7 @@ class Response extends Message
         default:
             throw new UnexpectedValueException(
                 'Unrecognized response type.',
-                50100,
+                UnexpectedValueException::CODE_RESPONSE_TYPE_UNKNOWN,
                 null,
                 $type
             );

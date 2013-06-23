@@ -18,7 +18,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 $invalidCommand = new Request($command);
             } catch (InvalidArgumentException $e) {
                 $this->assertEquals(
-                    40200,
+                    InvalidArgumentException::CODE_ABSOLUTE_REQUIRED,
                     $e->getCode(),
                     "Improper exception thrown for the command '{$command}'."
                 );
@@ -37,7 +37,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 $invalidCommand = new Request($command);
             } catch (InvalidArgumentException $e) {
                 $this->assertEquals(
-                    40201,
+                    InvalidArgumentException::CODE_CMD_UNRESOLVABLE,
                     $e->getCode(),
                     "Improper exception thrown for the command '{$command}'."
                 );
@@ -57,7 +57,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 $invalidCommand = new Request($command);
             } catch (InvalidArgumentException $e) {
                 $this->assertEquals(
-                    40202,
+                    InvalidArgumentException::CODE_CMD_INVALID,
                     $e->getCode(),
                     "Improper exception thrown for the command '{$command}'."
                 );
@@ -359,7 +359,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             $this->fail('Command had to fail.');
         } catch (InvalidArgumentException $e) {
             $this->assertEquals(
-                41000,
+                InvalidArgumentException::CODE_NAME_UNPARSABLE,
                 $e->getCode(),
                 'Improper exception code'
             );
@@ -369,7 +369,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             $this->fail('Command had to fail.');
         } catch (InvalidArgumentException $e) {
             $this->assertEquals(
-                41001,
+                InvalidArgumentException::CODE_VALUE_UNPARSABLE,
                 $e->getCode(),
                 'Improper exception code'
             );
@@ -394,7 +394,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 $request->setArgument($name);
             } catch (InvalidArgumentException $e) {
                 $this->assertEquals(
-                    20100,
+                    InvalidArgumentException::CODE_NAME_INVALID,
                     $e->getCode(),
                     "Improper exception thrown for the name '{$name}'."
                 );
@@ -430,7 +430,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 $query = Query::where($name);
             } catch (InvalidArgumentException $e) {
                 $this->assertEquals(
-                    20100,
+                    InvalidArgumentException::CODE_NAME_INVALID,
                     $e->getCode(),
                     "Improper exception thrown for the name '{$name}'."
                 );
@@ -457,7 +457,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 $query = Query::where('address', null, $action);
             } catch (UnexpectedValueException $e) {
                 $this->assertEquals(
-                    30100,
+                    UnexpectedValueException::CODE_ACTION_UNKNOWN,
                     $e->getCode(),
                     "Improper exception thrown for the action '{$action}'."
                 );
@@ -476,7 +476,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             $this->fail('Call had to fail.');
         } catch (InvalidArgumentException $e) {
             $this->assertEquals(
-                1100,
+                InvalidArgumentException::CODE_SEEKABLE_REQUIRED,
                 $e->getCode(),
                 'Improper exception code.'
             );
@@ -569,7 +569,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             Communicator::encodeLength($smallLength);
         } catch (LengthException $e) {
             $this->assertEquals(
-                1300,
+                LengthException::CODE_INVALID,
                 $e->getCode(),
                 "Length '{$smallLength}' must not be encodable."
             );
@@ -584,7 +584,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
             Communicator::encodeLength($largeLength);
         } catch (LengthException $e) {
             $this->assertEquals(
-                1301,
+                LengthException::CODE_BEYOND_SHEME,
                 $e->getCode(),
                 "Length '{$largeLength}' must not be encodable."
             );
@@ -623,7 +623,7 @@ class RequestHandlingTest extends \PHPUnit_Framework_TestCase
                 Communicator::decodeLength($trans);
             } catch (NotSupportedException $e) {
                 $this->assertEquals(
-                    1601,
+                    NotSupportedException::CODE_CONTROL_BYTE,
                     $e->getCode(),
                     'Improper exception code.'
                 );

@@ -31,6 +31,10 @@ namespace PEAR2\Net\RouterOS;
  */
 class LengthException extends \LengthException implements Exception
 {
+    
+    const CODE_UNSUPPORTED = 1200;
+    const CODE_INVALID = 1300;
+    const CODE_BEYOND_SHEME = 1301;
 
     /**
      *

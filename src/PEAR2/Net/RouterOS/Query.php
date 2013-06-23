@@ -98,7 +98,7 @@ class Query
         default:
             throw new UnexpectedValueException(
                 'Unknown action specified',
-                30100,
+                UnexpectedValueException::CODE_ACTION_UNKNOWN,
                 null,
                 $action
             );
@@ -203,7 +203,7 @@ class Query
         if (!$com->getTransmitter()->isAcceptingData()) {
             throw new SocketException(
                 'Transmitter is invalid. Sending aborted.',
-                30600
+                SocketException::CODE_UNACCEPTING_QUERY
             );
         }
         $bytes = 0;

@@ -79,7 +79,7 @@ abstract class Message
         ) {
             throw new InvalidArgumentException(
                 'Invalid name of argument supplied.',
-                20100
+                InvalidArgumentException::CODE_NAME_INVALID
             );
         }
         return $name;
