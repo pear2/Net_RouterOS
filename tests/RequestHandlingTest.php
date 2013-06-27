@@ -1,12 +1,24 @@
 <?php
-namespace PEAR2\Net\RouterOS;
 
+namespace PEAR2\Net\RouterOS\Misc\Test;
+
+
+use PEAR2\Net\RouterOS\Client;
+use PEAR2\Net\RouterOS\Communicator;
+use PEAR2\Net\RouterOS\InvalidArgumentException;
+use PEAR2\Net\RouterOS\LengthException;
+use PEAR2\Net\RouterOS\NotSupportedException;
+use PEAR2\Net\RouterOS\Query;
+use PEAR2\Net\RouterOS\Registry;
+use PEAR2\Net\RouterOS\Request;
+use PEAR2\Net\RouterOS\Response;
+use PEAR2\Net\RouterOS\UnexpectedValueException;
 use PEAR2\Net\Transmitter as T;
 
 /**
  * ~
  * 
- * @group Safe
+ * @group Misc
  * 
  * @category Net
  * @package  PEAR2_Net_RouterOS

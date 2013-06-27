@@ -3,13 +3,14 @@
 namespace PEAR2\Net\RouterOS\Client\Test\Safe\NonPersistent;
 
 use PEAR2\Net\RouterOS\Client;
-use PEAR2\Net\RouterOS\Client\Test\Safe\NonPersistentTest;
+use PEAR2\Net\RouterOS\Client\Test\Safe\NonPersistent;
 
-require_once __DIR__ . '/../NonPersistentTest.php';
+require_once __DIR__ . '/../NonPersistent.php';
 
 /**
  * ~
  * 
+ * @group Client
  * @group Safe
  * @group NonPersistent
  * @group Unencrypted
@@ -20,7 +21,7 @@ require_once __DIR__ . '/../NonPersistentTest.php';
  * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
  * @link     http://pear2.php.net/PEAR2_Net_RouterOS
  */
-class UnencryptedTest extends NonPersistentTest
+class UnencryptedTest extends NonPersistent
 {
     protected function setUp()
     {

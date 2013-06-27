@@ -118,29 +118,47 @@
 
     </php>
     <testsuites>
-        <testsuite name="All tests">
+        <testsuite name="All Tests">
             <file>ConnectionTest.php</file>
             <file>RequestHandlingTest.php</file>
 
             <file>Client/Safe/NonPersistent/UnencryptedTest.php</file>
-            <file>Client/Safe/NonPersistent/EncryptedTest.php</file>
             <file>Client/Safe/Persistent/UnencryptedTest.php</file>
-            <file>Client/Safe/Persistent/EncryptedTest.php</file>
-            <file>Client/Unsafe/NonPersistent/UnencryptedTest.php</file>
-            <file>Client/Unsafe/NonPersistent/EncryptedTest.php</file>
-            <file>Client/Unsafe/Persistent/UnencryptedTest.php</file>
-            <file>Client/Unsafe/Persistent/EncryptedTest.php</file>
-
             <file>Util/Safe/NonPersistent/UnencryptedTest.php</file>
-            <file>Util/Safe/NonPersistent/EncryptedTest.php</file>
             <file>Util/Safe/Persistent/UnencryptedTest.php</file>
-            <file>Util/Safe/Persistent/EncryptedTest.php</file>
+
+            <file>Client/Unsafe/NonPersistent/UnencryptedTest.php</file>
+            <file>Client/Unsafe/Persistent/UnencryptedTest.php</file>
             <file>Util/Unsafe/NonPersistent/UnencryptedTest.php</file>
-            <file>Util/Unsafe/NonPersistent/EncryptedTest.php</file>
             <file>Util/Unsafe/Persistent/UnencryptedTest.php</file>
+
+            <file>Client/Safe/NonPersistent/EncryptedTest.php</file>
+            <file>Client/Safe/Persistent/EncryptedTest.php</file>
+            <file>Util/Safe/NonPersistent/EncryptedTest.php</file>
+            <file>Util/Safe/Persistent/EncryptedTest.php</file>
+
+            <file>Client/Unsafe/NonPersistent/EncryptedTest.php</file>
+            <file>Client/Unsafe/Persistent/EncryptedTest.php</file>
+            <file>Util/Unsafe/NonPersistent/EncryptedTest.php</file>
             <file>Util/Unsafe/Persistent/EncryptedTest.php</file>
+
         </testsuite>
     </testsuites>
+    <groups>
+        <include>
+            <group>Unencrypted</group>
+            <group>NonPersistent</group>
+            <group>Persistent</group>
+            <group>Safe</group>
+            <group>Unsafe</group>
+            <group>Client</group>
+            <group>Util</group>
+            <group>Misc</group>
+        </include>
+        <exclude>
+            <group>Encrypted</group>
+        </exclude>
+    </groups>
     <filter>
         <whitelist>
             <directory suffix=".php">../src/PEAR2/Net/RouterOS</directory>

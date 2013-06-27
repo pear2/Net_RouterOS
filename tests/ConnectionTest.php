@@ -1,17 +1,27 @@
 <?php
-namespace PEAR2\Net\RouterOS\Client\Test;
+namespace PEAR2\Net\RouterOS\Misc\Test;
 
 use PEAR2\Net\RouterOS\Client;
 use PEAR2\Net\RouterOS\Communicator;
 use PEAR2\Net\RouterOS\DataFlowException;
 use PEAR2\Net\RouterOS\Exception;
 use PEAR2\Net\RouterOS\Query;
-use PEAR2\Net\RouterOS\Request;
 use PEAR2\Net\RouterOS\Response;
 use PEAR2\Net\RouterOS\SocketException;
 use PEAR2\Net\Transmitter as T;
 use PHPUnit_Framework_TestCase;
 
+/**
+ * ~
+ * 
+ * @group Misc
+ * 
+ * @category Net
+ * @package  PEAR2_Net_RouterOS
+ * @author   Vasil Rangelov <boen.robot@gmail.com>
+ * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
+ * @link     http://pear2.php.net/PEAR2_Net_RouterOS
+ */
 class ConnectionTest extends PHPUnit_Framework_TestCase
 {
     

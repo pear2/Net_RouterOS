@@ -48,4 +48,8 @@ foreach ($constants as $constant) {
         __NAMESPACE__ . '\Util\Test\\' . $constant,
         $value
     );
+    define(
+        __NAMESPACE__ . '\Misc\Test\\' . $constant,
+        $value
+    );
 }

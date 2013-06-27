@@ -246,7 +246,6 @@ abstract class UnsafeTest extends PHPUnit_Framework_TestCase
     /**
      * @depends testAdd
      * @depends testRemove
-     * @depends PEAR2\Net\RouterOS\UtilFeaturesTest::testFindNoCriteria
      * 
      * @return void
      */

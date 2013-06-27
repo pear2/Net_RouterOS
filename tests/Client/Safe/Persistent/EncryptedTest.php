@@ -3,14 +3,15 @@
 namespace PEAR2\Net\RouterOS\Client\Test\Safe\Persistent;
 
 use PEAR2\Net\RouterOS\Client;
-use PEAR2\Net\RouterOS\Client\Test\Safe\PersistentTest;
+use PEAR2\Net\RouterOS\Client\Test\Safe\Persistent;
 use PEAR2\Net\Transmitter\NetworkStream;
 
-require_once __DIR__ . '/../PersistentTest.php';
+require_once __DIR__ . '/../Persistent.php';
 
 /**
  * ~
  * 
+ * @group Client
  * @group Safe
  * @group Persistent
  * @group Encrypted
@@ -21,7 +22,7 @@ require_once __DIR__ . '/../PersistentTest.php';
  * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
  * @link     http://pear2.php.net/PEAR2_Net_RouterOS
  */
-class EncryptedTest extends PersistentTest
+class EncryptedTest extends Persistent
 {
     protected function setUp()
     {

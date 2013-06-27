@@ -39,7 +39,8 @@ abstract class UnsafeTest extends PHPUnit_Framework_TestCase
 
 
             $addRequest = new Request('/queue/simple/add');
-            $addRequest->setArgument('name', TEST_QUEUE_NAME);
+            $addRequest->setArgument('name', TEST_QUEUE_NAME)
+                ->setArgument('target', '0.0.0.0/0');
             $responses = $routerOS2->sendSync($addRequest);
             $this->assertEquals(
                 1,
@@ -69,7 +70,8 @@ abstract class UnsafeTest extends PHPUnit_Framework_TestCase
     public function testSendSyncReturningCollectionWithOneResponse()
     {
         $addRequest = new Request('/queue/simple/add');
-        $addRequest->setArgument('name', TEST_QUEUE_NAME);
+        $addRequest->setArgument('name', TEST_QUEUE_NAME)
+            ->setArgument('target', '0.0.0.0/0');
         $responses = $this->object->sendSync($addRequest);
         $this->assertEquals(
             1,
@@ -115,7 +117,8 @@ abstract class UnsafeTest extends PHPUnit_Framework_TestCase
         rewind($comment);
 
         $addRequest = new Request('/queue/simple/add');
-        $addRequest->setArgument('name', TEST_QUEUE_NAME);
+        $addRequest->setArgument('name', TEST_QUEUE_NAME)
+            ->setArgument('target', '0.0.0.0/0');
         $addRequest->setArgument('comment', $comment);
         $responses = $this->object->sendSync($addRequest);
         $this->assertEquals(
@@ -167,7 +170,8 @@ abstract class UnsafeTest extends PHPUnit_Framework_TestCase
             rewind($comment);
 
             $addRequest = new Request($addCommand);
-            $addRequest->setArgument('name', TEST_QUEUE_NAME);
+            $addRequest->setArgument('name', TEST_QUEUE_NAME)
+                ->setArgument('target', '0.0.0.0/0');
             $addRequest->setArgument('comment', $comment);
             $responses = $this->object->sendSync($addRequest);
             $this->assertEquals(
@@ -220,7 +224,8 @@ abstract class UnsafeTest extends PHPUnit_Framework_TestCase
             rewind($comment);
 
             $addRequest = new Request($addCommand);
-            $addRequest->setArgument('name', TEST_QUEUE_NAME);
+            $addRequest->setArgument('name', TEST_QUEUE_NAME)
+                ->setArgument('target', '0.0.0.0/0');
             $addRequest->setArgument('comment', $comment);
             $responses = $this->object->sendSync($addRequest);
             $this->assertEquals(
@@ -274,7 +279,8 @@ abstract class UnsafeTest extends PHPUnit_Framework_TestCase
             unset($commentString);
             rewind($comment);
             $addRequest = new Request('/queue/simple/add');
-            $addRequest->setArgument('name', TEST_QUEUE_NAME);
+            $addRequest->setArgument('name', TEST_QUEUE_NAME)
+                ->setArgument('target', '0.0.0.0/0');
             $addRequest->setArgument('comment', $comment);
             $responses = $this->object->sendSync($addRequest);
             if (count($responses) === 1
@@ -303,20 +309,22 @@ abstract class UnsafeTest extends PHPUnit_Framework_TestCase
     public function testResponseCollectionGetArgumentMap()
     {
         $addRequest = new Request('/queue/simple/add');
-        $addRequest->setArgument('name', TEST_QUEUE_NAME);
+        $addRequest->setArgument('name', TEST_QUEUE_NAME)
+            ->setArgument('target', '0.0.0.0/0')
+            ->setArgument('comment', 'API_TEST');
         $responses = $this->object->sendSync($addRequest);
         if (count($responses) === 1
             && $responses->getLast()->getType() === Response::TYPE_FINAL
         ) {
             $printRequest = new Request('/queue/simple/print');
-            $printRequest->setArgument('.proplist', 'name,target');
+            $printRequest->setArgument('.proplist', 'name,comment');
             $printRequest->setQuery(
                 Query::where('name', TEST_QUEUE_NAME)
                 ->orWhere('target', HOSTNAME_INVALID . '/32')
             );
             $responses = $this->object->sendSync($printRequest);
             $this->assertEquals(
-                array('name' => array(0, 1), 'target' => array(0)),
+                array('name' => array(0, 1), 'comment' => array(1)),
                 $responses->getArgumentMap(),
                 'Improper format of the returned array'
             );
@@ -347,7 +355,8 @@ abstract class UnsafeTest extends PHPUnit_Framework_TestCase
         
         
         $addRequest = new Request('/queue/simple/add');
-        $addRequest->setArgument('name', TEST_QUEUE_NAME);
+        $addRequest->setArgument('name', TEST_QUEUE_NAME)
+            ->setArgument('target', '0.0.0.0/0');
         $addRequest->setArgument('comment', 'ПРИМЕР');
         $responses = $this->object->sendSync($addRequest);
         $this->assertEquals(

@@ -6,7 +6,7 @@ use PEAR2\Net\RouterOS\Client\Test\UnsafeTest;
 
 require_once __DIR__ . '/../UnsafeTest.php';
 
-abstract class NonPersistentTest extends UnsafeTest
+abstract class NonPersistent extends UnsafeTest
 {
     protected function tearDown()
     {

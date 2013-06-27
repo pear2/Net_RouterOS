@@ -9,7 +9,7 @@ use PEAR2\Net\RouterOS\Request;
 
 require_once __DIR__ . '/../SafeTest.php';
 
-abstract class PersistentTest extends SafeTest
+abstract class Persistent extends SafeTest
 {
     
     protected function tearDown()
