@@ -103,16 +103,18 @@ class Client
      * @param string   $password The RouterOS password.
      * @param int|null $port     The port on which the RouterOS server provides
      *     the API service. You can also specify NULL, in which case the port
-     *     will automatically be chosen between 8728 and 8729, depending on your
-     *     encryption setting.
+     *     will automatically be chosen between 8728 and 8729, depending on the
+     *     value of $crypto.
      * @param bool     $persist  Whether or not the connection should be a
      *     persistent one.
      * @param float    $timeout  The timeout for the connection.
      * @param string   $crypto   The encryption for this connection. Must be one
      *     of the PEAR2\Net\Transmitter\NetworkStream::CRYPTO_* constants. Off
-     *     by default. For the sake of simplicity, if you specify an encryption,
-     *     don't specify a context and your default context uses the value
-     *     "DEFAULT" for ciphers, "ADH" will be automatically added to the list.
+     *     by default. RouterOS currently supports only TLS, but the setting is
+     *     provided in this fashion for forward compatibility's sake. And for
+     *     the sake of simplicity, if you specify an encryption, don't specify a
+     *     context and your default context uses the value "DEFAULT" for
+     *     ciphers, "ADH" will be automatically added to the list of ciphers.
      * @param resource $context  A context for the socket.
      * 
      * @see sendSync()
