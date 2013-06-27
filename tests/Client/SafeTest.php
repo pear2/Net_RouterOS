@@ -1,29 +1,31 @@
 <?php
-namespace PEAR2\Net\RouterOS;
 
-class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
+namespace PEAR2\Net\RouterOS\Client\Test;
+
+use PEAR2\Net\RouterOS\Client;
+use PEAR2\Net\RouterOS\Communicator;
+use PEAR2\Net\RouterOS\DataFlowException;
+use PEAR2\Net\RouterOS\LengthException;
+use PEAR2\Net\RouterOS\Query;
+use PEAR2\Net\RouterOS\Request;
+use PEAR2\Net\RouterOS\Response;
+use PEAR2\Net\RouterOS\UnexpectedValueException;
+use PHPUnit_Framework_Assert;
+use PHPUnit_Framework_TestCase;
+
+abstract class SafeTest extends PHPUnit_Framework_TestCase
 {
 
     /**
      * @var Client
      */
     protected $object;
-    
-    protected function setUp()
-    {
-        $this->object = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT);
-    }
-    
-    protected function tearDown()
-    {
-        unset($this->object);
-    }
 
     public function testSendSyncReturningCollection()
     {
         $list1 = $this->object->sendSync(new Request('/ip/arp/print'));
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list1,
             'The list is not a collection'
         );
@@ -38,13 +40,13 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
             'The address is not a string'
         );
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\Response',
+            ROS_NAMESPACE . '\Response',
             $list1->end(),
             'The list is empty'
         );
         $this->assertEquals(Response::TYPE_FINAL, $list1->current()->getType());
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\Response',
+            ROS_NAMESPACE . '\Response',
             $list1->prev(),
             'The list is empty'
         );
@@ -54,7 +56,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
             new Request('/ip/arp/print', null, 't')
         );
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list2,
             'The list is not a collection'
         );
@@ -69,13 +71,13 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
             'The address is not a string'
         );
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\Response',
+            ROS_NAMESPACE . '\Response',
             $list2->end(),
             'The list is empty'
         );
         $this->assertEquals(Response::TYPE_FINAL, $list2->current()->getType());
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\Response',
+            ROS_NAMESPACE . '\Response',
             $list2->prev(),
             'The list is empty'
         );
@@ -94,7 +96,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->object->isStreamingResponses());
         $list = $this->object->sendSync(new Request('/ip/arp/print'));
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );
@@ -183,18 +185,18 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->object->sendAsync(
             $ping,
             function ($response, $client) use (&$repliesCount) {
-                \PHPUnit_Framework_TestCase::assertInstanceOf(
-                    __NAMESPACE__ . '\Response',
+                PHPUnit_Framework_TestCase::assertInstanceOf(
+                    ROS_NAMESPACE . '\Response',
                     $response,
                     'A callback must receive a single response per call'
                 );
-                \PHPUnit_Framework_TestCase::assertInstanceOf(
-                    __NAMESPACE__ . '\Client',
+                PHPUnit_Framework_TestCase::assertInstanceOf(
+                    ROS_NAMESPACE . '\Client',
                     $client,
                     'A callback must receive a copy of the client object'
                 );
 
-                \PHPUnit_Framework_TestCase::assertEquals(
+                PHPUnit_Framework_TestCase::assertEquals(
                     'ping',
                     $response->getTag(),
                     'The callback must only receive responses meant for it.'
@@ -337,18 +339,18 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->object->sendAsync(
             $ping,
             function ($response, $client) use (&$responseCount) {
-                \PHPUnit_Framework_TestCase::assertInstanceOf(
-                    __NAMESPACE__ . '\Response',
+                PHPUnit_Framework_TestCase::assertInstanceOf(
+                    ROS_NAMESPACE . '\Response',
                     $response,
                     'A callback must receive a single response per call'
                 );
-                \PHPUnit_Framework_TestCase::assertInstanceOf(
-                    __NAMESPACE__ . '\Client',
+                PHPUnit_Framework_TestCase::assertInstanceOf(
+                    ROS_NAMESPACE . '\Client',
                     $client,
                     'A callback must receive a copy of the client object'
                 );
 
-                \PHPUnit_Framework_TestCase::assertEquals(
+                PHPUnit_Framework_TestCase::assertEquals(
                     'ping',
                     $response->getTag(),
                     'The callback must only receive responses meant for it.'
@@ -389,18 +391,18 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->object->sendAsync(
             $ping,
             function ($response, $client) use (&$repliesCount, $limit) {
-                \PHPUnit_Framework_TestCase::assertInstanceOf(
-                    __NAMESPACE__ . '\Response',
+                PHPUnit_Framework_TestCase::assertInstanceOf(
+                    ROS_NAMESPACE . '\Response',
                     $response,
                     'A callback must receive a single response per call'
                 );
-                \PHPUnit_Framework_TestCase::assertInstanceOf(
-                    __NAMESPACE__ . '\Client',
+                PHPUnit_Framework_TestCase::assertInstanceOf(
+                    ROS_NAMESPACE . '\Client',
                     $client,
                     'A callback must receive a copy of the client object'
                 );
 
-                \PHPUnit_Framework_TestCase::assertEquals(
+                PHPUnit_Framework_TestCase::assertEquals(
                     'ping',
                     $response->getTag(),
                     'The callback must only receive responses meant for it.'
@@ -424,18 +426,18 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $arpPrint->setTag('arp');
         $repliesCount = 0;
         $arpCallback = function ($response, $client) use (&$repliesCount) {
-                \PHPUnit_Framework_TestCase::assertInstanceOf(
-                    __NAMESPACE__ . '\Response',
+                PHPUnit_Framework_TestCase::assertInstanceOf(
+                    ROS_NAMESPACE . '\Response',
                     $response,
                     'A callback must receive a single response per call'
                 );
-                \PHPUnit_Framework_TestCase::assertInstanceOf(
-                    __NAMESPACE__ . '\Client',
+                PHPUnit_Framework_TestCase::assertInstanceOf(
+                    ROS_NAMESPACE . '\Client',
                     $client,
                     'A callback must receive a copy of the client object'
                 );
 
-                \PHPUnit_Framework_TestCase::assertEquals(
+                PHPUnit_Framework_TestCase::assertEquals(
                     'arp',
                     $response->getTag(),
                     'The callback must only receive responses meant for it.'
@@ -465,18 +467,18 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->object->sendAsync(
             $ping,
             function ($response, $client) use (&$repliesCount) {
-                \PHPUnit_Framework_TestCase::assertInstanceOf(
-                    __NAMESPACE__ . '\Response',
+                PHPUnit_Framework_TestCase::assertInstanceOf(
+                    ROS_NAMESPACE . '\Response',
                     $response,
                     'A callback must receive a single response per call'
                 );
-                \PHPUnit_Framework_TestCase::assertInstanceOf(
-                    __NAMESPACE__ . '\Client',
+                PHPUnit_Framework_TestCase::assertInstanceOf(
+                    ROS_NAMESPACE . '\Client',
                     $client,
                     'A callback must receive a copy of the client object'
                 );
 
-                \PHPUnit_Framework_TestCase::assertEquals(
+                PHPUnit_Framework_TestCase::assertEquals(
                     'ping',
                     $response->getTag(),
                     'The callback must only receive responses meant for it.'
@@ -494,7 +496,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
 
         
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );
@@ -515,18 +517,18 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->object->sendAsync(
             $ping,
             function ($response, $client) use (&$repliesCount) {
-                \PHPUnit_Framework_TestCase::assertInstanceOf(
-                    __NAMESPACE__ . '\Response',
+                PHPUnit_Framework_TestCase::assertInstanceOf(
+                    ROS_NAMESPACE . '\Response',
                     $response,
                     'A callback must receive a single response per call'
                 );
-                \PHPUnit_Framework_TestCase::assertInstanceOf(
-                    __NAMESPACE__ . '\Client',
+                PHPUnit_Framework_TestCase::assertInstanceOf(
+                    ROS_NAMESPACE . '\Client',
                     $client,
                     'A callback must receive a copy of the client object'
                 );
 
-                \PHPUnit_Framework_TestCase::assertEquals(
+                PHPUnit_Framework_TestCase::assertEquals(
                     'ping',
                     $response->getTag(),
                     'The callback must only receive responses meant for it.'
@@ -548,7 +550,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
 
         
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );
@@ -580,18 +582,18 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->object->sendAsync(
             $arpPrint,
             function ($response, $client) use (&$list2) {
-                \PHPUnit_Framework_TestCase::assertInstanceOf(
-                    __NAMESPACE__ . '\Response',
+                PHPUnit_Framework_TestCase::assertInstanceOf(
+                    ROS_NAMESPACE . '\Response',
                     $response,
                     'A callback must receive a single response per call'
                 );
-                \PHPUnit_Framework_TestCase::assertInstanceOf(
-                    __NAMESPACE__ . '\Client',
+                PHPUnit_Framework_TestCase::assertInstanceOf(
+                    ROS_NAMESPACE . '\Client',
                     $client,
                     'A callback must receive a copy of the client object'
                 );
 
-                \PHPUnit_Framework_TestCase::assertEquals(
+                PHPUnit_Framework_TestCase::assertEquals(
                     'arp',
                     $response->getTag(),
                     'The callback must only receive responses meant for it.'
@@ -647,7 +649,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->object->loop();
         $list = $this->object->extractNewResponses('arp');
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );
@@ -661,7 +663,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->object->loop(2);
         $list = $this->object->extractNewResponses('ping');
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );
@@ -684,7 +686,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->object->sendAsync(
             new Request('/queue simple listen', null, 'l'),
             function ($response) {
-                \PHPUnit_Framework_Assert::assertFalse($response);
+                PHPUnit_Framework_Assert::assertFalse($response);
             }
         );
         $this->assertSame(1, $this->object->getPendingRequestsCount());
@@ -729,7 +731,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(count($arpResponses1), count($arpResponses2));
         $this->assertEquals(count($arpResponses2), count($arpResponses3));
-        $this->assertInstanceOf(__NAMESPACE__ . '\Response', $arpResponses1(0));
+        $this->assertInstanceOf(ROS_NAMESPACE . '\Response', $arpResponses1(0));
     }
 
     public function testStreamEquality()
@@ -742,7 +744,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
 
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );
@@ -750,7 +752,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         $this->object->setStreamingResponses(true);
         $streamList = $this->object->sendSync($request);
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $streamList,
             'The list is not a collection'
         );
@@ -783,7 +785,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );
@@ -802,7 +804,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );
@@ -821,7 +823,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );
@@ -840,7 +842,7 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );
@@ -861,12 +863,12 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $fullList,
             'The list is not a collection'
         );
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );
@@ -885,12 +887,12 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $fullList,
             'The list is not a collection'
         );
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );
@@ -909,12 +911,12 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $fullList,
             'The list is not a collection'
         );
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );
@@ -933,12 +935,12 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $fullList,
             'The list is not a collection'
         );
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );
@@ -960,12 +962,12 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $fullList,
             'The list is not a collection'
         );
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );
@@ -985,12 +987,12 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $fullList,
             'The list is not a collection'
         );
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );
@@ -1009,12 +1011,12 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $fullList,
             'The list is not a collection'
         );
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );
@@ -1039,12 +1041,12 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $fullList,
             'The list is not a collection'
         );
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );
@@ -1066,12 +1068,12 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $fullList,
             'The list is not a collection'
         );
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );
@@ -1099,12 +1101,12 @@ class ClientFeaturesTest extends \PHPUnit_Framework_TestCase
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $fullList,
             'The list is not a collection'
         );
         $this->assertInstanceOf(
-            __NAMESPACE__ . '\ResponseCollection',
+            ROS_NAMESPACE . '\ResponseCollection',
             $list,
             'The list is not a collection'
         );

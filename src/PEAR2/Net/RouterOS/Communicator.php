@@ -90,13 +90,20 @@ class Communicator
      * Creates a new connection with the specified options.
      * 
      * @param string   $host    Hostname (IP or domain) of the RouterOS server.
-     * @param int      $port    The port on which the RouterOS server provides
-     *     the API service.
+     * @param int|null $port    The port on which the RouterOS server provides
+     *     the API service. You can also specify NULL, in which case the port
+     *     will automatically be chosen between 8728 and 8729, depending on your
+     *     encryption setting.
      * @param bool     $persist Whether or not the connection should be a
      *     persistent one.
      * @param float    $timeout The timeout for the connection.
      * @param string   $key     A string that uniquely identifies the
      *     connection.
+     * @param string   $crypto  The encryption for this connection. Must be one
+     *     of the PEAR2\Net\Transmitter\NetworkStream::CRYPTO_* constants. Off
+     *     by default. For the sake of simplicity, if you specify an encryption,
+     *     don't specify a context and your default context uses the value
+     *     "DEFAULT" for ciphers, "ADH" will be automatically added to the list.
      * @param resource $context A context for the socket.
      * 
      * @see sendWord()
@@ -107,8 +114,23 @@ class Communicator
         $persist = false,
         $timeout = null,
         $key = '',
+        $crypto = T\NetworkStream::CRYPTO_OFF,
         $context = null
     ) {
+        $isUnencrypted = T\NetworkStream::CRYPTO_OFF === $crypto;
+        if (($context === null) && !$isUnencrypted) {
+            $context = stream_context_get_default();
+            $opts = stream_context_get_options($context);
+            if (!isset($opts['ssl']['ciphers'])
+                || 'DEFAULT' === $opts['ssl']['ciphers']
+            ) {
+                stream_context_set_option($context, 'ssl', 'ciphers', 'ADH');
+            }
+        }
+        if (null === $port) {
+            $port = $isUnencrypted ? 8728 : 8729;
+        }
+
         try {
             $this->trans = new T\TcpClient(
                 $host,
@@ -116,6 +138,7 @@ class Communicator
                 $persist,
                 $timeout,
                 $key,
+                $crypto,
                 $context
             );
         } catch (T\Exception $e) {

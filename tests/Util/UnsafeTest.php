@@ -1,10 +1,17 @@
 <?php
-namespace PEAR2\Net\RouterOS;
 
-use DateTime;
+namespace PEAR2\Net\RouterOS\Util\Test;
+
 use DateInterval;
+use DateTime;
+use PEAR2\Net\RouterOS\Client;
+use PEAR2\Net\RouterOS\Query;
+use PEAR2\Net\RouterOS\Request;
+use PEAR2\Net\RouterOS\Response;
+use PEAR2\Net\RouterOS\Util;
+use PHPUnit_Framework_TestCase;
 
-class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
+abstract class UnsafeTest extends PHPUnit_Framework_TestCase
 {
     const REGEX_ID = '\*[A-F0-9]+';
     const REGEX_IDLIST = '/^(\*[A-F0-9]+\,)*(\*[A-F0-9]+)$/';
@@ -17,31 +24,6 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
      * @var Client
      */
     protected $client;
-    
-    /**
-     * @var bool Whether connections should be persistent ones.
-     */
-    protected $isPersistent = false;
-
-    protected function setUp()
-    {
-        $this->util = new Util(
-            $this->client = new Client(
-                \HOSTNAME,
-                USERNAME,
-                PASSWORD,
-                PORT,
-                $this->isPersistent
-            )
-        );
-    }
-
-    protected function tearDown()
-    {
-        unset($this->util);
-        $this->client->close();
-        unset($this->client);
-    }
 
     public function testAdd()
     {
@@ -743,15 +725,7 @@ class UtilStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
     
     public function testFilePutContentsNoPermissions()
     {
-        $this->util = new Util(
-            $this->client = new Client(
-                \HOSTNAME,
-                USERNAME2,
-                PASSWORD2,
-                PORT,
-                $this->isPersistent
-            )
-        );
+        $this->setUp(USERNAME2, PASSWORD2);
         $this->assertFalse($this->util->filePutContents(TEST_FILE_NAME, 'ok'));
     }
 }

@@ -3,6 +3,17 @@ namespace PEAR2\Net\RouterOS;
 
 use PEAR2\Net\Transmitter as T;
 
+/**
+ * ~
+ * 
+ * @group Safe
+ * 
+ * @category Net
+ * @package  PEAR2_Net_RouterOS
+ * @author   Vasil Rangelov <boen.robot@gmail.com>
+ * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
+ * @link     http://pear2.php.net/PEAR2_Net_RouterOS
+ */
 class RequestHandlingTest extends \PHPUnit_Framework_TestCase
 {
     public function testNonAbsoluteCommand()

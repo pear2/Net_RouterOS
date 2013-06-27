@@ -78,7 +78,7 @@ class Response extends Message
      * @param int          $timeout_s  If a response is not immediatly
      *     available, wait this many seconds. If NULL, wait indefinetly.
      * @param int          $timeout_us Microseconds to add to the waiting time.
-     * @param Registry     $reg      An optional registry to sync the
+     * @param Registry     $reg        An optional registry to sync the
      *     response with.
      * 
      * @see getType()

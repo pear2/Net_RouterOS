@@ -1,9 +1,18 @@
 <?php
-namespace PEAR2\Net\RouterOS;
+namespace PEAR2\Net\RouterOS\Client\Test;
 
+use PEAR2\Net\RouterOS\Client;
+use PEAR2\Net\RouterOS\Communicator;
+use PEAR2\Net\RouterOS\DataFlowException;
+use PEAR2\Net\RouterOS\Exception;
+use PEAR2\Net\RouterOS\Query;
+use PEAR2\Net\RouterOS\Request;
+use PEAR2\Net\RouterOS\Response;
+use PEAR2\Net\RouterOS\SocketException;
 use PEAR2\Net\Transmitter as T;
+use PHPUnit_Framework_TestCase;
 
-class ConnectionTest extends \PHPUnit_Framework_TestCase
+class ConnectionTest extends PHPUnit_Framework_TestCase
 {
     
     /**
@@ -20,13 +29,38 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     {
         ini_set('default_socket_timeout', self::$defaultSocketTimeout);
     }
+    
+    public function testNormalEncryptedConnection()
+    {
+        $this->markTestIncomplete(
+            'There are issues with PHP itself regarding TLS connections'
+        );
+        try {
+            $routerOS = new Client(
+                \HOSTNAME,
+                USERNAME,
+                PASSWORD,
+                ENC_PORT,
+                false,
+                null,
+                T\NetworkStream::CRYPTO_TLS
+            );
+            $this->assertInstanceOf(
+                ROS_NAMESPACE . '\Client',
+                $routerOS,
+                'Object initialization failed.'
+            );
+        } catch (Exception $e) {
+            $this->fail('Unable to connect normally:' . (string) $e);
+        }
+    }
 
     public function testNormalConnection()
     {
         try {
             $routerOS = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\Client',
+                ROS_NAMESPACE . '\Client',
                 $routerOS,
                 'Object initialization failed.'
             );
@@ -40,7 +74,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         try {
             $routerOS = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT, true);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\Client',
+                ROS_NAMESPACE . '\Client',
                 $routerOS,
                 'Object initialization failed.'
             );
@@ -55,14 +89,14 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         try {
             $routerOS1 = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\Client',
+                ROS_NAMESPACE . '\Client',
                 $routerOS1,
                 'Object initialization failed.'
             );
 
             $routerOS2 = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\Client',
+                ROS_NAMESPACE . '\Client',
                 $routerOS2,
                 'Object initialization failed.'
             );
@@ -76,14 +110,14 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         try {
             $routerOS1 = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT, true);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\Client',
+                ROS_NAMESPACE . '\Client',
                 $routerOS1,
                 'Object initialization failed.'
             );
 
             $routerOS2 = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT, true);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\Client',
+                ROS_NAMESPACE . '\Client',
                 $routerOS2,
                 'Object initialization failed.'
             );
@@ -111,7 +145,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 PORT
             );
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\Client',
+                ROS_NAMESPACE . '\Client',
                 $routerOS,
                 'Object initialization failed.'
             );
@@ -142,6 +176,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 PASSWORD,
                 PORT,
                 false,
+                null,
                 null,
                 $context
             );
@@ -498,6 +533,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 PORT_SILENT,
                 false,
                 null,
+                null,
                 'notContext'
             );
 
@@ -521,6 +557,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 PASSWORD,
                 PORT_SILENT,
                 false,
+                null,
                 null,
                 fopen(__FILE__, 'a+')
             );

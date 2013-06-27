@@ -26,6 +26,11 @@ namespace PEAR2\Net\RouterOS;
 use PEAR2\Net\Transmitter\Stream as S;
 
 /**
+ * Refers to the cryptography constants.
+ */
+use PEAR2\Net\Transmitter\NetworkStream AS N;
+
+/**
  * A RouterOS client.
  * 
  * Provides functionality for easily communicating with a RouterOS host.
@@ -96,11 +101,18 @@ class Client
      * @param string   $host     Hostname (IP or domain) of the RouterOS server.
      * @param string   $username The RouterOS username.
      * @param string   $password The RouterOS password.
-     * @param int      $port     The port on which the RouterOS server provides
-     *     the API service.
+     * @param int|null $port     The port on which the RouterOS server provides
+     *     the API service. You can also specify NULL, in which case the port
+     *     will automatically be chosen between 8728 and 8729, depending on your
+     *     encryption setting.
      * @param bool     $persist  Whether or not the connection should be a
      *     persistent one.
      * @param float    $timeout  The timeout for the connection.
+     * @param string   $crypto   The encryption for this connection. Must be one
+     *     of the PEAR2\Net\Transmitter\NetworkStream::CRYPTO_* constants. Off
+     *     by default. For the sake of simplicity, if you specify an encryption,
+     *     don't specify a context and your default context uses the value
+     *     "DEFAULT" for ciphers, "ADH" will be automatically added to the list.
      * @param resource $context  A context for the socket.
      * 
      * @see sendSync()
@@ -113,6 +125,7 @@ class Client
         $port = 8728,
         $persist = false,
         $timeout = null,
+        $crypto = N::CRYPTO_OFF,
         $context = null
     ) {
         $this->com = new Communicator(
@@ -121,6 +134,7 @@ class Client
             $persist,
             $timeout,
             $username . '/' . $password,
+            $crypto,
             $context
         );
         $timeout = null == $timeout
@@ -695,7 +709,8 @@ class Client
             $result = $response->getType() === Response::TYPE_FATAL;
             $result = $result && $this->com->close();
         } catch (SocketException $e) {
-            $result = $e->getCode() === 40900;
+            $result
+                = $e->getCode() === SocketException::CODE_UNACCEPTING_REQEUST;
             if (null !== $this->registry) {
                 $this->registry->setTaglessMode(false);
             }

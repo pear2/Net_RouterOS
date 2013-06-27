@@ -6,6 +6,8 @@ require_once 'PEAR2/Autoload.php';
 \PEAR2\Autoload::initialize(realpath('../../Net_Transmitter.git/src'));
 \PEAR2\Autoload::initialize(realpath('../../Cache_SHM.git/src'));
 
+define('ROS_NAMESPACE', __NAMESPACE__);
+
 /**
  * Resolves a hostname to an IP address.
  * 
@@ -37,5 +39,13 @@ function resolve($hostname)
 //Resolving HOSTNAME_* constants
 $constants = array('HOSTNAME', 'HOSTNAME_INVALID', 'HOSTNAME_SILENT');
 foreach ($constants as $constant) {
-    define(__NAMESPACE__ . '\\' . $constant, resolve(constant($constant)));
+    $value = resolve(constant($constant));
+    define(
+        __NAMESPACE__ . '\Client\Test\\' . $constant,
+        $value
+    );
+    define(
+        __NAMESPACE__ . '\Util\Test\\' . $constant,
+        $value
+    );
 }

@@ -151,7 +151,8 @@ class Util
      * Escapes a character for a RouterOS scripting context. Intended to only be
      * called for non-alphanumeric characters.
      * 
-     * @param string $char The character to be escaped.
+     * @param string $chars The matches array, expected to contain exactly one
+     *     member, in which is the whole string to be escaped.
      * 
      * @return string The escaped character.
      */

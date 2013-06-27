@@ -1,15 +1,16 @@
 <?php
-namespace PEAR2\Net\RouterOS;
 
-require_once 'ClientFeaturesTest.php';
+namespace PEAR2\Net\RouterOS\Client\Test\Safe;
 
-class ClientPersistentFeaturesTest extends ClientFeaturesTest
+use PEAR2\Net\RouterOS\Client;
+use PEAR2\Net\RouterOS\Client\Test;
+use PEAR2\Net\RouterOS\Client\Test\SafeTest;
+use PEAR2\Net\RouterOS\Request;
+
+require_once __DIR__ . '/../SafeTest.php';
+
+abstract class PersistentTest extends SafeTest
 {
-    
-    protected function setUp()
-    {
-        $this->object = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT, true);
-    }
     
     protected function tearDown()
     {
@@ -21,7 +22,7 @@ class ClientPersistentFeaturesTest extends ClientFeaturesTest
     {
         $client = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT, true);
         $pingRequest = new Request('/ping', null, 'ping');
-        $pingRequest->setArgument('address', HOSTNAME);
+        $pingRequest->setArgument('address', Test\HOSTNAME);
         $this->object->sendAsync($pingRequest);
         $client->sendAsync($pingRequest);
         $client->loop(2);

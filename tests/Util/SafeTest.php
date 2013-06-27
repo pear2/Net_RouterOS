@@ -1,7 +1,15 @@
 <?php
-namespace PEAR2\Net\RouterOS;
 
-class UtilFeaturesTest extends \PHPUnit_Framework_TestCase
+namespace PEAR2\Net\RouterOS\Util\Test;
+
+use PEAR2\Net\RouterOS\Client;
+use PEAR2\Net\RouterOS\Query;
+use PEAR2\Net\RouterOS\Request;
+use PEAR2\Net\RouterOS\Response;
+use PEAR2\Net\RouterOS\Util;
+use PHPUnit_Framework_TestCase;
+
+abstract class SafeTest extends PHPUnit_Framework_TestCase
 {
     const REGEX_ID = '\*[A-F0-9]+';
     const REGEX_IDLIST = '/^(\*[A-F0-9]+\,)*(\*[A-F0-9]+)?$/';
@@ -15,19 +23,6 @@ class UtilFeaturesTest extends \PHPUnit_Framework_TestCase
      * @var Client
      */
     protected $client;
-
-    protected function setUp()
-    {
-        $this->util = new Util(
-            $this->client = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT)
-        );
-    }
-
-    protected function tearDown()
-    {
-        unset($this->util);
-        unset($this->client);
-    }
 
     public function testChangeMenu()
     {
@@ -105,7 +100,7 @@ class UtilFeaturesTest extends \PHPUnit_Framework_TestCase
 function isHostnameInvalid(\$entry) {
     return \$entry->getArgument(
         'target'
-    ) === \PEAR2\Net\RouterOS\HOSTNAME_INVALID . '/32';
+    ) === \PEAR2\Net\RouterOS\Client\Test\HOSTNAME_INVALID . '/32';
 }
 HEREDOC
             );

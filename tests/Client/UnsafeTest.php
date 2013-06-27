@@ -1,23 +1,23 @@
 <?php
-namespace PEAR2\Net\RouterOS;
 
-class ClientStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
+namespace PEAR2\Net\RouterOS\Client\Test;
+
+use PEAR2\Net\RouterOS\Client;
+use PEAR2\Net\RouterOS\Communicator;
+use PEAR2\Net\RouterOS\Exception;
+use PEAR2\Net\RouterOS\LengthException;
+use PEAR2\Net\RouterOS\Query;
+use PEAR2\Net\RouterOS\Request;
+use PEAR2\Net\RouterOS\Response;
+use PHPUnit_Framework_TestCase;
+
+abstract class UnsafeTest extends PHPUnit_Framework_TestCase
 {
 
     /**
      * @var Client
      */
     protected $object;
-    
-    protected function setUp()
-    {
-        $this->object = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT);
-    }
-    
-    protected function tearDown()
-    {
-        unset($this->object);
-    }
 
     public function testMultipleDifferentPersistentConnection()
     {
@@ -25,14 +25,14 @@ class ClientStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
 
             $routerOS1 = new Client(\HOSTNAME, USERNAME2, PASSWORD2, PORT, true);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\Client',
+                ROS_NAMESPACE . '\Client',
                 $routerOS1,
                 'Object initialization failed.'
             );
 
             $routerOS2 = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT, true);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\Client',
+                ROS_NAMESPACE . '\Client',
                 $routerOS2,
                 'Object initialization failed.'
             );
@@ -53,7 +53,7 @@ class ClientStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
                 $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
                 $responses = $routerOS2->sendSync($removeRequest);
                 $this->assertInstanceOf(
-                    __NAMESPACE__ . '\ResponseCollection',
+                    ROS_NAMESPACE . '\ResponseCollection',
                     $responses,
                     'Response should be one.'
                 );
@@ -83,7 +83,7 @@ class ClientStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
             $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
             $responses = $this->object->sendSync($removeRequest);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\ResponseCollection',
+                ROS_NAMESPACE . '\ResponseCollection',
                 $responses,
                 'Responses should be a collection.'
             );
@@ -131,7 +131,7 @@ class ClientStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
             $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
             $responses = $this->object->sendSync($removeRequest);
             $this->assertInstanceOf(
-                __NAMESPACE__ . '\ResponseCollection',
+                ROS_NAMESPACE . '\ResponseCollection',
                 $responses,
                 'Response should be one.'
             );
@@ -183,7 +183,7 @@ class ClientStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
                 $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
                 $responses = $this->object->sendSync($removeRequest);
                 $this->assertInstanceOf(
-                    __NAMESPACE__ . '\ResponseCollection',
+                    ROS_NAMESPACE . '\ResponseCollection',
                     $responses,
                     'Response should be one.'
                 );
@@ -236,7 +236,7 @@ class ClientStateAlteringFeaturesTest extends \PHPUnit_Framework_TestCase
                 $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
                 $responses = $this->object->sendSync($removeRequest);
                 $this->assertInstanceOf(
-                    __NAMESPACE__ . '\ResponseCollection',
+                    ROS_NAMESPACE . '\ResponseCollection',
                     $responses,
                     'Response should be one.'
                 );

@@ -23,9 +23,16 @@
         The router is expected to contain at least two entries in
         "/queue/simple" and "/ip/arp", with those being HOSTNAME_INVALID and
         HOSTNAME_SILENT.
+        
         -->
         <const name="HOSTNAME" value="ros.example.com" />
         <const name="PORT" value="8728" />
+        
+        <!--
+        Port for encrypted connections. Must not be used at HOSTNAME_INVALID and
+        HOSTNAME_SILENT.
+        -->
+        <const name="ENC_PORT" value="8729" />
 
         <!--
         A server with a different service at the API port.
@@ -114,14 +121,24 @@
         <testsuite name="All tests">
             <file>ConnectionTest.php</file>
             <file>RequestHandlingTest.php</file>
-            <file>ClientFeaturesTest.php</file>
-            <file>ClientPersistentFeaturesTest.php</file>
-            <file>ClientStateAlteringFeaturesTest.php</file>
-            <file>ClientStateAlteringPersistentFeaturesTest.php</file>
-            <file>UtilFeaturesTest.php</file>
-            <file>UtilPersistentFeaturesTest.php</file>
-            <file>UtilStateAlteringFeaturesTest.php</file>
-            <file>UtilStateAlteringPersistentFeaturesTest.php</file>
+
+            <file>Client/Safe/NonPersistent/UnencryptedTest.php</file>
+            <file>Client/Safe/NonPersistent/EncryptedTest.php</file>
+            <file>Client/Safe/Persistent/UnencryptedTest.php</file>
+            <file>Client/Safe/Persistent/EncryptedTest.php</file>
+            <file>Client/Unsafe/NonPersistent/UnencryptedTest.php</file>
+            <file>Client/Unsafe/NonPersistent/EncryptedTest.php</file>
+            <file>Client/Unsafe/Persistent/UnencryptedTest.php</file>
+            <file>Client/Unsafe/Persistent/EncryptedTest.php</file>
+
+            <file>Util/Safe/NonPersistent/UnencryptedTest.php</file>
+            <file>Util/Safe/NonPersistent/EncryptedTest.php</file>
+            <file>Util/Safe/Persistent/UnencryptedTest.php</file>
+            <file>Util/Safe/Persistent/EncryptedTest.php</file>
+            <file>Util/Unsafe/NonPersistent/UnencryptedTest.php</file>
+            <file>Util/Unsafe/NonPersistent/EncryptedTest.php</file>
+            <file>Util/Unsafe/Persistent/UnencryptedTest.php</file>
+            <file>Util/Unsafe/Persistent/EncryptedTest.php</file>
         </testsuite>
     </testsuites>
     <filter>
