@@ -38,8 +38,10 @@ if (count(get_included_files()) > 1) {
             echo <<<HEREDOC
 The PHAR extension is available, but was unable to read this PHAR file's hash.
 Regardless, you should not be having any trouble using the package by directly
-including the archive.
-
+including this file. In the unlikely case that you can't include it
+successfully, you can instead extract one of the other archives, and include its
+autoloader.\n
+\n
 Exception details:
 HEREDOC
                 . $e . "\n\n";
@@ -48,33 +50,65 @@ HEREDOC
         echo <<<HEREDOC
 If you wish to use this package directly from this archive, you need to install
 and enable the PHAR extension. Otherwise, you must instead extract this archive,
-and include the autoloader.
+and include the autoloader.\n
+\n
+\n
+HEREDOC;
+    }
 
-
+    if (extension_loaded('openssl')) {
+        echo <<<HEREDOC
+The OpenSSL extension is loaded. If you can make any connection whatsoever, you
+could also make an encrypted one to RouterOS 6.1 or later.\n
+\n
+Note that due to known issues with PHP itself, encrypted connections may be
+unstable (as in "sometimes disconnect suddenly" or "sometimes hang when you use
+Client::sendSync() and/or Client::completeRequest()").\n
+\n
+\n
+HEREDOC;
+    } else {
+        echo <<<HEREDOC
+WARNING: The OpenSSL extension is not loaded.
+You can't make encrypted connections without it.\n
+\n
 HEREDOC;
     }
     
+    if (class_exists('PEAR2\Cache\SHM', true))
+    
     if (function_exists('stream_socket_client')) {
+        $failCode = constant(
+            'PEAR2\Net\RouterOS\SocketException::CODE_CONNECTION_FAIL'
+        );
         echo <<<HEREDOC
 The stream_socket_client() function is enabled.\n
-If you can't connect to RouterOS (SocketException with code 100), this means one
-of the following:\n
+If you can't connect to RouterOS (SocketException with code {$failCode}),
+this means one of the following:\n
 1. You haven't enabled the API service at RouterOS or you've enabled it on a
-different TCP port. Make sure that the "api" service at "/ip services" is
+different TCP port. Make sure that the "api" service at "/ip service" is
 enabled, and with that same TCP port (8728 by default).\n
 2. You've mistyped the IP and/or port. Check the IP and port you've specified
 are the one you intended.\n
-3. The router is not reachable from your web server. Try to reach the router
-from the web server by other means (e.g. Winbox, ping) using the same IP, and if
-you're unable to reach it, check your network's settings.\n
-2. Your web server is configured to forbid that outgoing connection. If you're
-the web server administrator, check your firewall's settings. If you're on a
-hosting plan... Typically, shared hosts block all outgoing connections, but it's
-also possible that only connections to that port are blocked. Try to connect to
-a host on a popular port (21, 80, etc.), and if successful, change the API
-service port to that port. If the connection fails even then, ask your host to
-configure their firewall so as to allow you to make outgoing connections to the
-ip:port you've set the API service on.
+3. The router is not reachable from your web server for some reason. Try to
+reach the router (!!!)from the web server(!!!) by other means (e.g. Winbox,
+ping) using the same IP, and if you're unable to reach it, check the network
+settings on your server, router and any intermediate nodes under your control
+that may affect the connection.\n
+4. Your web server is configured to forbid that outgoing connection. If you're
+the web server administrator, check your web server's firewall's settings. If
+you're on a hosting plan... Typically, shared hosts block all outgoing
+connections, but it's also possible that only connections to that port are
+blocked. Try to connect to a host on a popular port (21, 80, 443, etc.), and if
+successful, change the API service port to that port. If the connection fails
+even then, ask your host to configure their firewall so as to allow you to make
+outgoing connections to the ip:port you've set the API service on.\n
+5. The router has a filter/mangle/dst-nat rule that overrides the settings at
+"/ip service". This is a very rare scenario, but if you want to be sure, try to
+disable all rules that may cause such a thing, or (if you can afford it) set up
+a fresh RouterOS in place of the existing one, and see if you can connect to it
+instead. If you still can't connect, such a rule is certainly not the (only)
+reason.
 HEREDOC;
     } else {
         echo <<<HEREDOC

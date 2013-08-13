@@ -559,7 +559,7 @@ class Client
                 }
             }
         } catch (SocketException $e) {
-            if ($e->getCode() !== 50000) {
+            if ($e->getCode() !== SocketException::CODE_NO_DATA) {
                 // @codeCoverageIgnoreStart
                 // It's impossible to reliably cause any other SocketException.
                 // This line is only here in case the unthinkable happens:
@@ -699,16 +699,18 @@ class Client
      */
     public function close()
     {
-        $result = false;
+        $result = true;
         try {
-            if (null !== $this->registry) {
-                $this->registry->setTaglessMode(true);
+            if ($this->com->getTransmitter()->getCrypto() === N::CRYPTO_OFF) {
+                if (null !== $this->registry) {
+                    $this->registry->setTaglessMode(true);
+                }
+                $response = $this->sendSync(new Request('/quit'));
+                if (null !== $this->registry) {
+                    $this->registry->setTaglessMode(false);
+                }
+                $result = $response->getType() === Response::TYPE_FATAL;
             }
-            $response = $this->sendSync(new Request('/quit'));
-            if (null !== $this->registry) {
-                $this->registry->setTaglessMode(false);
-            }
-            $result = $response->getType() === Response::TYPE_FATAL;
             $result = $result && $this->com->close();
         } catch (SocketException $e) {
             $result

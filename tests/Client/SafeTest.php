@@ -110,7 +110,8 @@ abstract class SafeTest extends PHPUnit_Framework_TestCase
     public function testSendAsyncTagRequirement()
     {
         $ping = new Request('/ping');
-        $ping->setArgument('address', HOSTNAME_INVALID);
+        $ping->setArgument('address', HOSTNAME_INVALID)
+            ->setArgument('interval', '0.5');
         try {
             $this->object->sendAsync($ping);
 
@@ -139,11 +140,13 @@ abstract class SafeTest extends PHPUnit_Framework_TestCase
     public function testSendAsyncUniqueTagRequirement()
     {
         $ping = new Request('/ping');
-        $ping->setArgument('address', HOSTNAME_INVALID);
-        $ping->setTag('ping');
+        $ping->setArgument('address', HOSTNAME_INVALID)
+            ->setArgument('interval', '0.5')
+            ->setTag('ping');
         $ping2 = new Request('/ping');
-        $ping2->setArgument('address', HOSTNAME_INVALID);
-        $ping2->setTag('ping');
+        $ping2->setArgument('address', HOSTNAME_INVALID)
+            ->setArgument('interval', '0.5')
+            ->setTag('ping');
         $this->object->sendAsync($ping);
         try {
             $this->object->sendAsync($ping2);
@@ -161,8 +164,9 @@ abstract class SafeTest extends PHPUnit_Framework_TestCase
     public function testSendAsyncValidCallbackRequirement()
     {
         $ping = new Request('/ping');
-        $ping->setArgument('address', HOSTNAME_INVALID);
-        $ping->setTag('ping');
+        $ping->setArgument('address', HOSTNAME_INVALID)
+            ->setArgument('interval', '0.5')
+            ->setTag('ping');
         try {
             $this->object->sendAsync($ping, 3);
 
@@ -179,8 +183,9 @@ abstract class SafeTest extends PHPUnit_Framework_TestCase
     public function testSendAsyncWithCallbackAndTempLoop()
     {
         $ping = new Request('/ping');
-        $ping->setTag('ping');
-        $ping->setArgument('address', HOSTNAME);
+        $ping->setArgument('address', HOSTNAME)
+            ->setArgument('interval', '0.5')
+            ->setTag('ping');
         $repliesCount = 0;
         $this->object->sendAsync(
             $ping,
@@ -216,11 +221,13 @@ abstract class SafeTest extends PHPUnit_Framework_TestCase
     public function testSendAsyncAndFullCancel()
     {
         $ping = new Request('/ping');
-        $ping->setArgument('address', HOSTNAME_INVALID);
-        $ping->setTag('ping1');
+        $ping->setArgument('address', HOSTNAME_INVALID)
+            ->setArgument('interval', '0.5')
+            ->setTag('ping1');
         $ping2 = new Request('/ping');
-        $ping2->setArgument('address', HOSTNAME_INVALID);
-        $ping2->setTag('ping2');
+        $ping2->setArgument('address', HOSTNAME_INVALID)
+            ->setArgument('interval', '0.5')
+            ->setTag('ping2');
         $this->object->sendAsync($ping);
         $this->object->sendAsync($ping2);
         $this->object->loop(2);
@@ -264,11 +271,13 @@ abstract class SafeTest extends PHPUnit_Framework_TestCase
     public function testSendAsyncAndInvalidCancel()
     {
         $ping = new Request('/ping');
-        $ping->setArgument('address', HOSTNAME_INVALID);
-        $ping->setTag('ping1');
+        $ping->setArgument('address', HOSTNAME_INVALID)
+            ->setArgument('interval', '0.5')
+            ->setTag('ping1');
         $ping2 = new Request('/ping');
-        $ping2->setArgument('address', HOSTNAME_INVALID);
-        $ping2->setTag('ping2');
+        $ping2->setArgument('address', HOSTNAME_INVALID)
+            ->setArgument('interval', '0.5')
+            ->setTag('ping2');
         $this->object->sendAsync($ping);
         $this->object->sendAsync($ping2);
         $this->assertEquals(
@@ -296,11 +305,13 @@ abstract class SafeTest extends PHPUnit_Framework_TestCase
     public function testSendAsyncAndFullExtract()
     {
         $ping = new Request('/ping');
-        $ping->setArgument('address', HOSTNAME_INVALID);
-        $ping->setTag('ping1');
+        $ping->setArgument('address', HOSTNAME_INVALID)
+            ->setArgument('interval', '0.5')
+            ->setTag('ping1');
         $ping2 = new Request('/ping');
-        $ping2->setArgument('address', HOSTNAME_INVALID);
-        $ping2->setTag('ping2');
+        $ping2->setArgument('address', HOSTNAME_INVALID)
+            ->setArgument('interval', '0.5')
+            ->setTag('ping2');
         $this->object->sendAsync($ping);
         $this->object->sendAsync($ping2);
         $this->assertEquals(
@@ -332,8 +343,9 @@ abstract class SafeTest extends PHPUnit_Framework_TestCase
     public function testSendAsyncWithCallbackAndCancel()
     {
         $ping = new Request('/ping');
-        $ping->setTag('ping');
-        $ping->setArgument('address', HOSTNAME);
+        $ping->setArgument('address', HOSTNAME)
+            ->setArgument('interval', '0.5')
+            ->setTag('ping');
         $finalRepliesCount = -1;
         $responseCount = 0;
         $this->object->sendAsync(
@@ -385,8 +397,9 @@ abstract class SafeTest extends PHPUnit_Framework_TestCase
     {
         $limit = 5;
         $ping = new Request('/ping');
-        $ping->setTag('ping');
-        $ping->setArgument('address', HOSTNAME);
+        $ping->setArgument('address', HOSTNAME)
+            ->setArgument('interval', '0.5')
+            ->setTag('ping');
         $repliesCount = 0;
         $this->object->sendAsync(
             $ping,
@@ -461,8 +474,9 @@ abstract class SafeTest extends PHPUnit_Framework_TestCase
     public function testSendAsyncAndCompleteRequest()
     {
         $ping = new Request('/ping');
-        $ping->setTag('ping');
-        $ping->setArgument('address', HOSTNAME);
+        $ping->setArgument('address', HOSTNAME)
+            ->setArgument('interval', '0.5')
+            ->setTag('ping');
         $repliesCount = 0;
         $this->object->sendAsync(
             $ping,
@@ -511,8 +525,9 @@ abstract class SafeTest extends PHPUnit_Framework_TestCase
     public function testSendAsyncAndCompleteRequestWithStream()
     {
         $ping = new Request('/ping');
-        $ping->setTag('ping');
-        $ping->setArgument('address', HOSTNAME);
+        $ping->setArgument('address', HOSTNAME)
+            ->setArgument('interval', '0.5')
+            ->setTag('ping');
         $repliesCount = 0;
         $this->object->sendAsync(
             $ping,
@@ -656,8 +671,9 @@ abstract class SafeTest extends PHPUnit_Framework_TestCase
         $this->assertGreaterThan(0, count($list), 'No responses.');
 
         $ping = new Request('/ping');
-        $ping->setTag('ping');
-        $ping->setArgument('address', HOSTNAME);
+        $ping->setArgument('address', HOSTNAME)
+            ->setArgument('interval', '0.5')
+            ->setTag('ping');
         $this->object->sendAsync($ping);
 
         $this->object->loop(2);
@@ -704,9 +720,9 @@ abstract class SafeTest extends PHPUnit_Framework_TestCase
     {
         $obj = $this->object;
         $this->assertEquals(0, $obj->getPendingRequestsCount());
-        $obj(new Request('/ping address=127.0.0.1', null, 'ping1'));
+        $obj(new Request('/ping address=127.0.0.1 interval=1', null, 'ping1'));
         $this->assertEquals(1, $obj->getPendingRequestsCount());
-        $obj(new Request('/ping address=::1', null, 'ping2'));
+        $obj(new Request('/ping address=::1 interval=1', null, 'ping2'));
         $this->assertEquals(2, $obj->getPendingRequestsCount());
         $obj(4);
         $ping1Responses = $obj->extractNewResponses('ping1');

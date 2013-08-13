@@ -59,12 +59,114 @@ class Util
      *     keys, and the corresponding IDs as values.
      */
     protected $idCache = null;
+
+    /**
+     * Parses a value from a RouterOS scripting context.
+     * 
+     * Turns a value from RouterOS into an equivalent PHP value, based on
+     * determining the type in the same way RouterOS would determine it for a
+     * literal.
+     * 
+     * This method is intended to be the very opposite of {@link escapeValue()}.
+     * That is, results from that method, if given to this method, should
+     * produce equivalent results.
+     * 
+     * @param string $value The value to be parsed. Must be a literal of a
+     *     value, e.g. what {@link escapeValue()} will give you.
+     * 
+     * @return mixed Depending on RouterOS type detected:
+     *     - "nil" or "nothing" - NULL.
+     *     - "number" - int or double for large values.
+     *     - "bool" - a boolean.
+     *     - "time" - a {@link DateInterval} object.
+     *     - "array" - an array, with the values processed recursively.
+     *     - "str" - a string.
+     *     - Unrecognized type - treated as an unquoted string.
+     */
+    public static function parseValue($value)
+    {
+        $value = (string)$value;
+        
+        if ('' === $value) {
+            return null;
+        } elseif (in_array($value, array('true', 'false', 'yes', 'no'), true)) {
+            return $value === 'true' || $value === 'yes';
+        } elseif ($value === (string)($num = (int)$value)
+            || $value === (string)($num = (double)$value)
+        ) {
+            return $num;
+        } elseif (preg_match(
+            '/^
+               (?:(\d+)w)?
+               (?:(\d+)d)?
+               (?:(\d\d)\:)?
+               (\d\d)\:
+               (\d\d(:\.\d{1,6})?)
+            $/x',
+            $value,
+            $time
+        )) {
+            $days = isset($time[2]) ? (int)$time[2] : 0;
+            if (isset($time[1])) {
+                $days += 7 * (int)$time[1];
+            }
+            if ('' === $time[3]) {
+                $time[3] = 0;
+            }
+            return new DateInterval(
+                "P{$days}DT{$time[3]}H{$time[4]}M{$time[5]}S"
+            );
+        } elseif (('"' === $value[0]) && substr(strrev($value), 0, 1) === '"') {
+            return str_replace(
+                array('\"', '\\\\', "\\\n", "\\\r\n", "\\\r"),
+                array('"', '\\'),
+                substr($value, 1, -1)
+            );
+        } elseif ('{' === $value[0]) {
+            $len = strlen($value);
+            if ($value[$len - 1] === '}') {
+                $value = substr($value, 1, -1);
+                if ('' === $value) {
+                    return array();
+                }
+                $parsedValue = preg_split(
+                    '/
+                        (\"[^"]*\")
+                        |
+                        (\{[^{}]*(?2)?\})
+                        |
+                        ([^;]+)
+                    /sx',
+                    $value,
+                    null,
+                    PREG_SPLIT_DELIM_CAPTURE
+                );
+                $result = array();
+                foreach ($parsedValue as $token) {
+                    if ('' === $token || ';' === $token) {
+                        continue;
+                    }
+                    $result[] = static::parseValue($token);
+                }
+                return $result;
+            }
+        }
+        return $value;
+    }
     
     /**
      * Escapes a value for a RouterOS scripting context.
      * 
-     * Turns any PHP value into an equivalent whole value that can be inserted
-     * as part of a RouterOS script.
+     * Turns any native PHP value into an equivalent whole value that can be
+     * inserted as part of a RouterOS script.
+     * 
+     * DateTime and DateInterval objects will be casted to RouterOS' "time"
+     * type. A DateTime object will be converted to a time relative to the UNIX
+     * epoch time. Note that if a DateInterval does not have the "days" property
+     * ("a" in formatting), then its months and years will be ignored, because
+     * they can't be unambigiously converted to a "time" value.
+     * 
+     * Unrecognized types are casted to strings.
      * 
      * @param mixed $value The value to be escaped.
      * 
@@ -85,7 +187,7 @@ class Util
             break;
         case 'array':
             if (0 === count($value)) {
-                $value = '{}';
+                $value = '({})';
                 break;
             }
             $result = '';
@@ -105,13 +207,11 @@ class Util
             }
             if ($value instanceof DateInterval) {
                 if (false === $value->days || $value->days < 0) {
-                    $value = $value->format('%r')
-                        . ($value->y * 365 + $value->m * 12 + $value->d)
-                        . $value->format('d%H:%I:%S');
+                    $value = $value->format('%r%dd%H:%I:%S');
                 } else {
                     $value = $value->format('%r%ad%H:%I:%S');
                 }
-                if (isset($usec)) {
+                if (strpos('.', $value) === false && isset($usec)) {
                     $value .= '.' . $usec;
                 }
                 break;
@@ -226,11 +326,10 @@ class Util
      * @param string $source A script to execute.
      * @param array  $params An array of local variables to make available in
      *     the script. Variable names are array keys, and variable values are
-     *     array values. Note that the script's (generated) name is always added
-     *     as the variable "_", which you can overwrite from here.
-     *     Native PHP types will be converted to their RouterOS equivalents.
-     *     DateTime and DateInterval objects will be casted to RouterOS' "time"
-     *     type. Other types are casted to strings.
+     *     array values. Array values are automatically processed with
+     *     {@link escapeValue()}.
+     *     Note that the script's (generated) name is always added as the
+     *     variable "_", which you can overwrite from here.
      * @param string $policy Allows you to specify a policy the script must
      *     follow. Has the same format as in terminal. If left NULL, the script
      *     has no restrictions.
@@ -369,9 +468,10 @@ class Util
     /**
      * Gets a value of a specified entry at the current menu.
      * 
-     * @param int    $number     A number identifying the entry you're
-     *     targeting. Can also be an ID or (in some menus) name.
-     * @param string $value_name The name of the value you want to get.
+     * @param int|string|null $number     A number identifying the entry you're
+     *     targeting. Can also be an ID or (in some menus) name. For menus where
+     *     there are no entries (e.g. "/system identity"), you can specify NULL.
+     * @param string          $value_name The name of the value you want to get.
      * 
      * @return string|null|bool The value of the specified property. If the
      *     property is not set, NULL will be returned. If no such entry exists,
@@ -388,11 +488,13 @@ class Util
             }
         }
 
-        $number = (string)$number;
-        $request = new Request(
-            $this->menu . '/print',
-            Query::where('.id', $number)->orWhere('name', $number)
-        );
+        $request = new Request($this->menu . '/print');
+        if (null !== $number) {
+            $number = (string)$number;
+            $request->setQuery(
+                Query::where('.id', $number)->orWhere('name', $number)
+            );
+        }
         $request->setArgument('.proplist', $value_name);
         $responses = $this->client->sendSync($request)
             ->getAllOfType(Response::TYPE_DATA);
@@ -457,7 +559,8 @@ class Util
      * which match certain criteria.
      * 
      * @param mixed $numbers   Targeted entries. Can be any criteria accepted by
-     *     {@link find()}.
+     *     {@link find()} or NULL in case the menu is one without entries
+     *     (e.g. "/system identity").
      * @param array $newValues An array with the names of each property to set
      *     as an array key, and the new value as an array value.
      * 
@@ -470,9 +573,10 @@ class Util
         foreach ($newValues as $name => $value) {
             $setRequest->setArgument($name, $value);
         }
-        return $this->client->sendSync(
-            $setRequest->setArgument('numbers', $this->find($numbers))
-        );
+        if (null !== $numbers) {
+            $setRequest->setArgument('numbers', $this->find($numbers));
+        }
+        return $this->client->sendSync($setRequest);
     }
 
     /**
@@ -516,11 +620,11 @@ class Util
     /**
      * Adds a new entry at the current menu.
      * 
-     * @param array $values     Accepts one or more entries to add to the
+     * @param array $values Accepts one or more entries to add to the
      *     current menu. The data about each entry is specified as an array with
      *     the names of each property as an array key, and the value as an array
      *     value.
-     * @param array $values,... Additional entries.
+     * @param array $...    Additional entries.
      * 
      * @return string A comma separated list of the new entries' IDs.
      */

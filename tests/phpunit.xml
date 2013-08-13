@@ -17,6 +17,7 @@
 >
     -->
     <php>
+        <ini name="default_socket_timeout" value="4" />
         <!--
         The actual RouterOS machine and the port of the API service.
 

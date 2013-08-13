@@ -129,9 +129,12 @@ class Communicator
                 stream_context_set_option($context, 'ssl', 'ciphers', 'ADH');
             }
         }
+        // @codeCoverageIgnoreStart
+        // The $port is customizable in testing.
         if (null === $port) {
             $port = $isUnencrypted ? 8728 : 8729;
         }
+        // @codeCoverageIgnoreEnd
 
         try {
             $this->trans = new T\TcpClient(

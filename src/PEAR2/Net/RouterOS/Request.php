@@ -347,9 +347,11 @@ class Request extends Message
                 $token = '';
                 $this->setArgument($name);
                 $name = null;
-            } elseif (
-                preg_match('/^="(([^\\\"]|\\\"|\\\\)*)"/sS', $string, $matches)
-            ) {
+            } elseif (preg_match(
+                '/^="(([^\\\"]|\\\"|\\\\)*)"/sS',
+                $string,
+                $matches
+            )) {
                 $token = $matches[0];
                 $this->setArgument(
                     $name,

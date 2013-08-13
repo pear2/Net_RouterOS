@@ -26,6 +26,11 @@ namespace PEAR2\Net\RouterOS;
 use PEAR2\Net\Transmitter as T;
 
 /**
+ * Locks are released upon any exception from anywhere.
+ */
+use Exception as E;
+
+/**
  * Represents a RouterOS response.
  * 
  * @category Net
@@ -97,11 +102,11 @@ class Response extends Message
                     ->lock(T\Stream::DIRECTION_RECEIVE);
                 try {
                     $this->_receive($com, $asStream, $timeout_s, $timeout_us);
-                    $com->getTransmitter()->lock($old, true);
-                } catch (SocketException $e) {
+                } catch (E $e) {
                     $com->getTransmitter()->lock($old, true);
                     throw $e;
                 }
+                $com->getTransmitter()->lock($old, true);
             } else {
                 $this->_receive($com, $asStream, $timeout_s, $timeout_us);
             }
@@ -160,8 +165,7 @@ class Response extends Message
         if (!$com->getTransmitter()->isDataAwaiting(
             $timeout_s,
             $timeout_us
-        )
-        ) {
+        )) {
             throw new SocketException(
                 'No data within the time limit',
                 SocketException::CODE_NO_DATA

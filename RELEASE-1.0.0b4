@@ -4,8 +4,11 @@ Brand new way of manipulating data, and listen...
   - CRUD operations
   - Support of targeting and finding entries by numbers, just like from terminal
   - Executing scripts (with the ability to pass typed parameters ala SQL prepared statements)
-  - Putting and getting files out of RouterOS.
+  - Putting and getting files out of RouterOS
+  - Helper methods for converting back and forth between PHP and RouterOS values.
 * Client::loop() and Client::completeRequest() no longer fail if there's no reply within "default_socket_timeout" seconds. This means you can now use the "listen" command without also setting up something else to keep the connection busy.
 * Client::loop() now accepts timeouts modeled after stream_select()'s, as opposed to a single float value. As before, the default is "no time limit", but is now specified with NULL instead of 0. Analogous arguments have been added to Response's constructor.
+* When receiving, the release lock is released when ANY exception is thrown. Previously, this would be so only in case of SocketException.
 * Chnaged the PHAR stub to not fail when reading the hash fails.
-* Doc and CS fixes.
+* Exceptions now use constants to hold each code.
+* Doc and CS fixes, and unit test reorganization.
