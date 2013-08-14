@@ -12,6 +12,7 @@ foreach ($packages as $pkg) {
                 new RecursiveDirectoryIterator(
                     $pkg,
                     RecursiveDirectoryIterator::UNIX_PATHS
+                    | RecursiveDirectoryIterator::SKIP_DOTS
                 ),
                 RecursiveIteratorIterator::LEAVES_ONLY
             ) as $path

@@ -3,7 +3,7 @@
     <title>PEAR2_Net_RouterOS documentation</title>
     <parser>
         <default-package-name>PEAR2_Net_RouterOS</default-package-name>
-        <target>PEAR2_Net_RouterOS__PhpDocumentor_Documentation</target>
+        <target>PEAR2_Net_RouterOS__PhpDocumentor_Cache</target>
         <extensions>
             <extension>php</extension>
         </extensions>

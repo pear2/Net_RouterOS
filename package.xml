@@ -11,10 +11,10 @@
   <email>boen.robot@gmail.com</email>
   <active>yes</active>
  </lead>
- <date>2012-08-03</date>
- <time>04:21:24</time>
+ <date>2013-08-15</date>
+ <time>18:23:02</time>
  <version>
-  <release>1.0.0b3</release>
+  <release>1.0.0b4</release>
   <api>1.0.0</api>
  </version>
  <stability>
@@ -22,29 +22,27 @@
   <api>stable</api>
  </stability>
  <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</license>
- <notes>Bug fixes on edge cases, and some API changes
+ <notes>Brand new way of manipulating data, encryption, and listen...
 
-* (GH #6) Persistent connections are now properly supported. Added a new Registry class to facilitate this.
-* The second and third argument of Request::__construct() have been swapped.
-* At Request::__construct(), a backslash can now be escaped in an argument value, and arguments can be spread across multiple lines.
-* Client::getStreamResponses() and Client::setStreamResponses() are now Client::isStreamingResponses() and Client::setStreamingResponses(), respectively.
-* Query now uses things statically, allowing extensions in the process.
-* ResponseCollection::__invoke() now seeks instead of getting.
-* (GH #4) Client::completeRequest() now works with requests that use a callback.
-* Client::sendSync() now accepts requests with a tag.
-* Added support for non ASCII passwords.
-* Client now throws this package's SocketException on connection errors. The originating Transmitter exception is available in the trace.
-* Documentation fixes.</notes>
+* A new Util class that abstracts away tons of fancy features, including:
+  - CRUD operations
+  - Support of targeting and finding entries by numbers, just like from terminal
+  - Executing scripts (with the ability to pass typed parameters ala SQL prepared statements)
+  - Putting and getting files out of RouterOS
+  - Helper methods for converting back and forth between PHP and RouterOS values.
+* Support for encrypted connections, both with and without a certificate. Note that due to known issues with PHP itself, encrypted connections may be unstable (as in &quot;sometimes disconnect suddenly&quot; or &quot;sometimes hang when you use Client::sendSync() and/or Client::completeRequest() and/or Client::loop() without a timeout&quot;).
+* Client::loop() and Client::completeRequest() no longer fail if there's no reply within &quot;default_socket_timeout&quot; seconds. This means you can now use the &quot;listen&quot; command without also setting up something else to keep the connection busy.
+* Client::loop() now accepts timeouts modeled after stream_select()'s, as opposed to a single float value. As before, the default is &quot;no time limit&quot;, but is now specified with NULL instead of 0. Analogous arguments have been added to Response's constructor.
+* When receiving, the release lock is released when ANY exception is thrown. Previously, this would be so only in case of SocketException.
+* Chnaged the PHAR stub to not fail when reading the hash fails.
+* Exceptions now use constants to hold each code.
+* Doc and CS fixes, and unit test reorganization.</notes>
  <contents>
   <dir name="/">
    <dir name="docs" baseinstalldir="/">
-    <dir name="tutorials">
-     <dir name="PEAR2_Net_RouterOS">
-      <file role="doc" name="Client.cls"/>
-      <file role="doc" name="PEAR2_Net_RouterOS.pkg"/>
-      <file role="doc" name="Query.cls"/>
-     </dir>
-    </dir>
+    <file role="doc" name="apigen.neon">
+     <tasks:replace from="../src" to="php_dir" type="pear-config"/>
+    </file>
     <file role="doc" name="doxygen.ini">
      <tasks:replace from="../src" to="php_dir" type="pear-config"/>
      <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
@@ -140,21 +138,79 @@
         <tasks:replace from="~~description~~" to="description" type="package-info"/>
         <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
        </file>
+       <file role="php" name="Util.php">
+        <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
+        <tasks:replace from="~~description~~" to="description" type="package-info"/>
+        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+       </file>
       </dir>
      </dir>
     </dir>
    </dir>
    <dir name="tests" baseinstalldir="/">
+    <dir name="Client">
+     <dir name="Safe">
+      <dir name="NonPersistent">
+       <file role="test" name="EncryptedTest.php"/>
+       <file role="test" name="UnencryptedTest.php"/>
+      </dir>
+      <dir name="Persistent">
+       <file role="test" name="EncryptedTest.php"/>
+       <file role="test" name="UnencryptedTest.php"/>
+      </dir>
+      <file role="test" name="NonPersistent.php"/>
+      <file role="test" name="Persistent.php"/>
+     </dir>
+     <dir name="Unsafe">
+      <dir name="NonPersistent">
+       <file role="test" name="EncryptedTest.php"/>
+       <file role="test" name="UnencryptedTest.php"/>
+      </dir>
+      <dir name="Persistent">
+       <file role="test" name="EncryptedTest.php"/>
+       <file role="test" name="UnencryptedTest.php"/>
+      </dir>
+      <file role="test" name="NonPersistent.php"/>
+      <file role="test" name="Persistent.php"/>
+     </dir>
+     <file role="test" name="SafeTest.php"/>
+     <file role="test" name="UnsafeTest.php"/>
+    </dir>
+    <dir name="Util">
+     <dir name="Safe">
+      <dir name="NonPersistent">
+       <file role="test" name="EncryptedTest.php"/>
+       <file role="test" name="UnencryptedTest.php"/>
+      </dir>
+      <dir name="Persistent">
+       <file role="test" name="EncryptedTest.php"/>
+       <file role="test" name="UnencryptedTest.php"/>
+      </dir>
+      <file role="test" name="NonPersistentTest.php"/>
+      <file role="test" name="PersistentTest.php"/>
+     </dir>
+     <dir name="Unsafe">
+      <dir name="NonPersistent">
+       <file role="test" name="EncryptedTest.php"/>
+       <file role="test" name="UnencryptedTest.php"/>
+      </dir>
+      <dir name="Persistent">
+       <file role="test" name="EncryptedTest.php"/>
+       <file role="test" name="UnencryptedTest.php"/>
+      </dir>
+      <file role="test" name="NonPersistent.php"/>
+      <file role="test" name="Persistent.php"/>
+     </dir>
+     <file role="test" name="SafeTest.php"/>
+     <file role="test" name="UnsafeTest.php"/>
+    </dir>
     <file role="test" name="bootstrap.php">
      <tasks:replace from="../src" to="php_dir" type="pear-config"/>
      <tasks:replace from="../../PEAR2_Net_Transmitter.git/src/" to="php_dir" type="pear-config"/>
     </file>
-    <file role="test" name="ClientFeaturesTest.php"/>
-    <file role="test" name="ClientPersistentFeaturesTest.php"/>
     <file role="test" name="ConnectionTest.php"/>
+    <file role="test" name="HandlingTest.php"/>
     <file role="test" name="phpunit.xml"/>
-    <file role="test" name="RequestHandlingTest.php"/>
-    <file role="test" name="StateAlteringFeaturesTest.php"/>
    </dir>
   </dir>
  </contents>
@@ -169,7 +225,7 @@
    <package>
     <name>PEAR2_Net_Transmitter</name>
     <channel>pear2.php.net</channel>
-    <min>1.0.0a3</min>
+    <min>1.0.0a4</min>
    </package>
    <extension>
     <name>PCRE</name>
@@ -184,7 +240,7 @@
    <package>
     <name>PEAR2_Cache_SHM</name>
     <channel>pear2.php.net</channel>
-    <min>0.1.0</min>
+    <min>0.1.2</min>
    </package>
    <extension>
     <name>iconv</name>
@@ -193,32 +249,63 @@
  </dependencies>
  <phprelease>
   <filelist>
+   <install name="docs/apigen.neon" as="apigen.neon"/>
    <install name="docs/doxygen.ini" as="doxygen.ini"/>
    <install name="docs/phpdoc.dist.xml" as="phpdoc.dist.xml"/>
-   <install name="docs/tutorials/PEAR2_Net_RouterOS/Client.cls" as="tutorials/PEAR2_Net_RouterOS/Client.cls"/>
-   <install name="docs/tutorials/PEAR2_Net_RouterOS/PEAR2_Net_RouterOS.pkg" as="tutorials/PEAR2_Net_RouterOS/PEAR2_Net_RouterOS.pkg"/>
-   <install name="docs/tutorials/PEAR2_Net_RouterOS/Query.cls" as="tutorials/PEAR2_Net_RouterOS/Query.cls"/>
+   <install name="examples/callback-and-loop.php" as="examples/callback-and-loop.php"/>
+   <install name="examples/loop-and-extract.php" as="examples/loop-and-extract.php"/>
+   <install name="examples/send-and-complete.php" as="examples/send-and-complete.php"/>
+   <install name="examples/send-and-forget.php" as="examples/send-and-forget.php"/>
+   <install name="examples/sync-request-arguments.php" as="examples/sync-request-arguments.php"/>
+   <install name="examples/sync-request-simple.php" as="examples/sync-request-simple.php"/>
    <install name="src/PEAR2/Net/RouterOS/Client.php" as="PEAR2/Net/RouterOS/Client.php"/>
    <install name="src/PEAR2/Net/RouterOS/Communicator.php" as="PEAR2/Net/RouterOS/Communicator.php"/>
    <install name="src/PEAR2/Net/RouterOS/DataFlowException.php" as="PEAR2/Net/RouterOS/DataFlowException.php"/>
    <install name="src/PEAR2/Net/RouterOS/Exception.php" as="PEAR2/Net/RouterOS/Exception.php"/>
    <install name="src/PEAR2/Net/RouterOS/InvalidArgumentException.php" as="PEAR2/Net/RouterOS/InvalidArgumentException.php"/>
-   <install name="src/PEAR2/Net/RouterOS/LengthException.php" as="PEAR2/Net/RouterOS/LengthtException.php"/>
+   <install name="src/PEAR2/Net/RouterOS/LengthException.php" as="PEAR2/Net/RouterOS/LengthException.php"/>
    <install name="src/PEAR2/Net/RouterOS/Message.php" as="PEAR2/Net/RouterOS/Message.php"/>
    <install name="src/PEAR2/Net/RouterOS/NotSupportedException.php" as="PEAR2/Net/RouterOS/NotSupportedException.php"/>
    <install name="src/PEAR2/Net/RouterOS/Query.php" as="PEAR2/Net/RouterOS/Query.php"/>
+   <install name="src/PEAR2/Net/RouterOS/Registry.php" as="PEAR2/Net/RouterOS/Registry.php"/>
    <install name="src/PEAR2/Net/RouterOS/Request.php" as="PEAR2/Net/RouterOS/Request.php"/>
    <install name="src/PEAR2/Net/RouterOS/Response.php" as="PEAR2/Net/RouterOS/Response.php"/>
    <install name="src/PEAR2/Net/RouterOS/ResponseCollection.php" as="PEAR2/Net/RouterOS/ResponseCollection.php"/>
    <install name="src/PEAR2/Net/RouterOS/SocketException.php" as="PEAR2/Net/RouterOS/SocketException.php"/>
    <install name="src/PEAR2/Net/RouterOS/UnexpectedValueException.php" as="PEAR2/Net/RouterOS/UnexpectedValueException.php"/>
+   <install name="src/PEAR2/Net/RouterOS/Util.php" as="PEAR2/Net/RouterOS/Util.php"/>
    <install name="tests/bootstrap.php" as="bootstrap.php"/>
-   <install name="tests/ClientFeaturesTest.php" as="ClientFeaturesTest.php"/>
-   <install name="tests/ClientPersistentFeaturesTest.php" as="ClientPersistentFeaturesTest.php"/>
+   <install name="tests/Client/Safe/NonPersistent.php" as="Client/Safe/NonPersistent.php"/>
+   <install name="tests/Client/Safe/NonPersistent/EncryptedTest.php" as="Client/Safe/NonPersistent/EncryptedTest.php"/>
+   <install name="tests/Client/Safe/NonPersistent/UnencryptedTest.php" as="Client/Safe/NonPersistent/UnencryptedTest.php"/>
+   <install name="tests/Client/Safe/Persistent.php" as="Client/Safe/Persistent.php"/>
+   <install name="tests/Client/Safe/Persistent/EncryptedTest.php" as="Client/Safe/Persistent/EncryptedTest.php"/>
+   <install name="tests/Client/Safe/Persistent/UnencryptedTest.php" as="Client/Safe/Persistent/UnencryptedTest.php"/>
+   <install name="tests/Client/SafeTest.php" as="Client/SafeTest.php"/>
+   <install name="tests/Client/Unsafe/NonPersistent.php" as="Client/Unsafe/NonPersistent.php"/>
+   <install name="tests/Client/Unsafe/NonPersistent/EncryptedTest.php" as="Client/Unsafe/NonPersistent/EncryptedTest.php"/>
+   <install name="tests/Client/Unsafe/NonPersistent/UnencryptedTest.php" as="Client/Unsafe/NonPersistent/UnencryptedTest.php"/>
+   <install name="tests/Client/Unsafe/Persistent.php" as="Client/Unsafe/Persistent.php"/>
+   <install name="tests/Client/Unsafe/Persistent/EncryptedTest.php" as="Client/Unsafe/Persistent/EncryptedTest.php"/>
+   <install name="tests/Client/Unsafe/Persistent/UnencryptedTest.php" as="Client/Unsafe/Persistent/UnencryptedTest.php"/>
+   <install name="tests/Client/UnsafeTest.php" as="Client/UnsafeTest.php"/>
    <install name="tests/ConnectionTest.php" as="ConnectionTest.php"/>
+   <install name="tests/HandlingTest.php" as="HandlingTest.php"/>
    <install name="tests/phpunit.xml" as="phpunit.xml"/>
-   <install name="tests/RequestHandlingTest.php" as="RequestHandlingTest.php"/>
-   <install name="tests/StateAlteringFeaturesTest.php" as="StateAlteringFeaturesTest.php"/>
+   <install name="tests/Util/Safe/NonPersistent/EncryptedTest.php" as="Util/Safe/NonPersistent/EncryptedTest.php"/>
+   <install name="tests/Util/Safe/NonPersistent/UnencryptedTest.php" as="Util/Safe/NonPersistent/UnencryptedTest.php"/>
+   <install name="tests/Util/Safe/NonPersistentTest.php" as="Util/Safe/NonPersistentTest.php"/>
+   <install name="tests/Util/Safe/Persistent/EncryptedTest.php" as="Util/Safe/Persistent/EncryptedTest.php"/>
+   <install name="tests/Util/Safe/Persistent/UnencryptedTest.php" as="Util/Safe/Persistent/UnencryptedTest.php"/>
+   <install name="tests/Util/Safe/PersistentTest.php" as="Util/Safe/PersistentTest.php"/>
+   <install name="tests/Util/SafeTest.php" as="Util/SafeTest.php"/>
+   <install name="tests/Util/Unsafe/NonPersistent.php" as="Util/Unsafe/NonPersistent.php"/>
+   <install name="tests/Util/Unsafe/NonPersistent/EncryptedTest.php" as="Util/Unsafe/NonPersistent/EncryptedTest.php"/>
+   <install name="tests/Util/Unsafe/NonPersistent/UnencryptedTest.php" as="Util/Unsafe/NonPersistent/UnencryptedTest.php"/>
+   <install name="tests/Util/Unsafe/Persistent.php" as="Util/Unsafe/Persistent.php"/>
+   <install name="tests/Util/Unsafe/Persistent/EncryptedTest.php" as="Util/Unsafe/Persistent/EncryptedTest.php"/>
+   <install name="tests/Util/Unsafe/Persistent/UnencryptedTest.php" as="Util/Unsafe/Persistent/UnencryptedTest.php"/>
+   <install name="tests/Util/UnsafeTest.php" as="Util/UnsafeTest.php"/>
   </filelist>
  </phprelease>
 </package>
