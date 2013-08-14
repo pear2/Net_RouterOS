@@ -75,8 +75,6 @@ You can't make encrypted connections without it.\n
 HEREDOC;
     }
     
-    if (class_exists('PEAR2\Cache\SHM', true))
-    
     if (function_exists('stream_socket_client')) {
         $failCode = constant(
             'PEAR2\Net\RouterOS\SocketException::CODE_CONNECTION_FAIL'

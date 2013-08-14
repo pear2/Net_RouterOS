@@ -42,9 +42,6 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
     
     public function testNormalEncryptedConnection()
     {
-//        $this->markTestIncomplete(
-//            'There are issues with PHP itself regarding TLS connections'
-//        );
         try {
             $routerOS = new Client(
                 \HOSTNAME,

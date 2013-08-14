@@ -31,9 +31,9 @@ use PHPUnit_Framework_TestCase;
 class RequestHandlingTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @dataProvider providerNonAbsoluteCommand
-     * 
      * @param string $command
+     * 
+     * @dataProvider providerNonAbsoluteCommand
      * 
      * @return void
      */
@@ -61,9 +61,9 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider providerUnresolvableCommand
-     * 
      * @param string $command
+     * 
+     * @dataProvider providerUnresolvableCommand
      * 
      * @return void
      */
@@ -89,9 +89,9 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider providerInvalidCommand
-     * 
      * @param string $command
+     * 
+     * @dataProvider providerInvalidCommand
      * 
      * @return void
      */
@@ -118,10 +118,10 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider providerCommandTranslation
-     * 
      * @param string $command
      * @param string $expected
+     * 
+     * @dataProvider providerCommandTranslation
      * 
      * @return void
      */
@@ -150,11 +150,11 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @dataProvider providerCommandAndArgumentParsing
-     * 
      * @param string $command
      * @param string $expected
      * @param array  $args
+     * 
+     * @dataProvider providerCommandAndArgumentParsing
      * 
      * @return void
      */
@@ -592,10 +592,12 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @dataProvider providerCommandArgumentParsingExceptions
-     * 
      * @param string $command
      * @param int    $code
+     * 
+     * @dataProvider providerCommandArgumentParsingExceptions
+     * 
+     * @return void
      */
     public function testCommandArgumentParsingExceptions($command, $code)
     {
@@ -626,9 +628,11 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param string $name
+     * 
      * @dataProvider providerInvalidArgumentName
      * 
-     * @param string $name
+     * @return void
      */
     public function testInvalidArgumentName($name)
     {
@@ -645,9 +649,9 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider providerInvalidArgumentName
-     * 
      * @param string $name
+     * 
+     * @dataProvider providerInvalidArgumentName
      * 
      * @return void
      */
@@ -690,9 +694,11 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param string|int $action
+     * 
      * @dataProvider providerInvalidQueryArgumentAction
      * 
-     * @param string|int $action
+     * @return void
      */
     public function testInvalidQueryArgumentAction($action)
     {
@@ -772,10 +778,10 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider providerLengths
-     * 
      * @param string $expected
-     * @param int $length
+     * @param int    $length
+     * 
+     * @dataProvider providerLengths
      * 
      * @return void
      */
@@ -793,10 +799,10 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider providerLengths
-     * 
      * @param string $length
-     * @param int $expected
+     * @param int    $expected
+     * 
+     * @dataProvider providerLengths
      * 
      * @return void
      */
@@ -902,9 +908,9 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider providerControlByte
-     * 
      * @param int $controlByte
+     * 
+     * @dataProvider providerControlByte
      * 
      * @return void
      */
@@ -1157,10 +1163,10 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @dataProvider providerUtilParseValue
-     * 
      * @param string $value
-     * @param mixed $expected
+     * @param mixed  $expected
+     * 
+     * @dataProvider providerUtilParseValue
      * 
      * @return void
      */
