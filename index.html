@@ -39,22 +39,8 @@
             .ohloh {overflow:hidden;}
             .ohloh > * {width:400px;height:80%;float:left;}
             .gadget a {color:#0000FF;}
-            
-            #reasonBox {
-                position:absolute;
-                z-index:999;
-                top: 25%;
-                left: 25%;
-                width: 50%;
-                background-color:white;
-                color:black;
-                border: 2px dotted blue;
-                padding: 2%;
-            }
-            #reasonAnchor {
-                display:block;
-            }
         </style>
+        <link rel="stylesheet" type="text/css" href="reasons.css" />
         <script type="text/javascript">
         /* <![CDATA[ */
             (function() {
@@ -90,7 +76,8 @@
                     <input type="hidden" name="cmd" value="_s-xclick" />
                     <input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----" />
                     <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" name="submit" alt="PayPal - The safer, easier way to pay online!" />
-                    <img alt="" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1" /><span>or</span>
+                    <img alt="" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+                    <span>or</span>
                     <a class="FlattrButton" style="display:none;" rev="flattr;button:compact;" href="http://pear2.github.com/Net_RouterOS/"></a>
                     <noscript>
                         <p style="display:inline;margin:0;">
@@ -173,55 +160,6 @@ require_once 'PEAR2_Net_RouterOS-1.0.0b4.phar';
             } catch(err) {}
             /* ]]> */
         </script>
-        <script type="text/javascript">
-            /* <![CDATA[ */
-            (function() {
-                function getRandomInt(min, max) {
-                    return Math.floor(Math.random() * (max - min + 1) + min);
-                }
-                var reasons = [
-                    'Beer and other rejuvination elexirs.',
-                    'Science and other unproductive activities.',
-                    'Banks... it always comes down to them you know.',
-                    'Coca-cola and other toxic substances.',
-                    'Hook...uhm... I mean, Girls.',
-                    'Contrubutions to the world economy in the form of spendings for unneeded goods.',
-                    'Paying evil organizations such as electricity and water suppliers.',
-                    'Paying for my education and other atrocities against the kind of God creationists believe.',
-                    'Software licenses for crappy software... and MikroTik.',
-                    'Fragile hardware like routers, switces and... well, any hardware, really.',
-                    'Paying for the time-off needed to write semi-jokes about money spending, like the others you can see if you click this link again.'
-                ];
-                var reasonsGiven = [];
-                var donations = document.getElementById('donations');
-
-                var reasonBox = document.createElement('div');
-                reasonBox.id = 'reasonBox';
-                reasonBox.addEventListener('click', function(e) {
-                    reasonBox.parentNode.removeChild(reasonBox);
-                }, false);
-
-                var reasonAnchor = document.createElement('a');
-                reasonAnchor.id = 'reasonAnchor';
-                reasonAnchor.href = '#';
-                reasonAnchor.innerHTML = 'What will my money be spent on?';
-                reasonAnchor.addEventListener('click', function(e) {
-                    var reason;
-                    if (reasonsGiven.length === reasons.length) {
-                        reasonBox.innerHTML = 'What more reason do you need?';
-                    } else {
-                        do {
-                            reason = getRandomInt(0, reasons.length - 1);
-                        } while (-1 !== reasonsGiven.indexOf(reason));
-                        reasonBox.innerHTML = reasons[reason];
-                        reasonsGiven[reasonsGiven.length] = reason;
-                    }
-                    donations.appendChild(reasonBox);
-                }, false);
-
-                donations.appendChild(reasonAnchor);
-            })();
-            /* ]]> */
-        </script>
+        <script type="text/javascript" src="reasons.js"> </script>
     </body>
 </html>
