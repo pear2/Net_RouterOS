@@ -1,0 +1,132 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+
+/**
+ * RouterOS API client implementation.
+
+ * 
+ * RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.
+ * 
+ * PHP version 5
+ * 
+ * @category  Net
+ * @package   PEAR2_Net_RouterOS
+ * @author    Vasil Rangelov &lt;boen.robot@gmail.com&gt;
+ * @copyright 2011 Vasil Rangelov
+ * @license   http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
+ * @version   1.0.0b4
+ * @link      http://pear2.php.net/PEAR2_Net_RouterOS
+ */
+/**
+ * The namespace declaration.
+ */
+namespace PEAR2\Net\RouterOS;
+
+/**
+ * Exception thrown when encountering something not supported by RouterOS or
+ * this package.
+ * 
+ * @category Net
+ * @package  PEAR2_Net_RouterOS
+ * @author   Vasil Rangelov &lt;boen.robot@gmail.com&gt;
+ * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
+ * @link     http://pear2.php.net/PEAR2_Net_RouterOS
+ */
+class NotSupportedException extends \Exception implements Exception
+{
+
+    const CODE_CONTROL_BYTE = 1601;
+
+    /**
+     * @var mixed The unsuppported value.
+     */
+    private $_value;
+
+    /**
+     * Creates a new NotSupportedException.
+     * 
+     * @param string     $message  The Exception message to throw.
+     * @param int        $code     The Exception code.
+     * @param \Exception $previous The previous exception used for the exception
+     *     chaining.
+     * @param mixed      $value    The unsupported value.
+     */
+    public function __construct(
+        $message,
+        $code = 0,
+        $previous = null,
+        $value = null
+    ) {
+        parent::__construct($message, $code, $previous);
+        $this-&gt;_value = $value;
+    }
+
+    /**
+     * Gets the unsupported value.
+     * 
+     * @return mixed The unsupported value.
+     */
+    public function getValue()
+    {
+        return $this-&gt;_value;
+    }
+
+    // @codeCoverageIgnoreStart
+    // String representation is not reliable in testing
+
+    /**
+     * Returns a string representation of the exception.
+     * 
+     * @return string The exception as a string.
+     */
+    public function __toString()
+    {
+        return parent::__toString() . &quot;\nValue:{$this-&gt;_value}&quot;;
+    }
+
+    // @codeCoverageIgnoreEnd
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

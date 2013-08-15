@@ -1,0 +1,405 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+
+/**
+ * RouterOS API client implementation.
+
+ * 
+ * RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.
+ * 
+ * PHP version 5
+ * 
+ * @category  Net
+ * @package   PEAR2_Net_RouterOS
+ * @author    Vasil Rangelov &lt;boen.robot@gmail.com&gt;
+ * @copyright 2011 Vasil Rangelov
+ * @license   http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
+ * @version   1.0.0b4
+ * @link      http://pear2.php.net/PEAR2_Net_RouterOS
+ */
+/**
+ * The namespace declaration.
+ */
+namespace PEAR2\Net\RouterOS;
+
+/**
+ * Represents a collection of RouterOS responses.
+ * 
+ * @category Net
+ * @package  PEAR2_Net_RouterOS
+ * @author   Vasil Rangelov &lt;boen.robot@gmail.com&gt;
+ * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
+ * @link     http://pear2.php.net/PEAR2_Net_RouterOS
+ */
+class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
+{
+    
+    /**
+     * @var array An array with all {@link Response} objects.
+     */
+    protected $responses = array();
+    
+    /**
+     * @var array An array with each {@link Response} object's type.
+     */
+    protected $responseTypes = array();
+    
+    /**
+     * @var array An array with each {@link Response} object's tag.
+     */
+    protected $responseTags = array();
+    
+    /**
+     * @var array An array with all distinct arguments across all
+     *     {@link Response} objects. Created at the first call of
+     *     {@link getArgumentMap()}.
+     */
+    protected $argumentMap = null;
+    
+    /**
+     * @var int A pointer, as required by SeekableIterator.
+     */
+    protected $position = 0;
+    
+    /**
+     * Creates a new collection.
+     * 
+     * @param array $responses An array of responses, in network order.
+     */
+    public function __construct(array $responses)
+    {
+        $index = 0;
+        foreach ($responses as $response) {
+            if ($response instanceof Response) {
+                $this-&gt;responseTypes[$index] = $response-&gt;getType();
+                $this-&gt;responseTags[$index] = $response-&gt;getTag();
+                $this-&gt;responses[$index++] = $response;
+            }
+        }
+    }
+    
+    /**
+     * A shorthand gateway.
+     * 
+     * This is a magic PHP method that allows you to call the object as a
+     * function. Depending on the argument given, one of the other functions in
+     * the class is invoked and its returned value is returned by this function.
+     * 
+     * @param int $offset The offset of the response to seek to. Setting NULL
+     *     will seek to the last response.
+     * 
+     * @return Response The {@link Response} at the specified index, last
+     *     reponse if no index is provided or FALSE if the index is invalid or the
+     *     collection is empty.
+     */
+    public function __invoke($offset = null)
+    {
+        return null === $offset ? $this-&gt;end() : $this-&gt;seek($offset);
+    }
+    
+    /**
+     * Gets the whole collection as an array.
+     * 
+     * @return array An array with all responses, in network order.
+     */
+    public function toArray()
+    {
+        return $this-&gt;responses;
+    }
+
+    /**
+     * Counts the responses in the collection.
+     * 
+     * @return int The number of responses in the collection.
+     */
+    public function count()
+    {
+        return count($this-&gt;responses);
+    }
+
+    /**
+     * Checks if an offset exists.
+     * 
+     * @param int $offset The offset to check.
+     * 
+     * @return bool TRUE if the offset exists, FALSE otherwise.
+     */
+    public function offsetExists($offset)
+    {
+        return array_key_exists($offset, $this-&gt;responses);
+    }
+
+    /**
+     * Gets a {@link Response} from a specified offset.
+     * 
+     * @param int $offset The offset of the desired response.
+     * 
+     * @return Response The response at the specified offset.
+     */
+    public function offsetGet($offset)
+    {
+        return $this-&gt;responses[$offset];
+    }
+
+    /**
+     * N/A
+     * 
+     * This method exists only because it is required for ArrayAccess. The
+     * collection is read only.
+     * 
+     * @param int      $offset N/A
+     * @param Response $value  N/A
+     * 
+     * @return void
+     */
+    public function offsetSet($offset, $value)
+    {
+        
+    }
+
+
+    /**
+     * N/A
+     * 
+     * This method exists only because it is required for ArrayAccess. The
+     * collection is read only.
+     * 
+     * @param int $offset N/A
+     * 
+     * @return void
+     */
+    public function offsetUnset($offset)
+    {
+        
+    }
+
+    /**
+     * Resets the pointer to 0, and returns the first response.
+     * 
+     * @return Response The first response in the collection, or FALSE if the
+     *     collection is empty.
+     */
+    public function rewind()
+    {
+        return $this-&gt;seek(0);
+    }
+
+    /**
+     * Moves the position pointer to a specified position.
+     * 
+     * @param int $position The position to move to.
+     * 
+     * @return Response The {@link Response} at the specified position, or FALSE
+     *     if the specified position is not valid.
+     */
+    public function seek($position)
+    {
+        $this-&gt;position = $position;
+        return $this-&gt;current();
+    }
+
+    /**
+     * Moves the pointer forward by 1, and gets the next response.
+     * 
+     * @return Response The next {@link Response} object, or FALSE if the
+     *     position is not valid.
+     */
+    public function next()
+    {
+        ++$this-&gt;position;
+        return $this-&gt;current();
+    }
+
+    /**
+     * Gets the response at the current pointer position.
+     * 
+     * @return Response The response at the current pointer position, or FALSE
+     *     if the position is not valid.
+     */
+    public function current()
+    {
+        return $this-&gt;valid() ? $this-&gt;responses[$this-&gt;position] : false;
+    }
+
+    /**
+     * Moves the pointer backwards by 1, and gets the previous response.
+     * 
+     * @return Response The next {@link Response} object, or FALSE if the
+     *     position is not valid.
+     */
+    public function prev()
+    {
+        --$this-&gt;position;
+        return $this-&gt;current();
+    }
+
+    /**
+     * Moves the pointer to the last valid position, and returns the last
+     * response.
+     * 
+     * @return Response The last response in the collection, or FALSE if the
+     *     collection is empty.
+     */
+    public function end()
+    {
+        $this-&gt;position = count($this-&gt;responses) - 1;
+        return $this-&gt;current();
+    }
+
+    /**
+     * Gets the key at the current pointer position.
+     * 
+     * @return int The key at the current pointer position, i.e. the pointer
+     *     position itself, or FALSE if the position is not valid.
+     */
+    public function key()
+    {
+        return $this-&gt;valid() ? $this-&gt;position : false;
+    }
+
+    /**
+     * Checks if the pointer is still pointing to an existing offset.
+     * 
+     * @return bool TRUE if the pointer is valid, FALSE otherwise.
+     */
+    public function valid()
+    {
+        return $this-&gt;offsetExists($this-&gt;position);
+    }
+    
+    /**
+     * Gets all distinct argument names.
+     * 
+     * Gets all distinct argument names across all responses.
+     * 
+     * @return array An array with all distinct argument names as keys, and the
+     *     indexes at which they occur as values.
+     */
+    public function getArgumentMap()
+    {
+        if (null === $this-&gt;argumentMap) {
+            $arguments = array();
+            foreach ($this-&gt;responses as $index =&gt; $response) {
+                foreach (array_keys($response-&gt;getAllArguments()) as $name) {
+                    if (!isset($arguments[$name])) {
+                        $arguments[$name] = array();
+                    }
+                    $arguments[$name][] = $index;
+                }
+            }
+            $this-&gt;argumentMap = $arguments;
+        }
+        return $this-&gt;argumentMap;
+    }
+    
+    /**
+     * Gets all responses of a specified type.
+     * 
+     * @param string $type The response type to filter by. Valid values are the
+     *     Response::TYPE_* constants.
+     * 
+     * @return ResponseCollection A new collection with responses of the
+     *     specified type.
+     */
+    public function getAllOfType($type)
+    {
+        $result = array();
+        foreach (array_keys($this-&gt;responseTypes, $type, true) as $index) {
+            $result[] = $this-&gt;responses[$index];
+        }
+        return new ResponseCollection($result);
+    }
+    
+    /**
+     * Gets all responses with a specified tag.
+     * 
+     * @param string $tag The tag to filter by.
+     * 
+     * @return ResponseCollection A new collection with responses having the
+     *     specified tag.
+     */
+    public function getAllTagged($tag)
+    {
+        $result = array();
+        foreach (array_keys($this-&gt;responseTags, $tag, true) as $index) {
+            $result[] = $this-&gt;responses[$index];
+        }
+        return new ResponseCollection($result);
+    }
+    
+    /**
+     * Gets the last {@link Response} in the collection.
+     * 
+     * @return Response The last response in the collection or FALSE if the
+     *     collection is empty.
+     */
+    public function getLast()
+    {
+        $offset = count($this-&gt;responses) - 1;
+        return $offset &gt;= 0 ? $this-&gt;responses[$offset] : false;
+    }
+    
+    /**
+     * Calls a method of the response pointed by the pointer.
+     * 
+     * Calls a method of the response pointed by the pointer. This is a magic
+     * PHP method, thanks to which any function you call on the collection that
+     * is not defined will be redirected to the response.
+     * 
+     * @param string $method The name of the method to call.
+     * @param array  $args   The arguments to pass to the method.
+     * 
+     * @return mixed Whatever the called function returns.
+     */
+    public function __call($method, array $args)
+    {
+        return call_user_func_array(
+            array($this-&gt;current(), $method),
+            $args
+        );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>
