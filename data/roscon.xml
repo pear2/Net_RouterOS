@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<command>
+    <description>RouterOS API console.</description>
+    <version>@PACKAGE_VERSION@</version>
+    <argument name="hostname">
+        <description>Hostname of the RouterOS to connect to.</description>
+    </argument>
+    <argument name="username">
+        <description>Username to log in with. If left empty, no login will be performed.</description>
+        <optional>true</optional>
+    </argument>
+    <argument name="password">
+        <description>Password to log in with.</description>
+        <optional>true</optional>
+    </argument>
+    <option name="portNum">
+        <short_name>-p</short_name>
+        <long_name>--port</long_name>
+        <description>Port to connect to. Default is either 8728 or 8729, depending on whether an encryption is specified.</description>
+        <action>StoreInt</action>
+    </option>
+    <option name="conTime">
+        <long_name>--cTimeout</long_name>
+        <description>Time in seconds to wait for the connection to be estabilished. If "--timeout" is specified, its value will be used when this option is not specified.
+Defaults to PHP's default_socket_timeout ini option.</description>
+        <action>StoreInt</action>
+    </option>
+    <option name="crypto">
+        <long_name>--enc</long_name>
+        <description>Encryption to use, if at all. Currently, RouterOS supports only "TLS".
+(Default: "")</description>
+        <action>StoreString</action>
+    </option>
+    <option name="caPath">
+        <long_name>--ca</long_name>
+        <description>Optional path to a file or folder to use for certification authority, when using encryption. Ignored when not using encryption or using ADH cipher.</description>
+        <action>StoreString</action>
+    </option>
+    <option name="time">
+        <short_name>-t</short_name>
+        <long_name>--timeout</long_name>
+        <description>Time in seconds to wait when receiving. If this time passes without data awaiting, control is passed back for further input.
+(Default: 3)</description>
+        <action>StoreInt</action>
+    </option>
+    <option name="verbose">
+        <short_name>-v</short_name>
+        <long_name>--verbose</long_name>
+        <description>Turn on verbose output.</description>
+        <action>StoreTrue</action>
+    </option>
+    <option name="size">
+        <short_name>-w</short_name>
+        <long_name>--width</long_name>
+        <description>Width of console screen. Used in verbose mode to wrap output in this length.</description>
+        <action>StoreInt</action>
+    </option>
+    <option name="commandMode">
+        <long_name>--command-mode</long_name>
+        <description>Mode to send commands in. Can be one of:
+"w" - send every word as soon as it is entered
+"s" - wait for a sentence to be formed, and send all its words then
+"e" - wait for an empty sentence, and send all non empty sentences then.
+(Default: "s")
+</description>
+        <action>StoreString</action>
+        <choices>
+            <choice>w</choice>
+            <choice>s</choice>
+            <choice>e</choice>
+        </choices>
+    </option>
+    <option name="replyMode">
+        <long_name>--reply-mode</long_name>
+        <description>Mode to get replies in. Can be one of:
+"w" - after every send, try to get a word
+"s" - after every send, try to get a sentence
+"e" - after every send, try to get all sentences until a timeout.
+(Default: "s")
+</description>
+        <action>StoreString</action>
+        <choices>
+            <choice>w</choice>
+            <choice>s</choice>
+            <choice>e</choice>
+        </choices>
+    </option>
+    <option name="multiline">
+        <short_name>-m</short_name>
+        <long_name>--multiline</long_name>
+        <description>Turn on multiline mode. Without this mode, every line of input is considered a word. With it, every line is a line within the word, and the end of the word is marked instead by an "end of text" character as the only character on a line. To write out such a character, you can use ALT+Numpad3. If you want to write this character as part of the word, you can write two such characters on a line.</description>
+        <action>StoreTrue</action>
+    </option>
+</command>

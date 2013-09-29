@@ -1,10 +1,21 @@
 <?php
 namespace PEAR2\Net\RouterOS;
 
-require_once 'PEAR2/Autoload.php';
-\PEAR2\Autoload::initialize(realpath('../src'));
-\PEAR2\Autoload::initialize(realpath('../../Net_Transmitter.git/src'));
-\PEAR2\Autoload::initialize(realpath('../../Cache_SHM.git/src'));
+$autoloader = stream_resolve_include_path('/../vendor/autoload.php');
+if (false !== $autoloader) {
+    include_once $autoloader;
+} else {
+    $autoloader = stream_resolve_include_path('PEAR2/Autoload.php');
+    if (false !== $autoloader) {
+        include_once $autoloader;
+        \PEAR2\Autoload::initialize(realpath('../src'));
+        \PEAR2\Autoload::initialize(realpath('../../Net_Transmitter.git/src'));
+        \PEAR2\Autoload::initialize(realpath('../../Cache_SHM.git/src'));
+    } else {
+        die('No recognized autoloader is available.');
+    }
+}
+unset($autoloader);
 
 define('ROS_NAMESPACE', __NAMESPACE__);
 

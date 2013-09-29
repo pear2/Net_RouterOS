@@ -1,41 +1,52 @@
 <?php
-if (count(get_included_files()) > 1) {
+if (($isIncluded = count(get_included_files()) > 1) || $argc > 1) {
     Phar::mapPhar();
     include_once 'phar://' . __FILE__ . DIRECTORY_SEPARATOR .
         '@PACKAGE_NAME@-@PACKAGE_VERSION@' . DIRECTORY_SEPARATOR . 'src'
         . DIRECTORY_SEPARATOR . 'PEAR2' . DIRECTORY_SEPARATOR . 'Autoload.php';
-} else {
-    $isNotCli = PHP_SAPI !== 'cli';
-    if ($isNotCli) {
-        header('Content-Type: text/plain;charset=UTF-8');
-    }
-    echo "@PACKAGE_NAME@ @PACKAGE_VERSION@\n";
 
-    if (version_compare(phpversion(), '5.3.0', '<')) {
-        echo "\nThis package requires PHP 5.3.0 or later.";
-        exit(1);
+    if (!$isIncluded && $argc > 1) {
+        unset($isIncluded);
+        include_once 'phar://' . __FILE__ . DIRECTORY_SEPARATOR .
+            '@PACKAGE_NAME@-@PACKAGE_VERSION@' . DIRECTORY_SEPARATOR . 'bin'
+            . DIRECTORY_SEPARATOR . 'console.php';
     }
+    unset($isIncluded);
+    return;
+}
+unset($isIncluded);
 
-    $missing_extensions = array();
-    foreach (array('phar', 'spl', 'pcre') as $ext) {
-        if (!extension_loaded($ext)) {
-            $missing_extensions[] = $ext;
-        }
-    }
-    if ($missing_extensions) {
-        echo "\nYou must compile PHP with the following extensions enabled:\n",
-            implode(', ', $missing_extensions), "\n",
-            "or install the necessary extensions for your distribution.\n";
-        exit(1);
-    }
+$isNotCli = PHP_SAPI !== 'cli';
+if ($isNotCli) {
+    header('Content-Type: text/plain;charset=UTF-8');
+}
+echo "@PACKAGE_NAME@ @PACKAGE_VERSION@\n";
 
-    if (extension_loaded('phar')) {
-        try {
-            $phar = new Phar(__FILE__);
-            $sig = $phar->getSignature();
-            echo "{$sig['hash_type']} hash: {$sig['hash']}\n";
-        } catch (Exception $e) {
-            echo <<<HEREDOC
+if (version_compare(phpversion(), '5.3.0', '<')) {
+    echo "\nThis package requires PHP 5.3.0 or later.";
+    exit(1);
+}
+
+$missing_extensions = array();
+foreach (array('phar', 'spl', 'pcre') as $ext) {
+    if (!extension_loaded($ext)) {
+        $missing_extensions[] = $ext;
+    }
+}
+if ($missing_extensions) {
+    echo "\nYou must compile PHP with the following extensions enabled:\n",
+        implode(', ', $missing_extensions), "\n",
+        "or install the necessary extensions for your distribution.\n";
+    exit(1);
+}
+
+if (extension_loaded('phar')) {
+    try {
+        $phar = new Phar(__FILE__);
+        $sig = $phar->getSignature();
+        echo "{$sig['hash_type']} hash: {$sig['hash']}\n";
+    } catch (Exception $e) {
+        echo <<<HEREDOC
 The PHAR extension is available, but was unable to read this PHAR file's hash.
 Regardless, you should not be having any trouble using the package by directly
 including this file. In the unlikely case that you can't include it
@@ -44,20 +55,20 @@ its autoloader.
 
 Exception details:
 HEREDOC
-                . $e . "\n";
-        }
-    } else {
-        echo <<<HEREDOC
+            . $e . "\n";
+    }
+} else {
+    echo <<<HEREDOC
 If you wish to use this package directly from this archive, you need to install
 and enable the PHAR extension. Otherwise, you must instead extract this
 archive, and include the autoloader.
 
 HEREDOC;
-    }
+}
 
-    echo "\n" . str_repeat('=', 80) . "\n";
-    if (extension_loaded('openssl')) {
-        echo <<<HEREDOC
+echo "\n" . str_repeat('=', 80) . "\n";
+if (extension_loaded('openssl')) {
+    echo <<<HEREDOC
 The OpenSSL extension is loaded. If you can make any connection whatsoever, you
 could also make an encrypted one to RouterOS 6.1 or later.
 
@@ -67,17 +78,17 @@ Client::sendSync() and/or Client::completeRequest() and/or Client::loop()
 without a timeout").
 
 HEREDOC;
-    } else {
-        echo <<<HEREDOC
+} else {
+    echo <<<HEREDOC
 WARNING: The OpenSSL extension is not loaded.
 You can't make encrypted connections without it.
 
 HEREDOC;
-    }
+}
 
-    echo "\n" . str_repeat('=', 80) . "\n";
-    if (function_exists('stream_socket_client')) {
-        echo <<<HEREDOC
+echo "\n" . str_repeat('=', 80) . "\n";
+if (function_exists('stream_socket_client')) {
+    echo <<<HEREDOC
 The stream_socket_client() function is enabled.
 If you can't connect to RouterOS (SocketException with code equal to
 SocketException::CODE_CONNECTION_FAIL), this means one of the following:
@@ -112,14 +123,13 @@ instead. If you still can't connect, such a rule is certainly not the (only)
 reason.
 
 HEREDOC;
-    } else {
-        echo <<<HEREDOC
+} else {
+    echo <<<HEREDOC
 WARNING: stream_socket_client() is disabled. Without it, you won't be able to
 connect to any RouterOS host. Enable it in php.ini, or ask your host to enable
 it for you.
 
 HEREDOC;
-    }
 }
 
 __HALT_COMPILER();
