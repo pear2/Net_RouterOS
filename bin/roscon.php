@@ -5,7 +5,7 @@
  * 
  * ~~description~~
  * 
- * PHP version 5
+ * PHP version 5.3
  * 
  * @category  Net
  * @package   PEAR2_Net_RouterOS
@@ -17,9 +17,19 @@
  */
 
 /**
- * The whole application is around that.
+ * Used as a "catch all" for errors when connecting.
  */
-use PEAR2\Net\RouterOS;
+use Exception as E;
+
+/**
+ * Used to register dependency paths, if needed.
+ */
+use PEAR2\Autoload;
+
+/**
+ * Used for coloring the output, if the "--colors" argument is specified.
+ */
+use PEAR2\Console\Color;
 
 /**
  * Used for parsing the command line arguments.
@@ -27,45 +37,50 @@ use PEAR2\Net\RouterOS;
 use PEAR2\Console\CommandLine;
 
 /**
+ * The whole application is around that.
+ */
+use PEAR2\Net\RouterOS;
+
+/**
  * Used for error handling when connecting or receiving.
  */
 use PEAR2\Net\Transmitter\SocketException as SE;
 
-/**
- * Used as a "catch all" for errors when connecting.
- */
-use Exception as E;
-
 //If there's no appropriate autoloader, add one
 if (!class_exists('PEAR2\Net\RouterOS\Communicator', true)) {
     include_once 'PEAR2/Autoload.php';
-    \PEAR2\Autoload::initialize(realpath('../src'));
-    \PEAR2\Autoload::initialize(realpath('../../Net_Transmitter.git/src'));
+    Autoload::initialize(realpath(__DIR__ . '/../src'));
+    Autoload::initialize(realpath(__DIR__ . '/../../Net_Transmitter.git/src'));
+    Autoload::initialize(realpath(__DIR__ . '/../../Console_Color.git/src'));
 }
 
 // Locate the data dir, in preference as:
 // 1. The data folder at "mypear" (filled at install time by Pyrus/PEAR)
 // 2. The source layout's data folder (also used from PHAR)
 // 3. The PHP_PEAR_DATA_DIR environment variable, if available.
-$dataFolder = realpath('@PEAR2_DATA_DIR@/@PACKAGE_CHANNEL@/@PACKAGE_NAME@')
+$dataDir = realpath('@PEAR2_DATA_DIR@/@PACKAGE_CHANNEL@/@PACKAGE_NAME@')
     ?: (realpath(__DIR__ . '/../data') ?:
         (false != ($pearDataDir = getenv('PHP_PEAR_DATA_DIR'))
             ? realpath($pearDataDir . '/@PACKAGE_CHANNEL@/@PACKAGE_NAME@')
             : false
         )
     );
-if (false === $dataFolder) {
+if (false === $dataDir) {
     fwrite(
         STDERR,
         'Unable to find data dir.'
     );
     exit(10);
 }
-$consoleDefFile = realpath($dataFolder . '/roscon.xml');
+$consoleDefFile = realpath($dataDir . '/roscon.xml');
 if (false === $consoleDefFile) {
     fwrite(
         STDERR,
-        'Unable to find console definition file. Check your data dir setting.'
+        <<<HEREDOC
+The console definition file (roscon.xml) was not found at the data dir, which
+was found to be at
+{$dataDir}
+HEREDOC
     );
     exit(11);
 }
@@ -80,6 +95,34 @@ try {
     );
     exit(12);
 }
+
+$c_colors = array(
+    'SEND' => '',
+    'SENT' => '',
+    'RECV' => '',
+    'ERR'  => '',
+    ''     => ''
+);
+if ($cmd->options['colors']) {
+    $c_colors['SENT'] = new Color(
+        Color\Fonts::BLACK,
+        Color\Backgrounds::PURPLE
+    );
+    $c_colors['SEND'] = clone $c_colors['SENT'];
+    $c_colors['SEND']->setStyles(Color\Styles::UNDERLINE, true);
+    $c_colors['RECV'] = new Color(
+        Color\Fonts::BLACK,
+        Color\Backgrounds::GREEN
+    );
+    $c_colors['ERR'] = new Color(
+        Color\Fonts::WHITE,
+        Color\Backgrounds::RED
+    );
+    $c_colors[''] = new Color();
+    
+    //fwrite(STDOUT, $c_colors['']);
+}
+
 $cmd->options['size'] = $cmd->options['size'] ?: 80;
 $cmd->options['commandMode'] = $cmd->options['commandMode'] ?: 's';
 $cmd->options['replyMode'] = $cmd->options['replyMode'] ?: 's';
@@ -116,13 +159,13 @@ try {
         $comContext
     );
 } catch (E $e) {
-    fwrite(STDERR, "Error upon connecting: " . $e->getMessage());
+    fwrite(STDERR, "Error upon connecting: {$e->getMessage()}\n");
     $previous = $e->getPrevious();
     if ($previous instanceof SE) {
         fwrite(
             STDERR,
-            "\nDetails: (" . $previous->getSocketErrorNumber() .
-            ') ' . $previous->getSocketErrorMessage()
+            "Details: ({$previous->getSocketErrorNumber()}) "
+            . $previous->getSocketErrorMessage()
         );
     }
     return;
@@ -140,8 +183,13 @@ if (null !== $cmd->args['username']) {
 <<<HEREDOC
 Login refused. Possible reasons:
 1. No such username.
-2. Mistyped password.
-3. The user does not have the "api" privilege.
+3. The user does not have the "api" privilege. Check the username's group, and
+   it's permissions at "/user groups".
+2. Mistyped password. If the password contains non-ASCII characters, be careful
+   of your locale settings - either they must match those of the terminal you
+   set your password on, or you must type the equivalent code points in your
+   locale, which may display as different characters.
+
 HEREDOC
             );
             return;
@@ -153,41 +201,90 @@ HEREDOC
 }
 
 if ($cmd->options['verbose']) {
-    fwrite(STDOUT, "MODE |   LENGTH   |    LENGTH    | CONTENTS\n");
-    fwrite(STDOUT, "     |  (decoded) |   (encoded)  |");
-    $columns = array(
+    $c_columns = array(
         'mode' => 4,
         'length' => 10,
         'encodedLength' => 12
     );
-    $columns['contents'] = $cmd->options['size'] - 1//row length
-            - array_sum($columns)
-            - (3/*strlen(' | ')*/ * count($columns));
+    $c_columns['contents'] = $cmd->options['size'] - 1//row length
+            - array_sum($c_columns)
+            - (3/*strlen(' | ')*/ * count($c_columns));
     fwrite(
         STDOUT,
-        "\n" .
         implode(
-            '-|-',
+            "\n",
             array(
-                str_repeat('-', $columns['mode']),
-                str_repeat('-', $columns['length']),
-                str_repeat('-', $columns['encodedLength']),
-                str_repeat('-', $columns['contents'])
+                implode(
+                    ' | ',
+                    array(
+                        str_pad(
+                            'MODE',
+                            $c_columns['mode'],
+                            ' ',
+                            STR_PAD_RIGHT
+                        ),
+                        str_pad(
+                            'LENGTH',
+                            $c_columns['length'],
+                            ' ',
+                            STR_PAD_BOTH
+                        ),
+                        str_pad(
+                            'LENGTH',
+                            $c_columns['encodedLength'],
+                            ' ',
+                            STR_PAD_BOTH
+                        ),
+                        ' CONTENTS'
+                    )
+                ),
+                implode(
+                    ' | ',
+                    array(
+                        str_repeat(' ', $c_columns['mode']),
+                        str_pad(
+                            '(decoded)',
+                            $c_columns['length'],
+                            ' ',
+                            STR_PAD_BOTH
+                        ),
+                        str_pad(
+                            '(encoded)',
+                            $c_columns['encodedLength'],
+                            ' ',
+                            STR_PAD_BOTH
+                        ),
+                        ''
+                    )
+                ),
+                implode(
+                    '-|-',
+                    array(
+                        str_repeat('-', $c_columns['mode']),
+                        str_repeat('-', $c_columns['length']),
+                        str_repeat('-', $c_columns['encodedLength']),
+                        str_repeat('-', $c_columns['contents'])
+                    )
+                )
             )
         ) . "\n"
     );
 
-    define(
-        'PEAR2\Net\RouterOS\REGEX_WRAP',
-        '/([^\n]{1,' . ($columns['contents'])
-        . '})/sS'
-    );
+    $c_regexWrap = '/([^\n]{1,' . ($c_columns['contents']) . '})/sS';
 }
 
 $printWord = $cmd->options['verbose']
-    ? function ($mode, $word, $msg = '') use ($columns) {
+    ? function (
+        $mode,
+        $word,
+        $msg = ''
+    ) use (
+        $c_columns,
+        $c_regexWrap,
+        $c_colors
+        ) {
     $wordFragments = preg_split(
-        RouterOS\REGEX_WRAP,
+        $c_regexWrap,
         $word,
         null,
         PREG_SPLIT_DELIM_CAPTURE
@@ -199,7 +296,7 @@ $printWord = $cmd->options['verbose']
     if ('ERR' === $mode) {
         $details = str_pad(
             $msg,
-            $columns['length'] + $columns['encodedLength'] + 3,
+            $c_columns['length'] + $c_columns['encodedLength'] + 3,
             ' ',
             STR_PAD_BOTH
         );
@@ -218,42 +315,42 @@ $printWord = $cmd->options['verbose']
 
         $details = str_pad(
             '0x' . strtoupper(dechex($length)),
-            $columns['length'],
+            $c_columns['length'],
             ' ',
             STR_PAD_LEFT
         ) .
         ' | ' .
         str_pad(
             '0x' . strtoupper($encodedLength),
-            $columns['encodedLength'],
+            $c_columns['encodedLength'],
             ' ',
             STR_PAD_LEFT
         );
     }
     fwrite(
         STDOUT,
-        str_pad($mode, $columns['mode'], ' ', STR_PAD_RIGHT) . ' | ' .
-        $details . ' | ' .
+        str_pad($mode, $c_columns['mode'], ' ', STR_PAD_RIGHT) .
+        " | {$details} | {$c_colors[$mode]}" .
         implode(
-            "\n" . 
-            str_repeat(' ', $columns['mode']) .
+            "\n{$c_colors['']}" .
+            str_repeat(' ', $c_columns['mode']) .
             ' | ' .
             implode(
                 ('ERR' === $mode ? '   ' : ' | '),
                 array(
-                    str_repeat(' ', $columns['length']),
-                    str_repeat(' ', $columns['encodedLength'])
+                    str_repeat(' ', $c_columns['length']),
+                    str_repeat(' ', $c_columns['encodedLength'])
                 )
-            ) . ' | ',
+            ) . ' | ' . $c_colors[$mode],
             $wordFragments
-        ) . "\n"
+        ) . "\n{$c_colors['']}"
     );
     }
-    : function ($mode, $word, $msg = '') {
+    : function ($mode, $word, $msg = '') use ($c_colors) {
     if ('ERR' === $mode) {
-        fwrite(STDERR, "{$msg}: {$word}\n");
+        fwrite(STDERR, "{$c_colors[$mode]}{$msg}: {$word}{$c_colors['']}");
     } elseif ('SENT' !== $mode) {
-        fwrite(STDOUT, $word);
+        fwrite(STDOUT, "{$c_colors[$mode]}{$word}{$c_colors['']}\n");
     }
     };
 
@@ -272,16 +369,16 @@ while (true) {
                 implode(
                     ' | ',
                     array(
-                        str_pad('SEND', $columns['mode'], ' ', STR_PAD_RIGHT),
+                        str_pad('SEND', $c_columns['mode'], ' ', STR_PAD_RIGHT),
                         str_pad(
                             '<prompt>',
-                            $columns['length'],
+                            $c_columns['length'],
                             ' ',
                             STR_PAD_LEFT
                         ),
                         str_pad(
                             '<prompt>',
-                            $columns['encodedLength'],
+                            $c_columns['encodedLength'],
                             ' ',
                             STR_PAD_LEFT
                         ),
@@ -291,22 +388,53 @@ while (true) {
             );
         }
 
+        fwrite(STDOUT, $c_colors['SEND']);
+
         if ($cmd->options['multiline']) {
-            while (true) {
-                $line = stream_get_line(STDIN, PHP_INT_MAX, PHP_EOL);
-                if (chr(3) === $line) {
-                    break;
+            $line = stream_get_line(STDIN, PHP_INT_MAX, PHP_EOL);
+            if (chr(3) !== $line) {
+                if ('' === $line) {
+                    $word .= PHP_EOL;
+                } else {
+                    $word .= $line;
                 }
-                $word .= PHP_EOL;
-                if ((chr(3) . chr(3)) === $line) {
-                    $word .= chr(3);
-                    continue;
+                while (true) {
+                    if ($cmd->options['verbose']) {
+                        fwrite(
+                            STDOUT,
+                            "\n{$c_colors['']}" .
+                            implode(
+                                ' | ',
+                                array(
+                                    str_repeat(' ', $c_columns['mode']),
+                                    str_repeat(' ', $c_columns['length']),
+                                    str_repeat(' ', $c_columns['encodedLength']),
+                                    ''
+                                )
+                            )
+                            . $c_colors['SEND']
+                        );
+                    }
+                    $line = stream_get_line(STDIN, PHP_INT_MAX, PHP_EOL);
+                    if (chr(3) === $line) {
+                        break;
+                    }
+                    $word .= PHP_EOL;
+                    if ((chr(3) . chr(3)) === $line) {
+                        $word .= chr(3);
+                    } else {
+                        $word .= $line;
+                    }
                 }
-                $word .= $line;
             }
         } else {
             $word = stream_get_line(STDIN, PHP_INT_MAX, PHP_EOL);
         }
+
+        if ($cmd->options['verbose']) {
+            fwrite(STDOUT, "\n");
+        }
+        fwrite(STDOUT, $c_colors['']);
 
         $words[] = $word;
         if ('w' === $cmd->options['commandMode']) {
@@ -323,8 +451,12 @@ while (true) {
 
     //Input flush
     foreach ($words as $word) {
-        $com->sendWord($word);
-        $printWord('SENT', $word);
+        try {
+            $com->sendWord($word);
+            $printWord('SENT', $word);
+        } catch (SE $e) {
+            $printWord('ERR', $word, 'Failed to send word');
+        }
     }
 
     //Output cycle

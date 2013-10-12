@@ -31,6 +31,11 @@ use DateTime;
 use DateInterval;
 
 /**
+ * Implemented by this class.
+ */
+use Countable;
+
+/**
  * Utility class.
  * 
  * Abstracts away frequently used functionality (particularly CRUD operations)
@@ -42,7 +47,7 @@ use DateInterval;
  * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
  * @link     http://pear2.php.net/PEAR2_Net_RouterOS
  */
-class Util
+class Util implements Countable
 {
     /**
      * @var Client The connection to wrap around.
@@ -853,5 +858,23 @@ class Util
         }
 
         return $result;
+    }
+
+    /**
+     * Counts all items at the current menu.
+     * 
+     * @param Query $query A query to filter items by. Without it, all items
+     *     are included in the count.
+     * 
+     * @return int|null The number of items, or NULL on failure (e.g. if the
+     *     current menu does not have any items to begin with).
+     */
+    public function count(Query $query = null)
+    {
+        return self::parseValue(
+            $this->client->sendSync(
+                new Request($this->menu . '/print count-only=""', $query)
+            )->getLast()->getArgument('ret')
+        );
     }
 }

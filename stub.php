@@ -1,20 +1,49 @@
 <?php
-if (($isIncluded = count(get_included_files()) > 1) || $argc > 1) {
-    Phar::mapPhar();
-    include_once 'phar://' . __FILE__ . DIRECTORY_SEPARATOR .
-        '@PACKAGE_NAME@-@PACKAGE_VERSION@' . DIRECTORY_SEPARATOR . 'src'
-        . DIRECTORY_SEPARATOR . 'PEAR2' . DIRECTORY_SEPARATOR . 'Autoload.php';
 
-    if (!$isIncluded && $argc > 1) {
-        unset($isIncluded);
-        include_once 'phar://' . __FILE__ . DIRECTORY_SEPARATOR .
-            '@PACKAGE_NAME@-@PACKAGE_VERSION@' . DIRECTORY_SEPARATOR . 'bin'
-            . DIRECTORY_SEPARATOR . 'console.php';
+/**
+ * Stub for PEAR2_Net_RouterOS.
+ * 
+ * PHP version 5.3
+ * 
+ * @category  Net
+ * @package   PEAR2_Net_RouterOS
+ * @author    Vasil Rangelov <boen.robot@gmail.com>
+ * @copyright 2011 Vasil Rangelov
+ * @license   http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
+ * @version   GIT: $Id$
+ * @link      http://pear2.php.net/PEAR2_Net_RouterOS
+ */
+
+$isIncluded = count(get_included_files()) > 1;
+$hasArgs = $argc > 1;
+if ($isIncluded || $hasArgs) {
+    Phar::mapPhar();
+    $pkgDir = 'phar://' . __FILE__ . DIRECTORY_SEPARATOR .
+            '@PACKAGE_NAME@-@PACKAGE_VERSION@' . DIRECTORY_SEPARATOR;
+
+    //Set up autoloader
+    if (class_exists('PEAR2\Autoload', true)) {
+        //Called in this fashion to avoid parse errors on PHP =< 5.3.0
+        call_user_func(
+            array('PEAR2\Autoload', 'initialize'),
+            $pkgDir . DIRECTORY_SEPARATOR . 'src'
+        );
+    } else {
+        include_once $pkgDir . DIRECTORY_SEPARATOR
+            . 'src' . DIRECTORY_SEPARATOR
+            . 'PEAR2' . DIRECTORY_SEPARATOR
+            . 'Autoload.php';
     }
-    unset($isIncluded);
+
+    //Run console if there are any arguments
+    if ($hasArgs) {
+        include_once $pkgDir . DIRECTORY_SEPARATOR
+            . 'bin' . DIRECTORY_SEPARATOR
+            . 'roscon.php';
+    }
+    unset($pkgDir, $isIncluded, $hasArgs);
     return;
 }
-unset($isIncluded);
 
 $isNotCli = PHP_SAPI !== 'cli';
 if ($isNotCli) {
@@ -28,7 +57,7 @@ if (version_compare(phpversion(), '5.3.0', '<')) {
 }
 
 $missing_extensions = array();
-foreach (array('phar', 'spl', 'pcre') as $ext) {
+foreach (array('spl', 'pcre') as $ext) {
     if (!extension_loaded($ext)) {
         $missing_extensions[] = $ext;
     }
@@ -66,6 +95,12 @@ archive, and include the autoloader.
 HEREDOC;
 }
 
+echo "\n" . str_repeat('=', 80) . "\n";
+echo <<<HEREDOC
+This package provides a console. To see usage instructions, rerun this file
+from the command line with "--help" as an argument.
+
+HEREDOC;
 echo "\n" . str_repeat('=', 80) . "\n";
 if (extension_loaded('openssl')) {
     echo <<<HEREDOC

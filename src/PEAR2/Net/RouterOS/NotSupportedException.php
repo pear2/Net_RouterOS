@@ -21,6 +21,11 @@
 namespace PEAR2\Net\RouterOS;
 
 /**
+ * Base of this class.
+ */
+use Exception as E;
+
+/**
  * Exception thrown when encountering something not supported by RouterOS or
  * this package.
  * 
@@ -30,7 +35,7 @@ namespace PEAR2\Net\RouterOS;
  * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
  * @link     http://pear2.php.net/PEAR2_Net_RouterOS
  */
-class NotSupportedException extends \Exception implements Exception
+class NotSupportedException extends E implements Exception
 {
 
     const CODE_CONTROL_BYTE = 1601;

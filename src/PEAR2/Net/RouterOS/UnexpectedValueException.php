@@ -20,6 +20,8 @@
  */
 namespace PEAR2\Net\RouterOS;
 
+use UnexpectedValueException as U;
+
 /**
  * Exception thrown when encountering an invalid value in a function argument.
  * 
@@ -29,10 +31,8 @@ namespace PEAR2\Net\RouterOS;
  * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
  * @link     http://pear2.php.net/PEAR2_Net_RouterOS
  */
-class UnexpectedValueException extends \UnexpectedValueException
-    implements Exception
+class UnexpectedValueException extends U implements Exception
 {
-    
     const CODE_CALLBACK_INVALID = 10502;
     const CODE_ACTION_UNKNOWN = 30100;
     const CODE_RESPONSE_TYPE_UNKNOWN = 50100;

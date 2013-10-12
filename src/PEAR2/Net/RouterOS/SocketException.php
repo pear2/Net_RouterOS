@@ -21,6 +21,11 @@
 namespace PEAR2\Net\RouterOS;
 
 /**
+ * Base of this class.
+ */
+use RuntimeException;
+
+/**
  * Exception thrown when something goes wrong with the connection.
  * 
  * @category Net
@@ -29,7 +34,7 @@ namespace PEAR2\Net\RouterOS;
  * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
  * @link     http://pear2.php.net/PEAR2_Net_RouterOS
  */
-class SocketException extends \RuntimeException implements Exception
+class SocketException extends RuntimeException implements Exception
 {
     const CODE_SERVICE_INCOMPATIBLE = 10200;
     const CODE_CONNECTION_FAIL = 100;

@@ -21,6 +21,11 @@
 namespace PEAR2\Net\RouterOS;
 
 /**
+ * Base of this class.
+ */
+use RuntimeException;
+
+/**
  * Exception thrown when the request/response cycle goes an unexpected way.
  * 
  * @category Net
@@ -29,7 +34,7 @@ namespace PEAR2\Net\RouterOS;
  * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
  * @link     http://pear2.php.net/PEAR2_Net_RouterOS
  */
-class DataFlowException extends \RuntimeException implements Exception
+class DataFlowException extends RuntimeException implements Exception
 {
     const CODE_INVALID_CREDENTIALS = 10000;
     const CODE_TAG_REQUIRED = 10500;

@@ -839,27 +839,27 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
             14 => array(chr(0xEF) . chr(0xFF) . chr(0xFF) . chr(0xFE), 0xFFFFFFE),
             15 => array(chr(0xEF) . chr(0xFF) . chr(0xFF) . chr(0xFF), 0xFFFFFFF),
             16 => array(
-                chr(0xF0) . chr(0x10) . chr(0x00) . chr(0x00) . chr(0x00), 
+                chr(0xF0) . chr(0x10) . chr(0x00) . chr(0x00) . chr(0x00),
                 0x10000000
             ),
             17 => array(
-                chr(0xF0) . chr(0x10) . chr(0x00) . chr(0x00) . chr(0x01), 
+                chr(0xF0) . chr(0x10) . chr(0x00) . chr(0x00) . chr(0x01),
                 0x10000001
             ),
             18 => array(
-                chr(0xF0) . chr(0xFF) . chr(0xFF) . chr(0xFF) . chr(0xFE), 
+                chr(0xF0) . chr(0xFF) . chr(0xFF) . chr(0xFF) . chr(0xFE),
                 0xFFFFFFFE
             ),
             19 => array(
-                chr(0xF0) . chr(0xFF) . chr(0xFF) . chr(0xFF) . chr(0xFF), 
+                chr(0xF0) . chr(0xFF) . chr(0xFF) . chr(0xFF) . chr(0xFF),
                 0xFFFFFFFF
             ),
             20 => array(
-                chr(0xF1) . chr(0x00) . chr(0x00) . chr(0x00) . chr(0x00), 
+                chr(0xF1) . chr(0x00) . chr(0x00) . chr(0x00) . chr(0x00),
                 0x100000000
             ),
             21 => array(
-                chr(0xF1) . chr(0x00) . chr(0x00) . chr(0x00) . chr(0x01), 
+                chr(0xF1) . chr(0x00) . chr(0x00) . chr(0x00) . chr(0x01),
                 0x100000001
             ),
             22 => array(

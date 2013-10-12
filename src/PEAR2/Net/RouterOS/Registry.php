@@ -185,8 +185,10 @@ class Registry
                 $this->shm->unlock('taglessModeOwner');
             } else {
                 $this->shm->unlock('taglessModeOwner');
-                foreach ($this->shm->getIterator('/^(responseBuffer\_)/', true)
-                    as $targetBufferName) {
+                foreach ($this->shm->getIterator(
+                    '/^(responseBuffer\_)/',
+                    true
+                ) as $targetBufferName) {
                     $this->_add($response, $targetBufferName);
                 }
                 return true;

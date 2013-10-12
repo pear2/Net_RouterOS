@@ -21,6 +21,21 @@
 namespace PEAR2\Net\RouterOS;
 
 /**
+ * Implemented by this class.
+ */
+use ArrayAccess;
+
+/**
+ * Implemented by this class.
+ */
+use Countable;
+
+/**
+ * Implemented by this class.
+ */
+use SeekableIterator;
+
+/**
  * Represents a collection of RouterOS responses.
  * 
  * @category Net
@@ -29,7 +44,7 @@ namespace PEAR2\Net\RouterOS;
  * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
  * @link     http://pear2.php.net/PEAR2_Net_RouterOS
  */
-class ResponseCollection implements \ArrayAccess, \SeekableIterator, \Countable
+class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 {
     
     /**

@@ -173,15 +173,13 @@ class Response extends Message
         }
         $this->setType($com->getNextWord());
         if ($asStream) {
-            for (
-            $word = $com->getNextWordAsStream(), fseek($word, 0, SEEK_END);
-                    ftell($word) !== 0;
-                    $word = $com->getNextWordAsStream(), fseek(
-                        $word,
-                        0,
-                        SEEK_END
-                    )
-            ) {
+            for ($word = $com->getNextWordAsStream(), fseek($word, 0, SEEK_END);
+                ftell($word) !== 0;
+                $word = $com->getNextWordAsStream(), fseek(
+                    $word,
+                    0,
+                    SEEK_END
+                )) {
                 rewind($word);
                 $ind = fread($word, 1);
                 if ('=' === $ind || '.' === $ind) {
@@ -211,8 +209,7 @@ class Response extends Message
             }
         } else {
             for ($word = $com->getNextWord(); '' !== $word;
-                    $word = $com->getNextWord()
-            ) {
+                $word = $com->getNextWord()) {
                 if (preg_match('/^=([^=]+)=(.*)$/sS', $word, $matches)) {
                     $this->setArgument($matches[1], $matches[2]);
                 } elseif (preg_match('/^\.tag=(.*)$/sS', $word, $matches)) {

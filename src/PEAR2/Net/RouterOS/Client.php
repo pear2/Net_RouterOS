@@ -28,7 +28,7 @@ use PEAR2\Net\Transmitter\Stream as S;
 /**
  * Refers to the cryptography constants.
  */
-use PEAR2\Net\Transmitter\NetworkStream AS N;
+use PEAR2\Net\Transmitter\NetworkStream as N;
 
 /**
  * A RouterOS client.
@@ -206,7 +206,7 @@ class Client
      */
     public static function login(
         Communicator $com,
-        $username, 
+        $username,
         $password = '',
         $timeout = null
     ) {

@@ -20,6 +20,8 @@
  */
 namespace PEAR2\Net\RouterOS;
 
+use InvalidArgumentException as I;
+
 /**
  * Exception thrown when there's something wrong with message arguments.
  * 
@@ -29,8 +31,7 @@ namespace PEAR2\Net\RouterOS;
  * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
  * @link     http://pear2.php.net/PEAR2_Net_RouterOS
  */
-class InvalidArgumentException extends \InvalidArgumentException
-    implements Exception
+class InvalidArgumentException extends I implements Exception
 {
     const CODE_SEEKABLE_REQUIRED = 1100;
     const CODE_NAME_INVALID = 20100;
@@ -39,5 +40,4 @@ class InvalidArgumentException extends \InvalidArgumentException
     const CODE_CMD_INVALID = 40202;
     const CODE_NAME_UNPARSABLE = 41000;
     const CODE_VALUE_UNPARSABLE = 41001;
-    
 }
