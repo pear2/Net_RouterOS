@@ -60,7 +60,7 @@ class Util implements Countable
     protected $menu = '/';
 
     /**
-     * @var array An array with the numbers of entries in the current menu as
+     * @var array An array with the numbers of items in the current menu as
      *     keys, and the corresponding IDs as values.
      */
     protected $idCache = null;
@@ -360,15 +360,15 @@ class Util implements Countable
     /**
      * Clears the ID cache.
      * 
-     * Normally, the ID cache improves performance when targeting entries by a
+     * Normally, the ID cache improves performance when targeting items by a
      * number. If you're using both Util's methods and other means (e.g.
-     * {@link Client} or {@link Util::exec()}) to add/move/remove entries, the
+     * {@link Client} or {@link Util::exec()}) to add/move/remove items, the
      * cache may end up being out of date. By calling this method right before
-     * targeting an entry with a number, you can ensure number accuracy.
+     * targeting an item with a number, you can ensure number accuracy.
      * 
      * Note that Util's {@link move()} and {@link remove()} methods
      * automatically clear the cache before returning, while {@link add()} adds
-     * the new entry's ID to the cache as the next number. A change in the menu
+     * the new item's ID to the cache as the next number. A change in the menu
      * also clears the cache.
      * 
      * Note also that the cache is being rebuilt unconditionally every time you
@@ -383,23 +383,23 @@ class Util implements Countable
     }
 
     /**
-     * Finds the IDs of entries at the current menu.
+     * Finds the IDs of items at the current menu.
      * 
-     * Finds the IDs of entries based on specified criteria, and returns them as
+     * Finds the IDs of items based on specified criteria, and returns them as
      * a comma separated string, ready for insertion at a "numbers" argument.
      * 
      * Accepts zero or more criteria as arguments. If zero arguments are
-     * specified, returns all entries' IDs. The value of each criteria can be a
+     * specified, returns all items' IDs. The value of each criteria can be a
      * number (just as in Winbox), a literal ID to be included, a {@link Query}
      * object, or a callback. If a callback is specified, it is called for each
-     * entry, with the entry as an argument. If it returns a true value, the
+     * item, with the item as an argument. If it returns a true value, the
      * item's ID is included in the result. Every other value is casted to a
      * string. A string is treated as a comma separated values of IDs, numbers
      * or callback names. Non-existent callback names are instead placed in the
      * result, which may be useful in menus that accept identifiers other than
      * IDs, but note that it can cause errors on other menus.
      * 
-     * @return string A comma separated list of all entries matching the
+     * @return string A comma separated list of all items matching the
      *     specified criteria.
      */
     public function find()
@@ -471,15 +471,15 @@ class Util implements Countable
     }
 
     /**
-     * Gets a value of a specified entry at the current menu.
+     * Gets a value of a specified item at the current menu.
      * 
-     * @param int|string|null $number     A number identifying the entry you're
+     * @param int|string|null $number     A number identifying the item you're
      *     targeting. Can also be an ID or (in some menus) name. For menus where
-     *     there are no entries (e.g. "/system identity"), you can specify NULL.
+     *     there are no items (e.g. "/system identity"), you can specify NULL.
      * @param string          $value_name The name of the value you want to get.
      * 
      * @return string|null|bool The value of the specified property. If the
-     *     property is not set, NULL will be returned. If no such entry exists,
+     *     property is not set, NULL will be returned. If no such item exists,
      *     FALSE will be returned.
      */
     public function get($number, $value_name)
@@ -511,10 +511,10 @@ class Util implements Countable
     }
 
     /**
-     * Enables all entries at the current menu matching certain criteria.
+     * Enables all items at the current menu matching certain criteria.
      * 
      * Zero or more arguments can be specified, each being a criteria.
-     * If zero arguments are specified, enables all entries.
+     * If zero arguments are specified, enables all items.
      * See {@link find()} for a description of what criteria are accepted.
      * 
      * @return ResponseCollection returns the response collection, allowing you
@@ -526,13 +526,13 @@ class Util implements Countable
     }
 
     /**
-     * Disables all entries at the current menu matching certain criteria.
+     * Disables all items at the current menu matching certain criteria.
      * 
      * Zero or more arguments can be specified, each being a criteria.
-     * If zero arguments are specified, disables all entries.
+     * If zero arguments are specified, disables all items.
      * See {@link find()} for a description of what criteria are accepted.
      * 
-     * @return ResponseCollection returns the response collection, allowing you
+     * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
      */
     public function disable()
@@ -541,13 +541,13 @@ class Util implements Countable
     }
 
     /**
-     * Removes all entries at the current menu matching certain criteria.
+     * Removes all items at the current menu matching certain criteria.
      * 
      * Zero or more arguments can be specified, each being a criteria.
-     * If zero arguments are specified, removes all entries.
+     * If zero arguments are specified, removes all items.
      * See {@link find()} for a description of what criteria are accepted.
      * 
-     * @return ResponseCollection returns the response collection, allowing you
+     * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
      */
     public function remove()
@@ -560,16 +560,16 @@ class Util implements Countable
     /**
      * Sets new values.
      * 
-     * Sets new values on certain properties on all entries at the current menu
+     * Sets new values on certain properties on all items at the current menu
      * which match certain criteria.
      * 
-     * @param mixed $numbers   Targeted entries. Can be any criteria accepted by
-     *     {@link find()} or NULL in case the menu is one without entries
+     * @param mixed $numbers   Targeted items. Can be any criteria accepted by
+     *     {@link find()} or NULL in case the menu is one without items
      *     (e.g. "/system identity").
      * @param array $newValues An array with the names of each property to set
      *     as an array key, and the new value as an array value.
      * 
-     * @return ResponseCollection returns the response collection, allowing you
+     * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
      */
     public function set($numbers, array $newValues)
@@ -587,12 +587,12 @@ class Util implements Countable
     /**
      * Alias of {@link set()}
      * 
-     * @param mixed $numbers   Targeted entries. Can be any criteria accepted by
+     * @param mixed $numbers   Targeted items. Can be any criteria accepted by
      *     {@link find()}.
      * @param array $newValues An array with the names of each changed property
      *     as an array key, and the new value as an array value.
      * 
-     * @return ResponseCollection returns the response collection, allowing you
+     * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
      */
     public function edit($numbers, array $newValues)
@@ -601,17 +601,18 @@ class Util implements Countable
     }
 
     /**
-     * Unsets a value of a specified entry at the current menu.
+     * Unsets a value of a specified item at the current menu.
      * 
      * Equivalent of scripting's "unset" command. The "Value" part in the method
      * name is added because "unset" is a language construct, and thus a
      * reserved word.
      * 
-     * @param mixed  $numbers    Targeted entries. Can be any criteria accepted
+     * @param mixed  $numbers    Targeted items. Can be any criteria accepted
      *     by {@link find()}.
      * @param string $value_name The name of the value you want to unset.
      * 
-     * @return ResponseCollection
+     * @return ResponseCollection Returns the response collection, allowing you
+     *     to inspect errors, if any.
      */
     public function unsetValue($numbers, $value_name)
     {
@@ -623,21 +624,26 @@ class Util implements Countable
     }
 
     /**
-     * Adds a new entry at the current menu.
+     * Adds a new item at the current menu.
      * 
-     * @param array $values Accepts one or more entries to add to the
-     *     current menu. The data about each entry is specified as an array with
+     * @param array $values Accepts one or more items to add to the
+     *     current menu. The data about each item is specified as an array with
      *     the names of each property as an array key, and the value as an array
      *     value.
-     * @param array $...    Additional entries.
+     * @param array $...    Additional items.
      * 
-     * @return string A comma separated list of the new entries' IDs.
+     * @return string A comma separated list of the new items' IDs. If a
+     *     particular item was not added, this will be indicated by an empty
+     *     string in its spot on the list. e.g. "*1D,,*1E" means that
+     *     you supplied three items to be added, of which the second one was
+     *     not added for some reason.
      */
     public function add(array $values)
     {
         $addRequest = new Request($this->menu . '/add');
         $idList = '';
         foreach (func_get_args() as $values) {
+            $idList .= ',';
             if (!is_array($values)) {
                 continue;
             }
@@ -648,28 +654,28 @@ class Util implements Countable
             if (null !== $this->idCache) {
                 $this->idCache[] = $id;
             }
-            $idList .= $id . ',';
+            $idList .= $id;
             $addRequest->removeAllArguments();
         }
-        return rtrim($idList, ',');
+        return substr($idList, 1);
     }
 
     /**
-     * Moves entries at the current menu before a certain other entry.
+     * Moves items at the current menu before a certain other item.
      * 
-     * Moves entries before a certain other entry. Note that the "move"
+     * Moves items before a certain other item. Note that the "move"
      * command is not available on all menus. As a rule of thumb, if the order
-     * of entries in a menu is irrelevant to their interpretation, there won't
+     * of items in a menu is irrelevant to their interpretation, there won't
      * be a move command on that menu. If in doubt, check from a terminal.
      * 
-     * @param mixed $numbers     Targeted entries. Can be any criteria accepted
+     * @param mixed $numbers     Targeted items. Can be any criteria accepted
      *     by {@link find()}.
-     * @param mixed $destination Entry before which the targeted entries will be
+     * @param mixed $destination item before which the targeted items will be
      *     moved to. Can be any criteria accepted by {@link find()}. If multiple
-     *     entries match the criteria, the targeted entries will move above the
+     *     items match the criteria, the targeted items will move above the
      *     first match.
      * 
-     * @return ResponseCollection returns the response collection, allowing you
+     * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
      */
     public function move($numbers, $destination)
@@ -764,14 +770,14 @@ class Util implements Countable
     }
 
     /**
-     * Performs an action on a bulk of entries at the current menu.
+     * Performs an action on a bulk of items at the current menu.
      * 
      * @param string $what What action to perform.
      * @param array  $args Zero or more arguments can be specified, each being
-     *     a criteria. If zero arguments are specified, removes all entries.
+     *     a criteria. If zero arguments are specified, removes all items.
      *     See {@link find()} for a description of what criteria are accepted.
      * 
-     * @return ResponseCollection returns the response collection, allowing you
+     * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
      */
     protected function doBulk($what, array $args = array())
@@ -805,12 +811,13 @@ class Util implements Countable
      *     "/system script" under a random name (prefixed with the computer's
      *     name), and is removed after execution. To eliminate any possibility
      *     of name clashes, you can specify your own name.
-     * @param bool   $get    Whether to keep the script after execution.
+     * @param bool   $get    Whether to get the source of the script instead of
+     *     its name.
      * 
      * @return ResponseCollection|string If the script was not added
      *     successfully before execution, the ResponseCollection from the add
      *     attempt is going to be returned. Otherwise, the (generated) name of
-     *     the script.
+     *     the script, or its source if $get is TRUE.
      */
     private function _exec(
         $source,
@@ -861,20 +868,64 @@ class Util implements Countable
     }
 
     /**
-     * Counts all items at the current menu.
+     * Counts items at the current menu.
+     * 
+     * Counts items at the current menu. This executes a dedicated command
+     * ("print" with a "count-only" argument) on RouterOS, which is why only
+     * queries are allowed as a criteria, in contrast with {@link find()},
+     * where numbers and callbacks are allowed also.
      * 
      * @param Query $query A query to filter items by. Without it, all items
      *     are included in the count.
      * 
-     * @return int|null The number of items, or NULL on failure (e.g. if the
-     *     current menu does not have any items to begin with).
+     * @return int The number of items, or -1 on failure (e.g. if the
+     *     current menu does not have a "print" command or items to be counted).
      */
     public function count(Query $query = null)
     {
-        return self::parseValue(
+        $result = self::parseValue(
             $this->client->sendSync(
                 new Request($this->menu . '/print count-only=""', $query)
             )->getLast()->getArgument('ret')
         );
+
+        if (null === $result) {
+            return -1;
+        }
+        return $result;
+    }
+
+    /**
+     * Gets all items in the current menu.
+     * 
+     * Gets all items in the current menu, using a print request.
+     * 
+     * @param string[] $args  Additional arguments to pass to the request.
+     *     Each array key is the name of the argument, and each array value is
+     *     the value of the argument to be passed. Empty arguments can also be
+     *     specified using a numeric key, and the name of the argument as the
+     *     array value.
+     * @param Query    $query A query to filter items by.
+     * 
+     * @return ResponseCollection|bool A response collection with all
+     *     {@link Response::TYPE_DATA} responses. The collection will be empty
+     *     when there are no matching items. FALSE on failure.
+     */
+    public function getall(array $args = array(), Query $query = null)
+    {
+        $printRequest = new Request($this->menu . '/print', $query);
+        foreach ($args as $name => $value) {
+            if (is_int($name)) {
+                $printRequest->setArgument($value);
+            } else {
+                $printRequest->setArgument($name, $value);
+            }
+        }
+        $responses = $this->client->sendSync($printRequest);
+
+        if (!empty($responses->getAllOfType(Response::TYPE_ERROR))) {
+            return false;
+        }
+        return $responses->getAllOfType(Response::TYPE_DATA);
     }
 }

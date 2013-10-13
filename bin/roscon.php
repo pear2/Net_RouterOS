@@ -101,6 +101,7 @@ $c_colors = array(
     'SENT' => '',
     'RECV' => '',
     'ERR'  => '',
+    'NOTE' => '',
     ''     => ''
 );
 if ($cmd->options['colors']) {
@@ -118,9 +119,11 @@ if ($cmd->options['colors']) {
         Color\Fonts::WHITE,
         Color\Backgrounds::RED
     );
+    $c_colors['NOTE'] = new Color(
+        Color\Fonts::BLUE,
+        Color\Backgrounds::YELLOW
+    );
     $c_colors[''] = new Color();
-    
-    //fwrite(STDOUT, $c_colors['']);
 }
 
 $cmd->options['size'] = $cmd->options['size'] ?: 80;
@@ -201,6 +204,7 @@ HEREDOC
 }
 
 if ($cmd->options['verbose']) {
+    $c_sep = ' | ';
     $c_columns = array(
         'mode' => 4,
         'length' => 10,
@@ -208,14 +212,14 @@ if ($cmd->options['verbose']) {
     );
     $c_columns['contents'] = $cmd->options['size'] - 1//row length
             - array_sum($c_columns)
-            - (3/*strlen(' | ')*/ * count($c_columns));
+            - (3/*strlen($c_sep)*/ * count($c_columns));
     fwrite(
         STDOUT,
         implode(
             "\n",
             array(
                 implode(
-                    ' | ',
+                    $c_sep,
                     array(
                         str_pad(
                             'MODE',
@@ -239,7 +243,7 @@ if ($cmd->options['verbose']) {
                     )
                 ),
                 implode(
-                    ' | ',
+                    $c_sep,
                     array(
                         str_repeat(' ', $c_columns['mode']),
                         str_pad(
@@ -279,10 +283,11 @@ $printWord = $cmd->options['verbose']
         $word,
         $msg = ''
     ) use (
+        $c_sep,
         $c_columns,
         $c_regexWrap,
         $c_colors
-        ) {
+    ) {
     $wordFragments = preg_split(
         $c_regexWrap,
         $word,
@@ -293,7 +298,8 @@ $printWord = $cmd->options['verbose']
         unset($wordFragments[$i]);
     }
 
-    if ('ERR' === $mode) {
+    $isAbnormal = 'ERR' === $mode || 'NOTE' === $mode;
+    if ($isAbnormal) {
         $details = str_pad(
             $msg,
             $c_columns['length'] + $c_columns['encodedLength'] + 3,
@@ -319,7 +325,7 @@ $printWord = $cmd->options['verbose']
             ' ',
             STR_PAD_LEFT
         ) .
-        ' | ' .
+        $c_sep .
         str_pad(
             '0x' . strtoupper($encodedLength),
             $c_columns['encodedLength'],
@@ -329,26 +335,32 @@ $printWord = $cmd->options['verbose']
     }
     fwrite(
         STDOUT,
+        $c_colors[$mode] .
         str_pad($mode, $c_columns['mode'], ' ', STR_PAD_RIGHT) .
-        " | {$details} | {$c_colors[$mode]}" .
+        $c_colors[''] .
+        "{$c_sep}{$details}{$c_sep}{$c_colors[$mode]}" .
         implode(
             "\n{$c_colors['']}" .
             str_repeat(' ', $c_columns['mode']) .
-            ' | ' .
+            $c_sep .
             implode(
-                ('ERR' === $mode ? '   ' : ' | '),
+                ($isAbnormal ? '   ' : $c_sep),
                 array(
                     str_repeat(' ', $c_columns['length']),
                     str_repeat(' ', $c_columns['encodedLength'])
                 )
-            ) . ' | ' . $c_colors[$mode],
+            ) . $c_sep . $c_colors[$mode],
             $wordFragments
         ) . "\n{$c_colors['']}"
     );
     }
     : function ($mode, $word, $msg = '') use ($c_colors) {
-    if ('ERR' === $mode) {
-        fwrite(STDERR, "{$c_colors[$mode]}{$msg}: {$word}{$c_colors['']}");
+    if ('ERR' === $mode || 'NOTE' === $mode) {
+        fwrite(STDERR, "{$c_colors[$mode]}{$msg}");
+        if ('' !== $word) {
+            fwrite(STDERR, ": {$word}");
+        }
+        fwrite(STDERR, "{$c_colors['']}\n");
     } elseif ('SENT' !== $mode) {
         fwrite(STDOUT, "{$c_colors[$mode]}{$word}{$c_colors['']}\n");
     }
@@ -361,13 +373,19 @@ while (true) {
     $word = '';
     $words = array();
 
+
+    if (!$com->getTransmitter()->isAvailable()) {
+        $printWord('NOTE', '', 'Connection terminated');
+        break;
+    }
+
     //Input cycle
     while (true) {
         if ($cmd->options['verbose']) {
             fwrite(
                 STDOUT,
                 implode(
-                    ' | ',
+                    $c_sep,
                     array(
                         str_pad('SEND', $c_columns['mode'], ' ', STR_PAD_RIGHT),
                         str_pad(
@@ -404,7 +422,7 @@ while (true) {
                             STDOUT,
                             "\n{$c_colors['']}" .
                             implode(
-                                ' | ',
+                                $c_sep,
                                 array(
                                     str_repeat(' ', $c_columns['mode']),
                                     str_repeat(' ', $c_columns['length']),
@@ -455,13 +473,26 @@ while (true) {
             $com->sendWord($word);
             $printWord('SENT', $word);
         } catch (SE $e) {
-            $printWord('ERR', $word, 'Failed to send word');
+            if (0 === $e->getFragment()) {
+                $printWord('ERR', '', 'Failed to send word');
+            } else {
+                $printWord(
+                    'ERR',
+                    substr($word, 0, $e->getFragment()),
+                    "Partial word sent"
+                );
+            }
         }
     }
 
     //Output cycle
     while (true) {
+        if (!$com->getTransmitter()->isAvailable()) {
+            break;
+        }
+
         if (!$com->getTransmitter()->isDataAwaiting($cmd->options['time'])) {
+            $printWord('NOTE', '', 'Receiving timed out');
             break;
         }
 
@@ -475,7 +506,11 @@ while (true) {
                 break;
             }
         } catch (SE $e) {
-            $printWord('ERR', $e->getFragment(), 'Incomplete word');
+            if ('' === $e->getFragment()) {
+                $printWord('ERR', '', 'Failed to receive word');
+            } else {
+                $printWord('ERR', $e->getFragment(), 'Partial word received');
+            }
             break;
         } catch (RouterOS\NotSupportedException $e) {
             $printWord('ERR', $e->getValue(), 'Unsupported control byte');
@@ -484,9 +519,5 @@ while (true) {
             $printWord('ERR', (string)$e, 'Unknown error');
             break;
         }
-    }
-
-    if (!$com->getTransmitter()->isAvailable()) {
-        break;
     }
 }
