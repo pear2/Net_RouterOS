@@ -65,7 +65,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     /**
      * @var array An array with all distinct arguments across all
      *     {@link Response} objects. Created at the first call of
-     *     {@link getArgumentMap()}.
+     *     {@link static::getArgumentMap()}.
      */
     protected $argumentMap = null;
     

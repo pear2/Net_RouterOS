@@ -44,17 +44,17 @@ use PEAR2\Net\Transmitter\NetworkStream as N;
 class Client
 {
     /**
-     * Used in {@link isRequestActive()} to limit search only to requests
-     * that have a callback.
+     * Used in {@link static::isRequestActive()} to limit search only to
+     * requests that have a callback.
      */
     const FILTER_CALLBACK = 1;
     /**
-     * Used in {@link isRequestActive()} to limit search only to requests
-     * that use the buffer.
+     * Used in {@link static::isRequestActive()} to limit search only to
+     * requests that use the buffer.
      */
     const FILTER_BUFFER = 2;
     /**
-     * Used in {@link isRequestActive()} to indicate no limit in search.
+     * Used in {@link static::isRequestActive()} to indicate no limit in search.
      */
     const FILTER_ALL = 3;
 
@@ -438,8 +438,9 @@ class Client
      * 
      * @return ResponseCollection A collection of {@link Response} objects that
      *     haven't been passed to a callback function or previously extracted
-     *     with {@link extractNewResponses()}. Returns an empty collection when
-     *     $tag is set to NULL (responses can still be extracted).
+     *     with {@link static::extractNewResponses()}. Returns an empty
+     *     collection when $tag is set to NULL (responses can still be
+     *     extracted).
      */
     public function completeRequest($tag = null)
     {
@@ -590,7 +591,7 @@ class Client
      * to the "/cancel" command is highly reccomended, as it also updates the
      * counter of pending requests properly. Note that canceling a request also
      * removes any responses for it that were not previously extracted with
-     * {@link extractNewResponses()}.
+     * {@link static::extractNewResponses()}.
      * 
      * @param string $tag Tag of the request to cancel. Setting NULL will cancel
      *     all requests.
@@ -692,8 +693,8 @@ class Client
      * Closes the opened connection, even if it is a persistent one.
      * 
      * Closes the opened connection, even if it is a persistent one. Note that
-     * {@link extractNewResponses()} can still be used to extract responses
-     * collected prior to the closing.
+     * {@link static::extractNewResponses()} can still be used to extract
+     * responses collected prior to the closing.
      * 
      * @return bool TRUE on success, FALSE on failure.
      */

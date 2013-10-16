@@ -207,7 +207,7 @@ if ($cmd->options['verbose']) {
     $c_sep = ' | ';
     $c_columns = array(
         'mode' => 4,
-        'length' => 10,
+        'length' => 11,
         'encodedLength' => 12
     );
     $c_columns['contents'] = $cmd->options['size'] - 1//row length
@@ -319,11 +319,8 @@ $printWord = $cmd->options['verbose']
             );
         }
 
-        $dislayedLength = $length > 9999999999
-            ? '0x' . strtoupper(dechex($length))
-            : $length;
         $details = str_pad(
-            $dislayedLength,
+            $length,
             $c_columns['length'],
             ' ',
             STR_PAD_LEFT

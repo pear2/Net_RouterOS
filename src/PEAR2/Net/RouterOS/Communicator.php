@@ -231,16 +231,16 @@ class Communicator
      * Sets the default charset(s) for new connections.
      * 
      * @param mixed $charset     The charset to set. If $charsetType is
-     *     {@link CHARSET_ALL}, you can supply either a string to use for all
-     *     charsets, or an array with the charset types as keys, and the
+     *     {@link self::CHARSET_ALL}, you can supply either a string to use for
+     *     all charsets, or an array with the charset types as keys, and the
      *     charsets as values.
      * @param int   $charsetType Which charset to set. Valid values are the
      *     CHARSET_* constants. Any other value is treated as
-     *     {@link CHARSET_ALL}.
+     *     {@link self::CHARSET_ALL}.
      * 
      * @return string|array The old charset. If $charsetType is
-     *     {@link CHARSET_ALL}, the old values will be returned as an array with
-     *     the types as keys, and charsets as values.
+     *     {@link self::CHARSET_ALL}, the old values will be returned as an
+     *     array with the types as keys, and charsets as values.
      * @see setCharset()
      */
     public static function setDefaultCharset(
@@ -267,11 +267,11 @@ class Communicator
      * 
      * @param int $charsetType Which charset to get. Valid values are the
      *     CHARSET_* constants. Any other value is treated as
-     *     {@link CHARSET_ALL}.
+     *     {@link self::CHARSET_ALL}.
      * 
      * @return string|array The current charset. If $charsetType is
-     *     {@link CHARSET_ALL}, the current values will be returned as an array
-     *     with the types as keys, and charsets as values.
+     *     {@link self::CHARSET_ALL}, the current values will be returned as an
+     *     array with the types as keys, and charsets as values.
      * @see setDefaultCharset()
      */
     public static function getDefaultCharset($charsetType)
@@ -284,23 +284,23 @@ class Communicator
      * Sets the charset(s) for this connection.
      * 
      * Sets the charset(s) for this connection. The specified charset(s) will be
-     * used for all future words. When sending, {@link CHARSET_LOCAL} is
-     * converted to {@link CHARSET_REMOTE}, and when receiving,
-     * {@link CHARSET_REMOTE} is converted to {@link CHARSET_LOCAL}. Setting
-     * NULL to either charset will disable charset convertion, and data will be
-     * both sent and received "as is".
+     * used for all future words. When sending, {@link self::CHARSET_LOCAL} is
+     * converted to {@link self::CHARSET_REMOTE}, and when receiving,
+     * {@link self::CHARSET_REMOTE} is converted to {@link self::CHARSET_LOCAL}.
+     * Setting  NULL to either charset will disable charset convertion, and data
+     * will be both sent and received "as is".
      * 
      * @param mixed $charset     The charset to set. If $charsetType is
-     *     {@link CHARSET_ALL}, you can supply either a string to use for all
-     *     charsets, or an array with the charset types as keys, and the
+     *     {@link self::CHARSET_ALL}, you can supply either a string to use for
+     *     all charsets, or an array with the charset types as keys, and the
      *     charsets as values.
      * @param int   $charsetType Which charset to set. Valid values are the
-     *     Communicator::CHARSET_* constants. Any other value is treated as
-     *     {@link CHARSET_ALL}.
+     *     CHARSET_* constants. Any other value is treated as
+     *     {@link self::CHARSET_ALL}.
      * 
      * @return string|array The old charset. If $charsetType is
-     *     {@link CHARSET_ALL}, the old values will be returned as an array with
-     *     the types as keys, and charsets as values.
+     *     {@link self::CHARSET_ALL}, the old values will be returned as an
+     *     array with the types as keys, and charsets as values.
      * @see setDefaultCharset()
      */
     public function setCharset($charset, $charsetType = self::CHARSET_ALL)
@@ -325,11 +325,11 @@ class Communicator
      * 
      * @param int $charsetType Which charset to get. Valid values are the
      *     CHARSET_* constants. Any other value is treated as
-     *     {@link CHARSET_ALL}.
+     *     {@link self::CHARSET_ALL}.
      * 
      * @return string|array The current charset. If $charsetType is
-     *     {@link CHARSET_ALL}, the current values will be returned as an array
-     *     with the types as keys, and charsets as values.
+     *     {@link self::CHARSET_ALL}, the current values will be returned as an
+     *     array with the types as keys, and charsets as values.
      * @see getDefaultCharset()
      * @see setCharset()
      */

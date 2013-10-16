@@ -72,12 +72,12 @@ class Util implements Countable
      * determining the type in the same way RouterOS would determine it for a
      * literal.
      * 
-     * This method is intended to be the very opposite of {@link escapeValue()}.
-     * That is, results from that method, if given to this method, should
-     * produce equivalent results.
+     * This method is intended to be the very opposite of
+     * {@link static::escapeValue()}. hat is, results from that method, if
+     * given to this method, should produce equivalent results.
      * 
      * @param string $value The value to be parsed. Must be a literal of a
-     *     value, e.g. what {@link escapeValue()} will give you.
+     *     value, e.g. what {@link static::escapeValue()} will give you.
      * 
      * @return mixed Depending on RouterOS type detected:
      *     - "nil" or "nothing" - NULL.
@@ -196,8 +196,12 @@ class Util implements Countable
                 break;
             }
             $result = '';
-            foreach ($value as $val) {
-                $result .= ';' . static::escapeValue($val);
+            foreach ($value as $key => $val) {
+                $result .= ';';
+                if (!is_int($key)) {
+                    $result .= static::escapeValue($key) . '=';
+                }
+                $result .= static::escapeValue($val);
             }
             $value = '{' . substr($result, 1) . '}';
             break;
@@ -332,7 +336,7 @@ class Util implements Countable
      * @param array  $params An array of local variables to make available in
      *     the script. Variable names are array keys, and variable values are
      *     array values. Array values are automatically processed with
-     *     {@link escapeValue()}.
+     *     {@link static::escapeValue()}.
      *     Note that the script's (generated) name is always added as the
      *     variable "_", which you can overwrite from here.
      * @param string $policy Allows you to specify a policy the script must
@@ -366,13 +370,13 @@ class Util implements Countable
      * cache may end up being out of date. By calling this method right before
      * targeting an item with a number, you can ensure number accuracy.
      * 
-     * Note that Util's {@link move()} and {@link remove()} methods
-     * automatically clear the cache before returning, while {@link add()} adds
-     * the new item's ID to the cache as the next number. A change in the menu
-     * also clears the cache.
+     * Note that Util's {@link static::move()} and {@link static::remove()}
+     * methods automatically clear the cache before returning, while
+     * {@link static::add()} adds the new item's ID to the cache as the next
+     * number. A change in the menu also clears the cache.
      * 
      * Note also that the cache is being rebuilt unconditionally every time you
-     * use {@link find()} with a callback.
+     * use {@link static::find()} with a callback.
      * 
      * @return $this The Util object itself.
      */
@@ -527,7 +531,8 @@ class Util implements Countable
      * 
      * Zero or more arguments can be specified, each being a criteria.
      * If zero arguments are specified, enables all items.
-     * See {@link find()} for a description of what criteria are accepted.
+     * See {@link static::find()} for a description of what criteria are
+     * accepted.
      * 
      * @return ResponseCollection returns the response collection, allowing you
      *     to inspect errors, if any.
@@ -542,7 +547,8 @@ class Util implements Countable
      * 
      * Zero or more arguments can be specified, each being a criteria.
      * If zero arguments are specified, disables all items.
-     * See {@link find()} for a description of what criteria are accepted.
+     * See {@link static::find()} for a description of what criteria are
+     * accepted.
      * 
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
@@ -557,7 +563,8 @@ class Util implements Countable
      * 
      * Zero or more arguments can be specified, each being a criteria.
      * If zero arguments are specified, removes all items.
-     * See {@link find()} for a description of what criteria are accepted.
+     * See {@link static::find()} for a description of what criteria are
+     * accepted.
      * 
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
@@ -576,7 +583,7 @@ class Util implements Countable
      * which match certain criteria.
      * 
      * @param mixed $numbers   Targeted items. Can be any criteria accepted by
-     *     {@link find()} or NULL in case the menu is one without items
+     *     {@link static::find()} or NULL in case the menu is one without items
      *     (e.g. "/system identity").
      * @param array $newValues An array with the names of each property to set
      *     as an array key, and the new value as an array value.
@@ -597,10 +604,10 @@ class Util implements Countable
     }
 
     /**
-     * Alias of {@link set()}
+     * Alias of {@link static::set()}
      * 
      * @param mixed $numbers   Targeted items. Can be any criteria accepted by
-     *     {@link find()}.
+     *     {@link static::find()}.
      * @param array $newValues An array with the names of each changed property
      *     as an array key, and the new value as an array value.
      * 
@@ -620,7 +627,7 @@ class Util implements Countable
      * reserved word.
      * 
      * @param mixed  $numbers    Targeted items. Can be any criteria accepted
-     *     by {@link find()}.
+     *     by {@link static::find()}.
      * @param string $value_name The name of the value you want to unset.
      * 
      * @return ResponseCollection Returns the response collection, allowing you
@@ -681,11 +688,11 @@ class Util implements Countable
      * be a move command on that menu. If in doubt, check from a terminal.
      * 
      * @param mixed $numbers     Targeted items. Can be any criteria accepted
-     *     by {@link find()}.
+     *     by {@link static::find()}.
      * @param mixed $destination item before which the targeted items will be
-     *     moved to. Can be any criteria accepted by {@link find()}. If multiple
-     *     items match the criteria, the targeted items will move above the
-     *     first match.
+     *     moved to. Can be any criteria accepted by {@link static::find()}.
+     *     If multiple items match the criteria, the targeted items will move
+     *     above the first match.
      * 
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
@@ -708,8 +715,8 @@ class Util implements Countable
      * 
      * Counts items at the current menu. This executes a dedicated command
      * ("print" with a "count-only" argument) on RouterOS, which is why only
-     * queries are allowed as a criteria, in contrast with {@link find()},
-     * where numbers and callbacks are allowed also.
+     * queries are allowed as a criteria, in contrast with
+     * {@link static::find()}, where numbers and callbacks are allowed also.
      * 
      * @param Query $query A query to filter items by. Without it, all items
      *     are included in the count.
@@ -849,7 +856,8 @@ class Util implements Countable
      * @param string $what What action to perform.
      * @param array  $args Zero or more arguments can be specified, each being
      *     a criteria. If zero arguments are specified, removes all items.
-     *     See {@link find()} for a description of what criteria are accepted.
+     *     See {@link static::find()} for a description of what criteria are
+     *     accepted.
      * 
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
