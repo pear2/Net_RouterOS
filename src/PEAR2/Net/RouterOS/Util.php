@@ -92,7 +92,7 @@ class Util implements Countable
     {
         $value = (string)$value;
         
-        if ('' === $value) {
+        if (in_array($value, array('', 'nil'), true)) {
             return null;
         } elseif (in_array($value, array('true', 'false', 'yes', 'no'), true)) {
             return $value === 'true' || $value === 'yes';
@@ -207,7 +207,7 @@ class Util implements Countable
                 if ('000000' === $usec) {
                     unset($usec);
                 }
-                $unixEpoch = new DateTime('1970-01-01 00:00:00.000000');
+                $unixEpoch = new DateTime('@0');
                 $value = $unixEpoch->diff($value);
             }
             if ($value instanceof DateInterval) {
@@ -480,7 +480,7 @@ class Util implements Countable
      * 
      * @return string|null|bool The value of the specified property. If the
      *     property is not set, NULL will be returned. If no such item exists,
-     *     FALSE will be returned.
+     *     or the property name is not valid, FALSE will be returned.
      */
     public function get($number, $value_name)
     {
@@ -493,16 +493,28 @@ class Util implements Countable
             }
         }
 
-        $request = new Request($this->menu . '/print');
+        //For new RouterOS versions
+        $request = new Request($this->menu . '/get');
+        $request->setArgument('number', $number);
+        $request->setArgument('value-name', $value_name);
+        $responses = $this->client->sendSync($request);
+        if (Response::TYPE_ERROR === $responses->getType()) {
+            return false;
+        }
+        $result = $responses->getArgument('ret');
+        if (null !== $result) {
+            return $result;
+        }
+
+        // The "get" of old RouterOS versions return an empty !done response.
+        // This is a backup for them, although this should also execute on new
+        // versions when a valid property is not set.
+        $query = null;
         if (null !== $number) {
             $number = (string)$number;
-            $request->setQuery(
-                Query::where('.id', $number)->orWhere('name', $number)
-            );
+            $query = Query::where('.id', $number)->orWhere('name', $number);
         }
-        $request->setArgument('.proplist', $value_name);
-        $responses = $this->client->sendSync($request)
-            ->getAllOfType(Response::TYPE_DATA);
+        $responses = $this->getall(array('.proplist' => $value_name), $query);
 
         if (0 === count($responses)) {
             return false;
@@ -692,6 +704,68 @@ class Util implements Countable
     }
 
     /**
+     * Counts items at the current menu.
+     * 
+     * Counts items at the current menu. This executes a dedicated command
+     * ("print" with a "count-only" argument) on RouterOS, which is why only
+     * queries are allowed as a criteria, in contrast with {@link find()},
+     * where numbers and callbacks are allowed also.
+     * 
+     * @param Query $query A query to filter items by. Without it, all items
+     *     are included in the count.
+     * 
+     * @return int The number of items, or -1 on failure (e.g. if the
+     *     current menu does not have a "print" command or items to be counted).
+     */
+    public function count(Query $query = null)
+    {
+        $result = self::parseValue(
+            $this->client->sendSync(
+                new Request($this->menu . '/print count-only=""', $query)
+            )->getLast()->getArgument('ret')
+        );
+
+        if (null === $result) {
+            return -1;
+        }
+        return $result;
+    }
+
+    /**
+     * Gets all items in the current menu.
+     * 
+     * Gets all items in the current menu, using a print request.
+     * 
+     * @param string[] $args  Additional arguments to pass to the request.
+     *     Each array key is the name of the argument, and each array value is
+     *     the value of the argument to be passed. Empty arguments can also be
+     *     specified using a numeric key, and the name of the argument as the
+     *     array value.
+     * @param Query    $query A query to filter items by.
+     * 
+     * @return ResponseCollection|bool A response collection with all
+     *     {@link Response::TYPE_DATA} responses. The collection will be empty
+     *     when there are no matching items. FALSE on failure.
+     */
+    public function getall(array $args = array(), Query $query = null)
+    {
+        $printRequest = new Request($this->menu . '/print', $query);
+        foreach ($args as $name => $value) {
+            if (is_int($name)) {
+                $printRequest->setArgument($value);
+            } else {
+                $printRequest->setArgument($name, $value);
+            }
+        }
+        $responses = $this->client->sendSync($printRequest);
+
+        if (count($responses->getAllOfType(Response::TYPE_ERROR)) > 0) {
+            return false;
+        }
+        return $responses->getAllOfType(Response::TYPE_DATA);
+    }
+
+    /**
      * Puts a file on RouterOS's file system.
      * 
      * Puts a file on RouterOS's file system, regardless of the current menu.
@@ -865,67 +939,5 @@ class Util implements Countable
         }
 
         return $result;
-    }
-
-    /**
-     * Counts items at the current menu.
-     * 
-     * Counts items at the current menu. This executes a dedicated command
-     * ("print" with a "count-only" argument) on RouterOS, which is why only
-     * queries are allowed as a criteria, in contrast with {@link find()},
-     * where numbers and callbacks are allowed also.
-     * 
-     * @param Query $query A query to filter items by. Without it, all items
-     *     are included in the count.
-     * 
-     * @return int The number of items, or -1 on failure (e.g. if the
-     *     current menu does not have a "print" command or items to be counted).
-     */
-    public function count(Query $query = null)
-    {
-        $result = self::parseValue(
-            $this->client->sendSync(
-                new Request($this->menu . '/print count-only=""', $query)
-            )->getLast()->getArgument('ret')
-        );
-
-        if (null === $result) {
-            return -1;
-        }
-        return $result;
-    }
-
-    /**
-     * Gets all items in the current menu.
-     * 
-     * Gets all items in the current menu, using a print request.
-     * 
-     * @param string[] $args  Additional arguments to pass to the request.
-     *     Each array key is the name of the argument, and each array value is
-     *     the value of the argument to be passed. Empty arguments can also be
-     *     specified using a numeric key, and the name of the argument as the
-     *     array value.
-     * @param Query    $query A query to filter items by.
-     * 
-     * @return ResponseCollection|bool A response collection with all
-     *     {@link Response::TYPE_DATA} responses. The collection will be empty
-     *     when there are no matching items. FALSE on failure.
-     */
-    public function getall(array $args = array(), Query $query = null)
-    {
-        $printRequest = new Request($this->menu . '/print', $query);
-        foreach ($args as $name => $value) {
-            if (is_int($name)) {
-                $printRequest->setArgument($value);
-            } else {
-                $printRequest->setArgument($name, $value);
-            }
-        }
-        $responses = $this->client->sendSync($printRequest);
-
-        if (!empty($responses->getAllOfType(Response::TYPE_ERROR))) {
-            return false;
-        }
-        return $responses->getAllOfType(Response::TYPE_DATA);
     }
 }

@@ -319,8 +319,11 @@ $printWord = $cmd->options['verbose']
             );
         }
 
+        $dislayedLength = $length > 9999999999
+            ? '0x' . strtoupper(dechex($length))
+            : $length;
         $details = str_pad(
-            '0x' . strtoupper(dechex($length)),
+            $dislayedLength,
             $c_columns['length'],
             ' ',
             STR_PAD_LEFT
@@ -356,7 +359,7 @@ $printWord = $cmd->options['verbose']
     }
     : function ($mode, $word, $msg = '') use ($c_colors) {
     if ('ERR' === $mode || 'NOTE' === $mode) {
-        fwrite(STDERR, "{$c_colors[$mode]}{$msg}");
+        fwrite(STDERR, "{$c_colors[$mode]}-- {$msg}");
         if ('' !== $word) {
             fwrite(STDERR, ": {$word}");
         }
@@ -383,11 +386,13 @@ while (true) {
     while (true) {
         if ($cmd->options['verbose']) {
             fwrite(
-                STDOUT,
+                STDOUT,                
                 implode(
                     $c_sep,
                     array(
-                        str_pad('SEND', $c_columns['mode'], ' ', STR_PAD_RIGHT),
+                        $c_colors['SEND'] .
+                        str_pad('SEND', $c_columns['mode'], ' ', STR_PAD_RIGHT)
+                        . $c_colors[''],
                         str_pad(
                             '<prompt>',
                             $c_columns['length'],
@@ -409,41 +414,35 @@ while (true) {
         fwrite(STDOUT, $c_colors['SEND']);
 
         if ($cmd->options['multiline']) {
-            $line = stream_get_line(STDIN, PHP_INT_MAX, PHP_EOL);
-            if (chr(3) !== $line) {
-                if ('' === $line) {
-                    $word .= PHP_EOL;
+            while (true) {
+                $line = stream_get_line(STDIN, PHP_INT_MAX, PHP_EOL);
+                if (chr(3) === $line) {
+                    break;
+                }
+                if ((chr(3) . chr(3)) === $line) {
+                    $word .= chr(3);
                 } else {
-                    $word .= $line;
+                    $word .=  $line . PHP_EOL;
                 }
-                while (true) {
-                    if ($cmd->options['verbose']) {
-                        fwrite(
-                            STDOUT,
-                            "\n{$c_colors['']}" .
-                            implode(
-                                $c_sep,
-                                array(
-                                    str_repeat(' ', $c_columns['mode']),
-                                    str_repeat(' ', $c_columns['length']),
-                                    str_repeat(' ', $c_columns['encodedLength']),
-                                    ''
-                                )
+                if ($cmd->options['verbose']) {
+                    fwrite(
+                        STDOUT,
+                        "\n{$c_colors['']}" .
+                        implode(
+                            $c_sep,
+                            array(
+                                str_repeat(' ', $c_columns['mode']),
+                                str_repeat(' ', $c_columns['length']),
+                                str_repeat(' ', $c_columns['encodedLength']),
+                                ''
                             )
-                            . $c_colors['SEND']
-                        );
-                    }
-                    $line = stream_get_line(STDIN, PHP_INT_MAX, PHP_EOL);
-                    if (chr(3) === $line) {
-                        break;
-                    }
-                    $word .= PHP_EOL;
-                    if ((chr(3) . chr(3)) === $line) {
-                        $word .= chr(3);
-                    } else {
-                        $word .= $line;
-                    }
+                        )
+                        . $c_colors['SEND']
+                    );
                 }
+            }
+            if ('' !== $word) {
+                $word = substr($word, 0, -strlen(PHP_EOL));
             }
         } else {
             $word = stream_get_line(STDIN, PHP_INT_MAX, PHP_EOL);
@@ -459,7 +458,10 @@ while (true) {
             break;
         }
         if ('' === $word) {
-            if ('s' === $cmd->options['commandMode'] || '' === $prevWord) {
+            if ('s' === $cmd->options['commandMode']) {
+                break;
+            } elseif ('' === $prevWord) {//'e' === $cmd->options['commandMode']
+                array_pop($words);
                 break;
             }
         }
@@ -479,7 +481,7 @@ while (true) {
                 $printWord(
                     'ERR',
                     substr($word, 0, $e->getFragment()),
-                    "Partial word sent"
+                    'Partial word sent'
                 );
             }
         }

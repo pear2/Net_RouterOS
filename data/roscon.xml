@@ -65,7 +65,7 @@ Defaults to PHP's default_socket_timeout ini option.</description>
         <description>Mode to send commands in. Can be one of:
 "w" - send every word as soon as it is entered
 "s" - wait for a sentence to be formed, and send all its words then
-"e" - wait for an empty sentence, and send all of the sentences then.
+"e" - wait for an empty sentence, and send all previous sentences then. You can send an empty sentence by sending two consecutive empty words.
 (Default: "s")
 </description>
         <action>StoreString</action>

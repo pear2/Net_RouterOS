@@ -21,6 +21,8 @@ namespace PEAR2\Net\RouterOS;
  */
 use PEAR2\Autoload;
 
+chdir(__DIR__);
+
 $autoloader = stream_resolve_include_path('../vendor/autoload.php');
 if (false !== $autoloader) {
     include_once $autoloader;
