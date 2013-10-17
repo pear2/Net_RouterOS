@@ -9,7 +9,7 @@ use PEAR2\Net\RouterOS\Response;
 use PEAR2\Net\RouterOS\Util;
 use PHPUnit_Framework_TestCase;
 
-abstract class SafeTest extends PHPUnit_Framework_TestCase
+abstract class Safe extends PHPUnit_Framework_TestCase
 {
     const REGEX_ID = '\*[A-F0-9]+';
     const REGEX_IDLIST = '/^(\*[A-F0-9]+\,)*(\*[A-F0-9]+)?$/';
@@ -152,5 +152,20 @@ HEREDOC
             $findResults
         );
         $this->assertCount(2, explode(',', $findResults));
+    }
+
+    public function testGetallAndCount()
+    {
+        $this->util->changeMenu('/queue/simple');
+        $queues = $this->util->getall();
+        $this->assertInstanceOf(ROS_NAMESPACE . '\ResponseCollection', $queues);
+        $this->assertSameSize($queues, $this->util);
+    }
+
+    public function testInvalidGetallAndCount()
+    {
+        $this->util->changeMenu('/queue');
+        $this->assertFalse($this->util->getall());
+        $this->assertCount(-1, $this->util);
     }
 }

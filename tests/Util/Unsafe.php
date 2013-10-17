@@ -4,6 +4,7 @@ namespace PEAR2\Net\RouterOS\Util\Test;
 
 use DateInterval;
 use DateTime;
+use DateTimezone;
 use PEAR2\Net\RouterOS\Client;
 use PEAR2\Net\RouterOS\Query;
 use PEAR2\Net\RouterOS\Request;
@@ -11,10 +12,10 @@ use PEAR2\Net\RouterOS\Response;
 use PEAR2\Net\RouterOS\Util;
 use PHPUnit_Framework_TestCase;
 
-abstract class UnsafeTest extends PHPUnit_Framework_TestCase
+abstract class Unsafe extends PHPUnit_Framework_TestCase
 {
     const REGEX_ID = '\*[A-F0-9]+';
-    const REGEX_IDLIST = '/^(\*[A-F0-9]+\,)*(\*[A-F0-9]+)$/';
+    const REGEX_IDLIST = '/^((\*[A-F0-9]+)?\,)*(\*[A-F0-9]+)$/';
 
     /**
      * @var Util
@@ -289,7 +290,8 @@ abstract class UnsafeTest extends PHPUnit_Framework_TestCase
         $numberNameNot = $this->util->get(1 + $itemCount, 'name');
         $idName = $this->util->get($id, 'name');
         $nameTarget = $this->util->get(TEST_QUEUE_NAME, 'target');
-        $nameNot = $this->util->get(TEST_QUEUE_NAME, 'p2p');
+        $nameNot = $this->util->get(TEST_QUEUE_NAME, 'total-max-limit');
+        $nameInvalid = $this->util->get(TEST_QUEUE_NAME, 'p2p');
         $this->util->remove($id);
         $nameTargetNot = $this->util->get(
             TEST_QUEUE_NAME,
@@ -310,6 +312,7 @@ abstract class UnsafeTest extends PHPUnit_Framework_TestCase
             $nameTarget
         );
         $this->assertNull($nameNot);
+        $this->assertFalse($nameInvalid);
         $this->assertFalse($nameTargetNot);
     }
 
@@ -506,6 +509,20 @@ abstract class UnsafeTest extends PHPUnit_Framework_TestCase
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
         $this->assertSame('array', $results->getArgument('comment'));
+
+        $this->util->exec(
+            'add name=$name target=0.0.0.0/0 comment=[:typeof [($comment->"key")]]',
+            array(
+                'name' => TEST_QUEUE_NAME,
+                'comment' => array('key' => 2)
+            )
+        );
+        $results = $this->client->sendSync(
+            $printRequest
+        )->getAllOfType(Response::TYPE_DATA);
+        $this->util->remove(TEST_QUEUE_NAME);
+        $this->assertCount(1, $results);
+        $this->assertSame('num', $results->getArgument('comment'));
     }
 
     /**
@@ -609,7 +626,10 @@ abstract class UnsafeTest extends PHPUnit_Framework_TestCase
             'add name=$name target=0.0.0.0/0 comment=$comment',
             array(
                 'name' => TEST_QUEUE_NAME,
-                'comment' => new DateTime('1970-01-01 00:00:00.000001')
+                'comment' => new DateTime(
+                    '1970-01-01 00:00:00.000001',
+                    new DateTimezone('UTC')
+                )
             )
         );
         $results = $this->client->sendSync(
@@ -623,7 +643,10 @@ abstract class UnsafeTest extends PHPUnit_Framework_TestCase
             'add name=$name target=0.0.0.0/0 comment=$comment',
             array(
                 'name' => TEST_QUEUE_NAME,
-                'comment' => new DateTime('1970-01-02 00:00:01')
+                'comment' => new DateTime(
+                    '1970-01-02 00:00:01',
+                    new DateTimezone('UTC')
+                )
             )
         );
         $results = $this->client->sendSync(
@@ -637,7 +660,10 @@ abstract class UnsafeTest extends PHPUnit_Framework_TestCase
             'add name=$name target=0.0.0.0/0 comment=$comment',
             array(
                 'name' => TEST_QUEUE_NAME,
-                'comment' => new DateTime('1970-01-10 01:02:03')
+                'comment' => new DateTime(
+                    '1970-01-10 01:02:03',
+                    new DateTimezone('UTC')
+                )
             )
         );
         $results = $this->client->sendSync(

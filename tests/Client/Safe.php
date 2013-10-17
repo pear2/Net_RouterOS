@@ -13,7 +13,7 @@ use PEAR2\Net\RouterOS\UnexpectedValueException;
 use PHPUnit_Framework_Assert;
 use PHPUnit_Framework_TestCase;
 
-abstract class SafeTest extends PHPUnit_Framework_TestCase
+abstract class Safe extends PHPUnit_Framework_TestCase
 {
 
     /**

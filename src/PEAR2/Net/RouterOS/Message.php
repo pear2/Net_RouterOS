@@ -75,7 +75,7 @@ abstract class Message
     {
         $name = (string) $name;
         if ((empty($name) && $name !== '0')
-            || !preg_match('/[^=\s]/s', $name)
+            || preg_match('/[=\s]/s', $name)
         ) {
             throw new InvalidArgumentException(
                 'Invalid name of argument supplied.',

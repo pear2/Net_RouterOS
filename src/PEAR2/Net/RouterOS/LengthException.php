@@ -23,7 +23,7 @@ namespace PEAR2\Net\RouterOS;
 /**
  * Base of this class.
  */
-use LengthException;
+use LengthException as L;
 
 /**
  * Exception thrown when there is a problem with a word's length.
@@ -34,7 +34,7 @@ use LengthException;
  * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
  * @link     http://pear2.php.net/PEAR2_Net_RouterOS
  */
-class LengthException extends LengthException implements Exception
+class LengthException extends L implements Exception
 {
     
     const CODE_UNSUPPORTED = 1200;

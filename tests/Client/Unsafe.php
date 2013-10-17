@@ -11,7 +11,7 @@ use PEAR2\Net\RouterOS\Request;
 use PEAR2\Net\RouterOS\Response;
 use PHPUnit_Framework_TestCase;
 
-abstract class UnsafeTest extends PHPUnit_Framework_TestCase
+abstract class Unsafe extends PHPUnit_Framework_TestCase
 {
 
     /**

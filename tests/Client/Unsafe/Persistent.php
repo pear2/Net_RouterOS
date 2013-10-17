@@ -2,11 +2,11 @@
 
 namespace PEAR2\Net\RouterOS\Client\Test\Unsafe;
 
-use PEAR2\Net\RouterOS\Client\Test\UnsafeTest;
+use PEAR2\Net\RouterOS\Client\Test\Unsafe;
 
-require_once __DIR__ . '/../UnsafeTest.php';
+require_once __DIR__ . '/../Unsafe.php';
 
-abstract class Persistent extends UnsafeTest
+abstract class Persistent extends Unsafe
 {
     protected function tearDown()
     {

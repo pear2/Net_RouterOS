@@ -2,11 +2,11 @@
 
 namespace PEAR2\Net\RouterOS\Util\Test\Safe;
 
-use PEAR2\Net\RouterOS\Util\Test\SafeTest;
+use PEAR2\Net\RouterOS\Util\Test\Safe;
 
-require_once __DIR__ . '/../SafeTest.php';
+require_once __DIR__ . '/../Safe.php';
 
-abstract class NonPersistentTest extends SafeTest
+abstract class NonPersistentTest extends Safe
 {
     protected function tearDown()
     {

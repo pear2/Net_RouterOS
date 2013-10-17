@@ -136,22 +136,43 @@ class Util implements Countable
                 }
                 $parsedValue = preg_split(
                     '/
-                        (\"[^"]*\")
+                        (\"(?:\\\\\\\\|\\\\"|[^"])*\")
                         |
                         (\{[^{}]*(?2)?\})
                         |
-                        ([^;]+)
+                        ([^;=]+)
                     /sx',
                     $value,
                     null,
                     PREG_SPLIT_DELIM_CAPTURE
                 );
                 $result = array();
-                foreach ($parsedValue as $token) {
-                    if ('' === $token || ';' === $token) {
-                        continue;
+                $newVal = null;
+                $newKey = null;
+                for ($i = 0, $l = count($parsedValue); $i < $l; ++$i) {
+                    switch ($parsedValue[$i]) {
+                    case '':
+                        break;
+                    case ';':
+                        if (null === $newKey) {
+                            $result[] = $newVal;
+                        } else {
+                            $result[$newKey] = $newVal;
+                        }
+                        $newKey = $newVal = null;
+                        break;
+                    case '=':
+                        $newKey = static::parseValue($parsedValue[$i - 1]);
+                        $newVal = static::parseValue($parsedValue[++$i]);
+                        break;
+                    default:
+                        $newVal = static::parseValue($parsedValue[$i]);
                     }
-                    $result[] = static::parseValue($token);
+                }
+                if (null === $newKey) {
+                    $result[] = $newVal;
+                } else {
+                    $result[$newKey] = $newVal;
                 }
                 return $result;
             }
@@ -236,7 +257,7 @@ class Util implements Countable
     /**
      * Escapes a string for a RouterOS scripting context.
      * 
-     * Escapes a string for a RouterOS scripting context. The value can be
+     * Escapes a string for a RouterOS scripting context. The value can then be
      * surrounded with quotes at a RouterOS script (or concatenated onto a
      * larger string first), and you can be sure there won't be any code
      * injections coming from it.
@@ -263,7 +284,7 @@ class Util implements Countable
      * @param string $chars The matches array, expected to contain exactly one
      *     member, in which is the whole string to be escaped.
      * 
-     * @return string The escaped character.
+     * @return string The escaped characters.
      */
     private static function _escapeCharacters($chars)
     {
@@ -301,7 +322,7 @@ class Util implements Countable
      *     it's relative to the current menu, which by default is the root.
      * 
      * @return string The old menu. If an empty string is given for a new menu,
-     *     no change is performed, and this function returns the current menu.
+     *     no change is performed, and the current menu is returned.
      */
     public function changeMenu($newMenu = '')
     {
@@ -347,10 +368,10 @@ class Util implements Countable
      *     name), and is removed after execution. To eliminate any possibility
      *     of name clashes, you can specify your own name.
      * 
-     * @return ResponseCollection returns the response collection of the run,
-     *     allowing you to inspect errors, if any. If the script was not added
-     *     successfully before execution, the ResponseCollection from the add
-     *     attempt is going to be returned.
+     * @return ResponseCollection Returns the response collection of the run,
+     *     allowing you to inspect errors, if any.
+     *     If the script was not added successfully before execution, the
+     *     ResponseCollection from the add attempt is going to be returned.
      */
     public function exec(
         $source,
@@ -511,17 +532,23 @@ class Util implements Countable
         }
 
         // The "get" of old RouterOS versions return an empty !done response.
-        // This is a backup for them, although this should also execute on new
-        // versions when a valid property is not set.
+        // New versions return such only when the property is not set.
+        // This is a backup for old versions' sake.
         $query = null;
         if (null !== $number) {
             $number = (string)$number;
             $query = Query::where('.id', $number)->orWhere('name', $number);
         }
-        $responses = $this->getall(array('.proplist' => $value_name), $query);
+        $responses = $this->getall(
+            array('.proplist' => $value_name, 'detail'),
+            $query
+        );
 
         if (0 === count($responses)) {
+            // @codeCoverageIgnoreStart
+            // New versions of RouterOS can't possibly reach this section.
             return false;
+            // @codeCoverageIgnoreEnd
         }
         return $responses->getArgument($value_name);
     }
@@ -896,10 +923,11 @@ class Util implements Countable
      * @param bool   $get    Whether to get the source of the script instead of
      *     its name.
      * 
-     * @return ResponseCollection|string If the script was not added
-     *     successfully before execution, the ResponseCollection from the add
-     *     attempt is going to be returned. Otherwise, the (generated) name of
-     *     the script, or its source if $get is TRUE.
+     * @return ResponseCollection|string Returns the response collection of the
+     *     run, allowing you to inspect errors, if any, or the script's source
+     *     after execution, if $get is TRUE.
+     *     If the script was not added successfully before execution, the
+     *     ResponseCollection from the add attempt is going to be returned.
      */
     private function _exec(
         $source,

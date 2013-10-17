@@ -639,11 +639,12 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
         try {
             $request = new Request('/ping');
             $request->setArgument($name);
+            $this->fail('Argument should have thrown an exception');
         } catch (InvalidArgumentException $e) {
             $this->assertEquals(
                 InvalidArgumentException::CODE_NAME_INVALID,
                 $e->getCode(),
-                "Improper exception thrown for the name '{$name}'."
+                "Improper exception code thrown for the name '{$name}'."
             );
         }
     }
@@ -659,11 +660,12 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
     {
         try {
             $query = Query::where($name);
+            $this->fail('Argument should have thrown an exception');
         } catch (InvalidArgumentException $e) {
             $this->assertEquals(
                 InvalidArgumentException::CODE_NAME_INVALID,
                 $e->getCode(),
-                "Improper exception thrown for the name '{$name}'."
+                "Improper exception code thrown for the name '{$name}'."
             );
         }
     }
@@ -704,6 +706,7 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
     {
         try {
             $query = Query::where('address', null, $action);
+            $this->fail('Argument should have thrown an exception');
         } catch (UnexpectedValueException $e) {
             $this->assertEquals(
                 UnexpectedValueException::CODE_ACTION_UNKNOWN,
@@ -1181,36 +1184,65 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
     {
         return array(
             0 => array('', null),
-            1 => array('1', 1),
-            2 => array('true', true),
-            3 => array('yes', true),
-            4 => array('false', false),
-            5 => array('no', false),
-            6 => array('"test"', 'test'),
-            7 => array('test', 'test'),
-            8 => array('00:00', new DateInterval('PT0H0M0S')),
-            9 => array('00:00:00', new DateInterval('PT0H0M0S')),
-            10 => array('1d00:00:00', new DateInterval('P1DT0H0M0S')),
-            11 => array('1w00:00:00', new DateInterval('P7DT0H0M0S')),
-            12 => array('1w1d00:00:00', new DateInterval('P8DT0H0M0S')),
-            13 => array('{}', array()),
-            14 => array('{a}', array('a')),
-            15 => array('{1;2}', array(1, 2)),
-            16 => array('{a;b}', array('a', 'b')),
-            17 => array('{"a";"b"}', array('a', 'b')),
-            18 => array('{"a;b";c}', array('a;b', 'c')),
-            19 => array('{a;"b;c"}', array('a', 'b;c')),
-            20 => array('{"a;b";c;d}', array('a;b', 'c', 'd')),
-            21 => array('{a;"b;c";d}', array('a', 'b;c', 'd')),
-            22 => array('{a;b;"c;d"}', array('a', 'b', 'c;d')),
-            23 => array('{{a;b};c}', array(array('a', 'b'), 'c')),
-            24 => array('{a;{b;c};d}', array('a', array('b', 'c'), 'd')),
-            25 => array('{a;b;{c;d}}', array('a', 'b', array('c', 'd'))),
-            26 => array(
+            1 => array('nil', null),
+            2 => array('1', 1),
+            3 => array('true', true),
+            4 => array('yes', true),
+            5 => array('false', false),
+            6 => array('no', false),
+            7 => array('"test"', 'test'),
+            8 => array('test', 'test'),
+            9 => array('00:00', new DateInterval('PT0H0M0S')),
+            10 => array('00:00:00', new DateInterval('PT0H0M0S')),
+            11 => array('1d00:00:00', new DateInterval('P1DT0H0M0S')),
+            12 => array('1w00:00:00', new DateInterval('P7DT0H0M0S')),
+            13 => array('1w1d00:00:00', new DateInterval('P8DT0H0M0S')),
+            14 => array('{}', array()),
+            15 => array('{a}', array('a')),
+            16 => array('{1;2}', array(1, 2)),
+            17 => array('{a;b}', array('a', 'b')),
+            18 => array('{"a";"b"}', array('a', 'b')),
+            19 => array('{"a;b";c}', array('a;b', 'c')),
+            20 => array('{a;"b;c"}', array('a', 'b;c')),
+            21 => array('{"a;b";c;d}', array('a;b', 'c', 'd')),
+            22 => array('{a;"b;c";d}', array('a', 'b;c', 'd')),
+            23 => array('{a;b;"c;d"}', array('a', 'b', 'c;d')),
+            24 => array('{{a;b};c}', array(array('a', 'b'), 'c')),
+            25 => array('{a;{b;c};d}', array('a', array('b', 'c'), 'd')),
+            26 => array('{a;b;{c;d}}', array('a', 'b', array('c', 'd'))),
+            27 => array(
                 '{{a;{b;c}};d}',
                 array(array('a', array('b', 'c')), 'd')
             ),
-            27 => array(
+            28 => array(
+                '{a=1;b=2}',
+                array('a' => 1, 'b' => 2)
+            ),
+            29 => array(
+                '{a="test1";b="test2"}',
+                array('a' => 'test1', 'b' => 'test2')
+            ),
+            30 => array(
+                '{a=1;b;c=2}',
+                array('a' => 1, 'b', 'c' => 2)
+            ),
+            31 => array(
+                '{a="b;c";d=2}',
+                array('a' => 'b;c', 'd' => 2)
+            ),
+            32 => array(
+                '{a="b;c=2";d=2}',
+                array('a' => 'b;c=2', 'd' => 2)
+            ),
+            33 => array(
+                '{a="b";c}',
+                array('a' => 'b', 'c')
+            ),
+            34 => array(
+                '{1="test"}',
+                array(1 => 'test')
+            ),
+            35 => array(
                 '{a',
                 '{a'
             )
