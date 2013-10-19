@@ -163,9 +163,15 @@ abstract class Message
     /**
      * Sets an argument for the message.
      * 
-     * @param string $name  Name of the argument.
-     * @param string $value Value of the argument. Setting the value to NULL
-     *     removes an argument of this name.
+     * @param string               $name  Name of the argument.
+     * @param string|resource|null $value Value of the argument as a string or
+     *     seekable stream.
+     *     Setting the value to NULL removes an argument of this name.
+     *     If a seekable stream is provided, it is sent from its current
+     *     posistion to its end, and the pointer is seeked back to its current
+     *     position after sending.
+     *     Non seekable streams, as well as all other types, are casted to a
+     *     string.
      * 
      * @return self|Message The message object.
      * @see getArgument()

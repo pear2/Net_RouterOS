@@ -36,6 +36,11 @@ use DateInterval;
 use Countable;
 
 /**
+ * Used to reliably write to streams at {@link static::prepareScript()}.
+ */
+use PEAR2\Net\Transmitter\Stream;
+
+/**
  * Utility class.
  * 
  * Abstracts away frequently used functionality (particularly CRUD operations)
@@ -179,6 +184,75 @@ class Util implements Countable
         }
         return $value;
     }
+
+    /**
+     * Prepares a script.
+     * 
+     * Prepares a script for eventual execution by prepending parameters as
+     * variables to it.
+     * 
+     * This is particularly useful when you're creating scripts that you don't
+     * want to execute right now (as with {@link static::exec()}, but instead
+     * you want to store it for later execution, perhaps by supplying it to
+     * "/system scheduler".
+     * 
+     * @param string|resource $source The source of the script, as a string or
+     *     stream. If a stream is provided, reading starts from the current
+     *     position to the end of the stream, and the pointer stays at the end
+     *     after reading is done.
+     * @param array           $params An array of parameters to make available
+     *     in the script as local variables.
+     *     Variable names are array keys, and variable values are array values.
+     *     Array values are automatically processed with
+     *     {@link static::escapeValue()}. Streams are also supported, and are
+     *     processed in chunks, each with
+     *     {@link static::escapeString()}. Processing starts from the current
+     *     position to the end of the stream, and the stream's pointer stays at
+     *     the end after reading is done.
+     * @param resource|null   $stream An existing stream to write the resulting
+     *     script to.
+     * 
+     * @return resource|int If a $stream is not provided, a new php://temp
+     *     stream with the script is returned, where the stream's pointer is at
+     *     the start. If a $stream is provided, the number of bytes written to
+     *     it is returned, and the pointer remains where it was after the write
+     *     (i.e. it is not seeked back).
+     */
+    public static function prepareScript(
+        $source,
+        array $params = array(),
+        $stream = null
+    ) {
+        $resultStream = $stream ?: fopen('php://temp', 'r+b');
+        $writer = new Stream($resultStream, false);
+        $bytes = 0;
+
+        foreach ($params as $pname => $pvalue) {
+            $pname = static::escapeString($pname);
+            $bytes += $writer->send(":local \"{$pname}\" ");
+            if (Stream::isStream($pvalue)) {
+                $reader = new Stream($pvalue, false);
+                $chunkSize = $reader->getChunk(Stream::DIRECTION_RECEIVE);
+                $bytes += $writer->send('"');
+                while ($reader->isDataAwaiting()) {
+                    $bytes += $writer->send(
+                        static::escapeString(fread($pvalue, $chunkSize))
+                    );
+                }
+                $bytes += $writer->send("\";\n");
+            } else {
+                $bytes += $writer->send(static::escapeValue($pvalue) . ";\n");
+            }
+        }
+
+        $bytes += $writer->send($source);
+        if ($stream) {
+            return $bytes;
+        }
+
+        rewind($resultStream);
+        return $resultStream;
+    }
     
     /**
      * Escapes a value for a RouterOS scripting context.
@@ -192,7 +266,8 @@ class Util implements Countable
      * ("a" in formatting), then its months and years will be ignored, because
      * they can't be unambigiously converted to a "time" value.
      * 
-     * Unrecognized types are casted to strings.
+     * Unrecognized types (i.e. resources and other objects) are casted to
+     * strings.
      * 
      * @param mixed $value The value to be escaped.
      * 
@@ -347,29 +422,39 @@ class Util implements Countable
     /**
      * Executes a RouterOS script.
      * 
-     * Executes a RouterOS script, written as a string.
+     * Executes a RouterOS script, written as a string or a stream.
      * Note that in cases of errors, the line numbers will be off, because the
      * script is executed at the current menu as context, with the specified
      * variables pre declared. This is achieved by prepending 1+count($params)
      * lines before your actual script.
      * 
-     * @param string $source A script to execute.
-     * @param array  $params An array of local variables to make available in
-     *     the script. Variable names are array keys, and variable values are
-     *     array values. Array values are automatically processed with
-     *     {@link static::escapeValue()}.
+     * @param string|resource $source The source of the script, as a string or
+     *     stream. If a stream is provided, reading starts from the current
+     *     position to the end of the stream, and the pointer stays at the end
+     *     after reading is done.
+     * @param array           $params An array of parameters to make available
+     *     in the script as local variables.
+     *     Variable names are array keys, and variable values are array values.
+     *     Array values are automatically processed with
+     *     {@link static::escapeValue()}. Streams are also supported, and are
+     *     processed in chunks, each processed with
+     *     {@link static::escapeString()}. Processing starts from the current
+     *     position to the end of the stream, and the stream's pointer is left
+     *     untouched after the reading is done.
      *     Note that the script's (generated) name is always added as the
-     *     variable "_", which you can overwrite from here.
-     * @param string $policy Allows you to specify a policy the script must
-     *     follow. Has the same format as in terminal. If left NULL, the script
-     *     has no restrictions.
-     * @param string $name   The script is executed after being saved in
-     *     "/system script" under a random name (prefixed with the computer's
+     *     variable "_", which will be inadvertently lost if you overwrite it
+     *     from here.
+     * @param string          $policy Allows you to specify a policy the script
+     *     must follow. Has the same format as in terminal.
+     *     If left NULL, the script has no restrictions beyond those imposed by
+     *     the username.
+     * @param string          $name   The script is executed after being saved
+     *     in "/system script" under a random name (prefixed with the computer's
      *     name), and is removed after execution. To eliminate any possibility
      *     of name clashes, you can specify your own name.
      * 
-     * @return ResponseCollection Returns the response collection of the run,
-     *     allowing you to inspect errors, if any.
+     * @return ResponseCollection Returns the response collection of the
+     *     run, allowing you to inspect errors, if any.
      *     If the script was not added successfully before execution, the
      *     ResponseCollection from the add attempt is going to be returned.
      */
@@ -504,8 +589,8 @@ class Util implements Countable
      * @param string          $value_name The name of the value you want to get.
      * 
      * @return string|null|bool The value of the specified property. If the
-     *     property is not set, NULL will be returned. If no such item exists,
-     *     or the property name is not valid, FALSE will be returned.
+     *     property is not set, NULL will be returned. FALSE on failure
+     *     (e.g. no such item, invalid property, etc.).
      */
     public function get($number, $value_name)
     {
@@ -531,7 +616,7 @@ class Util implements Countable
             return $result;
         }
 
-        // The "get" of old RouterOS versions return an empty !done response.
+        // The "get" of old RouterOS versions returns an empty !done response.
         // New versions return such only when the property is not set.
         // This is a backup for old versions' sake.
         $query = null;
@@ -614,6 +699,9 @@ class Util implements Countable
      *     (e.g. "/system identity").
      * @param array $newValues An array with the names of each property to set
      *     as an array key, and the new value as an array value.
+     *     Flags (properties with a value "true" that is interpreted as
+     *     equivalent of "yes" from CLI) can also be specified with a numeric
+     *     index as the array key, and the name of the flag as the array value.
      * 
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
@@ -622,7 +710,11 @@ class Util implements Countable
     {
         $setRequest = new Request($this->menu . '/set');
         foreach ($newValues as $name => $value) {
-            $setRequest->setArgument($name, $value);
+            if (is_int($name)) {
+                $setRequest->setArgument($value, 'true');
+            } else {
+                $setRequest->setArgument($name, $value);
+            }
         }
         if (null !== $numbers) {
             $setRequest->setArgument('numbers', $this->find($numbers));
@@ -637,6 +729,9 @@ class Util implements Countable
      *     {@link static::find()}.
      * @param array $newValues An array with the names of each changed property
      *     as an array key, and the new value as an array value.
+     *     Flags (properties with a value "true" that is interpreted as
+     *     equivalent of "yes" from CLI) can also be specified with a numeric
+     *     index as the array key, and the name of the flag as the array value.
      * 
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
@@ -676,6 +771,9 @@ class Util implements Countable
      *     current menu. The data about each item is specified as an array with
      *     the names of each property as an array key, and the value as an array
      *     value.
+     *     Flags (properties with a value "true" that is interpreted as
+     *     equivalent of "yes" from CLI) can also be specified with a numeric
+     *     index as the array key, and the name of the flag as the array value.
      * @param array $...    Additional items.
      * 
      * @return string A comma separated list of the new items' IDs. If a
@@ -694,7 +792,11 @@ class Util implements Countable
                 continue;
             }
             foreach ($values as $name => $value) {
-                $addRequest->setArgument($name, $value);
+                if (is_int($name)) {
+                    $addRequest->setArgument($value, 'true');
+                } else {
+                    $addRequest->setArgument($name, $value);
+                }
             }
             $id = $this->client->sendSync($addRequest)->getArgument('ret');
             if (null !== $this->idCache) {
@@ -770,12 +872,13 @@ class Util implements Countable
      * 
      * Gets all items in the current menu, using a print request.
      * 
-     * @param string[] $args  Additional arguments to pass to the request.
+     * @param string[mixed] $args  Additional arguments to pass to the request.
      *     Each array key is the name of the argument, and each array value is
-     *     the value of the argument to be passed. Empty arguments can also be
+     *     the value of the argument to be passed.
+     *     Arguments without a value (i.e. empty arguments) can also be
      *     specified using a numeric key, and the name of the argument as the
      *     array value.
-     * @param Query    $query A query to filter items by.
+     * @param Query|null    $query A query to filter items by.
      * 
      * @return ResponseCollection|bool A response collection with all
      *     {@link Response::TYPE_DATA} responses. The collection will be empty
@@ -807,12 +910,26 @@ class Util implements Countable
      * minimum of a little over 4 seconds, most of which are in sleep. It waits
      * 2 seconds after a file is first created (required to actually start
      * writing to the file), and another 2 seconds after its contents is written
-     * (performed in order to verify success afterwards). If you want an
-     * efficient way of transferring files, use (T)FTP.
+     * (performed in order to verify success afterwards).
+     * Similarly for removal (when $data is NULL) - there are two seconds in
+     * sleep, used to verify the file was really deleted.
      * 
-     * @param string $filename  The filename to write data in.
-     * @param string $data      The data the file is going to have.
-     * @param bool   $overwrite Whether to overwrite the file if it exists.
+     * If you want an efficient way of transferring files, use (T)FTP.
+     * If you want an efficient way of removing files, use
+     * {@link static::changeMenu()} to move to the "/file" menu, and call
+     * {@link static::remove()} without performing verification afterwards.
+     * 
+     * @param string               $filename  The filename to write data in.
+     * @param string|resource|null $data      The data the file is going to have
+     *     as a string or a seekable stream.
+     *     Setting the value to NULL removes a file of this name.
+     *     If a seekable stream is provided, it is sent from its current
+     *     posistion to its end, and the pointer is seeked back to its current
+     *     position after sending.
+     *     Non seekable streams, as well as all other types, are casted to a
+     *     string.
+     * @param bool                 $overwrite Whether to overwrite the file if
+     *     it exists.
      * 
      * @return bool TRUE on success, FALSE on failure.
      */
@@ -822,7 +939,22 @@ class Util implements Countable
             '/file/print .proplist=""',
             Query::where('name', $filename)
         );
-        if (!$overwrite && count($this->client->sendSync($printRequest)) > 1) {
+        $fileExists = count($this->client->sendSync($printRequest)) > 1;
+
+        if (null === $data) {
+            if (!$fileExists) {
+                return false;
+            }
+            $removeRequest = new Request('/file/remove');
+            $this->client->sendSync(
+                $removeRequest->setArgument('numbers', $filename)
+            );
+            //Required for RouterOS to REALLY remove the file.
+            sleep(2);
+            return !(count($this->client->sendSync($printRequest)) > 1);
+        }
+
+        if (!$overwrite && $fileExists) {
             return false;
         }
         $result = $this->client->sendSync(
@@ -905,29 +1037,37 @@ class Util implements Countable
      * Same as the public equivalent, with the addition of allowing you to get
      * the contents of the script post execution, instead of removing it.
      * 
-     * @param string $source A script to execute.
-     * @param array  $params An array of local variables to make available in
-     *     the script. Variable names are array keys, and variable values are
-     *     array values. Note that the script's (generated) name is always added
-     *     as the variable "_", which you can overwrite from here.
-     *     Native PHP types will be converted to their RouterOS equivalents.
-     *     DateTime and DateInterval objects will be casted to RouterOS' "time"
-     *     type. Other types are casted to strings.
-     * @param string $policy Allows you to specify a policy the script must
-     *     follow. Has the same format as in terminal. If left NULL, the script
-     *     has no restrictions.
-     * @param string $name   The script is executed after being saved in
-     *     "/system script" under a random name (prefixed with the computer's
+     * @param string|resource $source The source of the script, as a string or
+     *     stream. If a stream is provided, reading starts from the current
+     *     position to the end of the stream, and the pointer stays at the end
+     *     after reading is done.
+     * @param array           $params An array of parameters to make available
+     *     in the script as local variables.
+     *     Variable names are array keys, and variable values are array values.
+     *     Array values are automatically processed with
+     *     {@link static::escapeValue()}. Streams are also supported, and are
+     *     processed in chunks, each processed with
+     *     {@link static::escapeString()}. Processing starts from the current
+     *     position to the end of the stream, and the stream's pointer is left
+     *     untouched after the reading is done.
+     *     Note that the script's (generated) name is always added as the
+     *     variable "_", which will be inadvertently lost if you overwrite it
+     *     from here.
+     * @param string          $policy Allows you to specify a policy the script
+     *     must follow. Has the same format as in terminal.
+     *     If left NULL, the script has no restrictions beyond those imposed by
+     *     the username.
+     * @param string          $name   The script is executed after being saved
+     *     in "/system script" under a random name (prefixed with the computer's
      *     name), and is removed after execution. To eliminate any possibility
      *     of name clashes, you can specify your own name.
-     * @param bool   $get    Whether to get the source of the script instead of
-     *     its name.
+     * @param bool            $get    Whether to get the source of the script.
      * 
      * @return ResponseCollection|string Returns the response collection of the
-     *     run, allowing you to inspect errors, if any, or the script's source
-     *     after execution, if $get is TRUE.
+     *     run, allowing you to inspect errors, if any.
      *     If the script was not added successfully before execution, the
      *     ResponseCollection from the add attempt is going to be returned.
+     *     If $get is TRUE, returns the source of the script on success.
      */
     private function _exec(
         $source,
@@ -943,16 +1083,17 @@ class Util implements Countable
         $request->setArgument('name', $name);
         $request->setArgument('policy', $policy);
 
-        $finalSource = '/' . str_replace('/', ' ', substr($this->menu, 1))
-            . "\n";
-
         $params += array('_' => $name);
-        foreach ($params as $pname => $pvalue) {
-            $pname = static::escapeString($pname);
-            $pvalue = static::escapeValue($pvalue);
-            $finalSource .= ":local \"{$pname}\" {$pvalue};\n";
-        }
-        $finalSource .= $source . "\n";
+
+        $finalSource = fopen('php://temp', 'r+b');
+        fwrite(
+            $finalSource,
+            '/' . str_replace('/', ' ', substr($this->menu, 1)). "\n"
+        );
+        static::prepareScript($source, $params, $finalSource);
+        fwrite($finalSource, "\n");
+        rewind($finalSource);
+
         $request->setArgument('source', $finalSource);
         $result = $this->client->sendSync($request);
 

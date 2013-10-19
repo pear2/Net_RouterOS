@@ -341,7 +341,7 @@ class Client
      *     one last time after that with a response that notifies about the
      *     canceling.
      * 
-     * @return self|Client The client object.
+     * @return $this The client object.
      * @see completeRequest()
      * @see loop()
      * @see cancelRequest()

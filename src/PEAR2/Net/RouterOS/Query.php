@@ -114,7 +114,7 @@ class Query
      * @param string $action One of the ACTION_* constants. Describes the
      *     operation to perform.
      * 
-     * @return self|Query The query object.
+     * @return static The query object.
      */
     public static function where(
         $name,
@@ -128,7 +128,7 @@ class Query
     /**
      * Negates the query.
      * 
-     * @return self|Query The query object.
+     * @return $this The query object.
      */
     public function not()
     {
@@ -139,13 +139,18 @@ class Query
     /**
      * Adds a condition as an alternative to the query.
      * 
-     * @param string $name   The name of the property to test.
-     * @param string $value  The value to test against. Not required for
-     *     existence tests.
-     * @param string $action One of the ACTION_* constants. Describes the
-     *     operation to perform.
+     * @param string               $name   The name of the property to test.
+     * @param string|resource|null $value  Value of the property as a string or
+     *     seekable stream. Not required for existence tests.
+     *     If a seekable stream is provided, it is sent from its current
+     *     posistion to its end, and the pointer is seeked back to its current
+     *     position after sending.
+     *     Non seekable streams, as well as all other types, are casted to a
+     *     string.
+     * @param string               $action One of the ACTION_* constants.
+     *     Describes the operation to perform.
      * 
-     * @return self|Query The query object.
+     * @return $this The query object.
      */
     public function orWhere($name, $value = null, $action = self::ACTION_EXIST)
     {
@@ -156,13 +161,18 @@ class Query
     /**
      * Adds a condition in addition to the query.
      * 
-     * @param string $name   The name of the property to test.
-     * @param string $value  The value to test against. Not required for
-     *     existence tests.
-     * @param string $action One of the ACTION_* constants. Describes the
-     *     operation to perform.
+     * @param string               $name   The name of the property to test.
+     * @param string|resource|null $value  Value of the property as a string or
+     *     seekable stream. Not required for existence tests.
+     *     If a seekable stream is provided, it is sent from its current
+     *     posistion to its end, and the pointer is seeked back to its current
+     *     position after sending.
+     *     Non seekable streams, as well as all other types, are casted to a
+     *     string.
+     * @param string               $action One of the ACTION_* constants.
+     *     Describes the operation to perform.
      * 
-     * @return self|Query The query object.
+     * @return $this The query object.
      */
     public function andWhere($name, $value = null, $action = self::ACTION_EXIST)
     {
@@ -227,13 +237,18 @@ class Query
     /**
      * Adds a condition.
      * 
-     * @param string $name   The name of the property to test.
-     * @param string $value  The value to test against. Not required for
-     *     existence tests.
-     * @param string $action One of the ACTION_* constants. Describes the
-     *     operation to perform.
+     * @param string               $name   The name of the property to test.
+     * @param string|resource|null $value  Value of the property as a string or
+     *     seekable stream. Not required for existence tests.
+     *     If a seekable stream is provided, it is sent from its current
+     *     posistion to its end, and the pointer is seeked back to its current
+     *     position after sending.
+     *     Non seekable streams, as well as all other types, are casted to a
+     *     string.
+     * @param string               $action One of the ACTION_* constants.
+     *     Describes the operation to perform.
      * 
-     * @return self|Query The query object.
+     * @return $this The query object.
      */
     protected function addWhere($name, $value, $action)
     {

@@ -114,7 +114,7 @@ class Request extends Message
      * 
      * @param string $command The command to send.
      * 
-     * @return self|Request The request object.
+     * @return $this The request object.
      * @see getCommand()
      * @see setArgument()
      */
@@ -177,7 +177,7 @@ class Request extends Message
      * @param Query $query The query to be set. Setting NULL will remove the
      *     currently associated query.
      * 
-     * @return self|Request The request object.
+     * @return $this The request object.
      * @see getQuery()
      */
     public function setQuery(Query $query = null)
@@ -205,7 +205,7 @@ class Request extends Message
      * 
      * @param string $tag The tag to set.
      * 
-     * @return self|Request The request object.
+     * @return $this The request object.
      * @see getTag()
      */
     public function setTag($tag)
@@ -216,11 +216,17 @@ class Request extends Message
     /**
      * Sets an argument for the request.
      * 
-     * @param string $name  Name of the argument.
-     * @param string $value Value of the argument. Setting the value to NULL
-     *     removes an argument of this name.
+     * @param string               $name  Name of the argument.
+     * @param string|resource|null $value Value of the argument as a string or
+     *     seekable stream.
+     *     Setting the value to NULL removes an argument of this name.
+     *     If a seekable stream is provided, it is sent from its current
+     *     posistion to its end, and the pointer is seeked back to its current
+     *     position after sending.
+     *     Non seekable streams, as well as all other types, are casted to a
+     *     string.
      * 
-     * @return self|Request The request object.
+     * @return $this The request object.
      * @see getArgument()
      */
     public function setArgument($name, $value = '')
@@ -231,7 +237,7 @@ class Request extends Message
     /**
      * Removes all arguments from the request.
      * 
-     * @return self|Request The request object.
+     * @return $this The request object.
      */
     public function removeAllArguments()
     {

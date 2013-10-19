@@ -391,7 +391,7 @@ class Communicator
      * supplied stream must be seekable.
      * 
      * @param string   $prefix A string to prepend before the stream contents.
-     * @param resource $stream The stream to send.
+     * @param resource $stream The seekable stream to send.
      * 
      * @return int The number of bytes sent.
      * @see sendWord()
@@ -441,7 +441,7 @@ class Communicator
      * 
      * Verifies if the specified length is supported by the API. Throws a
      * {@link LengthException} if that's not the case. Currently, RouterOS
-     * supports words up to 0xFFFFFFF in length, so that's the only check
+     * supports words up to 0xFFFFFFFF in length, so that's the only check
      * performed.
      * 
      * @param int $length The length to verify.
@@ -450,9 +450,9 @@ class Communicator
      */
     protected static function verifyLengthSupport($length)
     {
-        if ($length > 0xFFFFFFF) {
+        if ($length > 0xFFFFFFFF) {
             throw new LengthException(
-                'Words with length above 0xFFFFFFF are not supported.',
+                'Words with length above 0xFFFFFFFF are not supported.',
                 LengthException::CODE_UNSUPPORTED,
                 null,
                 $length

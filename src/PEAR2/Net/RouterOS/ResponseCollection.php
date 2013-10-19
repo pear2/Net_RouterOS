@@ -311,7 +311,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * @param string $type The response type to filter by. Valid values are the
      *     Response::TYPE_* constants.
      * 
-     * @return ResponseCollection A new collection with responses of the
+     * @return static A new collection with responses of the
      *     specified type.
      */
     public function getAllOfType($type)
@@ -320,7 +320,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
         foreach (array_keys($this->responseTypes, $type, true) as $index) {
             $result[] = $this->responses[$index];
         }
-        return new ResponseCollection($result);
+        return new static($result);
     }
     
     /**
@@ -328,7 +328,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * 
      * @param string $tag The tag to filter by.
      * 
-     * @return ResponseCollection A new collection with responses having the
+     * @return static A new collection with responses having the
      *     specified tag.
      */
     public function getAllTagged($tag)
@@ -337,7 +337,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
         foreach (array_keys($this->responseTags, $tag, true) as $index) {
             $result[] = $this->responses[$index];
         }
-        return new ResponseCollection($result);
+        return new static($result);
     }
     
     /**
