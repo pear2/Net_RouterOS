@@ -11,8 +11,8 @@
   <email>boen.robot@gmail.com</email>
   <active>yes</active>
  </lead>
- <date>2013-08-15</date>
- <time>18:23:02</time>
+ <date>2013-10-20</date>
+ <time>05:01:52</time>
  <version>
   <release>1.0.0b4</release>
   <api>1.0.0</api>
@@ -39,6 +39,11 @@
 * Doc and CS fixes, and unit test reorganization.</notes>
  <contents>
   <dir name="/">
+   <dir name="data" baseinstalldir="/">
+    <file role="data" name="roscon.xml">
+     <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+    </file>
+   </dir>
    <dir name="docs" baseinstalldir="/">
     <file role="doc" name="apigen.neon">
      <tasks:replace from="../src" to="php_dir" type="pear-config"/>
@@ -58,6 +63,17 @@
     <file role="doc" name="send-and-forget.php"/>
     <file role="doc" name="sync-request-arguments.php"/>
     <file role="doc" name="sync-request-simple.php"/>
+   </dir>
+   <dir name="scripts" baseinstalldir="/">
+    <file role="script" name="roscon.bat"/>
+    <file role="script" name="roscon.php">
+     <tasks:replace from="../src" to="php_dir" type="pear-config"/>
+     <tasks:replace from="../../PEAR2_Net_Transmitter.git/src/" to="php_dir" type="pear-config"/>
+     <tasks:replace from="../../PEAR2_Console_Color.git/src/" to="php_dir" type="pear-config"/>
+     <tasks:replace from="@PEAR2_DATA_DIR@" to="data_dir" type="pear-config"/>
+     <tasks:replace from="@PACKAGE_CHANNEL@" to="channel" type="package-info"/>
+     <tasks:replace from="@PACKAGE_NAME@" to="name" type="package-info"/>
+    </file>
    </dir>
    <dir name="src" baseinstalldir="/">
     <dir name="PEAR2">
@@ -173,8 +189,8 @@
       <file role="test" name="NonPersistent.php"/>
       <file role="test" name="Persistent.php"/>
      </dir>
-     <file role="test" name="SafeTest.php"/>
-     <file role="test" name="UnsafeTest.php"/>
+     <file role="test" name="Safe.php"/>
+     <file role="test" name="Unsafe.php"/>
     </dir>
     <dir name="Util">
      <dir name="Safe">
@@ -201,8 +217,8 @@
       <file role="test" name="NonPersistent.php"/>
       <file role="test" name="Persistent.php"/>
      </dir>
-     <file role="test" name="SafeTest.php"/>
-     <file role="test" name="UnsafeTest.php"/>
+     <file role="test" name="Safe.php"/>
+     <file role="test" name="Unsafe.php"/>
     </dir>
     <file role="test" name="bootstrap.php">
      <tasks:replace from="../src" to="php_dir" type="pear-config"/>
@@ -249,6 +265,7 @@
  </dependencies>
  <phprelease>
   <filelist>
+   <install name="data/roscon.xml" as="roscon.xml"/>
    <install name="docs/apigen.neon" as="apigen.neon"/>
    <install name="docs/doxygen.ini" as="doxygen.ini"/>
    <install name="docs/phpdoc.dist.xml" as="phpdoc.dist.xml"/>
@@ -258,6 +275,8 @@
    <install name="examples/send-and-forget.php" as="examples/send-and-forget.php"/>
    <install name="examples/sync-request-arguments.php" as="examples/sync-request-arguments.php"/>
    <install name="examples/sync-request-simple.php" as="examples/sync-request-simple.php"/>
+   <install name="scripts/roscon.bat" as="roscon.bat"/>
+   <install name="scripts/roscon.php" as="roscon"/>
    <install name="src/PEAR2/Net/RouterOS/Client.php" as="PEAR2/Net/RouterOS/Client.php"/>
    <install name="src/PEAR2/Net/RouterOS/Communicator.php" as="PEAR2/Net/RouterOS/Communicator.php"/>
    <install name="src/PEAR2/Net/RouterOS/DataFlowException.php" as="PEAR2/Net/RouterOS/DataFlowException.php"/>
@@ -275,37 +294,37 @@
    <install name="src/PEAR2/Net/RouterOS/UnexpectedValueException.php" as="PEAR2/Net/RouterOS/UnexpectedValueException.php"/>
    <install name="src/PEAR2/Net/RouterOS/Util.php" as="PEAR2/Net/RouterOS/Util.php"/>
    <install name="tests/bootstrap.php" as="bootstrap.php"/>
+   <install name="tests/Client/Safe.php" as="Client/Safe.php"/>
    <install name="tests/Client/Safe/NonPersistent.php" as="Client/Safe/NonPersistent.php"/>
    <install name="tests/Client/Safe/NonPersistent/EncryptedTest.php" as="Client/Safe/NonPersistent/EncryptedTest.php"/>
    <install name="tests/Client/Safe/NonPersistent/UnencryptedTest.php" as="Client/Safe/NonPersistent/UnencryptedTest.php"/>
    <install name="tests/Client/Safe/Persistent.php" as="Client/Safe/Persistent.php"/>
    <install name="tests/Client/Safe/Persistent/EncryptedTest.php" as="Client/Safe/Persistent/EncryptedTest.php"/>
    <install name="tests/Client/Safe/Persistent/UnencryptedTest.php" as="Client/Safe/Persistent/UnencryptedTest.php"/>
-   <install name="tests/Client/SafeTest.php" as="Client/SafeTest.php"/>
+   <install name="tests/Client/Unsafe.php" as="Client/Unsafe.php"/>
    <install name="tests/Client/Unsafe/NonPersistent.php" as="Client/Unsafe/NonPersistent.php"/>
    <install name="tests/Client/Unsafe/NonPersistent/EncryptedTest.php" as="Client/Unsafe/NonPersistent/EncryptedTest.php"/>
    <install name="tests/Client/Unsafe/NonPersistent/UnencryptedTest.php" as="Client/Unsafe/NonPersistent/UnencryptedTest.php"/>
    <install name="tests/Client/Unsafe/Persistent.php" as="Client/Unsafe/Persistent.php"/>
    <install name="tests/Client/Unsafe/Persistent/EncryptedTest.php" as="Client/Unsafe/Persistent/EncryptedTest.php"/>
    <install name="tests/Client/Unsafe/Persistent/UnencryptedTest.php" as="Client/Unsafe/Persistent/UnencryptedTest.php"/>
-   <install name="tests/Client/UnsafeTest.php" as="Client/UnsafeTest.php"/>
    <install name="tests/ConnectionTest.php" as="ConnectionTest.php"/>
    <install name="tests/HandlingTest.php" as="HandlingTest.php"/>
    <install name="tests/phpunit.xml" as="phpunit.xml"/>
+   <install name="tests/Util/Safe.php" as="Util/Safe.php"/>
    <install name="tests/Util/Safe/NonPersistent/EncryptedTest.php" as="Util/Safe/NonPersistent/EncryptedTest.php"/>
    <install name="tests/Util/Safe/NonPersistent/UnencryptedTest.php" as="Util/Safe/NonPersistent/UnencryptedTest.php"/>
    <install name="tests/Util/Safe/NonPersistentTest.php" as="Util/Safe/NonPersistentTest.php"/>
    <install name="tests/Util/Safe/Persistent/EncryptedTest.php" as="Util/Safe/Persistent/EncryptedTest.php"/>
    <install name="tests/Util/Safe/Persistent/UnencryptedTest.php" as="Util/Safe/Persistent/UnencryptedTest.php"/>
    <install name="tests/Util/Safe/PersistentTest.php" as="Util/Safe/PersistentTest.php"/>
-   <install name="tests/Util/SafeTest.php" as="Util/SafeTest.php"/>
+   <install name="tests/Util/Unsafe.php" as="Util/Unsafe.php"/>
    <install name="tests/Util/Unsafe/NonPersistent.php" as="Util/Unsafe/NonPersistent.php"/>
    <install name="tests/Util/Unsafe/NonPersistent/EncryptedTest.php" as="Util/Unsafe/NonPersistent/EncryptedTest.php"/>
    <install name="tests/Util/Unsafe/NonPersistent/UnencryptedTest.php" as="Util/Unsafe/NonPersistent/UnencryptedTest.php"/>
    <install name="tests/Util/Unsafe/Persistent.php" as="Util/Unsafe/Persistent.php"/>
    <install name="tests/Util/Unsafe/Persistent/EncryptedTest.php" as="Util/Unsafe/Persistent/EncryptedTest.php"/>
    <install name="tests/Util/Unsafe/Persistent/UnencryptedTest.php" as="Util/Unsafe/Persistent/UnencryptedTest.php"/>
-   <install name="tests/Util/UnsafeTest.php" as="Util/UnsafeTest.php"/>
   </filelist>
  </phprelease>
 </package>

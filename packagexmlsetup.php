@@ -38,9 +38,9 @@ $packageGen = function (
         'tasks:replace' => array(
             array(
                 'attribs' => array(
-                    'from' => '../../PEAR2_Net_Transmitter.git/src/',
-                    'to' => 'php_dir',
-                    'type' => 'pear-config'
+                    'from' => 'GIT: $Id$',
+                    'to' => 'version',
+                    'type' => 'package-info'
                 )
             )
         )
@@ -100,6 +100,50 @@ $packageGen = function (
         $package->files['docs/doxygen.ini']->getArrayCopy(),
         $srcDirTask,
         $verTask
+    );
+
+    $package->files['scripts/roscon.php'] = array_merge_recursive(
+        $package->files['scripts/roscon.php']->getArrayCopy(),
+        $srcDirTask,
+        array(
+            'tasks:replace' => array(
+                array(
+                    'attribs' => array(
+                        'from' => '../../PEAR2_Net_Transmitter.git/src/',
+                        'to' => 'php_dir',
+                        'type' => 'pear-config'
+                    )
+                ),
+                array(
+                    'attribs' => array(
+                        'from' => '../../PEAR2_Console_Color.git/src/',
+                        'to' => 'php_dir',
+                        'type' => 'pear-config'
+                    )
+                ),
+                array(
+                    'attribs' => array(
+                        'from' => '@PEAR2_DATA_DIR@',
+                        'to' => 'data_dir',
+                        'type' => 'pear-config'
+                    )
+                ),
+                array(
+                    'attribs' => array(
+                        'from' => '@PACKAGE_CHANNEL@',
+                        'to' => 'channel',
+                        'type' => 'package-info'
+                    )
+                ),
+                array(
+                    'attribs' => array(
+                        'from' => '@PACKAGE_NAME@',
+                        'to' => 'name',
+                        'type' => 'package-info'
+                    )
+                ),
+            )
+        )
     );
 
     $hasCompatible = null !== $compatible;
@@ -181,9 +225,25 @@ $packageGen = function (
             $filename = substr($path->getPathname(), 2);
 
         if (isset($package->files[$filename])) {
-            $as = (strpos($filename, 'examples') === 0)
+            $as = (strpos($filename, 'examples/') === 0)
                 ? $filename
                 : substr($filename, strpos($filename, '/') + 1);
+            if (strpos($filename, 'scripts/') === 0) {
+                $parsedFilename = pathinfo($filename);
+                if (isset($parsedFilename['extension'])
+                    && 'php' === $parsedFilename['extension']
+                    && !is_file(
+                        $parsedFilename['dirname'] . '/' .
+                        $parsedFilename['filename']
+                    )
+                    && is_file(
+                        $parsedFilename['dirname'] . '/' .
+                        $parsedFilename['filename'] . '.bat'
+                    )
+                ) {
+                    $as = substr($as, 0, -4);
+                }
+            }
             $package->getReleaseToInstall('php')->installAs($filename, $as);
         }
     }

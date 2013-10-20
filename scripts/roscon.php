@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 /**
@@ -49,9 +50,10 @@ use PEAR2\Net\Transmitter\SocketException as SE;
 //If there's no appropriate autoloader, add one
 if (!class_exists('PEAR2\Net\RouterOS\Communicator', true)) {
     include_once 'PEAR2/Autoload.php';
-    Autoload::initialize(realpath(__DIR__ . '/../src'));
-    Autoload::initialize(realpath(__DIR__ . '/../../Net_Transmitter.git/src'));
-    Autoload::initialize(realpath(__DIR__ . '/../../Console_Color.git/src'));
+    chdir(__DIR__);
+    Autoload::initialize(realpath('../src'));
+    Autoload::initialize(realpath('../../Net_Transmitter.git/src'));
+    Autoload::initialize(realpath('../../Console_Color.git/src'));
 }
 
 // Locate the data dir, in preference as:
@@ -85,15 +87,15 @@ HEREDOC
     exit(11);
 }
 
+$cmdParser = CommandLine::fromXmlFile($consoleDefFile);
 try {
-    $cmdParser = CommandLine::fromXmlFile($consoleDefFile);
     $cmd = $cmdParser->parse();
 } catch (CommandLine\Exception $e) {
     fwrite(
         STDERR,
-        'Error when parsing command line: ' . $e->getMessage()
+        'Error when parsing command line: ' . $e->getMessage() . "\n"
     );
-    exit(12);
+    $cmdParser->displayUsage(12);
 }
 
 $c_colors = array(
