@@ -61,6 +61,16 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * @var array An array with each {@link Response} object's tag.
      */
     protected $responseTags = array();
+
+    /**
+     * @var array An array with positions of responses, based on an argument
+     * name. The name of each argument is the array key, and the array value is
+     * another array where the key is the value for that argument, and the value
+     * is the posistion of the response. For performance reasons, each key is
+     * built only when {@link static::setIndex()} is called with that argument,
+     * and remains available for the lifetime of this collection.
+     */
+    protected $responsesIndex = array();
     
     /**
      * @var array An array with all distinct arguments across all
@@ -73,6 +83,11 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * @var int A pointer, as required by SeekableIterator.
      */
     protected $position = 0;
+
+    /**
+     * @var string|null Name of argument to use as index. NULL when disabled.
+     */
+    protected $index = null;
     
     /**
      * Creates a new collection.
@@ -81,16 +96,16 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      */
     public function __construct(array $responses)
     {
-        $index = 0;
+        $pos = 0;
         foreach ($responses as $response) {
             if ($response instanceof Response) {
-                $this->responseTypes[$index] = $response->getType();
-                $this->responseTags[$index] = $response->getTag();
-                $this->responses[$index++] = $response;
+                $this->responseTypes[$pos] = $response->getType();
+                $this->responseTags[$pos] = $response->getTag();
+                $this->responses[$pos++] = $response;
             }
         }
     }
-    
+
     /**
      * A shorthand gateway.
      * 
@@ -109,14 +124,64 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     {
         return null === $offset ? $this->end() : $this->seek($offset);
     }
-    
+
+    /**
+     * Sets an argument to be usable as a key in the collection.
+     * 
+     * @param string|null $name The name of the argument to use. Future calls
+     * that accept a position will then also be able to search that argument for
+     * a matching value. Specifying NULL will disable such lookups (as is by
+     * default).
+     * 
+     * @return $this The object itself.
+     */
+    public function setIndex($name)
+    {
+        if (null !== $name) {
+            $name = (string)$name;
+            if (!isset($this->responsesIndex[$name])) {
+                $this->responsesIndex[$name] = array();
+                foreach ($this->responses as $pos => $response) {
+                    $val = $response->getArgument($name);
+                    if (null !== $val) {
+                        $this->responsesIndex[$name][$val] = $pos;
+                    }
+                }
+            }
+        }
+        $this->index = $name;
+        return $this;
+    }
+
+    /**
+     * Gets the name of the argument used as an index.
+     * 
+     * @return string|null Name of argument to use as index. NULL when disabled.
+     */
+    public function getIndex()
+    {
+        return $this->index;
+    }
+
     /**
      * Gets the whole collection as an array.
      * 
+     * @param bool $useIndex Whether to use the index values as keys for the
+     * resulting array.
+     * 
      * @return array An array with all responses, in network order.
      */
-    public function toArray()
+    public function toArray($useIndex = false)
     {
+        if ($useIndex) {
+            $positions = $this->responsesIndex[$this->index];
+            asort($positions, SORT_NUMERIC);
+            $positions = array_flip($positions);
+            return array_combine(
+                $positions,
+                array_intersect_key($this->responses, $positions)
+            );
+        }
         return $this->responses;
     }
 
@@ -133,25 +198,30 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     /**
      * Checks if an offset exists.
      * 
-     * @param int $offset The offset to check.
+     * @param int|string $offset The offset to check.
      * 
      * @return bool TRUE if the offset exists, FALSE otherwise.
      */
     public function offsetExists($offset)
     {
-        return array_key_exists($offset, $this->responses);
+        return is_int($offset)
+            ? array_key_exists($offset, $this->responses)
+            : array_key_exists($offset, $this->responsesIndex[$this->index]);
     }
 
     /**
      * Gets a {@link Response} from a specified offset.
      * 
-     * @param int $offset The offset of the desired response.
+     * @param int|string $offset The offset of the desired response. If the
+     * collection is indexed, you can also supply the value to search for.
      * 
      * @return Response The response at the specified offset.
      */
     public function offsetGet($offset)
     {
-        return $this->responses[$offset];
+        return is_int($offset)
+            ? $this->responses[$offset]
+            : $this->responses[$this->responsesIndex[$this->index][$offset]];
     }
 
     /**
@@ -160,8 +230,8 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * This method exists only because it is required for ArrayAccess. The
      * collection is read only.
      * 
-     * @param int      $offset N/A
-     * @param Response $value  N/A
+     * @param int|string $offset N/A
+     * @param Response   $value  N/A
      * 
      * @return void
      */
@@ -170,14 +240,13 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
         
     }
 
-
     /**
      * N/A
      * 
      * This method exists only because it is required for ArrayAccess. The
      * collection is read only.
      * 
-     * @param int $offset N/A
+     * @param int|string $offset N/A
      * 
      * @return void
      */
@@ -200,14 +269,17 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     /**
      * Moves the position pointer to a specified position.
      * 
-     * @param int $position The position to move to.
+     * @param int|string $position The position to move to. If the collection is
+     * indexed, you can also supply a value to move the pointer to.
      * 
      * @return Response The {@link Response} at the specified position, or FALSE
      *     if the specified position is not valid.
      */
     public function seek($position)
     {
-        $this->position = $position;
+        $this->position = is_int($position)
+            ? $position
+            : $this->responsesIndex[$this->index][$position];
         return $this->current();
     }
 
@@ -279,7 +351,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     {
         return $this->offsetExists($this->position);
     }
-    
+
     /**
      * Gets all distinct argument names.
      * 
@@ -304,7 +376,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
         }
         return $this->argumentMap;
     }
-    
+
     /**
      * Gets all responses of a specified type.
      * 
@@ -322,7 +394,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
         }
         return new static($result);
     }
-    
+
     /**
      * Gets all responses with a specified tag.
      * 
@@ -339,7 +411,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
         }
         return new static($result);
     }
-    
+
     /**
      * Gets the last {@link Response} in the collection.
      * 
@@ -351,7 +423,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
         $offset = count($this->responses) - 1;
         return $offset >= 0 ? $this->responses[$offset] : false;
     }
-    
+
     /**
      * Calls a method of the response pointed by the pointer.
      * 

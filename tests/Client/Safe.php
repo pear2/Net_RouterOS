@@ -1172,24 +1172,23 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             $comment = fopen('php://temp', 'r+b');
             $fillerString = str_repeat('t', 0xFFFFFF);
             //fwrite($comment, $fillerString);
-            for ($i = 0; $i < 16; $i++) {
+            for ($i = 0; $i < 256; $i++) {
                 fwrite($comment, $fillerString);
             }
             unset($fillerString);
             fwrite(
                 $comment,
-                str_repeat('t', 0xF/* - strlen('=comment=') */)
+                str_repeat('t', 0xFE/* - strlen('=comment=') */)
             );
+            $argL = (double) sprintf('%u', ftell($comment));
             rewind($comment);
 
-            $commentString = stream_get_contents($comment);
-            $maxArgL = 0xFFFFFFF - strlen('=comment=');
+            $maxArgL = 0xFFFFFFFF - strlen('?comment=');
             $this->assertGreaterThan(
                 $maxArgL,
-                strlen($commentString),
+                $argL,
                 '$comment is not long enough.'
             );
-            unset($commentString);
             rewind($comment);
             $printRequest = new Request('/ip/arp/print');
             $printRequest->setQuery(Query::where('comment', $comment));
@@ -1197,17 +1196,16 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             fclose($comment);
             //Clearing out for other tests.
             ini_set('memory_limit', $memoryLimit);
-            $this->fail('Lengths above 0xFFFFFFF should not be supported.');
+            $this->fail('Lengths above 0xFFFFFFFF should not be supported.');
         } catch (LengthException $e) {
             fclose($comment);
+            //Clearing out for other tests.
+            ini_set('memory_limit', $memoryLimit);
             $this->assertEquals(
                 LengthException::CODE_UNSUPPORTED,
                 $e->getCode(),
                 'Improper exception thrown.'
             );
         }
-
-        //Clearing out for other tests.
-        ini_set('memory_limit', $memoryLimit);
     }
 }

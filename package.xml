@@ -11,10 +11,10 @@
   <email>boen.robot@gmail.com</email>
   <active>yes</active>
  </lead>
- <date>2013-10-20</date>
- <time>05:01:52</time>
+ <date>2013-10-24</date>
+ <time>18:18:13</time>
  <version>
-  <release>1.0.0b4</release>
+  <release>1.0.0b5</release>
   <api>1.0.0</api>
  </version>
  <stability>
@@ -22,38 +22,35 @@
   <api>stable</api>
  </stability>
  <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</license>
- <notes>Brand new way of manipulating data, encryption, and listen...
+ <notes>Console and some overall improvements.
 
-* A new Util class that abstracts away tons of fancy features, including:
-  - CRUD operations
-  - Support of targeting and finding entries by numbers, just like from terminal
-  - Executing scripts (with the ability to pass typed parameters ala SQL prepared statements)
-  - Putting and getting files out of RouterOS
-  - Helper methods for converting back and forth between PHP and RouterOS values.
-* Support for encrypted connections, both with and without a certificate. Note that due to known issues with PHP itself, encrypted connections may be unstable (as in &quot;sometimes disconnect suddenly&quot; or &quot;sometimes hang when you use Client::sendSync() and/or Client::completeRequest() and/or Client::loop() without a timeout&quot;).
-* Client::loop() and Client::completeRequest() no longer fail if there's no reply within &quot;default_socket_timeout&quot; seconds. This means you can now use the &quot;listen&quot; command without also setting up something else to keep the connection busy.
-* Client::loop() now accepts timeouts modeled after stream_select()'s, as opposed to a single float value. As before, the default is &quot;no time limit&quot;, but is now specified with NULL instead of 0. Analogous arguments have been added to Response's constructor.
-* When receiving, the release lock is released when ANY exception is thrown. Previously, this would be so only in case of SocketException.
-* Chnaged the PHAR stub to not fail when reading the hash fails.
-* Exceptions now use constants to hold each code.
-* Doc and CS fixes, and unit test reorganization.</notes>
+* The PHAR file is now also a console. When installed, the console is available from the executable &quot;roscon&quot;.
+* New Util methods:
+    - getall()
+    - count()
+    - prepareScript()
+* Util::get() now uses RouterOS' &quot;get&quot; command, unless it returns an empty !done response (as it does for RouterOS versions prior to 6.0), in which case it automatically fallbacks to a print with a query.
+* Util::escapeValue() and Util::parseValue() now support associative arrays (introduced in RouterOS 6.2).
+* ResponseCollection can now be searched by argument values, if you first designate an argument name with the new ResponseCollection::setIndex() method.
+* Doc fixes (Notably: Clarified the acceptability of seekable streams as argument values, which has been present for a long time, but never documented).
+* CS fixes.</notes>
  <contents>
   <dir name="/">
    <dir name="data" baseinstalldir="/">
     <file role="data" name="roscon.xml">
-     <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+     <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
     </file>
    </dir>
    <dir name="docs" baseinstalldir="/">
     <file role="doc" name="apigen.neon">
-     <tasks:replace from="../src" to="php_dir" type="pear-config"/>
+     <tasks:replace type="pear-config" to="php_dir" from="../src"/>
     </file>
     <file role="doc" name="doxygen.ini">
-     <tasks:replace from="../src" to="php_dir" type="pear-config"/>
-     <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+     <tasks:replace type="pear-config" to="php_dir" from="../src"/>
+     <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
     </file>
     <file role="doc" name="phpdoc.dist.xml">
-     <tasks:replace from="../src" to="php_dir" type="pear-config"/>
+     <tasks:replace type="pear-config" to="php_dir" from="../src"/>
     </file>
    </dir>
    <dir name="examples">
@@ -65,14 +62,17 @@
     <file role="doc" name="sync-request-simple.php"/>
    </dir>
    <dir name="scripts" baseinstalldir="/">
-    <file role="script" name="roscon.bat"/>
+    <file role="script" name="roscon.bat">
+     <tasks:windowseol/>
+    </file>
     <file role="script" name="roscon.php">
-     <tasks:replace from="../src" to="php_dir" type="pear-config"/>
-     <tasks:replace from="../../PEAR2_Net_Transmitter.git/src/" to="php_dir" type="pear-config"/>
-     <tasks:replace from="../../PEAR2_Console_Color.git/src/" to="php_dir" type="pear-config"/>
-     <tasks:replace from="@PEAR2_DATA_DIR@" to="data_dir" type="pear-config"/>
-     <tasks:replace from="@PACKAGE_CHANNEL@" to="channel" type="package-info"/>
-     <tasks:replace from="@PACKAGE_NAME@" to="name" type="package-info"/>
+     <tasks:replace type="pear-config" to="php_dir" from="../src"/>
+     <tasks:replace type="pear-config" to="data_dir" from="@PEAR2_DATA_DIR@"/>
+     <tasks:replace type="package-info" to="channel" from="@PACKAGE_CHANNEL@"/>
+     <tasks:replace type="package-info" to="name" from="@PACKAGE_NAME@"/>
+     <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+     <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+     <tasks:replace type="package-info" to="description" from="~~description~~"/>
     </file>
    </dir>
    <dir name="src" baseinstalldir="/">
@@ -80,84 +80,84 @@
      <dir name="Net">
       <dir name="RouterOS">
        <file role="php" name="Client.php">
-        <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
-        <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+        <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+        <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+        <tasks:replace type="package-info" to="description" from="~~description~~"/>
        </file>
        <file role="php" name="Communicator.php">
-        <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
-        <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+        <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+        <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+        <tasks:replace type="package-info" to="description" from="~~description~~"/>
        </file>
        <file role="php" name="DataFlowException.php">
-        <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
-        <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+        <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+        <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+        <tasks:replace type="package-info" to="description" from="~~description~~"/>
        </file>
        <file role="php" name="Exception.php">
-        <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
-        <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+        <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+        <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+        <tasks:replace type="package-info" to="description" from="~~description~~"/>
        </file>
        <file role="php" name="InvalidArgumentException.php">
-        <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
-        <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+        <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+        <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+        <tasks:replace type="package-info" to="description" from="~~description~~"/>
        </file>
        <file role="php" name="LengthException.php">
-        <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
-        <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+        <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+        <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+        <tasks:replace type="package-info" to="description" from="~~description~~"/>
        </file>
        <file role="php" name="Message.php">
-        <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
-        <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+        <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+        <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+        <tasks:replace type="package-info" to="description" from="~~description~~"/>
        </file>
        <file role="php" name="NotSupportedException.php">
-        <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
-        <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+        <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+        <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+        <tasks:replace type="package-info" to="description" from="~~description~~"/>
        </file>
        <file role="php" name="Query.php">
-        <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
-        <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+        <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+        <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+        <tasks:replace type="package-info" to="description" from="~~description~~"/>
        </file>
        <file role="php" name="Registry.php">
-        <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
-        <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+        <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+        <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+        <tasks:replace type="package-info" to="description" from="~~description~~"/>
        </file>
        <file role="php" name="Request.php">
-        <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
-        <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+        <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+        <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+        <tasks:replace type="package-info" to="description" from="~~description~~"/>
        </file>
        <file role="php" name="Response.php">
-        <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
-        <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+        <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+        <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+        <tasks:replace type="package-info" to="description" from="~~description~~"/>
        </file>
        <file role="php" name="ResponseCollection.php">
-        <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
-        <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+        <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+        <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+        <tasks:replace type="package-info" to="description" from="~~description~~"/>
        </file>
        <file role="php" name="SocketException.php">
-        <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
-        <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+        <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+        <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+        <tasks:replace type="package-info" to="description" from="~~description~~"/>
        </file>
        <file role="php" name="UnexpectedValueException.php">
-        <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
-        <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+        <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+        <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+        <tasks:replace type="package-info" to="description" from="~~description~~"/>
        </file>
        <file role="php" name="Util.php">
-        <tasks:replace from="~~summary~~" to="summary" type="package-info"/>
-        <tasks:replace from="~~description~~" to="description" type="package-info"/>
-        <tasks:replace from="GIT: $Id$" to="version" type="package-info"/>
+        <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+        <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+        <tasks:replace type="package-info" to="description" from="~~description~~"/>
        </file>
       </dir>
      </dir>
@@ -221,12 +221,14 @@
      <file role="test" name="Unsafe.php"/>
     </dir>
     <file role="test" name="bootstrap.php">
-     <tasks:replace from="../src" to="php_dir" type="pear-config"/>
-     <tasks:replace from="../../PEAR2_Net_Transmitter.git/src/" to="php_dir" type="pear-config"/>
+     <tasks:replace type="pear-config" to="php_dir" from="../src"/>
+     <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
     </file>
     <file role="test" name="ConnectionTest.php"/>
     <file role="test" name="HandlingTest.php"/>
-    <file role="test" name="phpunit.xml"/>
+    <file role="test" name="phpunit.xml">
+     <tasks:replace type="pear-config" to="php_dir" from="../src"/>
+    </file>
    </dir>
   </dir>
  </contents>
