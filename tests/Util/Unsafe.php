@@ -33,11 +33,19 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         $this->util->changeMenu('/queue/simple');
         $this->assertRegExp(
             '/^' . self::REGEX_ID . '$/',
-            $id = $this->util->add(array('name' => TEST_QUEUE_NAME))
+            $id = $this->util->add(array('name' => TEST_QUEUE_NAME, 'disabled'))
         );
+
         $afterCount = count($this->client->sendSync($printRequest));
         $this->assertSame(1 + $beforeCount, $afterCount);
-        
+        $this->assertSame(
+            'true',
+            $this->client->sendSync(
+                $printRequest->setQuery(Query::where('name', TEST_QUEUE_NAME))
+            )->getArgument('disabled')
+        );
+        $printRequest->setQuery(null);
+
         $removeRequest = new Request('/queue/simple/remove');
         $removeRequest->setArgument('numbers', $id);
         $this->client->sendSync($removeRequest);
@@ -61,7 +69,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         );
         $afterCount = substr_count($this->util->find(), ',');
         $this->assertSame(1 + $beforeCount, $afterCount);
-        
+
         $removeRequest = new Request('/queue/simple/remove');
         $removeRequest->setArgument('numbers', $id);
         $this->client->sendSync($removeRequest);
@@ -135,7 +143,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         );
         $afterCount = count($this->client->sendSync($printRequest));
         $this->assertSame(1 + $beforeCount, $afterCount);
-        
+
         $this->util->remove($id);
 
         $postCount = count($this->client->sendSync($printRequest));
@@ -162,7 +170,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         );
         $afterCount = count($this->client->sendSync($printRequest));
         $this->assertSame(2 + $beforeCount, $afterCount);
-        
+
         $this->util->remove($idList);
 
         $postCount = count($this->client->sendSync($printRequest));
@@ -179,7 +187,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         );
         $afterCount = count($this->client->sendSync($printRequest));
         $this->assertSame(2 + $beforeCount, $afterCount);
-        
+
         $this->util->remove($idList);
 
         $postCount = count($this->client->sendSync($printRequest));
@@ -206,25 +214,32 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             Query::where('.id', $id)
         );
 
+        $responses = $this->client->sendSync($printRequest);
         $this->assertSame(
             HOSTNAME_SILENT . '/32',
-            $this->client->sendSync(
-                $printRequest
-            )->getArgument('target')
+            $responses->getArgument('target')
+        );
+        $this->assertNotSame(
+            'true',
+            $responses->getArgument('disabled')
         );
 
         $this->util->set(
             $id,
             array(
-                'target' => HOSTNAME_INVALID . '/32'
+                'target' => HOSTNAME_INVALID . '/32',
+                'disabled'
             )
         );
 
+        $responses = $this->client->sendSync($printRequest);
         $this->assertSame(
             HOSTNAME_INVALID . '/32',
-            $this->client->sendSync(
-                $printRequest
-            )->getArgument('target')
+            $responses->getArgument('target')
+        );
+        $this->assertSame(
+            'true',
+            $responses->getArgument('disabled')
         );
 
         $this->util->edit(
@@ -234,11 +249,14 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             )
         );
 
+        $responses = $this->client->sendSync($printRequest);
         $this->assertSame(
             HOSTNAME_SILENT . '/32',
-            $this->client->sendSync(
-                $printRequest
-            )->getArgument('target')
+            $responses->getArgument('target')
+        );
+        $this->assertSame(
+            'true',
+            $responses->getArgument('disabled')
         );
 
         $this->util->remove($id);
@@ -266,7 +284,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         );
         $this->assertSame($id, $this->util->find($itemCount));
         $this->assertSame($id, $this->util->find((string)$itemCount));
-        
+
         $this->util->remove($id);
     }
 
@@ -353,7 +371,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             '/queue/simple/print',
             Query::where('name', TEST_QUEUE_NAME)
         );
-  
+ 
         $this->util->changeMenu('/queue/simple');
         $this->assertCount(
             0,
@@ -373,7 +391,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
                 $printRequest
             )->getAllOfType(Response::TYPE_DATA)
         );
-        
+
         $this->util->remove(TEST_QUEUE_NAME);
  
         $this->assertCount(
@@ -717,7 +735,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         $this->util->remove($idList);
         $this->assertCount(1, $result);
     }
-    
+
     public function testFilePutAndGetContents()
     {
         $data1 = 'test';
@@ -735,9 +753,9 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             $data1
         );
         $getResult3 = $this->util->fileGetContents(TEST_FILE_NAME);
-        $this->util->changeMenu('/file');
-        $this->util->remove(TEST_FILE_NAME);
+        $putResult4 = $this->util->filePutContents(TEST_FILE_NAME, null);
         $getResult4 = $this->util->fileGetContents(TEST_FILE_NAME);
+        $putResult5 = $this->util->filePutContents(TEST_FILE_NAME, null);
 
         $this->assertTrue($putResult1);
         $this->assertSame($data1, $getResult1);
@@ -745,9 +763,11 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         $this->assertSame($data2, $getResult2);
         $this->assertFalse($putResult3);
         $this->assertSame($data2, $getResult3);
+        $this->assertTrue($putResult4);
         $this->assertFalse($getResult4);
+        $this->assertFalse($putResult5);
     }
-    
+
     public function testFilePutContentsNoPermissions()
     {
         $this->setUp(USERNAME2, PASSWORD2);

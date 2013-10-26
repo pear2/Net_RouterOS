@@ -113,8 +113,9 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * function. Depending on the argument given, one of the other functions in
      * the class is invoked and its returned value is returned by this function.
      * 
-     * @param int $offset The offset of the response to seek to. Setting NULL
-     *     will seek to the last response.
+     * @param int|string $offset The offset of the response to seek to.
+     *     If the collection is indexed, you can also supply a value to seek to.
+     *     Setting NULL will seek to the last response.
      * 
      * @return Response The {@link Response} at the specified index, last
      *     reponse if no index is provided or FALSE if the index is invalid or the
@@ -129,9 +130,12 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * Sets an argument to be usable as a key in the collection.
      * 
      * @param string|null $name The name of the argument to use. Future calls
-     * that accept a position will then also be able to search that argument for
-     * a matching value. Specifying NULL will disable such lookups (as is by
-     * default).
+     *     that accept a position will then also be able to search that argument
+     *     for a matching value.
+     *     Specifying NULL will disable such lookups (as is by default).
+     *     Note that in case this value occures multiple times within the
+     *     collection, only the last matching response will be accessible by
+     *     that value.
      * 
      * @return $this The object itself.
      */

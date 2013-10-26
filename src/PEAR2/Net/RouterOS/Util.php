@@ -223,7 +223,8 @@ class Util implements Countable
         array $params = array(),
         $stream = null
     ) {
-        $resultStream = $stream ?: fopen('php://temp', 'r+b');
+        $isStreamGiven = Stream::isStream($stream);
+        $resultStream = $isStreamGiven ? $stream : fopen('php://temp', 'r+b');
         $writer = new Stream($resultStream, false);
         $bytes = 0;
 
@@ -234,7 +235,7 @@ class Util implements Countable
                 $reader = new Stream($pvalue, false);
                 $chunkSize = $reader->getChunk(Stream::DIRECTION_RECEIVE);
                 $bytes += $writer->send('"');
-                while ($reader->isDataAwaiting()) {
+                while ($reader->isAvailable() && $reader->isDataAwaiting()) {
                     $bytes += $writer->send(
                         static::escapeString(fread($pvalue, $chunkSize))
                     );
@@ -246,7 +247,7 @@ class Util implements Countable
         }
 
         $bytes += $writer->send($source);
-        if ($stream) {
+        if ($isStreamGiven) {
             return $bytes;
         }
 
@@ -396,8 +397,8 @@ class Util implements Countable
      *     or CLI syntax and can be either absolute or relative. If relative,
      *     it's relative to the current menu, which by default is the root.
      * 
-     * @return string The old menu. If an empty string is given for a new menu,
-     *     no change is performed, and the current menu is returned.
+     * @return $this|string The object itself. If an empty string is given for
+     *     a new menu, no change is performed, and the current menu is returned.
      */
     public function changeMenu($newMenu = '')
     {
@@ -405,7 +406,7 @@ class Util implements Countable
         if ('' === $newMenu) {
             return $this->menu;
         }
-        $oldMenu = $this->menu;
+
         $menuRequest = new Request('/menu');
         if ('/' === $newMenu[0]) {
             $this->menu = $menuRequest->setCommand($newMenu)->getCommand();
@@ -416,7 +417,7 @@ class Util implements Countable
             )->getCommand();
         }
         $this->clearIdCache();
-        return $oldMenu;
+        return $this;
     }
 
     /**

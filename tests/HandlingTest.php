@@ -1164,7 +1164,33 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
         $reg1->close();
         $this->assertStringStartsWith('-1_', $reg2->getOwnershipTag());
     }
-    
+
+    public function testPrepareScript()
+    {
+        $msg = 'testing';
+        $result = Util::prepareScript(
+            '/log print $msg',
+            array('msg' => $msg)
+        );
+        $this->assertSame(
+            ":local \"msg\" \"{$msg}\";\n/log print \$msg",
+            stream_get_contents($result)
+        );
+
+        $testParam = fopen('php://temp', 'r+b');
+        fwrite($testParam, $msg);
+        rewind($testParam);
+        $result = Util::prepareScript(
+            '/log print $msg',
+            array('msg' => $testParam)
+        );
+        $this->assertSame(
+            ":local \"msg\" \"{$msg}\";\n/log print \$msg",
+            stream_get_contents($result)
+        );
+        $this->assertSame(strlen($msg), ftell($testParam));
+    }
+
     /**
      * @param string $value
      * @param mixed  $expected

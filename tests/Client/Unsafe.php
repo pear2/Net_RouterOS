@@ -305,7 +305,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         //Clearing out for other tests.
         ini_set('memory_limit', $memoryLimit);
     }
-    
+
     public function testResponseCollectionGetArgumentMap()
     {
         $addRequest = new Request('/queue/simple/add');
@@ -332,9 +332,54 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             $removeRequest = new Request('/queue/simple/remove');
             $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
             $response = $this->object->sendSync($removeRequest);
+        } else {
+            $this->fail('Failed to add test queue.');
         }
     }
-    
+
+    public function testResponseCollectionIndex()
+    {
+        $queueComment = 'API_TEST';
+        $addRequest = new Request('/queue/simple/add');
+        $addRequest->setArgument('name', TEST_QUEUE_NAME)
+            ->setArgument('target', '0.0.0.0/0')
+            ->setArgument('comment', $queueComment);
+        $responses = $this->object->sendSync($addRequest);
+        if (count($responses) === 1
+            && $responses->getLast()->getType() === Response::TYPE_FINAL
+        ) {
+            $printRequest = new Request('/queue/simple/print');
+            $printRequest->setArgument('.proplist', 'name,comment');
+            $responses = $this->object->sendSync($printRequest)
+                ->setIndex('name');
+            $this->assertSame('name', $responses->getIndex());
+
+            $this->assertSame(
+                $queueComment,
+                $responses[TEST_QUEUE_NAME]('comment')
+            );
+            $this->assertSame(
+                count($responses->toArray(true)),
+                count($responses->toArray(false)) - 1//!done
+            );
+
+            $this->assertNotSame(
+                $responses->current(),
+                $responses->seek(TEST_QUEUE_NAME)
+            );
+            $this->assertSame(
+                $responses->current(),
+                $responses[TEST_QUEUE_NAME]
+            );
+
+            $removeRequest = new Request('/queue/simple/remove');
+            $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
+            $response = $this->object->sendSync($removeRequest);
+        } else {
+            $this->fail('Failed to add test queue.');
+        }
+    }
+
     public function testSetCharset()
     {
         if (!extension_loaded('iconv') || !function_exists('iconv')) {
@@ -352,8 +397,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
                 )
             )
         );
-        
-        
+
         $addRequest = new Request('/queue/simple/add');
         $addRequest->setArgument('name', TEST_QUEUE_NAME)
             ->setArgument('target', '0.0.0.0/0');
@@ -376,7 +420,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             $printRequest = new Request('/queue/simple/print');
             $printRequest->setQuery(Query::where('name', TEST_QUEUE_NAME));
             $responses = $this->object->sendSync($printRequest);
-            
+
             $this->assertEquals(
                 TEST_QUEUE_NAME,
                 $responses[0]->getArgument('name')
@@ -385,15 +429,15 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
                 'ПРИМЕР',
                 $responses[0]->getArgument('comment')
             );
-            
+
             $this->object->setCharset($appropriateCharsets);
             $this->assertNotEquals(
                 'ПРИМЕР',
                 $responses[0]->getArgument('comment')
             );
-            
+
             $responses = $this->object->sendSync($printRequest);
-            
+
             $this->assertEquals(
                 TEST_QUEUE_NAME,
                 $responses[0]->getArgument('name')
@@ -402,7 +446,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
                 'ПРИМЕР',
                 $responses[0]->getArgument('comment')
             );
-            
+
             $this->object->setCharset(
                 'ISO-8859-1',
                 Communicator::CHARSET_REMOTE
@@ -412,7 +456,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
                 'ПРИМЕР',
                 $responses[0]->getArgument('comment')
             );
-            
+
             $this->object->setCharset(
                 'ISO-8859-1',
                 Communicator::CHARSET_LOCAL
@@ -422,14 +466,14 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
                 'ПРИМЕР',
                 $responses[0]->getArgument('comment')
             );
-            
+
             $this->object->setCharset($appropriateCharsets);
             $responses = $this->object->sendSync($printRequest);
             $this->assertEquals(
                 'ПРИМЕР',
                 $responses[0]->getArgument('comment')
             );
-            
+
             $this->object->setStreamingResponses(true);
             $responses = $this->object->sendSync($printRequest);
             $this->assertEquals(
@@ -457,7 +501,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
                     $responses[0]->getArgument('comment')
                 )
             );
-            
+
             $testQueueNameStream = fopen('php://temp', 'r+b');
             fwrite($testQueueNameStream, TEST_QUEUE_NAME);
             rewind($testQueueNameStream);
@@ -479,8 +523,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
                     $responses[0]->getArgument('comment')
                 )
             );
-            
-            
+
             $removeRequest = new Request('/queue/simple/remove');
             $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
             $responses = $this->object->sendSync($removeRequest);

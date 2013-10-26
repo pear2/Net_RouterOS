@@ -27,14 +27,34 @@ abstract class Safe extends PHPUnit_Framework_TestCase
     public function testChangeMenu()
     {
         $this->assertSame('/', $this->util->changeMenu());
-        $this->assertSame('/', $this->util->changeMenu('queue'));
-        $this->assertSame('/queue', $this->util->changeMenu('simple'));
-        $this->assertSame('/queue/simple', $this->util->changeMenu('.. tree'));
-        $this->assertSame('/queue/tree', $this->util->changeMenu('../type'));
-        $this->assertSame('/queue/type', $this->util->changeMenu('/interface'));
-        $this->assertSame('/interface', $this->util->changeMenu('/ip/arp'));
-        $this->assertSame('/ip/arp', $this->util->changeMenu('/ip hotspot'));
-        $this->assertSame('/ip/hotspot', $this->util->changeMenu());
+        $this->assertSame(
+            '/queue',
+            $this->util->changeMenu('queue')->changeMenu()
+        );
+        $this->assertSame(
+            '/queue/simple',
+            $this->util->changeMenu('simple')->changeMenu()
+        );
+        $this->assertSame(
+            '/queue/tree',
+            $this->util->changeMenu('.. tree')->changeMenu()
+        );
+        $this->assertSame(
+            '/queue/type',
+            $this->util->changeMenu('../type')->changeMenu()
+        );
+        $this->assertSame(
+            '/interface',
+            $this->util->changeMenu('/interface')->changeMenu()
+        );
+        $this->assertSame(
+            '/ip/arp',
+            $this->util->changeMenu('/ip/arp')->changeMenu()
+        );
+        $this->assertSame(
+            '/ip/hotspot',
+            $this->util->changeMenu('/ip hotspot')->changeMenu()
+        );
     }
 
     public function testFindByQuery()

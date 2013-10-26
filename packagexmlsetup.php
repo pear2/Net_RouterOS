@@ -43,15 +43,15 @@ $config = array(
             'type' => 'pear-config',
             'to' => 'php_dir'
         ),
-        '../../PEAR2_Net_Transmitter.git/src' => array(
+        '../../Net_Transmitter.git/src' => array(
             'type' => 'pear-config',
             'to' => 'php_dir'
         ),
-        '../../PEAR2_Cache_SHM.git/src' => array(
+        '../../Cache_SHM.git/src' => array(
             'type' => 'pear-config',
             'to' => 'php_dir'
         ),
-        '../../PEAR2_Console_Color.git/src' => array(
+        '../../Console_Color.git/src' => array(
             'type' => 'pear-config',
             'to' => 'php_dir'
         ),

@@ -8,6 +8,7 @@ Console and some overall improvements.
 * Util::get() now uses RouterOS' "get" command, unless it returns an empty !done response (as it does for RouterOS versions prior to 6.0), in which case it automatically fallbacks to a print with a query.
 * Util::escapeValue() and Util::parseValue() now support associative arrays (introduced in RouterOS 6.2).
 * Util::add() and Util::set()/Util::edit() now support flags as values with a numeric key.
+* Util::changeMenu() now returns the Util object itself, except when you supply an empty string, when the current menu is returned (as before).
 * ResponseCollection can now be searched by argument values, if you first designate an argument name with the new ResponseCollection::setIndex() method.
 * Doc fixes (Notably: Clarified the acceptability of seekable streams as argument values, which has been present for a long time, but never documented).
 * CS fixes.

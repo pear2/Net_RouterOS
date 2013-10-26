@@ -11,8 +11,8 @@
   <email>boen.robot@gmail.com</email>
   <active>yes</active>
  </lead>
- <date>2013-10-24</date>
- <time>18:18:13</time>
+ <date>2013-10-26</date>
+ <time>19:56:36</time>
  <version>
   <release>1.0.0b5</release>
   <api>1.0.0</api>
@@ -31,6 +31,8 @@
     - prepareScript()
 * Util::get() now uses RouterOS' &quot;get&quot; command, unless it returns an empty !done response (as it does for RouterOS versions prior to 6.0), in which case it automatically fallbacks to a print with a query.
 * Util::escapeValue() and Util::parseValue() now support associative arrays (introduced in RouterOS 6.2).
+* Util::add() and Util::set()/Util::edit() now support flags as values with a numeric key.
+* Util::changeMenu() now returns the Util object itself, except when you supply an empty string, when the current menu is returned (as before).
 * ResponseCollection can now be searched by argument values, if you first designate an argument name with the new ResponseCollection::setIndex() method.
 * Doc fixes (Notably: Clarified the acceptability of seekable streams as argument values, which has been present for a long time, but never documented).
 * CS fixes.</notes>
@@ -67,6 +69,8 @@
     </file>
     <file role="script" name="roscon.php">
      <tasks:replace type="pear-config" to="php_dir" from="../src"/>
+     <tasks:replace type="pear-config" to="php_dir" from="../../Net_Transmitter.git/src"/>
+     <tasks:replace type="pear-config" to="php_dir" from="../../Console_Color.git/src"/>
      <tasks:replace type="pear-config" to="data_dir" from="@PEAR2_DATA_DIR@"/>
      <tasks:replace type="package-info" to="channel" from="@PACKAGE_CHANNEL@"/>
      <tasks:replace type="package-info" to="name" from="@PACKAGE_NAME@"/>
@@ -222,6 +226,8 @@
     </dir>
     <file role="test" name="bootstrap.php">
      <tasks:replace type="pear-config" to="php_dir" from="../src"/>
+     <tasks:replace type="pear-config" to="php_dir" from="../../Net_Transmitter.git/src"/>
+     <tasks:replace type="pear-config" to="php_dir" from="../../Cache_SHM.git/src"/>
      <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
     </file>
     <file role="test" name="ConnectionTest.php"/>
