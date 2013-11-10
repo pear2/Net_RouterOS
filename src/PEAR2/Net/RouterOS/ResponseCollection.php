@@ -64,11 +64,12 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * @var array An array with positions of responses, based on an argument
-     * name. The name of each argument is the array key, and the array value is
-     * another array where the key is the value for that argument, and the value
-     * is the posistion of the response. For performance reasons, each key is
-     * built only when {@link static::setIndex()} is called with that argument,
-     * and remains available for the lifetime of this collection.
+     *     name. The name of each argument is the array key, and the array value
+     *     is another array where the key is the value for that argument, and
+     *     the value is the posistion of the response. For performance reasons,
+     *     each key is built only when {@link static::setIndex()} is called with
+     *     that argument, and remains available for the lifetime of this
+     *     collection.
      */
     protected $responsesIndex = array();
     
@@ -171,7 +172,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * Gets the whole collection as an array.
      * 
      * @param bool $useIndex Whether to use the index values as keys for the
-     * resulting array.
+     *     resulting array.
      * 
      * @return array An array with all responses, in network order.
      */
@@ -217,7 +218,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * Gets a {@link Response} from a specified offset.
      * 
      * @param int|string $offset The offset of the desired response. If the
-     * collection is indexed, you can also supply the value to search for.
+     *     collection is indexed, you can also supply the value to search for.
      * 
      * @return Response The response at the specified offset.
      */
@@ -274,7 +275,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * Moves the position pointer to a specified position.
      * 
      * @param int|string $position The position to move to. If the collection is
-     * indexed, you can also supply a value to move the pointer to.
+     *     indexed, you can also supply a value to move the pointer to.
      * 
      * @return Response The {@link Response} at the specified position, or FALSE
      *     if the specified position is not valid.

@@ -15,26 +15,16 @@
  * @link      http://pear2.php.net/PEAR2_Net_RouterOS
  */
 
-$isIncluded = count(get_included_files()) > 1;
 $hasArgs = $argc > 1;
-if ($isIncluded || $hasArgs) {
+if (count(get_included_files()) > 1 || $hasArgs) {
     Phar::mapPhar();
     $pkgDir = 'phar://' . __FILE__ . DIRECTORY_SEPARATOR .
             '@PACKAGE_NAME@-@PACKAGE_VERSION@' . DIRECTORY_SEPARATOR;
 
-    //Set up autoloader
-    if (class_exists('PEAR2\Autoload', true)) {
-        //Called in this fashion to avoid parse errors on PHP =< 5.3.0
-        call_user_func(
-            array('PEAR2\Autoload', 'initialize'),
-            $pkgDir . DIRECTORY_SEPARATOR . 'src'
-        );
-    } else {
-        include_once $pkgDir . DIRECTORY_SEPARATOR
-            . 'src' . DIRECTORY_SEPARATOR
-            . 'PEAR2' . DIRECTORY_SEPARATOR
-            . 'Autoload.php';
-    }
+    include_once $pkgDir . DIRECTORY_SEPARATOR
+        . 'src' . DIRECTORY_SEPARATOR
+        . 'PEAR2' . DIRECTORY_SEPARATOR
+        . 'Autoload.php';
 
     //Run console if there are any arguments
     if ($hasArgs) {
@@ -42,7 +32,7 @@ if ($isIncluded || $hasArgs) {
             . 'bin' . DIRECTORY_SEPARATOR
             . 'roscon.php';
     }
-    unset($pkgDir, $isIncluded, $hasArgs);
+    unset($pkgDir, $hasArgs);
     return;
 }
 
@@ -84,6 +74,7 @@ successfully, you can instead extract one of the other archives, and include
 its autoloader.
 
 Exception details:
+
 HEREDOC
             . $e . "\n";
     }
@@ -96,12 +87,6 @@ archive, and include the autoloader.
 HEREDOC;
 }
 
-echo "\n" . str_repeat('=', 80) . "\n";
-echo <<<HEREDOC
-This package provides a console. To see usage instructions, rerun this file
-from the command line with "--help" as an argument.
-
-HEREDOC;
 echo "\n" . str_repeat('=', 80) . "\n";
 if (extension_loaded('openssl')) {
     echo <<<HEREDOC
@@ -167,5 +152,12 @@ it for you.
 
 HEREDOC;
 }
+
+echo "\n" . str_repeat('=', 80) . "\n";
+echo <<<HEREDOC
+This package provides a console. To see usage instructions, rerun this file
+from the command line with "--help" as an argument.
+
+HEREDOC;
 
 __HALT_COMPILER();
