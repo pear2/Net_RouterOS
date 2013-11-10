@@ -276,6 +276,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * 
      * @param int|string $position The position to move to. If the collection is
      *     indexed, you can also supply a value to move the pointer to.
+     *     A non-existent index will move the pointer to "-1".
      * 
      * @return Response The {@link Response} at the specified position, or FALSE
      *     if the specified position is not valid.
@@ -284,7 +285,9 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     {
         $this->position = is_int($position)
             ? $position
-            : $this->responsesIndex[$this->index][$position];
+            : ($this->offsetExists($position)
+                ? $this->responsesIndex[$this->index][$position]
+                : -1);
         return $this->current();
     }
 
