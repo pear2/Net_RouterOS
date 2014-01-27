@@ -49,11 +49,29 @@ use PEAR2\Net\Transmitter\SocketException as SE;
 
 //If there's no appropriate autoloader, add one
 if (!class_exists('PEAR2\Net\RouterOS\Communicator', true)) {
-    include_once 'PEAR2/Autoload.php';
-    chdir(__DIR__);
-    Autoload::initialize(realpath('../src'));
-    Autoload::initialize(realpath('../../Net_Transmitter.git/src'));
-    Autoload::initialize(realpath('../../Console_Color.git/src'));
+    $autoloader = stream_resolve_include_path('../vendor/autoload.php');
+    if (false !== $autoloader) {
+        include_once $autoloader;
+    } else {
+        $autoloader = stream_resolve_include_path('PEAR2/Autoload.php');
+        if (false !== $autoloader) {
+            include_once $autoloader;
+            Autoload::initialize(realpath('../src'));
+            Autoload::initialize(realpath('../../Net_Transmitter.git/src'));
+            Autoload::initialize(realpath('../../Cache_SHM.git/src'));
+        } else {
+            fwrite(
+                STDERR,
+                <<<HEREDOC
+No recognized autoloader is available.
+Please install this package with Pyrus, PEAR or Composer.
+Alternatively, install PEAR2_Autoload, and/or add it to your include_path.
+HEREDOC
+            );
+            exit(10);
+        }
+    }
+    unset($autoloader);
 }
 
 // Locate the data dir, in preference as:
@@ -72,7 +90,7 @@ if (false === $dataDir) {
         STDERR,
         'Unable to find data dir.'
     );
-    exit(10);
+    exit(11);
 }
 $consoleDefFile = realpath($dataDir . '/roscon.xml');
 if (false === $consoleDefFile) {
@@ -84,7 +102,7 @@ was found to be at
 {$dataDir}
 HEREDOC
     );
-    exit(11);
+    exit(12);
 }
 
 $cmdParser = CommandLine::fromXmlFile($consoleDefFile);
@@ -95,7 +113,7 @@ try {
         STDERR,
         'Error when parsing command line: ' . $e->getMessage() . "\n"
     );
-    $cmdParser->displayUsage(12);
+    $cmdParser->displayUsage(13);
 }
 
 $c_colors = array(
@@ -126,6 +144,10 @@ if ($cmd->options['colors']) {
         Color\Backgrounds::YELLOW
     );
     $c_colors[''] = new Color();
+
+    foreach ($c_colors as $mode => $color) {
+        $c_colors[$mode] = ((string)$color) . "\033[K";
+    }
 }
 
 $cmd->options['size'] = $cmd->options['size'] ?: 80;
@@ -188,12 +210,18 @@ if (null !== $cmd->args['username']) {
 <<<HEREDOC
 Login refused. Possible reasons:
 1. No such username.
-3. The user does not have the "api" privilege. Check the username's group, and
-   it's permissions at "/user groups".
-2. Mistyped password. If the password contains non-ASCII characters, be careful
-   of your locale settings - either they must match those of the terminal you
-   set your password on, or you must type the equivalent code points in your
-   locale, which may display as different characters.
+   Make sure you have spelled it correctly.
+2. The user does not have the "api" privilege.
+   Check the permissions of the user's group at "/user group".
+3. The user is not allowed to access the router from your web server's IP.
+   Make sure your web server's IP address is within the subnets the user is
+   allowed to log in from. You can check them at the "address" property
+   of the user in the "/user" menu.
+4. Mistyped password.
+   If the password contains non-ASCII characters, be careful of your locale.
+   It must match that of the terminal you set your password on, or you must
+   type the equivalent code points in your current locale, which may display as
+   different characters.
 
 HEREDOC
             );

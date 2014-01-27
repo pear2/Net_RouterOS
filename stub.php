@@ -116,7 +116,7 @@ SocketException::CODE_CONNECTION_FAIL), this means one of the following:
 
 1. You haven't enabled the API service at RouterOS or you've enabled it on a
 different TCP port. Make sure that the "api" service at "/ip service" is
-enabled, and with that same TCP port (8728 by default).
+enabled, and with that same TCP port (8728 by default or 8729 for "api-ssl").
 
 2. You've mistyped the IP and/or port. Check the IP and port you've specified
 are the ones you intended.
