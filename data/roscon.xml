@@ -51,13 +51,23 @@ Defaults to PHP's default_socket_timeout ini option.</description>
     </option>
     <option name="colors">
         <long_name>--colors</long_name>
-        <description>Turn on color output.</description>
-        <action>StoreTrue</action>
+        <description>Choose whether to color output. Possible values:
+"auto" - color is always enabled on UNIX operating systems, and on Windows if ANSICON is installed (detected via the ANSICON_VER environment variable).
+"yes"  - force colored output.
+"no"   - force no coloring of output.
+(Default: "auto")</description>
+        <action>StoreString</action>
+        <choices>
+            <choice>auto</choice>
+            <choice>yes</choice>
+            <choice>no</choice>
+        </choices>
     </option>
     <option name="size">
         <short_name>-w</short_name>
         <long_name>--width</long_name>
-        <description>Width of console screen. Used in verbose mode to wrap output in this length.</description>
+        <description>Width of console screen. Used in verbose mode to wrap output in this length.
+(Default: 80)</description>
         <action>StoreInt</action>
     </option>
     <option name="commandMode">

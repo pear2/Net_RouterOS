@@ -59,6 +59,7 @@ if (!class_exists('PEAR2\Net\RouterOS\Communicator', true)) {
             Autoload::initialize(realpath('../src'));
             Autoload::initialize(realpath('../../Net_Transmitter.git/src'));
             Autoload::initialize(realpath('../../Cache_SHM.git/src'));
+            Autoload::initialize(realpath('../../Console_Color.git/src'));
         } else {
             fwrite(
                 STDERR,
@@ -116,40 +117,7 @@ try {
     $cmdParser->displayUsage(13);
 }
 
-$c_colors = array(
-    'SEND' => '',
-    'SENT' => '',
-    'RECV' => '',
-    'ERR'  => '',
-    'NOTE' => '',
-    ''     => ''
-);
-if ($cmd->options['colors']) {
-    $c_colors['SENT'] = new Color(
-        Color\Fonts::BLACK,
-        Color\Backgrounds::PURPLE
-    );
-    $c_colors['SEND'] = clone $c_colors['SENT'];
-    $c_colors['SEND']->setStyles(Color\Styles::UNDERLINE, true);
-    $c_colors['RECV'] = new Color(
-        Color\Fonts::BLACK,
-        Color\Backgrounds::GREEN
-    );
-    $c_colors['ERR'] = new Color(
-        Color\Fonts::WHITE,
-        Color\Backgrounds::RED
-    );
-    $c_colors['NOTE'] = new Color(
-        Color\Fonts::BLUE,
-        Color\Backgrounds::YELLOW
-    );
-    $c_colors[''] = new Color();
-
-    foreach ($c_colors as $mode => $color) {
-        $c_colors[$mode] = ((string)$color) . "\033[K";
-    }
-}
-
+$cmd->options['colors'] = $cmd->options['colors'] ?: 'auto';
 $cmd->options['size'] = $cmd->options['size'] ?: 80;
 $cmd->options['commandMode'] = $cmd->options['commandMode'] ?: 's';
 $cmd->options['replyMode'] = $cmd->options['replyMode'] ?: 's';
@@ -174,6 +142,44 @@ $comContext = null === $cmd->options['caPath']
                 'capath' => $cmd->options['caPath'])
           )
     );
+
+$c_colors = array(
+    'SEND' => '',
+    'SENT' => '',
+    'RECV' => '',
+    'ERR'  => '',
+    'NOTE' => '',
+    ''     => ''
+);
+if ('auto' === $cmd->options['colors']) {
+    $cmd->options['colors'] = (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN'
+    || getenv('ANSICON_VER') != false) ? 'yes' : 'no';
+}
+if ('yes' === $cmd->options['colors']) {
+    $c_colors['SENT'] = new Color(
+        Color\Fonts::BLACK,
+        Color\Backgrounds::PURPLE
+    );
+    $c_colors['SEND'] = clone $c_colors['SENT'];
+    $c_colors['SEND']->setStyles(Color\Styles::UNDERLINE, true);
+    $c_colors['RECV'] = new Color(
+        Color\Fonts::BLACK,
+        Color\Backgrounds::GREEN
+    );
+    $c_colors['ERR'] = new Color(
+        Color\Fonts::WHITE,
+        Color\Backgrounds::RED
+    );
+    $c_colors['NOTE'] = new Color(
+        Color\Fonts::BLUE,
+        Color\Backgrounds::YELLOW
+    );
+    $c_colors[''] = new Color();
+
+    foreach ($c_colors as $mode => $color) {
+        $c_colors[$mode] = ((string)$color) . "\033[K";
+    }
+}
 
 try {
     $com = new RouterOS\Communicator(
@@ -327,6 +333,9 @@ $printWord = $cmd->options['verbose']
     for ($i = 0, $l = count($wordFragments); $i < $l; $i += 2) {
         unset($wordFragments[$i]);
     }
+    if ('' !== $c_colors['']) {
+        $wordFragments = str_replace("\033", "\033[27@", $wordFragments);
+    }
 
     $isAbnormal = 'ERR' === $mode || 'NOTE' === $mode;
     if ($isAbnormal) {
@@ -385,6 +394,11 @@ $printWord = $cmd->options['verbose']
     );
     }
     : function ($mode, $word, $msg = '') use ($c_colors) {
+    if ('' !== $c_colors['']) {
+        $word = str_replace("\033", "\033[27@", $word);
+        $msg = str_replace("\033", "\033[27@", $msg);
+    }
+
     if ('ERR' === $mode || 'NOTE' === $mode) {
         fwrite(STDERR, "{$c_colors[$mode]}-- {$msg}");
         if ('' !== $word) {
