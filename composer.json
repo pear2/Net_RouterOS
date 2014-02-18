@@ -32,5 +32,6 @@
             "PEAR2\\Cache\\SHM": "vendor/pear2/cache_shm/src/"
         }
     },
+    "bin": ["scripts/roscon.php"],
     "minimum-stability": "dev"
 }

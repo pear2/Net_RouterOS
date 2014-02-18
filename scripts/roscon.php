@@ -47,32 +47,72 @@ use PEAR2\Net\RouterOS;
  */
 use PEAR2\Net\Transmitter\SocketException as SE;
 
+if (PHP_SAPI !== 'cli' && count(get_included_files()) === 1) {
+    header('Content-Type: text/plain;charset=UTF-8');
+    echo <<<HEREDOC
+For security reasons, this file can not be ran DIRECTLY, except from the
+command line. It can be included however, even when not using the command line.
+HEREDOC;
+    return;
+}
+
 //If there's no appropriate autoloader, add one
 if (!class_exists('PEAR2\Net\RouterOS\Communicator', true)) {
+    $cwd = chdir(__DIR__);
+
+    //The composer autoloader from this package.
+    //Also matched if the bin-dir is changed to a folder that is directly
+    //descended from the composer project root.
     $autoloader = stream_resolve_include_path('../vendor/autoload.php');
     if (false !== $autoloader) {
         include_once $autoloader;
     } else {
-        $autoloader = stream_resolve_include_path('PEAR2/Autoload.php');
+        //The composer autoloader, when this package is a dependency.
+        $autoloader = stream_resolve_include_path(
+            (false === ($vendorDir = getenv('COMPOSER_VENDOR_DIR'))
+                ? '../../..'
+                : $vendorDir) . '/autoload.php'
+        );
+        unset($vendorDir);
         if (false !== $autoloader) {
             include_once $autoloader;
-            Autoload::initialize(realpath('../src'));
-            Autoload::initialize(realpath('../../Net_Transmitter.git/src'));
-            Autoload::initialize(realpath('../../Cache_SHM.git/src'));
-            Autoload::initialize(realpath('../../Console_Color.git/src'));
         } else {
-            fwrite(
-                STDERR,
-                <<<HEREDOC
+            //PEAR2_Autoload, most probably installed globally.
+            $autoloader = stream_resolve_include_path('PEAR2/Autoload.php');
+            if (false !== $autoloader) {
+                include_once $autoloader;
+                Autoload::initialize(
+                    realpath('../src')
+                );
+                Autoload::initialize(
+                    realpath('../../Net_Transmitter.git/src')
+                );
+                Autoload::initialize(
+                    realpath('../../Cache_SHM.git/src')
+                );
+                Autoload::initialize(
+                    realpath('../../Console_Color.git/src')
+                );
+                Autoload::initialize(
+                    realpath('../../Console_CommandLine.git/src')
+                );
+            } else {
+                fwrite(
+                    STDERR,
+                    <<<HEREDOC
 No recognized autoloader is available.
 Please install this package with Pyrus, PEAR or Composer.
 Alternatively, install PEAR2_Autoload, and/or add it to your include_path.
 HEREDOC
-            );
-            exit(10);
+                );
+                chdir($cwd);
+                exit(10);
+            }
         }
     }
-    unset($autoloader);
+
+    chdir($cwd);
+    unset($autoloader, $cwd);
 }
 
 // Locate the data dir, in preference as:
@@ -117,10 +157,6 @@ try {
     $cmdParser->displayUsage(13);
 }
 
-$cmd->options['colors'] = $cmd->options['colors'] ?: 'auto';
-$cmd->options['size'] = $cmd->options['size'] ?: 80;
-$cmd->options['commandMode'] = $cmd->options['commandMode'] ?: 's';
-$cmd->options['replyMode'] = $cmd->options['replyMode'] ?: 's';
 $comTimeout = null === $cmd->options['conTime']
     ? (null === $cmd->options['time']
             ? (int)ini_get('default_socket_timeout')
@@ -151,11 +187,11 @@ $c_colors = array(
     'NOTE' => '',
     ''     => ''
 );
-if ('auto' === $cmd->options['colors']) {
-    $cmd->options['colors'] = (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN'
+if ('auto' === $cmd->options['isColored']) {
+    $cmd->options['isColored'] = (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN'
     || getenv('ANSICON_VER') != false) ? 'yes' : 'no';
 }
-if ('yes' === $cmd->options['colors']) {
+if ('yes' === $cmd->options['isColored']) {
     $c_colors['SENT'] = new Color(
         Color\Fonts::BLACK,
         Color\Backgrounds::PURPLE
@@ -198,8 +234,45 @@ try {
         fwrite(
             STDERR,
             "Details: ({$previous->getSocketErrorNumber()}) "
-            . $previous->getSocketErrorMessage()
+            . $previous->getSocketErrorMessage() . "\n\n"
         );
+    }
+    if ($e instanceof RouterOS\SocketException
+        && $e->getCode() === RouterOS\SocketException::CODE_CONNECTION_FAIL
+    ) {
+        echo <<<HEREDOC
+Possible reasons:
+
+1. You haven't enabled the API service at RouterOS or you've enabled it on a
+different TCP port. Make sure that the "api" service at "/ip service" is
+enabled, and with that same TCP port (8728 by default or 8729 for "api-ssl").
+
+2. You've mistyped the IP and/or port. Check the IP and port you've specified
+are the ones you intended.
+
+3. The router is not reachable from your web server for some reason. Try to
+reach the router (!!!)from the web server(!!!) by other means (e.g. Winbox,
+ping) using the same IP, and if you're unable to reach it, check the network
+settings on your server, router and any intermediate nodes under your control
+that may affect the connection.
+
+4. Your web server is configured to forbid that outgoing connection. If you're
+the web server administrator, check your web server's firewall's settings. If
+you're on a hosting plan... Typically, shared hosts block all outgoing
+connections, but it's also possible that only connections to that port are
+blocked. Try to connect to a host on a popular port (21, 80, 443, etc.), and if
+successful, change the API service port to that port. If the connection fails
+even then, ask your host to configure their firewall so as to allow you to make
+outgoing connections to the ip:port you've set the API service on.
+
+5. The router has a filter/mangle/nat rule that overrides the settings at
+"/ip service". This is a very rare scenario, but if you want to be sure, try to
+disable all rules that may cause such a thing, or (if you can afford it) set up
+a fresh RouterOS in place of the existing one, and see if you can connect to it
+instead. If you still can't connect, such a rule is certainly not the (only)
+reason.
+
+HEREDOC;
     }
     return;
 }
@@ -224,7 +297,9 @@ Login refused. Possible reasons:
    allowed to log in from. You can check them at the "address" property
    of the user in the "/user" menu.
 4. Mistyped password.
-   If the password contains non-ASCII characters, be careful of your locale.
+   Make sure you have spelled it correctly.
+   If it contains spaces, don't forget to quote the whole password.
+   If it contains non-ASCII characters, be careful of your locale.
    It must match that of the terminal you set your password on, or you must
    type the equivalent code points in your current locale, which may display as
    different characters.

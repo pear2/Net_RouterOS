@@ -1,0 +1,30 @@
+# The following file contains everything needed
+# to adjust a fresh RouterOS install so that
+# the tests run successfully.
+# Extracted (and modified for portability) from
+# the actual VM that tests are performed against.
+
+/interface ethernet
+set [ find default-name=ether1 ] name=vm
+set [ find default-name=ether2 ] name=local
+set [ find default-name=ether3 ] name=net
+/ip dhcp-client
+add disabled=no interface=vm
+add disabled=no interface=net
+
+# The following may be pasted to a Winbox Terminal,
+# as opposed to you having to type it out.
+
+/user
+add address="" disabled=no group=full name=apifull password=apifull
+add address="" disabled=no group=read name=api password=api
+add address="" disabled=no group=full name=api-ANSI password="\E0\EF\E8"
+/queue simple
+add max-limit=100M/100M name=_TOTAL target=local
+add max-limit=1M/2M name=A parent=_TOTAL target=192.168.57.2/32
+add max-limit=1M/2M name=B parent=_TOTAL target=192.168.57.3/32
+add max-limit=1M/2M name=C parent=_TOTAL target=192.168.57.4/32
+add max-limit=1M/2M name=D parent=_TOTAL target=192.168.57.5/32
+add name=_API_TESTING target=net
+add name=INVALID parent=_API_TESTING target=[:resolve "invalid.ros.example.com"]
+add name=SILENT parent=_API_TESTING target=[:resolve "silent.ros.example.com"]

@@ -49,10 +49,10 @@ Defaults to PHP's default_socket_timeout ini option.</description>
         <description>Turn on verbose output.</description>
         <action>StoreTrue</action>
     </option>
-    <option name="colors">
+    <option name="isColored">
         <long_name>--colors</long_name>
         <description>Choose whether to color output. Possible values:
-"auto" - color is always enabled on UNIX operating systems, and on Windows if ANSICON is installed (detected via the ANSICON_VER environment variable).
+"auto" - color is always enabled, except on Windows, where ANSICON must be installed (detected via the ANSICON_VER environment variable).
 "yes"  - force colored output.
 "no"   - force no coloring of output.
 (Default: "auto")</description>
@@ -62,6 +62,7 @@ Defaults to PHP's default_socket_timeout ini option.</description>
             <choice>yes</choice>
             <choice>no</choice>
         </choices>
+        <default>auto</default>
     </option>
     <option name="size">
         <short_name>-w</short_name>
@@ -69,6 +70,7 @@ Defaults to PHP's default_socket_timeout ini option.</description>
         <description>Width of console screen. Used in verbose mode to wrap output in this length.
 (Default: 80)</description>
         <action>StoreInt</action>
+        <default>80</default>
     </option>
     <option name="commandMode">
         <long_name>--command-mode</long_name>
@@ -76,14 +78,14 @@ Defaults to PHP's default_socket_timeout ini option.</description>
 "w" - send every word as soon as it is entered
 "s" - wait for a sentence to be formed, and send all its words then
 "e" - wait for an empty sentence, and send all previous sentences then. You can send an empty sentence by sending two consecutive empty words.
-(Default: "s")
-</description>
+(Default: "s")</description>
         <action>StoreString</action>
         <choices>
             <choice>w</choice>
             <choice>s</choice>
             <choice>e</choice>
         </choices>
+        <default>s</default>
     </option>
     <option name="replyMode">
         <long_name>--reply-mode</long_name>
@@ -91,14 +93,14 @@ Defaults to PHP's default_socket_timeout ini option.</description>
 "w" - after every send, try to get a word
 "s" - after every send, try to get a sentence
 "e" - after every send, try to get all sentences until a timeout.
-(Default: "s")
-</description>
+(Default: "s")</description>
         <action>StoreString</action>
         <choices>
             <choice>w</choice>
             <choice>s</choice>
             <choice>e</choice>
         </choices>
+        <default>s</default>
     </option>
     <option name="multiline">
         <short_name>-m</short_name>

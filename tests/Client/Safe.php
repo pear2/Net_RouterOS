@@ -1132,7 +1132,99 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             'The list was never filtered.'
         );
     }
-    
+
+    public function testResponseCollectionOrderBy()
+    {
+        $request = new Request('/queue/simple/print');
+        $fullList = $this->object->sendSync($request)
+            ->getAllOfType(Response::TYPE_DATA);
+
+        $defaultFirst = $fullList[0]->getArgument('name');
+        $defaultLast = $fullList->getLast()->getArgument('name');
+
+        $sortedByNameASC = $fullList->orderBy(array('name'));
+        $sortedByNameASCFirst = $sortedByNameASC[0]->getArgument('name');
+        $sortedByNameASCLast = $sortedByNameASC->getLast()->getArgument('name');
+
+        $this->assertNotSame($defaultFirst, $sortedByNameASCFirst);
+        $this->assertNotSame($defaultLast, $sortedByNameASCLast);
+
+        $sortedByNameASC = $fullList->orderBy(array('name' => null));
+        $sortedByNameASCFirst = $sortedByNameASC[0]->getArgument('name');
+        $sortedByNameASCLast = $sortedByNameASC->getLast()->getArgument('name');
+
+        $this->assertNotSame($defaultFirst, $sortedByNameASCFirst);
+        $this->assertNotSame($defaultLast, $sortedByNameASCLast);
+
+        $sortedByNameDESC = $fullList->orderBy(array('name' => SORT_DESC));
+        $sortedByNameDESCFirst = $sortedByNameDESC[0]->getArgument('name');
+        $sortedByNameDESCLast = $sortedByNameDESC->getLast()
+            ->getArgument('name');
+
+        $this->assertSame($sortedByNameDESCFirst, $sortedByNameASCLast);
+        $this->assertSame($sortedByNameDESCLast, $sortedByNameASCFirst);
+
+        $sortedByNameDESC = $fullList->orderBy(
+            array('name' => array(SORT_DESC, SORT_REGULAR))
+        );
+        $sortedByNameDESCFirst = $sortedByNameDESC[0]->getArgument('name');
+        $sortedByNameDESCLast = $sortedByNameDESC->getLast()
+            ->getArgument('name');
+
+        $this->assertSame($sortedByNameDESCFirst, $sortedByNameASCLast);
+        $this->assertSame($sortedByNameDESCLast, $sortedByNameASCFirst);
+
+        $sortedByMaxLimitAndName = $fullList->orderBy(
+            array('max-limit', 'name')
+        );
+        $sortedByMaxLimitAndNameFirst = $sortedByMaxLimitAndName[0]
+            ->getArgument('name');
+        $sortedByMaxLimitAndNameLast = $sortedByMaxLimitAndName->getLast()
+            ->getArgument('name');
+
+        $this->assertNotSame($defaultFirst, $sortedByMaxLimitAndNameFirst);
+        $this->assertNotSame(
+            $sortedByNameASCFirst,
+            $sortedByMaxLimitAndNameFirst
+        );
+
+        $sortedByMaxLimit = $fullList->orderBy(
+            array('max-limit')
+        );
+        $sortedByMaxLimitFirst = $sortedByMaxLimit[0]
+            ->getArgument('name');
+        $sortedByMaxLimitLast = $sortedByMaxLimit->getLast()
+            ->getArgument('name');
+
+        $this->assertNotSame($defaultFirst, $sortedByMaxLimitFirst);
+        $this->assertNotSame(
+            $sortedByNameASCFirst,
+            $sortedByMaxLimitFirst
+        );
+
+        $sortedByMaxLimitDownload = $fullList->orderBy(
+            array('max-limit' => function($a, $b) {
+                list($uploadA, $downloadA) = explode('/', $a);
+                list($uploadB, $downloadB) = explode('/', $b);
+                return strcmp($downloadA, $downloadB);
+            })
+        );
+        $sortedByMaxLimitDownloadFirst = $sortedByMaxLimitDownload[0]
+            ->getArgument('name');
+        $sortedByMaxLimitDownloadLast = $sortedByMaxLimitDownload->getLast()
+            ->getArgument('name');
+
+        $this->assertNotSame($defaultFirst, $sortedByMaxLimitDownloadFirst);
+        $this->assertNotSame(
+            $sortedByNameASCFirst,
+            $sortedByMaxLimitDownloadFirst
+        );
+        $this->assertNotSame(
+            $sortedByMaxLimitFirst,
+            $sortedByMaxLimitDownloadFirst
+        );
+    }
+
     public function testDefaultCharsets()
     {
         $this->assertNull(

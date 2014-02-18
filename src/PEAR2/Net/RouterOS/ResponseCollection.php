@@ -89,6 +89,13 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * @var string|null Name of argument to use as index. NULL when disabled.
      */
     protected $index = null;
+
+    /**
+     * @var array Criterias used by {@link compare()} to determine the order
+     *     between two respones. See {@link orderBy()} for a detailed
+     *     description of this array's format.
+     */
+    protected $compareBy = array();
     
     /**
      * Creates a new collection.
@@ -433,6 +440,36 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     }
 
     /**
+     * Order resones by criteria.
+     * 
+     * @param mixed[] $criteria The criteria to order respones by. It takes the
+     *     form of an array where each key is the name of the property to use
+     *     as (N+1)th sorting key. The value of each member can be either NULL
+     *     (for that property, sort normally in ascending order), a single sort
+     *     order constant (SORT_ASC or SORT_DESC) to sort normally in the
+     *     specified order, an array where the first member is an order
+     *     constant, and the second one is sorting flags (same as built in PHP
+     *     array functions) or a callback.
+     *     If a callback is provided, it must accept two arguments
+     *     (the two values to be compared), and return -1, 0 or 1 if the first
+     *     value is respectively less than, equal to or greather than the second
+     *     one.
+     *     Each key of $criteria can also be numeric, in which case the
+     *     value is the name of the property, and sorting is done normally in
+     *     ascending order.
+     * 
+     * @return static A new collection with the responses sorted in the
+     *     specified order.
+     */
+    public function orderBy(array $criteria)
+    {
+        $this->compareBy = $criteria;
+        $sortedResponses = $this->responses;
+        usort($sortedResponses, array($this, 'compare'));
+        return new static($sortedResponses);
+    }
+
+    /**
      * Calls a method of the response pointed by the pointer.
      * 
      * Calls a method of the response pointed by the pointer. This is a magic
@@ -450,5 +487,56 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
             array($this->current(), $method),
             $args
         );
+    }
+
+    /**
+     * Compares two respones.
+     * 
+     * Compares two respones, based on criteria defined in
+     * {@link static::$compareBy}.
+     * 
+     * @param Response $a The response to compare.
+     * @param Response $b The response to compare $a against.
+     * 
+     * @return int Returns 0 if the two respones are equal according to every
+     *     criteria specified, -1 if $a should be placed before $b, and 1 if $b
+     *     should be placed before $a.
+     */
+    protected function compare(Response $a, Response $b)
+    {
+        foreach ($this->compareBy as $name => $spec) {
+            if (!is_string($name)) {
+                $name = $spec;
+                $spec = null;
+            }
+
+            $members = array(
+                0 => $a->getArgument($name),
+                1 => $b->getArgument($name)
+            );
+
+            if (is_callable($spec)) {
+                uasort($members, $spec);
+            } elseif ($members[0] === $members[1]) {
+                continue;
+            } else {
+                $flags = SORT_REGULAR;
+                $order = SORT_ASC;
+                if (is_array($spec)) {
+                    list($order, $flags) = $spec;
+                } elseif (null !== $spec) {
+                    $order = $spec;
+                }
+
+                if (SORT_ASC === $order) {
+                    asort($members, $flags);
+                } else {
+                    arsort($members, $flags);
+                }
+            }
+            return (key($members) === 0) ? -1 : 1;
+        }
+
+        return 0;
     }
 }

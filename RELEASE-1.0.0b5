@@ -10,5 +10,6 @@ Console and some overall improvements.
 * Util::add() and Util::set()/Util::edit() now support flags as values with a numeric key.
 * Util::changeMenu() now returns the Util object itself, except when you supply an empty string, when the current menu is returned (as before).
 * ResponseCollection can now be searched by argument values, if you first designate an argument name with the new ResponseCollection::setIndex() method.
+* ResponseCollection can now produce a sorted response collection based on user defined criteria using the new ResponseCollection::orderBy() method.
 * Doc fixes (Notably: Clarified the acceptability of seekable streams as argument values, which has been present for a long time, but never documented).
 * CS fixes.
