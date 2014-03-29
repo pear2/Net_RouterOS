@@ -1,11 +1,11 @@
 <?php
-namespace PEAR2\Net\RouterOS;
+use PEAR2\Net\RouterOS;
 
-require_once 'PEAR2/Net/RouterOS/Autoload.php';
+require_once 'PEAR2/Autoload.php';
 
-$client = new Client('192.168.0.1', 'admin');
+$client = new RouterOS\Client('192.168.0.1', 'admin');
 
-$responses = $client->sendSync(new Request('/ip/arp/print'));
+$responses = $client->sendSync(new RouterOS\Request('/ip/arp/print'));
 
 foreach ($responses as $response) {
     if ($response->getType() === Response::TYPE_DATA) {

@@ -58,7 +58,8 @@ HEREDOC;
 
 //If there's no appropriate autoloader, add one
 if (!class_exists('PEAR2\Net\RouterOS\Communicator', true)) {
-    $cwd = chdir(__DIR__);
+    $cwd = getcwd();
+    chdir(__DIR__);
 
     //The composer autoloader from this package.
     //Also matched if the bin-dir is changed to a folder that is directly
@@ -188,32 +189,43 @@ $c_colors = array(
     ''     => ''
 );
 if ('auto' === $cmd->options['isColored']) {
-    $cmd->options['isColored'] = (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN'
-    || getenv('ANSICON_VER') != false) ? 'yes' : 'no';
+    $cmd->options['isColored'] = ((strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN'
+    || getenv('ANSICON_VER') != false)
+    && class_exists('PEAR2\Console\Color', true)) ? 'yes' : 'no';
 }
 if ('yes' === $cmd->options['isColored']) {
-    $c_colors['SENT'] = new Color(
-        Color\Fonts::BLACK,
-        Color\Backgrounds::PURPLE
-    );
-    $c_colors['SEND'] = clone $c_colors['SENT'];
-    $c_colors['SEND']->setStyles(Color\Styles::UNDERLINE, true);
-    $c_colors['RECV'] = new Color(
-        Color\Fonts::BLACK,
-        Color\Backgrounds::GREEN
-    );
-    $c_colors['ERR'] = new Color(
-        Color\Fonts::WHITE,
-        Color\Backgrounds::RED
-    );
-    $c_colors['NOTE'] = new Color(
-        Color\Fonts::BLUE,
-        Color\Backgrounds::YELLOW
-    );
-    $c_colors[''] = new Color();
+    if (class_exists('PEAR2\Console\Color', true)) {
+        $c_colors['SENT'] = new Color(
+            Color\Fonts::BLACK,
+            Color\Backgrounds::PURPLE
+        );
+        $c_colors['SEND'] = clone $c_colors['SENT'];
+        $c_colors['SEND']->setStyles(Color\Styles::UNDERLINE, true);
+        $c_colors['RECV'] = new Color(
+            Color\Fonts::BLACK,
+            Color\Backgrounds::GREEN
+        );
+        $c_colors['ERR'] = new Color(
+            Color\Fonts::WHITE,
+            Color\Backgrounds::RED
+        );
+        $c_colors['NOTE'] = new Color(
+            Color\Fonts::BLUE,
+            Color\Backgrounds::YELLOW
+        );
+        $c_colors[''] = new Color();
 
-    foreach ($c_colors as $mode => $color) {
-        $c_colors[$mode] = ((string)$color) . "\033[K";
+        foreach ($c_colors as $mode => $color) {
+            $c_colors[$mode] = ((string)$color) . "\033[K";
+        }
+    } else {
+        fwrite(
+            STDERR,
+            <<<HEREDOC
+Warning: Color was forced, but PEAR2_Console_Color is not available.
+         Resuming with colors disabled.
+HEREDOC
+        );
     }
 }
 
@@ -240,39 +252,51 @@ try {
     if ($e instanceof RouterOS\SocketException
         && $e->getCode() === RouterOS\SocketException::CODE_CONNECTION_FAIL
     ) {
-        echo <<<HEREDOC
+        fwrite(
+            STDERR,
+            <<<HEREDOC
 Possible reasons:
 
 1. You haven't enabled the API service at RouterOS or you've enabled it on a
-different TCP port. Make sure that the "api" service at "/ip service" is
-enabled, and with that same TCP port (8728 by default or 8729 for "api-ssl").
+   different TCP port.
+   Make sure that the "api" service at "/ip service" is enabled, and with that
+   same TCP port (8728 by default or 8729 for "api-ssl").
 
-2. You've mistyped the IP and/or port. Check the IP and port you've specified
-are the ones you intended.
+2. You've mistyped the IP and/or port.
+   Check the IP and port you've specified are the ones you intended.
 
-3. The router is not reachable from your web server for some reason. Try to
-reach the router (!!!)from the web server(!!!) by other means (e.g. Winbox,
-ping) using the same IP, and if you're unable to reach it, check the network
-settings on your server, router and any intermediate nodes under your control
-that may affect the connection.
+3. Your web server's IP is not in the list of subnets allowed to use the API.
+   Check the "address" property at "/ip service".
+   If it's empty, that's not the problem for sure. If it's non-empty however,
+   make sure your IP is in that list, or is at least matched as part of an
+   otherwise larger subnet.
 
-4. Your web server is configured to forbid that outgoing connection. If you're
-the web server administrator, check your web server's firewall's settings. If
-you're on a hosting plan... Typically, shared hosts block all outgoing
-connections, but it's also possible that only connections to that port are
-blocked. Try to connect to a host on a popular port (21, 80, 443, etc.), and if
-successful, change the API service port to that port. If the connection fails
-even then, ask your host to configure their firewall so as to allow you to make
-outgoing connections to the ip:port you've set the API service on.
+4. The router is not reachable from your web server for some reason.
+   Try to reach the router (!!!)from the web server(!!!) by other means
+   (e.g. Winbox, ping) using the same IP, and if you're unable to reach it,
+   check the network settings on your server, router and any intermediate nodes
+   under your control that may affect the connection.
 
-5. The router has a filter/mangle/nat rule that overrides the settings at
-"/ip service". This is a very rare scenario, but if you want to be sure, try to
-disable all rules that may cause such a thing, or (if you can afford it) set up
-a fresh RouterOS in place of the existing one, and see if you can connect to it
-instead. If you still can't connect, such a rule is certainly not the (only)
-reason.
+5. Your web server is configured to forbid that outgoing connection.
+   If you're the web server administrator, check your web server's firewall's
+   settings. If you're on a hosting plan... Typically, shared hosts block all
+   outgoing connections, but it's also possible that only connections to that
+   port are blocked. Try to connect to a host on a popular port (21, 80, 443,
+   etc.), and if successful, change the API service port to that port. If the
+   connection fails even then, ask your host to configure their firewall so as
+   to allow you to make outgoing connections to the ip:port you've set the API
+   service on.
 
-HEREDOC;
+6. The router has a filter/mangle/nat rule that overrides the settings at
+   "/ip service".
+   This is a very rare scenario, but if you want to be sure, try to disable all
+   rules that may cause such a thing, or (if you can afford it) set up a fresh
+   RouterOS in place of the existing one, and see if you can connect to it
+   instead. If you still can't connect, such a rule is certainly not the (only)
+   reason.
+
+HEREDOC
+        );
     }
     return;
 }
@@ -286,16 +310,20 @@ if (null !== $cmd->args['username']) {
         )) {
             fwrite(
                 STDERR,
-<<<HEREDOC
+                <<<HEREDOC
 Login refused. Possible reasons:
+
 1. No such username.
    Make sure you have spelled it correctly.
+
 2. The user does not have the "api" privilege.
    Check the permissions of the user's group at "/user group".
+
 3. The user is not allowed to access the router from your web server's IP.
    Make sure your web server's IP address is within the subnets the user is
    allowed to log in from. You can check them at the "address" property
    of the user in the "/user" menu.
+
 4. Mistyped password.
    Make sure you have spelled it correctly.
    If it contains spaces, don't forget to quote the whole password.
@@ -386,10 +414,8 @@ if ($cmd->options['verbose']) {
     );
 
     $c_regexWrap = '/([^\n]{1,' . ($c_columns['contents']) . '})/sS';
-}
-
-$printWord = $cmd->options['verbose']
-    ? function (
+    
+    $printWord = function (
         $mode,
         $word,
         $msg = ''
@@ -399,91 +425,93 @@ $printWord = $cmd->options['verbose']
         $c_regexWrap,
         $c_colors
     ) {
-    $wordFragments = preg_split(
-        $c_regexWrap,
-        $word,
-        null,
-        PREG_SPLIT_DELIM_CAPTURE
-    );
-    for ($i = 0, $l = count($wordFragments); $i < $l; $i += 2) {
-        unset($wordFragments[$i]);
-    }
-    if ('' !== $c_colors['']) {
-        $wordFragments = str_replace("\033", "\033[27@", $wordFragments);
-    }
-
-    $isAbnormal = 'ERR' === $mode || 'NOTE' === $mode;
-    if ($isAbnormal) {
-        $details = str_pad(
-            $msg,
-            $c_columns['length'] + $c_columns['encodedLength'] + 3,
-            ' ',
-            STR_PAD_BOTH
+        $wordFragments = preg_split(
+            $c_regexWrap,
+            $word,
+            null,
+            PREG_SPLIT_DELIM_CAPTURE
         );
-    } else {
-        $length = strlen($word);
-        $lengthBytes = RouterOS\Communicator::encodeLength($length);
-        $encodedLength = '';
-        for ($i = 0, $l = strlen($lengthBytes); $i < $l; ++$i) {
-            $encodedLength .= str_pad(
-                dechex(ord($lengthBytes[$i])),
-                2,
-                '0',
+        for ($i = 0, $l = count($wordFragments); $i < $l; $i += 2) {
+            unset($wordFragments[$i]);
+        }
+        if ('' !== $c_colors['']) {
+            $wordFragments = str_replace("\033", "\033[27@", $wordFragments);
+        }
+
+        $isAbnormal = 'ERR' === $mode || 'NOTE' === $mode;
+        if ($isAbnormal) {
+            $details = str_pad(
+                $msg,
+                $c_columns['length'] + $c_columns['encodedLength'] + 3,
+                ' ',
+                STR_PAD_BOTH
+            );
+        } else {
+            $length = strlen($word);
+            $lengthBytes = RouterOS\Communicator::encodeLength($length);
+            $encodedLength = '';
+            for ($i = 0, $l = strlen($lengthBytes); $i < $l; ++$i) {
+                $encodedLength .= str_pad(
+                    dechex(ord($lengthBytes[$i])),
+                    2,
+                    '0',
+                    STR_PAD_LEFT
+                );
+            }
+
+            $details = str_pad(
+                $length,
+                $c_columns['length'],
+                ' ',
+                STR_PAD_LEFT
+            ) .
+            $c_sep .
+            str_pad(
+                '0x' . strtoupper($encodedLength),
+                $c_columns['encodedLength'],
+                ' ',
                 STR_PAD_LEFT
             );
         }
-
-        $details = str_pad(
-            $length,
-            $c_columns['length'],
-            ' ',
-            STR_PAD_LEFT
-        ) .
-        $c_sep .
-        str_pad(
-            '0x' . strtoupper($encodedLength),
-            $c_columns['encodedLength'],
-            ' ',
-            STR_PAD_LEFT
-        );
-    }
-    fwrite(
-        STDOUT,
-        $c_colors[$mode] .
-        str_pad($mode, $c_columns['mode'], ' ', STR_PAD_RIGHT) .
-        $c_colors[''] .
-        "{$c_sep}{$details}{$c_sep}{$c_colors[$mode]}" .
-        implode(
-            "\n{$c_colors['']}" .
-            str_repeat(' ', $c_columns['mode']) .
-            $c_sep .
+        fwrite(
+            STDOUT,
+            $c_colors[$mode] .
+            str_pad($mode, $c_columns['mode'], ' ', STR_PAD_RIGHT) .
+            $c_colors[''] .
+            "{$c_sep}{$details}{$c_sep}{$c_colors[$mode]}" .
             implode(
-                ($isAbnormal ? '   ' : $c_sep),
-                array(
-                    str_repeat(' ', $c_columns['length']),
-                    str_repeat(' ', $c_columns['encodedLength'])
-                )
-            ) . $c_sep . $c_colors[$mode],
-            $wordFragments
-        ) . "\n{$c_colors['']}"
-    );
-    }
-    : function ($mode, $word, $msg = '') use ($c_colors) {
-    if ('' !== $c_colors['']) {
-        $word = str_replace("\033", "\033[27@", $word);
-        $msg = str_replace("\033", "\033[27@", $msg);
-    }
-
-    if ('ERR' === $mode || 'NOTE' === $mode) {
-        fwrite(STDERR, "{$c_colors[$mode]}-- {$msg}");
-        if ('' !== $word) {
-            fwrite(STDERR, ": {$word}");
-        }
-        fwrite(STDERR, "{$c_colors['']}\n");
-    } elseif ('SENT' !== $mode) {
-        fwrite(STDOUT, "{$c_colors[$mode]}{$word}{$c_colors['']}\n");
-    }
+                "\n{$c_colors['']}" .
+                str_repeat(' ', $c_columns['mode']) .
+                $c_sep .
+                implode(
+                    ($isAbnormal ? '   ' : $c_sep),
+                    array(
+                        str_repeat(' ', $c_columns['length']),
+                        str_repeat(' ', $c_columns['encodedLength'])
+                    )
+                ) . $c_sep . $c_colors[$mode],
+                $wordFragments
+            ) . "\n{$c_colors['']}"
+        );
     };
+} else {
+    $printWord = function ($mode, $word, $msg = '') use ($c_colors) {
+        if ('' !== $c_colors['']) {
+            $word = str_replace("\033", "\033[27@", $word);
+            $msg = str_replace("\033", "\033[27@", $msg);
+        }
+
+        if ('ERR' === $mode || 'NOTE' === $mode) {
+            fwrite(STDERR, "{$c_colors[$mode]}-- {$msg}");
+            if ('' !== $word) {
+                fwrite(STDERR, ": {$word}");
+            }
+            fwrite(STDERR, "{$c_colors['']}\n");
+        } elseif ('SENT' !== $mode) {
+            fwrite(STDOUT, "{$c_colors[$mode]}{$word}{$c_colors['']}\n");
+        }
+    };
+}
 
 //Input/Output cycle
 while (true) {
@@ -527,7 +555,7 @@ while (true) {
             );
         }
 
-        fwrite(STDOUT, $c_colors['SEND']);
+        fwrite(STDOUT, (string)$c_colors['SEND']);
 
         if ($cmd->options['multiline']) {
             while (true) {
@@ -567,7 +595,7 @@ while (true) {
         if ($cmd->options['verbose']) {
             fwrite(STDOUT, "\n");
         }
-        fwrite(STDOUT, $c_colors['']);
+        fwrite(STDOUT, (string)$c_colors['']);
 
         $words[] = $word;
         if ('w' === $cmd->options['commandMode']) {

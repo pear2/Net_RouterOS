@@ -51,7 +51,7 @@ Defaults to PHP's default_socket_timeout ini option.</description>
     </option>
     <option name="isColored">
         <long_name>--colors</long_name>
-        <description>Choose whether to color output. Possible values:
+        <description>Choose whether to color output (requires PEAR2_Console_Color). Possible values:
 "auto" - color is always enabled, except on Windows, where ANSICON must be installed (detected via the ANSICON_VER environment variable).
 "yes"  - force colored output.
 "no"   - force no coloring of output.

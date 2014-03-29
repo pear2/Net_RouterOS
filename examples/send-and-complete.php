@@ -1,11 +1,11 @@
 <?php
-namespace PEAR2\Net\RouterOS;
+use PEAR2\Net\RouterOS;
 
-require_once 'PEAR2/Net/RouterOS/Autoload.php';
+require_once 'PEAR2/Autoload.php';
 
-$client = new Client('192.168.0.1', 'admin');
+$client = new RouterOS\Client('192.168.0.1', 'admin');
 
-$addRequest = new Request('/ip/arp/add');
+$addRequest = new RouterOS\Request('/ip/arp/add');
 
 $addRequest->setArgument('address', '192.168.0.100');
 $addRequest->setArgument('mac-address', '00:00:00:00:00:01');

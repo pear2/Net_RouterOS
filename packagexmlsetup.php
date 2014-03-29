@@ -85,16 +85,19 @@ $config = array(
     )
 );
 
+if (!isset($package)) {
+    die('This file must be executed via "pyrus.phar make".');
+}
+
 $packageGen = function (
     array $config,
     v2 $package,
     v2 $compatible = null
 ) {
-    $hasCompatible = null !== $compatible;
 
     $tasksNs = $package->getTasksNs();
-    if ($hasCompatible) {
-        $cTaskNs = $compatible->getTasksNs();
+    if ($compatible) {
+        $cTasksNs = $compatible->getTasksNs();
     }
 
     $oldCwd = getcwd();
@@ -108,14 +111,7 @@ $packageGen = function (
         RecursiveIteratorIterator::LEAVES_ONLY
     ) as $path) {
             $filename = substr($path->getPathname(), 2);
-
-        if ($hasCompatible) {
-            $cFilename = str_replace(
-                'src/',
-                'php/',
-                $filename
-            );
-        }
+            $cFilename = str_replace('src/', 'php/', $filename);
 
         if (isset($package->files[$filename])) {
             $parsedFilename = pathinfo($filename);
@@ -154,7 +150,7 @@ $packageGen = function (
                         )
                     );
 
-                    if ($hasCompatible) {
+                    if ($compatible) {
                         $compatible->files[$cFilename] = array_merge_recursive(
                             $compatible->files[$cFilename]->getArrayCopy(),
                             array(
@@ -178,7 +174,7 @@ $packageGen = function (
                         )
                     );
 
-                    if ($hasCompatible) {
+                    if ($compatible) {
                         $compatible->files[$cFilename] = array_merge_recursive(
                             $compatible->files[$cFilename]->getArrayCopy(),
                             array(

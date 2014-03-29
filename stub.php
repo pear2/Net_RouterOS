@@ -41,7 +41,7 @@ if ('cli' !== PHP_SAPI) {
 echo "@PACKAGE_NAME@ @PACKAGE_VERSION@\n";
 
 if (version_compare(phpversion(), '5.3.0', '<')) {
-    echo "\nERROR: This package requires PHP 5.3.0 or later.";
+    echo "\nERROR: This package requires PHP 5.3.0 or later.\n";
     exit(1);
 }
 

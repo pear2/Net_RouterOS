@@ -19,17 +19,23 @@
         "php": ">=5.3.0",
         "pear2/net_transmitter": ">=1.0.0a4"
     },
+    "require-dev": {
+        "phpunit/phpunit": "@stable",
+        "squizlabs/php_codesniffer": "@stable",
+        "scrutinizer/php-analyzer": "dev-master"
+    },
     "suggest": {
-        "pear2/cache_shm": ">=0.1.2",
-        "ext-apc": ">=3.0.13",
-        "ext-wincache": ">=1.1.0",
-        "ext-openssl": "*"
+        "pear2/cache_shm": "Enables persistent connections.",
+        "ext-apc": "This or Wincache is required for persistent connections.",
+        "ext-wincache": "This or APC is required for persistent connections. Reccomended instead of APC on Windows.",
+        "ext-openssl": "Enables encrypted connections."
     },
     "autoload": {
         "psr-0": {
             "PEAR2\\Net\\RouterOS\\": "src/",
             "PEAR2\\Net\\Transmitter\\": "vendor/pear2/net_transmitter/src/",
-            "PEAR2\\Cache\\SHM": "vendor/pear2/cache_shm/src/"
+            "PEAR2\\Cache\\SHM": "vendor/pear2/cache_shm/src/",
+            "PEAR2\\Console\\Color": "vendor/pear2/console_color/src/"
         }
     },
     "bin": ["scripts/roscon.php"],

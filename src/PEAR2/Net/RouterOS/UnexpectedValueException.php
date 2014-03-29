@@ -45,11 +45,11 @@ class UnexpectedValueException extends U implements Exception
     /**
      * Creates a new UnexpectedValueException.
      * 
-     * @param string    $message  The Exception message to throw.
-     * @param int       $code     The Exception code.
-     * @param Exception $previous The previous exception used for the exception
+     * @param string     $message  The Exception message to throw.
+     * @param int        $code     The Exception code.
+     * @param \Exception $previous The previous exception used for the exception
      *     chaining.
-     * @param mixed     $value    The unexpected value.
+     * @param mixed      $value    The unexpected value.
      */
     public function __construct(
         $message,
