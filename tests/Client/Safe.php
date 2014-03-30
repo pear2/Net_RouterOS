@@ -774,8 +774,8 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         );
 
         foreach ($list as $index => $response) {
-            $streamListArgs = $streamList[$index]->getAllArguments();
-            foreach ($response->getAllArguments() as $argName => $value) {
+            $streamListArgs = $streamList[$index]->getIterator();
+            foreach ($response as $argName => $value) {
                 $this->assertArrayHasKey(
                     $argName,
                     $streamListArgs,

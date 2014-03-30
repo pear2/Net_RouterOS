@@ -299,7 +299,7 @@ class Request extends Message
         if (null !== ($tag = $this->getTag())) {
             $bytes += $com->sendWord('.tag=' . $tag);
         }
-        foreach ($this->getAllArguments() as $name => $value) {
+        foreach ($this->arguments as $name => $value) {
             $prefix = '=' . $name . '=';
             if (is_string($value)) {
                 $bytes += $com->sendWord($prefix . $value);

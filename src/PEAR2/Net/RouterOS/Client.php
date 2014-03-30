@@ -31,6 +31,11 @@ use PEAR2\Net\Transmitter\Stream as S;
 use PEAR2\Net\Transmitter\NetworkStream as N;
 
 /**
+ * Catches arbitrary exceptions at some points.
+ */
+use Exception as E;
+
+/**
  * A RouterOS client.
  * 
  * Provides functionality for easily communicating with a RouterOS host.
@@ -228,7 +233,7 @@ class Client
                 return $result;
             }
             return self::_login($com, $username, $password, $timeout);
-        } catch (\Exception $e) {
+        } catch (E $e) {
             if ($com->getTransmitter()->isPersistent() && null !== $old) {
                 $com->getTransmitter()->lock($old, true);
             }
@@ -596,7 +601,7 @@ class Client
      * @param string $tag Tag of the request to cancel. Setting NULL will cancel
      *     all requests.
      * 
-     * @return self|Client The client object.
+     * @return $this The client object.
      * @see sendAsync()
      * @see close()
      */
@@ -710,7 +715,7 @@ class Client
                 if (null !== $this->registry) {
                     $this->registry->setTaglessMode(false);
                 }
-                $result = $response->getType() === Response::TYPE_FATAL;
+                $result = $response[0]->getType() === Response::TYPE_FATAL;
             }
             $result = $result && $this->com->close();
         } catch (SocketException $e) {
@@ -744,7 +749,7 @@ class Client
      * 
      * @param Request $request The request to send.
      * 
-     * @return self|Client The client object.
+     * @return $this The client object.
      * @see sendSync()
      * @see sendAsync()
      */

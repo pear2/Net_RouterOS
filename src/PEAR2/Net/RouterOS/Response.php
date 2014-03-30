@@ -228,7 +228,7 @@ class Response extends Message
      * 
      * @param string $type The new response type.
      * 
-     * @return self|Response The response object.
+     * @return $this The response object.
      * @see getType()
      */
     protected function setType($type)

@@ -1,8 +1,17 @@
-# The following file contains everything needed
-# to adjust a fresh RouterOS install so that
-# the tests run successfully.
-# Extracted (and modified for portability) from
-# the actual VM that tests are performed against.
+# The following file contains everything needed to adjust a fresh RouterOS
+# install so that the tests run successfully with the provided PHPUnit settings.
+# Extracted (and modified for portability) from the actual VM that tests are
+# performed against.
+#
+# If you adjust the PHPUnit settings, you may want to adjust this file also.
+#
+# NOTE: 192.168.57.0/24 is assumed to be the subnet
+#       that the interface "local" uses.
+#       Other interfaces should use another subnet.
+#       You can safely replace "192.168.57." with another subnet if you must.
+
+# You may need to manually type out the following part,
+# since it's required to estabilish ANY connection with the router.
 
 /interface ethernet
 set [ find default-name=ether1 ] name=vm

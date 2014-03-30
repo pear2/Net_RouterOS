@@ -21,6 +21,21 @@
 namespace PEAR2\Net\RouterOS;
 
 /**
+ * Implements this interface.
+ */
+use Countable;
+
+/**
+ * Implements this interface.
+ */
+use IteratorAggregate;
+
+/**
+ * Requred for IteratorAggregate::getIterator() to work properly with foreach.
+ */
+use ArrayObject;
+
+/**
  * Represents a RouterOS message.
  * 
  * @category Net
@@ -29,7 +44,7 @@ namespace PEAR2\Net\RouterOS;
  * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
  * @link     http://pear2.php.net/PEAR2_Net_RouterOS
  */
-abstract class Message
+abstract class Message implements IteratorAggregate, Countable
 {
 
     /**
@@ -59,7 +74,7 @@ abstract class Message
     public function __invoke($name = null)
     {
         if (null === $name) {
-            return $this->getAllArguments();
+            return $this->getTag();
         }
         return $this->getArgument($name);
     }
@@ -120,7 +135,7 @@ abstract class Message
      * 
      * @param string $tag The tag to set.
      * 
-     * @return self|Message The message object.
+     * @return $this The message object.
      * @see getTag()
      */
     protected function setTag($tag)
@@ -150,14 +165,24 @@ abstract class Message
     /**
      * Gets all arguments in an array.
      * 
-     * @return array An array with the keys as argument names, and the array
-     *     values as argument values.
+     * @return ArrayObject An ArrayObject with the keys being argument names,
+     *     and the array values being argument values.
      * @see getArgument()
      * @see setArgument()
      */
-    public function getAllArguments()
+    public function getIterator()
     {
-        return $this->arguments;
+        return new ArrayObject($this->arguments);
+    }
+
+    /**
+     * Counts the number of arguments.
+     * 
+     * @return int The number of arguments.
+     */
+    public function count()
+    {
+        return count($this->arguments);
     }
 
     /**
@@ -173,7 +198,7 @@ abstract class Message
      *     Non seekable streams, as well as all other types, are casted to a
      *     string.
      * 
-     * @return self|Message The message object.
+     * @return $this The message object.
      * @see getArgument()
      */
     protected function setArgument($name, $value = '')
@@ -190,7 +215,7 @@ abstract class Message
     /**
      * Removes all arguments from the message.
      * 
-     * @return self|Message The message object.
+     * @return $this The message object.
      */
     protected function removeAllArguments()
     {

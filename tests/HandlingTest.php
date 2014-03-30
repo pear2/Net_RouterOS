@@ -168,7 +168,7 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             $args,
-            $request->getAllArguments(),
+            $request->getIterator()->getArrayCopy(),
             "Command '{$command}' was not parsed properly."
         );
     }
@@ -762,21 +762,21 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
     public function testArgumentRemoval()
     {
         $request = new Request('/ip/arp/add');
-        $this->assertEmpty($request->getAllArguments());
+        $this->assertEmpty($request);
 
         $request->setArgument('address', HOSTNAME_INVALID);
-        $this->assertNotEmpty($request->getAllArguments());
+        $this->assertNotEmpty($request);
         $this->assertEquals(HOSTNAME_INVALID, $request->getArgument('address'));
 
         $request->removeAllArguments();
-        $this->assertEmpty($request->getAllArguments());
+        $this->assertEmpty($request);
         $this->assertEquals(null, $request->getArgument('address'));
 
         $request->setArgument('address', HOSTNAME_INVALID);
-        $this->assertNotEmpty($request->getAllArguments());
+        $this->assertNotEmpty($request);
         $this->assertEquals(HOSTNAME_INVALID, $request->getArgument('address'));
         $request->setArgument('address', null);
-        $this->assertEmpty($request->getAllArguments());
+        $this->assertEmpty($request);
         $this->assertEquals(null, $request->getArgument('address'));
     }
 
@@ -972,7 +972,7 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             0,
-            count($quitResponse->getAllArguments()),
+            count($quitResponse),
             'There should be no arguments.'
         );
         $com->close();
@@ -997,7 +997,7 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             0,
-            count($quitResponse->getAllArguments()),
+            count($quitResponse),
             'There should be no arguments.'
         );
         $com->close();
@@ -1089,14 +1089,14 @@ class RequestHandlingTest extends PHPUnit_Framework_TestCase
         $request('address', HOSTNAME)->setTag('p');
         $this->assertEquals(HOSTNAME, $request('address'));
         $this->assertEquals('p', $request->getTag());
-        $this->assertEquals(array('address' => HOSTNAME), $request());
+        $this->assertEquals('p', $request());
         $request($com);
         $response = new Response(
             $com,
             false,
             ini_get('default_socket_timeout')
         );
-        $this->assertInternalType('array', $response());
+        $this->assertInternalType('string', $response());
         $this->assertEquals(HOSTNAME, $response('host'));
         
         $request = new Request('/queue/simple/print');

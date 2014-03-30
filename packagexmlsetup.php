@@ -96,9 +96,7 @@ $packageGen = function (
 ) {
 
     $tasksNs = $package->getTasksNs();
-    if ($compatible) {
-        $cTasksNs = $compatible->getTasksNs();
-    }
+    $cTasksNs = $compatible ? $compatible->getTasksNs() : '';
 
     $oldCwd = getcwd();
     chdir(__DIR__);

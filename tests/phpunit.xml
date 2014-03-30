@@ -19,6 +19,12 @@
     <php>
         <ini name="default_socket_timeout" value="4" />
         <!--
+        The following ini directives are also required,
+        but can only be set in php.ini:
+            allow_url_include = On
+        -->
+
+        <!--
         The actual RouterOS machine and the port of the API service.
 
         The router is expected to contain at least two entries in

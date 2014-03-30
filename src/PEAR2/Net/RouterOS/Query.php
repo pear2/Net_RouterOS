@@ -114,7 +114,7 @@ class Query
      * @param string $action One of the ACTION_* constants. Describes the
      *     operation to perform.
      * 
-     * @return static The query object.
+     * @return static A new query object.
      */
     public static function where(
         $name,

@@ -43,6 +43,19 @@ use SeekableIterator;
  * @author   Vasil Rangelov <boen.robot@gmail.com>
  * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
  * @link     http://pear2.php.net/PEAR2_Net_RouterOS
+ * 
+ * @method string getType()
+ *     Calls {@link Response::getType()}
+ *     on the response pointed by the pointer.
+ * @method string getUnrecognizedWords()
+ *     Calls {@link Response::getUnrecognizedWords()}
+ *     on the response pointed by the pointer.
+ * @method string getArgument(string $name)
+ *     Calls {@link Response::getArgument()}
+ *     on the response pointed by the pointer.
+ * @method string getTag()
+ *     Calls {@link Response::getTag()}
+ *     on the response pointed by the pointer.
  */
 class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 {
@@ -380,7 +393,8 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
         if (null === $this->argumentMap) {
             $arguments = array();
             foreach ($this->responses as $index => $response) {
-                foreach (array_keys($response->getAllArguments()) as $name) {
+                $names = array_keys($response->getIterator()->getArrayCopy());
+                foreach ($names as $name) {
                     if (!isset($arguments[$name])) {
                         $arguments[$name] = array();
                     }
