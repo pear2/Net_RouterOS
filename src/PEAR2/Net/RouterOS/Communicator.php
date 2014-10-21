@@ -197,21 +197,21 @@ class Communicator
     /**
      * Uses iconv to convert a stream from one charset to another.
      * 
-     * @param string   $in_charset  The charset of the stream.
-     * @param string   $out_charset The desired resulting charset.
-     * @param resource $stream      The stream to convert.
+     * @param string   $inCharset  The charset of the stream.
+     * @param string   $outCharset The desired resulting charset.
+     * @param resource $stream     The stream to convert.
      * 
      * @return resource A new stream that uses the $out_charset. The stream is a
      *     subset from the original stream, from its current position to its
      *     end.
      */
-    public static function iconvStream($in_charset, $out_charset, $stream)
+    public static function iconvStream($inCharset, $outCharset, $stream)
     {
         $bytes = 0;
         $result = fopen('php://temp', 'r+b');
         $iconvFilter = stream_filter_append(
             $result,
-            'convert.iconv.' . $in_charset . '.' . $out_charset,
+            'convert.iconv.' . $inCharset . '.' . $outCharset,
             STREAM_FILTER_WRITE
         );
         

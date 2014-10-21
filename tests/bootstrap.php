@@ -39,7 +39,10 @@ if (false !== $autoloader) {
 }
 unset($autoloader);
 
-define('ROS_NAMESPACE', __NAMESPACE__);
+$defineConstants = !defined('ROS_NAMESPACE');
+if ($defineConstants) {
+    define('ROS_NAMESPACE', __NAMESPACE__);
+}
 
 /**
  * Resolves a hostname to an IP address.
@@ -68,20 +71,22 @@ $resolve = function ($hostname) use (&$resolve) {
     }
 };
 
-//Resolving HOSTNAME_* constants
-$constants = array('HOSTNAME', 'HOSTNAME_INVALID', 'HOSTNAME_SILENT');
-foreach ($constants as $constant) {
-    $value = $resolve(constant($constant));
-    define(
-        __NAMESPACE__ . '\Client\Test\\' . $constant,
-        $value
-    );
-    define(
-        __NAMESPACE__ . '\Util\Test\\' . $constant,
-        $value
-    );
-    define(
-        __NAMESPACE__ . '\Misc\Test\\' . $constant,
-        $value
-    );
+if ($defineConstants) {
+    //Resolving HOSTNAME_* constants
+    $constants = array('HOSTNAME', 'HOSTNAME_INVALID', 'HOSTNAME_SILENT');
+    foreach ($constants as $constant) {
+        $value = $resolve(constant($constant));
+        define(
+            __NAMESPACE__ . '\Client\Test\\' . $constant,
+            $value
+        );
+        define(
+            __NAMESPACE__ . '\Util\Test\\' . $constant,
+            $value
+        );
+        define(
+            __NAMESPACE__ . '\Misc\Test\\' . $constant,
+            $value
+        );
+    }
 }

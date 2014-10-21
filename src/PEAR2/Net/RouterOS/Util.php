@@ -65,8 +65,9 @@ class Util implements Countable
     protected $menu = '/';
 
     /**
-     * @var array An array with the numbers of items in the current menu as
-     *     keys, and the corresponding IDs as values.
+     * @var array|null An array with the numbers of items in the current menu as
+     *     keys, and the corresponding IDs as values. NULL when the cache needs
+     *     regenerating.
      */
     protected $idCache = null;
 
@@ -387,34 +388,45 @@ class Util implements Countable
     {
         $this->client = $client;
     }
+
+    /**
+     * Gets the current menu.
+     * 
+     * @return string The current menu.
+     */
+    public function getMenu()
+    {
+        return $this->menu;
+    }
     
     /**
-     * Changes the current menu.
+     * Sets the current menu.
      * 
-     * Changes the current menu.
+     * Sets the current menu.
      * 
      * @param string $newMenu The menu to change to. Can be specified with API
      *     or CLI syntax and can be either absolute or relative. If relative,
      *     it's relative to the current menu, which by default is the root.
      * 
-     * @return $this|string The object itself. If an empty string is given for
-     *     a new menu, no change is performed, and the current menu is returned.
+     * @return $this The object itself. If an empty string is given for
+     *     a new menu, no change is performed,
+     *     but the ID cache is cleared anyway.
+     * 
+     * @see static::clearIdCache()
      */
-    public function changeMenu($newMenu = '')
+    public function setMenu($newMenu)
     {
         $newMenu = (string)$newMenu;
-        if ('' === $newMenu) {
-            return $this->menu;
-        }
-
-        $menuRequest = new Request('/menu');
-        if ('/' === $newMenu[0]) {
-            $this->menu = $menuRequest->setCommand($newMenu)->getCommand();
-        } else {
-            $this->menu = $menuRequest->setCommand(
-                '/' . str_replace('/', ' ', substr($this->menu, 1)) . ' ' .
-                str_replace('/', ' ', $newMenu)
-            )->getCommand();
+        if ('' !== $newMenu) {
+            $menuRequest = new Request('/menu');
+            if ('/' === $newMenu[0]) {
+                $this->menu = $menuRequest->setCommand($newMenu)->getCommand();
+            } else {
+                $this->menu = $menuRequest->setCommand(
+                    '/' . str_replace('/', ' ', substr($this->menu, 1)) . ' ' .
+                    str_replace('/', ' ', $newMenu)
+                )->getCommand();
+            }
         }
         $this->clearIdCache();
         return $this;
@@ -517,9 +529,13 @@ class Util implements Countable
     {
         if (func_num_args() === 0) {
             if (null === $this->idCache) {
-                $idCache = $this->client->sendSync(
-                    new Request($this->menu . '/find')
-                )->getArgument('ret');
+                $idCache = str_replace(
+                    ';',
+                    ',',
+                    $this->client->sendSync(
+                        new Request($this->menu . '/find')
+                    )->getArgument('ret')
+                );
                 $this->idCache = explode(',', $idCache);
                 return $idCache;
             }
@@ -584,16 +600,16 @@ class Util implements Countable
     /**
      * Gets a value of a specified item at the current menu.
      * 
-     * @param int|string|null $number     A number identifying the item you're
+     * @param int|string|null $number    A number identifying the item you're
      *     targeting. Can also be an ID or (in some menus) name. For menus where
      *     there are no items (e.g. "/system identity"), you can specify NULL.
-     * @param string          $value_name The name of the value you want to get.
+     * @param string          $valueName The name of the value you want to get.
      * 
      * @return string|null|bool The value of the specified property. If the
      *     property is not set, NULL will be returned. FALSE on failure
      *     (e.g. no such item, invalid property, etc.).
      */
-    public function get($number, $value_name)
+    public function get($number, $valueName)
     {
         if (is_int($number) || ((string)$number === (string)(int)$number)) {
             $this->find();
@@ -607,7 +623,7 @@ class Util implements Countable
         //For new RouterOS versions
         $request = new Request($this->menu . '/get');
         $request->setArgument('number', $number);
-        $request->setArgument('value-name', $value_name);
+        $request->setArgument('value-name', $valueName);
         $responses = $this->client->sendSync($request);
         if (Response::TYPE_ERROR === $responses->getType()) {
             return false;
@@ -625,8 +641,8 @@ class Util implements Countable
             $number = (string)$number;
             $query = Query::where('.id', $number)->orWhere('name', $number);
         }
-        $responses = $this->getall(
-            array('.proplist' => $value_name, 'detail'),
+        $responses = $this->getAll(
+            array('.proplist' => $valueName, 'detail'),
             $query
         );
 
@@ -636,7 +652,7 @@ class Util implements Countable
             return false;
             // @codeCoverageIgnoreEnd
         }
-        return $responses->getArgument($value_name);
+        return $responses->getArgument($valueName);
     }
 
     /**
@@ -749,19 +765,19 @@ class Util implements Countable
      * name is added because "unset" is a language construct, and thus a
      * reserved word.
      * 
-     * @param mixed  $numbers    Targeted items. Can be any criteria accepted
+     * @param mixed  $numbers   Targeted items. Can be any criteria accepted
      *     by {@link static::find()}.
-     * @param string $value_name The name of the value you want to unset.
+     * @param string $valueName The name of the value you want to unset.
      * 
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
      */
-    public function unsetValue($numbers, $value_name)
+    public function unsetValue($numbers, $valueName)
     {
         $unsetRequest = new Request($this->menu . '/unset');
         return $this->client->sendSync(
             $unsetRequest->setArgument('numbers', $this->find($numbers))
-                ->setArgument('value-name', $value_name)
+                ->setArgument('value-name', $valueName)
         );
     }
 
@@ -848,13 +864,15 @@ class Util implements Countable
      * queries are allowed as a criteria, in contrast with
      * {@link static::find()}, where numbers and callbacks are allowed also.
      * 
+     * @param int   $mode  The counter mode.
+     *     Currently ignored, but present for compatiblity with PHP 5.6+.
      * @param Query $query A query to filter items by. Without it, all items
      *     are included in the count.
      * 
      * @return int The number of items, or -1 on failure (e.g. if the
      *     current menu does not have a "print" command or items to be counted).
      */
-    public function count(Query $query = null)
+    public function count($mode = COUNT_NORMAL, Query $query = null)
     {
         $result = self::parseValue(
             $this->client->sendSync(
@@ -873,19 +891,20 @@ class Util implements Countable
      * 
      * Gets all items in the current menu, using a print request.
      * 
-     * @param string[mixed] $args  Additional arguments to pass to the request.
+     * @param array<int|string,string> $args  Additional arguments to pass
+     *     to the request.
      *     Each array key is the name of the argument, and each array value is
      *     the value of the argument to be passed.
      *     Arguments without a value (i.e. empty arguments) can also be
      *     specified using a numeric key, and the name of the argument as the
      *     array value.
-     * @param Query|null    $query A query to filter items by.
+     * @param Query|null               $query A query to filter items by.
      * 
      * @return ResponseCollection|bool A response collection with all
      *     {@link Response::TYPE_DATA} responses. The collection will be empty
      *     when there are no matching items. FALSE on failure.
      */
-    public function getall(array $args = array(), Query $query = null)
+    public function getAll(array $args = array(), Query $query = null)
     {
         $printRequest = new Request($this->menu . '/print', $query);
         foreach ($args as $name => $value) {
@@ -917,7 +936,7 @@ class Util implements Countable
      * 
      * If you want an efficient way of transferring files, use (T)FTP.
      * If you want an efficient way of removing files, use
-     * {@link static::changeMenu()} to move to the "/file" menu, and call
+     * {@link static::setMenu()} to move to the "/file" menu, and call
      * {@link static::remove()} without performing verification afterwards.
      * 
      * @param string               $filename  The filename to write data in.

@@ -5,24 +5,29 @@
 #
 # If you adjust the PHPUnit settings, you may want to adjust this file also.
 #
+# You may need to manually type out the following part,
+# since it's required to estabilish ANY connection with the router.
+# ```
+# /ip dhcp-client add disabled=no interface=ether1
+# ```
+#
+# NOTE: ether1 is assumed to be a host-only adapter;
+#       ether2 is assumed to be a NAT adapter;
+#       ether3 can be anything, including "not connected".
 # NOTE: 192.168.57.0/24 is assumed to be the subnet
 #       that the interface "local" uses.
 #       Other interfaces should use another subnet.
 #       You can safely replace "192.168.57." with another subnet if you must.
-
-# You may need to manually type out the following part,
-# since it's required to estabilish ANY connection with the router.
+#
+# The following may be pasted to a Winbox Terminal,
+# as opposed to you having to type it out.
 
 /interface ethernet
 set [ find default-name=ether1 ] name=vm
-set [ find default-name=ether2 ] name=local
-set [ find default-name=ether3 ] name=net
+set [ find default-name=ether2 ] name=net
+set [ find default-name=ether3 ] name=local
 /ip dhcp-client
-add disabled=no interface=vm
 add disabled=no interface=net
-
-# The following may be pasted to a Winbox Terminal,
-# as opposed to you having to type it out.
 
 /user
 add address="" disabled=no group=full name=apifull password=apifull

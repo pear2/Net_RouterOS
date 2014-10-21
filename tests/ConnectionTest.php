@@ -645,7 +645,7 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
             $this->fail('The query had to fail.');
         } catch (SocketException $e) {
             $this->assertEquals(
-                SocketException::CODE_UNACCEPTING_QUERY,
+                SocketException::CODE_QUERY_SEND_FAIL,
                 $e->getCode(),
                 'Improper exception code.'
             );

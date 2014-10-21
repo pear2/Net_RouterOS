@@ -1133,6 +1133,38 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @requires PHP 5.6
+     */
+    public function testResponseCollectionWordCount()
+    {
+        $this->assertEquals(
+            3/*!re + .id*/+ 2/*!done*/,
+            count(
+                $this->object->sendSync(
+                    new Request(
+                        '/queue/simple/print .proplist=.id',
+                        Query::where('target', HOSTNAME_SILENT . '/32')
+                    )
+                ),
+                COUNT_RECURSIVE
+            )
+        );
+    }
+
+    public function testResponseCollectionWordCountCall()
+    {
+        $this->assertEquals(
+            3/*!re + .id*/+ 2/*!done*/,
+            $this->object->sendSync(
+                new Request(
+                    '/queue/simple/print .proplist=.id',
+                    Query::where('target', HOSTNAME_SILENT . '/32')
+                )
+            )->count(COUNT_RECURSIVE)
+        );
+    }
+
     public function testResponseCollectionOrderBy()
     {
         $request = new Request('/queue/simple/print');
@@ -1203,7 +1235,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         );
 
         $sortedByMaxLimitDownload = $fullList->orderBy(
-            array('max-limit' => function($a, $b) {
+            array('max-limit' => function ($a, $b) {
                 list($uploadA, $downloadA) = explode('/', $a);
                 list($uploadB, $downloadB) = explode('/', $b);
                 return strcmp($downloadA, $downloadB);

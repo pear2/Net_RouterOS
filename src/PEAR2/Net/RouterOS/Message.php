@@ -66,10 +66,10 @@ abstract class Message implements IteratorAggregate, Countable
      * the class is invoked and its returned value is returned by this function.
      * 
      * @param string $name The name of an argument to get the value of, or NULL
-     *     to get all arguments as an array.
+     *     to get the tag.
      * 
-     * @return string|array The value of the specified argument, or an array of
-     *     all arguments if NULL is provided.
+     * @return string|resource The value of the specified argument,
+     *     or the tag if NULL is provided.
      */
     public function __invoke($name = null)
     {
@@ -178,11 +178,20 @@ abstract class Message implements IteratorAggregate, Countable
     /**
      * Counts the number of arguments.
      * 
-     * @return int The number of arguments.
+     * @param int $mode The counter mode.
+     *     Either COUNT_NORMAL or COUNT_RECURSIVE.
+     *     When in normal mode, counts the number of arguments.
+     *     When in recursive mode, counts the number of API words.
+     * 
+     * @return int The number of arguments/words.
      */
-    public function count()
+    public function count($mode = COUNT_NORMAL)
     {
-        return count($this->arguments);
+        $result = count($this->arguments);
+        if ($mode !== COUNT_NORMAL) {
+            $result += 2/*first+last word*/ + (int)(string)$this->getTag();
+        }
+        return $result;
     }
 
     /**

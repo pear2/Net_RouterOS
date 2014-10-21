@@ -213,7 +213,7 @@ class Query
         if (!$com->getTransmitter()->isAcceptingData()) {
             throw new SocketException(
                 'Transmitter is invalid. Sending aborted.',
-                SocketException::CODE_UNACCEPTING_QUERY
+                SocketException::CODE_QUERY_SEND_FAIL
             );
         }
         $bytes = 0;

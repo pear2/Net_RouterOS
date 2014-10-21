@@ -1,6 +1,11 @@
 imports:
     - php
 inherit: true
+before_commands:
+    - composer require pear2/net_transmitter:dev-develop
+    - composer require pear2/cache_shm:dev-develop
+    - composer require pear2/console_commandline
+    - composer require pear2/console_color
 tools:
     php_sim: false
     php_cpd: true

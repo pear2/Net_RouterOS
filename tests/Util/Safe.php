@@ -24,42 +24,42 @@ abstract class Safe extends PHPUnit_Framework_TestCase
      */
     protected $client;
 
-    public function testChangeMenu()
+    public function testSetGetMenu()
     {
-        $this->assertSame('/', $this->util->changeMenu());
+        $this->assertSame('/', $this->util->getMenu());
         $this->assertSame(
             '/queue',
-            $this->util->changeMenu('queue')->changeMenu()
+            $this->util->setMenu('queue')->getMenu()
         );
         $this->assertSame(
             '/queue/simple',
-            $this->util->changeMenu('simple')->changeMenu()
+            $this->util->setMenu('simple')->getMenu()
         );
         $this->assertSame(
             '/queue/tree',
-            $this->util->changeMenu('.. tree')->changeMenu()
+            $this->util->setMenu('.. tree')->getMenu()
         );
         $this->assertSame(
             '/queue/type',
-            $this->util->changeMenu('../type')->changeMenu()
+            $this->util->setMenu('../type')->getMenu()
         );
         $this->assertSame(
             '/interface',
-            $this->util->changeMenu('/interface')->changeMenu()
+            $this->util->setMenu('/interface')->getMenu()
         );
         $this->assertSame(
             '/ip/arp',
-            $this->util->changeMenu('/ip/arp')->changeMenu()
+            $this->util->setMenu('/ip/arp')->getMenu()
         );
         $this->assertSame(
             '/ip/hotspot',
-            $this->util->changeMenu('/ip hotspot')->changeMenu()
+            $this->util->setMenu('/ip hotspot')->getMenu()
         );
     }
 
     public function testFindByQuery()
     {
-        $this->util->changeMenu('/queue/simple');
+        $this->util->setMenu('/queue/simple');
         $this->assertRegExp(
             '/^' . self::REGEX_ID . '$/',
             $this->util->find(
@@ -70,7 +70,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
 
     public function testFindNoCriteria()
     {
-        $this->util->changeMenu('/queue/simple');
+        $this->util->setMenu('/queue/simple');
         $findResults = $this->util->find();
         $this->assertRegExp(
             self::REGEX_IDLIST,
@@ -88,7 +88,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
 
     public function testFindCallback()
     {
-        $this->util->changeMenu('/queue/simple');
+        $this->util->setMenu('/queue/simple');
         $findResults = $this->util->find(
             function ($entry) {
                 return $entry->getArgument(
@@ -113,19 +113,9 @@ abstract class Safe extends PHPUnit_Framework_TestCase
     
     public function testByCallbackName()
     {
-        if (!function_exists('isHostnameInvalid')) {
-            include 'data://text/plain;base64,' . base64_encode(
-                <<<HEREDOC
-<?php
-function isHostnameInvalid(\$entry) {
-    return \$entry->getArgument(
-        'target'
-    ) === \PEAR2\Net\RouterOS\Client\Test\HOSTNAME_INVALID . '/32';
-}
-HEREDOC
-            );
-        }
-        $this->util->changeMenu('/queue/simple');
+        include_once __DIR__ . '/../Extra/isHostnameInvalid.php';
+
+        $this->util->setMenu('/queue/simple');
         $findResults = $this->util->find('isHostnameInvalid');
         $this->assertRegExp(
             '/^' . self::REGEX_ID . '$/',
@@ -158,7 +148,7 @@ HEREDOC
     
     public function testFindByCommaSeparatedValue()
     {
-        $this->util->changeMenu('/queue/simple');
+        $this->util->setMenu('/queue/simple');
         $findResults = $this->util->find('0,1');
         $this->assertRegExp(
             self::REGEX_IDLIST,
@@ -176,16 +166,16 @@ HEREDOC
 
     public function testGetallAndCount()
     {
-        $this->util->changeMenu('/queue/simple');
-        $queues = $this->util->getall();
+        $this->util->setMenu('/queue/simple');
+        $queues = $this->util->getAll();
         $this->assertInstanceOf(ROS_NAMESPACE . '\ResponseCollection', $queues);
         $this->assertSameSize($queues, $this->util);
     }
 
     public function testInvalidGetallAndCount()
     {
-        $this->util->changeMenu('/queue');
-        $this->assertFalse($this->util->getall());
+        $this->util->setMenu('/queue');
+        $this->assertFalse($this->util->getAll());
         $this->assertCount(-1, $this->util);
     }
 }

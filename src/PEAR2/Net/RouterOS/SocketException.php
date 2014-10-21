@@ -38,7 +38,7 @@ class SocketException extends RuntimeException implements Exception
 {
     const CODE_SERVICE_INCOMPATIBLE = 10200;
     const CODE_CONNECTION_FAIL = 100;
-    const CODE_UNACCEPTING_QUERY = 30600;
-    const CODE_UNACCEPTING_REQEUST = 40900;
+    const CODE_QUERY_SEND_FAIL = 30600;
+    const CODE_REQUEST_SEND_FAIL = 40900;
     const CODE_NO_DATA = 50000;
 }

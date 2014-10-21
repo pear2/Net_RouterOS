@@ -527,41 +527,41 @@ class Client
      * are no more pending requests or when a specified timeout has passed
      * (whichever comes first).
      * 
-     * @param int $timeout_s  Timeout for the loop. If NULL, there is no time
+     * @param int $timeoutS  Timeout for the loop. If NULL, there is no time
      *     limit.
-     * @param int $timeout_us Microseconds to add to the time limit.
+     * @param int $timeoutUs Microseconds to add to the time limit.
      * 
      * @return bool TRUE when there are any more pending requests, FALSE
      *     otherwise.
      * @see extractNewResponses()
      * @see getPendingRequestsCount()
      */
-    public function loop($timeout_s = null, $timeout_us = 0)
+    public function loop($timeoutS = null, $timeoutUs = 0)
     {
         try {
-            if (null === $timeout_s) {
+            if (null === $timeoutS) {
                 while ($this->getPendingRequestsCount() !== 0) {
                     $this->dispatchNextResponse(null);
                 }
             } else {
-                list($start_us, $start_s) = explode(' ', microtime());
+                list($startUs, $startS) = explode(' ', microtime());
                 while ($this->getPendingRequestsCount() !== 0
-                    && ($timeout_s >= 0 || $timeout_us >= 0)
+                    && ($timeoutS >= 0 || $timeoutUs >= 0)
                 ) {
-                    $this->dispatchNextResponse($timeout_s, $timeout_us);
-                    list($end_us, $end_s) = explode(' ', microtime());
+                    $this->dispatchNextResponse($timeoutS, $timeoutUs);
+                    list($endUs, $endS) = explode(' ', microtime());
 
-                    $timeout_s -= $end_s - $start_s;
-                    $timeout_us -= $end_us - $start_us;
-                    if ($timeout_us <= 0) {
-                        if ($timeout_s > 0) {
-                            $timeout_us = 1000000 + $timeout_us;
-                            $timeout_s--;
+                    $timeoutS -= $endS - $startS;
+                    $timeoutUs -= $endUs - $startUs;
+                    if ($timeoutUs <= 0) {
+                        if ($timeoutS > 0) {
+                            $timeoutUs = 1000000 + $timeoutUs;
+                            $timeoutS--;
                         }
                     }
 
-                    $start_s = $end_s;
-                    $start_us = $end_us;
+                    $startS = $endS;
+                    $startUs = $endUs;
                 }
             }
         } catch (SocketException $e) {
@@ -706,25 +706,34 @@ class Client
     public function close()
     {
         $result = true;
-        try {
-            if ($this->com->getTransmitter()->getCrypto() === N::CRYPTO_OFF) {
-                if (null !== $this->registry) {
-                    $this->registry->setTaglessMode(true);
-                }
-                $response = $this->sendSync(new Request('/quit'));
-                if (null !== $this->registry) {
-                    $this->registry->setTaglessMode(false);
-                }
-                $result = $response[0]->getType() === Response::TYPE_FATAL;
+        /*
+         * The check below is done because for some unknown reason
+         * (either a PHP or a RouterOS bug) calling "/quit" on an encrypted
+         * connection makes one end hang.
+         * 
+         * Since encrypted connections only appeared in RouterOS 6.1, and
+         * the "/quit" call is needed for all <6.0 versions, problems due
+         * to its absence should be limited to some earlier 6.* versions
+         * on some RouterBOARD devices.
+         */
+        if ($this->com->getTransmitter()->getCrypto() === N::CRYPTO_OFF) {
+            if (null !== $this->registry) {
+                $this->registry->setTaglessMode(true);
             }
-            $result = $result && $this->com->close();
-        } catch (SocketException $e) {
-            $result
-                = $e->getCode() === SocketException::CODE_UNACCEPTING_REQEUST;
+            try {
+                $response = $this->sendSync(new Request('/quit'));
+                $result = $response[0]->getType() === Response::TYPE_FATAL;
+            } catch (SocketException $e) {
+                $result
+                    = $e->getCode() === SocketException::CODE_REQUEST_SEND_FAIL;
+            } catch (E $e) {
+                //Ignore unknown errors.
+            }
             if (null !== $this->registry) {
                 $this->registry->setTaglessMode(false);
             }
         }
+        $result = $result && $this->com->close();
         $this->callbacks = array();
         $this->pendingRequestsCount = 0;
         return $result;
@@ -766,20 +775,20 @@ class Client
      * Dispatches the next response in queue, i.e. it executes the associated
      * callback if there is one, or places the response in the response buffer.
      * 
-     * @param int $timeout_s  If a response is not immediatly available, wait
+     * @param int $timeoutS  If a response is not immediatly available, wait
      *     this many seconds. If NULL, wait indefinetly.
-     * @param int $timeout_us Microseconds to add to the waiting time.
+     * @param int $timeoutUs Microseconds to add to the waiting time.
      * 
      * @throws SocketException When there's no response within the time limit.
      * @return Response The dispatched response.
      */
-    protected function dispatchNextResponse($timeout_s = 0, $timeout_us = 0)
+    protected function dispatchNextResponse($timeoutS = 0, $timeoutUs = 0)
     {
         $response = new Response(
             $this->com,
             $this->_streamingResponses,
-            $timeout_s,
-            $timeout_us,
+            $timeoutS,
+            $timeoutUs,
             $this->registry
         );
         if ($response->getType() === Response::TYPE_FATAL) {

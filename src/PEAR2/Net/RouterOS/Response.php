@@ -76,14 +76,14 @@ class Response extends Message
     /**
      * Extracts a new response from a communicator.
      * 
-     * @param Communicator $com        The communicator from which to extract
+     * @param Communicator $com       The communicator from which to extract
      *     the new response.
-     * @param bool         $asStream   Whether to populate the argument values
+     * @param bool         $asStream  Whether to populate the argument values
      *     with streams instead of strings.
-     * @param int          $timeout_s  If a response is not immediatly
+     * @param int          $timeoutS  If a response is not immediatly
      *     available, wait this many seconds. If NULL, wait indefinetly.
-     * @param int          $timeout_us Microseconds to add to the waiting time.
-     * @param Registry     $reg        An optional registry to sync the
+     * @param int          $timeoutUs Microseconds to add to the waiting time.
+     * @param Registry     $reg       An optional registry to sync the
      *     response with.
      * 
      * @see getType()
@@ -92,8 +92,8 @@ class Response extends Message
     public function __construct(
         Communicator $com,
         $asStream = false,
-        $timeout_s = 0,
-        $timeout_us = null,
+        $timeoutS = 0,
+        $timeoutUs = null,
         Registry $reg = null
     ) {
         if (null === $reg) {
@@ -101,18 +101,18 @@ class Response extends Message
                 $old = $com->getTransmitter()
                     ->lock(T\Stream::DIRECTION_RECEIVE);
                 try {
-                    $this->_receive($com, $asStream, $timeout_s, $timeout_us);
+                    $this->_receive($com, $asStream, $timeoutS, $timeoutUs);
                 } catch (E $e) {
                     $com->getTransmitter()->lock($old, true);
                     throw $e;
                 }
                 $com->getTransmitter()->lock($old, true);
             } else {
-                $this->_receive($com, $asStream, $timeout_s, $timeout_us);
+                $this->_receive($com, $asStream, $timeoutS, $timeoutUs);
             }
         } else {
             while (null === ($response = $reg->getNextResponse())) {
-                $newResponse = new self($com, true, $timeout_s, $timeout_us);
+                $newResponse = new self($com, true, $timeoutS, $timeoutUs);
                 $tagInfo = $reg::parseTag($newResponse->getTag());
                 $newResponse->setTag($tagInfo[1]);
                 if (!$reg->add($newResponse, $tagInfo[0])) {
@@ -146,32 +146,37 @@ class Response extends Message
      * This is the function that performs the actual receiving, while the
      * constructor is also involved in locks and registry sync.
      * 
-     * @param Communicator $com        The communicator from which to extract
+     * @param Communicator $com       The communicator from which to extract
      *     the new response.
-     * @param bool         $asStream   Whether to populate the argument values
+     * @param bool         $asStream  Whether to populate the argument values
      *     with streams instead of strings.
-     * @param int          $timeout_s  If a response is not immediatly
+     * @param int          $timeoutS  If a response is not immediatly
      *     available, wait this many seconds. If NULL, wait indefinetly.
-     * @param int          $timeout_us Microseconds to add to the waiting time.
+     *     Note that if an empty sentence is received, the timeout will be
+     *     reset for another sentence receiving.
+     * @param int          $timeoutUs Microseconds to add to the waiting time.
      * 
      * @return void
      */
     private function _receive(
         Communicator $com,
         $asStream = false,
-        $timeout_s = 0,
-        $timeout_us = null
+        $timeoutS = 0,
+        $timeoutUs = null
     ) {
-        if (!$com->getTransmitter()->isDataAwaiting(
-            $timeout_s,
-            $timeout_us
-        )) {
-            throw new SocketException(
-                'No data within the time limit',
-                SocketException::CODE_NO_DATA
-            );
-        }
-        $this->setType($com->getNextWord());
+        do {
+            if (!$com->getTransmitter()->isDataAwaiting(
+                $timeoutS,
+                $timeoutUs
+            )) {
+                throw new SocketException(
+                    'No data within the time limit',
+                    SocketException::CODE_NO_DATA
+                );
+            }
+            $type = $com->getNextWord();
+        } while ('' === $type);
+        $this->setType($type);
         if ($asStream) {
             for ($word = $com->getNextWordAsStream(), fseek($word, 0, SEEK_END);
                 ftell($word) !== 0;
@@ -269,5 +274,24 @@ class Response extends Message
     public function getUnrecognizedWords()
     {
         return $this->unrecognizedWords;
+    }
+
+    /**
+     * Counts the number of arguments or words.
+     * 
+     * @param int $mode The counter mode.
+     *     Either COUNT_NORMAL or COUNT_RECURSIVE.
+     *     When in normal mode, counts the number of arguments.
+     *     When in recursive mode, counts the number of API words.
+     * 
+     * @return int The number of arguments/words.
+     */
+    public function count($mode = COUNT_NORMAL)
+    {
+        $result = parent::count($mode);
+        if ($mode !== COUNT_NORMAL) {
+            $result += count($this->unrecognizedWords);
+        }
+        return $result;
     }
 }

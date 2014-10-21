@@ -62,7 +62,7 @@ class Request extends Message
      */
     public function __construct($command, Query $query = null, $tag = null)
     {
-        if (false !== ($firstEquals = strpos($command, '='))
+        if (false !== strpos($command, '=')
             && false !== ($spaceBeforeEquals = strrpos(
                 strstr($command, '=', true),
                 ' '
@@ -83,13 +83,14 @@ class Request extends Message
      * function. Depending on the argument given, one of the other functions in
      * the class is invoked and its returned value is returned by this function.
      * 
-     * @param mixed $arg A {@link Query} to associate the request
-     *     with, a {@link Communicator} to send the request over, an argument to
-     *     get the value of, or NULL to get all arguments as an array. If a
+     * @param Query|Communicator|string|null $arg A {@link Query} to associate
+     *     the request with, a {@link Communicator} to send the request over,
+     *     an argument to get the value of, or NULL to get the tag. If a
      *     second argument is provided, this becomes the name of the argument to
      *     set the value of, and the second argument is the value to set.
      * 
-     * @return mixed Whatever the long form function would have returned.
+     * @return string|resource|int|$this Whatever the long form
+     *     function returns.
      */
     public function __invoke($arg = null)
     {
@@ -291,7 +292,7 @@ class Request extends Message
         if (!$com->getTransmitter()->isAcceptingData()) {
             throw new SocketException(
                 'Transmitter is invalid. Sending aborted.',
-                SocketException::CODE_UNACCEPTING_REQEUST
+                SocketException::CODE_REQUEST_SEND_FAIL
             );
         }
         $bytes = 0;

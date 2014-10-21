@@ -211,13 +211,26 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     }
 
     /**
-     * Counts the responses in the collection.
+     * Counts the responses/words in the collection.
+     * 
+     * @param int $mode The counter mode.
+     *     Either COUNT_NORMAL or COUNT_RECURSIVE.
+     *     When in normal mode, counts the number of responses.
+     *     When in recursive mode, counts the total number of API words.
      * 
      * @return int The number of responses in the collection.
      */
-    public function count()
+    public function count($mode = COUNT_NORMAL)
     {
-        return count($this->responses);
+        if ($mode !== COUNT_NORMAL) {
+            $result = 0;
+            foreach ($this->responses as $response) {
+                $result += $response->count($mode);
+            }
+            return $result;
+        } else {
+            return count($this->responses);
+        }
     }
 
     /**
@@ -509,14 +522,14 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * Compares two respones, based on criteria defined in
      * {@link static::$compareBy}.
      * 
-     * @param Response $a The response to compare.
-     * @param Response $b The response to compare $a against.
+     * @param Response $itemA The response to compare.
+     * @param Response $itemB The response to compare $a against.
      * 
      * @return int Returns 0 if the two respones are equal according to every
      *     criteria specified, -1 if $a should be placed before $b, and 1 if $b
      *     should be placed before $a.
      */
-    protected function compare(Response $a, Response $b)
+    protected function compare(Response $itemA, Response $itemB)
     {
         foreach ($this->compareBy as $name => $spec) {
             if (!is_string($name)) {
@@ -525,8 +538,8 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
             }
 
             $members = array(
-                0 => $a->getArgument($name),
-                1 => $b->getArgument($name)
+                0 => $itemA->getArgument($name),
+                1 => $itemB->getArgument($name)
             );
 
             if (is_callable($spec)) {

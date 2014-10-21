@@ -9,6 +9,7 @@ use PEAR2\Net\RouterOS\LengthException;
 use PEAR2\Net\RouterOS\Query;
 use PEAR2\Net\RouterOS\Request;
 use PEAR2\Net\RouterOS\Response;
+use PEAR2\Net\RouterOS\SocketException;
 use PHPUnit_Framework_TestCase;
 
 abstract class Unsafe extends PHPUnit_Framework_TestCase
@@ -18,6 +19,31 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
      * @var Client
      */
     protected $object;
+    
+    /**
+     * Runs the test in a separate process for the sake of
+     * peristent connections.
+     * 
+     * @runInSeparateProcess
+     * 
+     * @return void
+     */
+    public function testSystemReboot()
+    {
+        $this->object->sendSync(new Request('/system/reboot'));
+        $this->object->close();
+        $this->object = null;
+        sleep(1);
+        while (true) {
+            try {
+                $this->object = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT);
+                $this->assertTrue(true);
+                return;
+            } catch (SocketException $e) {
+                //Connection is expected to fail several times before success.
+            }
+        }
+    }
 
     public function testMultipleDifferentPersistentConnection()
     {

@@ -21,11 +21,12 @@
     },
     "require-dev": {
         "phpunit/phpunit": "@stable",
-        "squizlabs/php_codesniffer": "@stable",
-        "scrutinizer/php-analyzer": "dev-master"
+        "squizlabs/php_codesniffer": "@stable"
     },
     "suggest": {
         "pear2/cache_shm": "Enables persistent connections.",
+        "pear2/console_commandline": "Enables the console",
+        "pear2/console_color": "Enables colors in the console",
         "ext-apc": "This or Wincache is required for persistent connections.",
         "ext-wincache": "This or APC is required for persistent connections. Reccomended instead of APC on Windows.",
         "ext-openssl": "Enables encrypted connections."

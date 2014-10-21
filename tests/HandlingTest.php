@@ -28,7 +28,7 @@ use PHPUnit_Framework_TestCase;
  * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
  * @link     http://pear2.php.net/PEAR2_Net_RouterOS
  */
-class RequestHandlingTest extends PHPUnit_Framework_TestCase
+class HandlingTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @param string $command

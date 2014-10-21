@@ -30,7 +30,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
     {
         $printRequest = new Request('/queue/simple/print');
         $beforeCount = count($this->client->sendSync($printRequest));
-        $this->util->changeMenu('/queue/simple');
+        $this->util->setMenu('/queue/simple');
         $this->assertRegExp(
             '/^' . self::REGEX_ID . '$/',
             $id = $this->util->add(array('name' => TEST_QUEUE_NAME, 'disabled'))
@@ -61,7 +61,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
      */
     public function testAddUpdatingCache()
     {
-        $this->util->changeMenu('/queue/simple');
+        $this->util->setMenu('/queue/simple');
         $beforeCount = substr_count($this->util->find(), ',');
         $this->assertRegExp(
             '/^' . self::REGEX_ID . '$/',
@@ -85,7 +85,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
      */
     public function testDisableAndEnable()
     {
-        $this->util->changeMenu('/queue/simple');
+        $this->util->setMenu('/queue/simple');
         $id = $this->util->add(
             array(
                 'name' => TEST_QUEUE_NAME,
@@ -131,7 +131,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
     {
         $printRequest = new Request('/queue/simple/print');
         $beforeCount = count($this->client->sendSync($printRequest));
-        $this->util->changeMenu('/queue/simple');
+        $this->util->setMenu('/queue/simple');
         $this->assertRegExp(
             '/^' . self::REGEX_ID . '$/',
             $id = $this->util->add(
@@ -158,7 +158,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
     public function testAddMultiple()
     {
         $printRequest = new Request('/queue/simple/print');
-        $this->util->changeMenu('/queue/simple');
+        $this->util->setMenu('/queue/simple');
 
         $beforeCount = count($this->client->sendSync($printRequest));
         $this->assertRegExp(
@@ -201,7 +201,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
      */
     public function testSetAndEdit()
     {
-        $this->util->changeMenu('/queue/simple');
+        $this->util->setMenu('/queue/simple');
         $id = $this->util->add(
             array(
                 'name' => TEST_QUEUE_NAME,
@@ -270,7 +270,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
      */
     public function testFindByNumber()
     {
-        $this->util->changeMenu('/queue/simple');
+        $this->util->setMenu('/queue/simple');
         $itemCount = count(explode(',', $this->util->find()));
         $id = $this->util->add(
             array(
@@ -295,7 +295,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
      */
     public function testGet()
     {
-        $this->util->changeMenu('/queue/simple');
+        $this->util->setMenu('/queue/simple');
         $itemCount = count(explode(',', $this->util->find()));
         $id = $this->util->add(
             array(
@@ -342,7 +342,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
     public function testUnsetValue()
     {
         $value = 'all-p2p';
-        $this->util->changeMenu('/ip/firewall/filter');
+        $this->util->setMenu('/ip/firewall/filter');
         $id = $this->util->add(
             array(
                 'comment' => 'API TESTING',
@@ -372,7 +372,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             Query::where('name', TEST_QUEUE_NAME)
         );
  
-        $this->util->changeMenu('/queue/simple');
+        $this->util->setMenu('/queue/simple');
         $this->assertCount(
             0,
             $this->client->sendSync(
@@ -425,7 +425,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             '/queue/simple/print',
             Query::where('name', TEST_QUEUE_NAME)
         );
-        $this->util->changeMenu('/queue/simple');
+        $this->util->setMenu('/queue/simple');
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=[:typeof $comment]',
@@ -554,7 +554,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             '/queue/simple/print',
             Query::where('name', TEST_QUEUE_NAME)
         );
-        $this->util->changeMenu('/queue/simple');
+        $this->util->setMenu('/queue/simple');
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=$comment',
@@ -599,7 +599,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         $this->assertSame('true', $results->getArgument('comment'));
 
         $this->util->exec(
-            'add name=$name target=0.0.0.0/0 comment=$comment',
+            'add name=$name target=0.0.0.0/0 comment=[:pick $comment 0]',
             array(
                 'name' => TEST_QUEUE_NAME,
                 'comment' => array('hello', 'world')
@@ -610,7 +610,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('hello,world', $results->getArgument('comment'));
+        $this->assertSame('hello', $results->getArgument('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=$comment',
@@ -708,7 +708,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
     public function testMove()
     {
-        $this->util->changeMenu('/queue/simple');
+        $this->util->setMenu('/queue/simple');
         $id = $this->util->add(array('name' => TEST_QUEUE_NAME));
         $result = $this->util->move($id, 0);
         $this->util->remove($id);
