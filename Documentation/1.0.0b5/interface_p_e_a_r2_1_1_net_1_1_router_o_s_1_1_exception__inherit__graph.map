@@ -1,0 +1,8 @@
+<map id="Exception" name="Exception">
+<area shape="rect" id="node2" href="$class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_data_flow_exception.html" title="DataFlowException" alt="" coords="158,5,293,32"/>
+<area shape="rect" id="node3" href="$class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_invalid_argument_exception.html" title="InvalidArgumentException" alt="" coords="140,56,311,83"/>
+<area shape="rect" id="node4" href="$class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_length_exception.html" title="LengthException" alt="" coords="166,107,285,133"/>
+<area shape="rect" id="node5" href="$class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_not_supported_exception.html" title="NotSupportedException" alt="" coords="146,157,305,184"/>
+<area shape="rect" id="node6" href="$class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_socket_exception.html" title="SocketException" alt="" coords="165,208,286,235"/>
+<area shape="rect" id="node7" href="$class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_unexpected_value_exception.html" title="UnexpectedValueException" alt="" coords="134,259,317,285"/>
+</map>
