@@ -42,7 +42,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             'true',
             $this->client->sendSync(
                 $printRequest->setQuery(Query::where('name', TEST_QUEUE_NAME))
-            )->getArgument('disabled')
+            )->getProperty('disabled')
         );
         $printRequest->setQuery(null);
 
@@ -100,21 +100,21 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
         $this->assertSame(
             'false',
-            $this->client->sendSync($printRequest)->getArgument('disabled')
+            $this->client->sendSync($printRequest)->getProperty('disabled')
         );
 
         $this->util->disable($id);
 
         $this->assertSame(
             'true',
-            $this->client->sendSync($printRequest)->getArgument('disabled')
+            $this->client->sendSync($printRequest)->getProperty('disabled')
         );
 
         $this->util->enable($id);
 
         $this->assertSame(
             'false',
-            $this->client->sendSync($printRequest)->getArgument('disabled')
+            $this->client->sendSync($printRequest)->getProperty('disabled')
         );
 
         $removeRequest = new Request('/queue/simple/remove');
@@ -217,11 +217,11 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         $responses = $this->client->sendSync($printRequest);
         $this->assertSame(
             HOSTNAME_SILENT . '/32',
-            $responses->getArgument('target')
+            $responses->getProperty('target')
         );
         $this->assertNotSame(
             'true',
-            $responses->getArgument('disabled')
+            $responses->getProperty('disabled')
         );
 
         $this->util->set(
@@ -235,11 +235,11 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         $responses = $this->client->sendSync($printRequest);
         $this->assertSame(
             HOSTNAME_INVALID . '/32',
-            $responses->getArgument('target')
+            $responses->getProperty('target')
         );
         $this->assertSame(
             'true',
-            $responses->getArgument('disabled')
+            $responses->getProperty('disabled')
         );
 
         $this->util->edit(
@@ -252,11 +252,11 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         $responses = $this->client->sendSync($printRequest);
         $this->assertSame(
             HOSTNAME_SILENT . '/32',
-            $responses->getArgument('target')
+            $responses->getProperty('target')
         );
         $this->assertSame(
             'true',
-            $responses->getArgument('disabled')
+            $responses->getProperty('disabled')
         );
 
         $this->util->remove($id);
@@ -414,7 +414,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
         $this->assertCount(1, $results);
 
-        $this->assertSame(TEST_SCRIPT_NAME, $results->getArgument('comment'));
+        $this->assertSame(TEST_SCRIPT_NAME, $results->getProperty('comment'));
 
         $this->util->remove(TEST_QUEUE_NAME);
     }
@@ -439,7 +439,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('num', $results->getArgument('comment'));
+        $this->assertSame('num', $results->getProperty('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=[:typeof $comment]',
@@ -453,7 +453,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('str', $results->getArgument('comment'));
+        $this->assertSame('str', $results->getProperty('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=[:typeof $comment]',
@@ -468,7 +468,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
         $this->assertContains(
-            $results->getArgument('comment'),
+            $results->getProperty('comment'),
             array('nil', 'nothing')
         );
 
@@ -484,7 +484,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('bool', $results->getArgument('comment'));
+        $this->assertSame('bool', $results->getProperty('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=[:typeof $comment]',
@@ -498,7 +498,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('time', $results->getArgument('comment'));
+        $this->assertSame('time', $results->getProperty('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=[:typeof $comment]',
@@ -512,7 +512,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('time', $results->getArgument('comment'));
+        $this->assertSame('time', $results->getProperty('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=[:typeof $comment]',
@@ -526,7 +526,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('array', $results->getArgument('comment'));
+        $this->assertSame('array', $results->getProperty('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=[:typeof [($comment->"key")]]',
@@ -540,7 +540,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('num', $results->getArgument('comment'));
+        $this->assertSame('num', $results->getProperty('comment'));
     }
 
     /**
@@ -568,7 +568,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('2', $results->getArgument('comment'));
+        $this->assertSame('2', $results->getProperty('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=$comment',
@@ -582,7 +582,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('test', $results->getArgument('comment'));
+        $this->assertSame('test', $results->getProperty('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=$comment',
@@ -596,7 +596,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('true', $results->getArgument('comment'));
+        $this->assertSame('true', $results->getProperty('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=[:pick $comment 0]',
@@ -610,7 +610,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('hello', $results->getArgument('comment'));
+        $this->assertSame('hello', $results->getProperty('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=$comment',
@@ -624,7 +624,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame(null, $results->getArgument('comment'));
+        $this->assertSame(null, $results->getProperty('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=$comment',
@@ -638,7 +638,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame(null, $results->getArgument('comment'));
+        $this->assertSame(null, $results->getProperty('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=$comment',
@@ -655,7 +655,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('00:00:00.000001', $results->getArgument('comment'));
+        $this->assertSame('00:00:00.000001', $results->getProperty('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=$comment',
@@ -672,7 +672,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('1d00:00:01', $results->getArgument('comment'));
+        $this->assertSame('1d00:00:01', $results->getProperty('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=$comment',
@@ -689,7 +689,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('1w2d01:02:03', $results->getArgument('comment'));
+        $this->assertSame('1w2d01:02:03', $results->getProperty('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=$comment',
@@ -703,7 +703,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('1w1d00:00:00', $results->getArgument('comment'));
+        $this->assertSame('1w1d00:00:00', $results->getProperty('comment'));
     }
 
     public function testMove()
@@ -740,6 +740,14 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
     {
         $data1 = 'test';
         $data2 = 'ok';
+        $data1s = fopen('php://temp', 'r+b');
+        fwrite($data1s, $data1);
+        rewind($data1s);
+        $data2s = fopen('php://temp', 'r+b');
+        fwrite($data2s, $data2);
+        rewind($data2s);
+
+        //New and overwite string
         $putResult1 = $this->util->filePutContents(TEST_FILE_NAME, $data1);
         $getResult1 = $this->util->fileGetContents(TEST_FILE_NAME);
         $putResult2 = $this->util->filePutContents(
@@ -748,14 +756,8 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             true
         );
         $getResult2 = $this->util->fileGetContents(TEST_FILE_NAME);
-        $putResult3 = $this->util->filePutContents(
-            TEST_FILE_NAME,
-            $data1
-        );
+        $putResult3 = $this->util->filePutContents(TEST_FILE_NAME, $data1);
         $getResult3 = $this->util->fileGetContents(TEST_FILE_NAME);
-        $putResult4 = $this->util->filePutContents(TEST_FILE_NAME, null);
-        $getResult4 = $this->util->fileGetContents(TEST_FILE_NAME);
-        $putResult5 = $this->util->filePutContents(TEST_FILE_NAME, null);
 
         $this->assertTrue($putResult1);
         $this->assertSame($data1, $getResult1);
@@ -763,9 +765,110 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         $this->assertSame($data2, $getResult2);
         $this->assertFalse($putResult3);
         $this->assertSame($data2, $getResult3);
+
+        //Removal
+        $putResult4 = $this->util->filePutContents(TEST_FILE_NAME, null);
+        $getResult4 = $this->util->fileGetContents(TEST_FILE_NAME);
+        $putResult5 = $this->util->filePutContents(TEST_FILE_NAME, null);
         $this->assertTrue($putResult4);
         $this->assertFalse($getResult4);
         $this->assertFalse($putResult5);
+        
+        //New and overwite stream
+        $putResult1 = $this->util->filePutContents(TEST_FILE_NAME, $data1s);
+        $getResult1 = $this->util->fileGetContents(TEST_FILE_NAME);
+        $putResult2 = $this->util->filePutContents(
+            TEST_FILE_NAME,
+            $data2s,
+            true
+        );
+        $getResult2 = $this->util->fileGetContents(TEST_FILE_NAME);
+        $putResult3 = $this->util->filePutContents(TEST_FILE_NAME, $data1s);
+        $getResult3 = $this->util->fileGetContents(TEST_FILE_NAME);
+
+        $this->assertTrue($putResult1);
+        $this->assertSame($data1, $getResult1);
+        $this->assertTrue($putResult2);
+        $this->assertSame($data2, $getResult2);
+        $this->assertFalse($putResult3);
+        $this->assertSame($data2, $getResult3);
+
+        //Removal
+        $putResult4 = $this->util->filePutContents(TEST_FILE_NAME, null);
+        $getResult4 = $this->util->fileGetContents(TEST_FILE_NAME);
+        $putResult5 = $this->util->filePutContents(TEST_FILE_NAME, null);
+        $this->assertTrue($putResult4);
+        $this->assertFalse($getResult4);
+        $this->assertFalse($putResult5);
+    }
+    
+    public function testFilePutAndGetContentsStreamed()
+    {
+        $data1 = 'test';
+        $data2 = 'ok';
+        $data1s = fopen('php://temp', 'r+b');
+        fwrite($data1s, $data1);
+        rewind($data1s);
+        $data2s = fopen('php://temp', 'r+b');
+        fwrite($data2s, $data2);
+        rewind($data2s);
+
+        $this->client->setStreamingResponses(true);
+        //New and overwite string
+        $putResult1 = $this->util->filePutContents(TEST_FILE_NAME, $data1);
+        $getResult1 = $this->util->fileGetContents(TEST_FILE_NAME);
+        $putResult2 = $this->util->filePutContents(
+            TEST_FILE_NAME,
+            $data2,
+            true
+        );
+        $getResult2 = $this->util->fileGetContents(TEST_FILE_NAME);
+        $putResult3 = $this->util->filePutContents(TEST_FILE_NAME, $data1);
+        $getResult3 = $this->util->fileGetContents(TEST_FILE_NAME);
+
+        $this->assertTrue($putResult1);
+        $this->assertSame($data1, stream_get_contents($getResult1));
+        $this->assertTrue($putResult2);
+        $this->assertSame($data2, stream_get_contents($getResult2));
+        $this->assertFalse($putResult3);
+        $this->assertSame($data2, stream_get_contents($getResult3));
+
+        //Removal
+        $putResult4 = $this->util->filePutContents(TEST_FILE_NAME, null);
+        $getResult4 = $this->util->fileGetContents(TEST_FILE_NAME);
+        $putResult5 = $this->util->filePutContents(TEST_FILE_NAME, null);
+        $this->assertTrue($putResult4);
+        $this->assertFalse($getResult4);
+        $this->assertFalse($putResult5);
+        
+        //New and overwite stream
+        $putResult1 = $this->util->filePutContents(TEST_FILE_NAME, $data1s);
+        $getResult1 = $this->util->fileGetContents(TEST_FILE_NAME);
+        $putResult2 = $this->util->filePutContents(
+            TEST_FILE_NAME,
+            $data2s,
+            true
+        );
+        $getResult2 = $this->util->fileGetContents(TEST_FILE_NAME);
+        $putResult3 = $this->util->filePutContents(TEST_FILE_NAME, $data1s);
+        $getResult3 = $this->util->fileGetContents(TEST_FILE_NAME);
+
+        $this->assertTrue($putResult1);
+        $this->assertSame($data1, stream_get_contents($getResult1));
+        $this->assertTrue($putResult2);
+        $this->assertSame($data2, stream_get_contents($getResult2));
+        $this->assertFalse($putResult3);
+        $this->assertSame($data2, stream_get_contents($getResult3));
+
+        //Removal
+        $putResult4 = $this->util->filePutContents(TEST_FILE_NAME, null);
+        $getResult4 = $this->util->fileGetContents(TEST_FILE_NAME);
+        $putResult5 = $this->util->filePutContents(TEST_FILE_NAME, null);
+        $this->assertTrue($putResult4);
+        $this->assertFalse($getResult4);
+        $this->assertFalse($putResult5);
+
+        $this->client->setStreamingResponses(false);
     }
 
     public function testFilePutContentsNoPermissions()

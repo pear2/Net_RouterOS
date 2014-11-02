@@ -17,11 +17,14 @@
     },
     "require": {
         "php": ">=5.3.0",
-        "pear2/net_transmitter": ">=1.0.0a4"
+        "pear2/net_transmitter": ">=1.0.0a5"
     },
     "require-dev": {
         "phpunit/phpunit": "@stable",
-        "squizlabs/php_codesniffer": "@stable"
+        "squizlabs/php_codesniffer": "@stable",
+        "pear2/cache_shm": "dev-develop",
+        "pear2/console_commandline": "dev-master",
+        "pear2/console_color": "dev-develop"
     },
     "suggest": {
         "pear2/cache_shm": "Enables persistent connections.",

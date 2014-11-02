@@ -55,6 +55,10 @@ $config = array(
             'type' => 'pear-config',
             'to' => 'php_dir'
         ),
+        '../../Console_CommandLine.git/src' => array(
+            'type' => 'pear-config',
+            'to' => 'php_dir'
+        ),
         '@PEAR2_DATA_DIR@' => array(
             'type' => 'pear-config',
             'to' => 'data_dir'

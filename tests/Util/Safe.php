@@ -91,7 +91,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $this->util->setMenu('/queue/simple');
         $findResults = $this->util->find(
             function ($entry) {
-                return $entry->getArgument(
+                return $entry->getProperty(
                     'target'
                 ) === HOSTNAME_INVALID . '/32';
             }
@@ -107,7 +107,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
                     '/queue/simple/print',
                     Query::where('target', HOSTNAME_INVALID . '/32')
                 )
-            )->getArgument('.id')
+            )->getProperty('.id')
         );
     }
     
@@ -128,7 +128,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
                     '/queue/simple/print',
                     Query::where('target', HOSTNAME_INVALID . '/32')
                 )
-            )->getArgument('.id')
+            )->getProperty('.id')
         );
     }
 
@@ -141,8 +141,8 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             )
         );
         $this->assertSame(
-            $originalResult->getArgument('.id'),
-            $this->util->find($originalResult->getArgument('.id'))
+            $originalResult->getProperty('.id'),
+            $this->util->find($originalResult->getProperty('.id'))
         );
     }
     

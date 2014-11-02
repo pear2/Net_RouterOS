@@ -16,7 +16,18 @@
 
 $extrafiles = array();
 $phpDir = Pyrus\Config::current()->php_dir;
-$packages = array('PEAR2/Autoload', 'PEAR2/Cache/SHM', 'PEAR2/Net/Transmitter');
+$packages = array(
+    'PEAR2/Autoload',
+    'PEAR2/Cache/SHM',
+    'PEAR2/Console/CommandLine',
+    'PEAR2/Console/Color',
+    'PEAR2/Net/Transmitter'
+);
+
+//Quick&dirty workaround for Console_CommandLine's xmlschema.rng file.
+$extrafiles['data/pear2.php.net/PEAR2_Console_CommandLine/xmlschema.rng']
+    = Pyrus\Config::current()->data_dir . DIRECTORY_SEPARATOR .
+        'pear2.php.net/PEAR2_Console_CommandLine/xmlschema.rng';
 
 $oldCwd = getcwd();
 chdir($phpDir);

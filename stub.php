@@ -15,7 +15,7 @@
  * @link      http://pear2.php.net/PEAR2_Net_RouterOS
  */
 
-if (count(get_included_files()) > 1 || ($argc > 1 && 'cli' === PHP_SAPI)) {
+if (count(get_included_files()) > 1 || ('cli' === PHP_SAPI && $argc > 1)) {
     Phar::mapPhar();
 
     include_once 'phar://' . __FILE__ . DIRECTORY_SEPARATOR
@@ -26,10 +26,10 @@ if (count(get_included_files()) > 1 || ($argc > 1 && 'cli' === PHP_SAPI)) {
 
     //Run console if there are any arguments,
     //and we are running directly.
-    if ($argc > 1 && count(get_included_files()) === 1) {
+    if ('cli' === PHP_SAPI && $argc > 1 && 2 === count(get_included_files())) {
         include_once 'phar://' . __FILE__ . DIRECTORY_SEPARATOR
             . '@PACKAGE_NAME@-@PACKAGE_VERSION@' . DIRECTORY_SEPARATOR
-            . 'bin' . DIRECTORY_SEPARATOR
+            . 'scripts' . DIRECTORY_SEPARATOR
             . 'roscon.php';
     }
     return;
@@ -68,13 +68,15 @@ if ($supportsPhar) {
         echo <<<HEREDOC
 
 The PHAR extension is available, but was unable to read this PHAR file's hash.
+
 HEREDOC;
         if (false !== strpos($e->getMessage(), 'file extension')) {
             echo <<<HEREDOC
-
 This can happen if you've renamed the file to ".php" instead of ".phar".
 Regardless, you should be able to include this file without problems.
 HEREDOC;
+        } else {
+            echo 'Details: ' . $e->getMessage();
         }
     }
 } else {
@@ -116,9 +118,9 @@ console. Make sure to check your web server's firewall.
 HEREDOC;
 } else {
     echo <<<HEREDOC
-WARNING: stream_socket_client() is disabled. Without it, you won't be able to
-         connect to any RouterOS host. Enable it in php.ini, or ask your host
-         to enable it for you.
+WARNING: stream_socket_client() is disabled.
+         Without it, you won't be able to connect to any RouterOS host.
+         Enable it in php.ini, or ask your host to enable it for you.
 
 HEREDOC;
 }
@@ -128,8 +130,9 @@ $supportsResolver = function_exists('stream_resolve_include_path');
 if (!$supportsPhar && !$supportsResolver) {
     echo <<<HEREDOC
 
-WARNING: You can't use the API console in any way. You must enable the PHAR
-         extension (compiled into PHP by default) and/or the
+WARNING: You can't use the API console in any way.
+         If you want to use it, you must enable the PHAR extension
+         (compiled into PHP by default) and/or the
          stream_resolve_include_path() function (available since PHP 5.3.2).
 
 HEREDOC;
@@ -138,6 +141,7 @@ HEREDOC;
         echo <<<HEREDOC
 You can access the console by rerunning this file from the command line with
 arguments. To see usage instructions, use the "--help" argument.
+
 HEREDOC;
     }
     if ($supportsResolver) {

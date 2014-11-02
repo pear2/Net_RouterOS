@@ -49,14 +49,26 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
     {
         try {
 
-            $routerOS1 = new Client(\HOSTNAME, USERNAME2, PASSWORD2, PORT, true);
+            $routerOS1 = new Client(
+                \HOSTNAME,
+                USERNAME2,
+                PASSWORD2,
+                PORT,
+                true
+            );
             $this->assertInstanceOf(
                 ROS_NAMESPACE . '\Client',
                 $routerOS1,
                 'Object initialization failed.'
             );
 
-            $routerOS2 = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT, true);
+            $routerOS2 = new Client(
+                \HOSTNAME,
+                USERNAME,
+                PASSWORD,
+                PORT,
+                true
+            );
             $this->assertInstanceOf(
                 ROS_NAMESPACE . '\Client',
                 $routerOS2,
@@ -105,7 +117,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             'There should be only one response.'
         );
         if (count($responses) === 1
-            && $responses->getLast()->getType() === Response::TYPE_FINAL
+            && $responses[-1]->getType() === Response::TYPE_FINAL
         ) {
             $removeRequest = new Request('/queue/simple/remove');
             $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
@@ -153,7 +165,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             'There should be only one response.'
         );
         if (count($responses) === 1
-            && $responses->getLast()->getType() === Response::TYPE_FINAL
+            && $responses[-1]->getType() === Response::TYPE_FINAL
         ) {
 
             $removeRequest = new Request('/queue/simple/remove');
@@ -177,7 +189,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         );
         $this->assertEquals(2, count($systemResource));
         $freeMemory = 1024
-            * (int) $systemResource[0]->getArgument('free-memory');
+            * (int) $systemResource[0]->getProperty('free-memory');
 
         $addCommand = '/queue/simple/add';
         $requiredMemory = 0x4000
@@ -206,7 +218,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
                 'There should be only one response.'
             );
             if (count($responses) === 1
-                && $responses->getLast()->getType() === Response::TYPE_FINAL
+                && $responses[-1]->getType() === Response::TYPE_FINAL
             ) {
 
                 $removeRequest = new Request('/queue/simple/remove');
@@ -231,7 +243,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         );
         $this->assertEquals(2, count($systemResource));
         $freeMemory = 1024
-            * (int) $systemResource[0]->getArgument('free-memory');
+            * (int) $systemResource[0]->getProperty('free-memory');
 
         $addCommand = '/queue/simple/add';
         $requiredMemory = 0x200000
@@ -260,7 +272,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
                 'There should be only one response.'
             );
             if (count($responses) === 1
-                && $responses->getLast()->getType() === Response::TYPE_FINAL
+                && $responses[-1]->getType() === Response::TYPE_FINAL
             ) {
 
                 $removeRequest = new Request('/queue/simple/remove');
@@ -310,7 +322,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             $addRequest->setArgument('comment', $comment);
             $responses = $this->object->sendSync($addRequest);
             if (count($responses) === 1
-                && $responses->getLast()->getType() === Response::TYPE_FINAL
+                && $responses[-1]->getType() === Response::TYPE_FINAL
             ) {
                 $removeRequest = new Request('/queue/simple/remove');
                 $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
@@ -340,7 +352,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             ->setArgument('comment', 'API_TEST');
         $responses = $this->object->sendSync($addRequest);
         if (count($responses) === 1
-            && $responses->getLast()->getType() === Response::TYPE_FINAL
+            && $responses[-1]->getType() === Response::TYPE_FINAL
         ) {
             $printRequest = new Request('/queue/simple/print');
             $printRequest->setArgument('.proplist', 'name,comment');
@@ -351,7 +363,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             $responses = $this->object->sendSync($printRequest);
             $this->assertEquals(
                 array('name' => array(0, 1), 'comment' => array(1)),
-                $responses->getArgumentMap(),
+                $responses->getPropertyMap(),
                 'Improper format of the returned array'
             );
             
@@ -372,7 +384,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             ->setArgument('comment', $queueComment);
         $responses = $this->object->sendSync($addRequest);
         if (count($responses) === 1
-            && $responses->getLast()->getType() === Response::TYPE_FINAL
+            && $responses[-1]->getType() === Response::TYPE_FINAL
         ) {
             $printRequest = new Request('/queue/simple/print');
             $printRequest->setArgument('.proplist', 'name,comment');
@@ -435,7 +447,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             'There should be only one response.'
         );
         if (count($responses) === 1
-            && $responses->getLast()->getType() === Response::TYPE_FINAL
+            && $responses[-1]->getType() === Response::TYPE_FINAL
         ) {
             $appropriateCharsets = $this->object->setCharset(
                 array(
@@ -449,28 +461,28 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
             $this->assertEquals(
                 TEST_QUEUE_NAME,
-                $responses[0]->getArgument('name')
+                $responses[0]->getProperty('name')
             );
             $this->assertNotEquals(
                 'ПРИМЕР',
-                $responses[0]->getArgument('comment')
+                $responses[0]->getProperty('comment')
             );
 
             $this->object->setCharset($appropriateCharsets);
             $this->assertNotEquals(
                 'ПРИМЕР',
-                $responses[0]->getArgument('comment')
+                $responses[0]->getProperty('comment')
             );
 
             $responses = $this->object->sendSync($printRequest);
 
             $this->assertEquals(
                 TEST_QUEUE_NAME,
-                $responses[0]->getArgument('name')
+                $responses[0]->getProperty('name')
             );
             $this->assertEquals(
                 'ПРИМЕР',
-                $responses[0]->getArgument('comment')
+                $responses[0]->getProperty('comment')
             );
 
             $this->object->setCharset(
@@ -480,7 +492,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             $responses = $this->object->sendSync($printRequest);
             $this->assertNotEquals(
                 'ПРИМЕР',
-                $responses[0]->getArgument('comment')
+                $responses[0]->getProperty('comment')
             );
 
             $this->object->setCharset(
@@ -490,14 +502,14 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             $responses = $this->object->sendSync($printRequest);
             $this->assertNotEquals(
                 'ПРИМЕР',
-                $responses[0]->getArgument('comment')
+                $responses[0]->getProperty('comment')
             );
 
             $this->object->setCharset($appropriateCharsets);
             $responses = $this->object->sendSync($printRequest);
             $this->assertEquals(
                 'ПРИМЕР',
-                $responses[0]->getArgument('comment')
+                $responses[0]->getProperty('comment')
             );
 
             $this->object->setStreamingResponses(true);
@@ -505,7 +517,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             $this->assertEquals(
                 'ПРИМЕР',
                 stream_get_contents(
-                    $responses[0]->getArgument('comment')
+                    $responses[0]->getProperty('comment')
                 )
             );
             $this->object->setCharset(
@@ -516,7 +528,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             $this->assertNotEquals(
                 'ПРИМЕР',
                 stream_get_contents(
-                    $responses[0]->getArgument('comment')
+                    $responses[0]->getProperty('comment')
                 )
             );
             $this->object->setCharset('windows-1251');
@@ -524,7 +536,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             $this->assertNotEquals(
                 'ПРИМЕР',
                 stream_get_contents(
-                    $responses[0]->getArgument('comment')
+                    $responses[0]->getProperty('comment')
                 )
             );
 
@@ -538,7 +550,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             $this->assertNotEquals(
                 'ПРИМЕР',
                 stream_get_contents(
-                    $responses[0]->getArgument('comment')
+                    $responses[0]->getProperty('comment')
                 )
             );
             $this->object->setCharset($appropriateCharsets);
@@ -546,7 +558,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             $this->assertEquals(
                 'ПРИМЕР',
                 stream_get_contents(
-                    $responses[0]->getArgument('comment')
+                    $responses[0]->getProperty('comment')
                 )
             );
 

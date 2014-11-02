@@ -48,10 +48,11 @@ abstract class Message implements IteratorAggregate, Countable
 {
 
     /**
-     * @var array An array with message arguments. Keys are the names of the
-     *     arguments, array values are values for the corresponding argument.
+     * @var array An array with message attributes. Each array key is the the
+     *     name of an attribute, and the correspding array value is the value
+     *     for that attribute.
      */
-    protected $arguments = array();
+    protected $attributes = array();
 
     /**
      * @var string An optional tag to associate the message with.
@@ -65,10 +66,10 @@ abstract class Message implements IteratorAggregate, Countable
      * function. Depending on the argument given, one of the other functions in
      * the class is invoked and its returned value is returned by this function.
      * 
-     * @param string $name The name of an argument to get the value of, or NULL
+     * @param string $name The name of an attribute to get the value of, or NULL
      *     to get the tag.
      * 
-     * @return string|resource The value of the specified argument,
+     * @return string|resource The value of the specified attribute,
      *     or the tag if NULL is provided.
      */
     public function __invoke($name = null)
@@ -76,17 +77,17 @@ abstract class Message implements IteratorAggregate, Countable
         if (null === $name) {
             return $this->getTag();
         }
-        return $this->getArgument($name);
+        return $this->getAttribute($name);
     }
 
     /**
-     * Sanitizes a name of an argument (message or query one).
+     * Sanitizes a name of an attribute (message or query one).
      * 
      * @param mixed $name The name to sanitize.
      * 
      * @return string The sanitized name.
      */
-    public static function sanitizeArgumentName($name)
+    public static function sanitizeAttributeName($name)
     {
         $name = (string) $name;
         if ((empty($name) && $name !== '0')
@@ -101,13 +102,13 @@ abstract class Message implements IteratorAggregate, Countable
     }
 
     /**
-     * Sanitizes a value of an argument (message or query one).
+     * Sanitizes a value of an attribute (message or query one).
      * 
      * @param mixed $value The value to sanitize.
      * 
      * @return string The sanitized value.
      */
-    public static function sanitizeArgumentValue($value)
+    public static function sanitizeAttributeValue($value)
     {
         if (Communicator::isSeekableStream($value)) {
             return $value;
@@ -145,19 +146,19 @@ abstract class Message implements IteratorAggregate, Countable
     }
 
     /**
-     * Gets the value of an argument.
+     * Gets the value of an attribute.
      * 
-     * @param string $name The name of the argument.
+     * @param string $name The name of the attribute.
      * 
-     * @return string|resource The value of the specified argument. Returns NULL
-     *     if such an argument is not set.
-     * @see setArgument()
+     * @return string|resource|null The value of the specified attribute.
+     *     Returns NULL if such an attribute is not set.
+     * @see setAttribute()
      */
-    public function getArgument($name)
+    protected function getAttribute($name)
     {
-        $name = self::sanitizeArgumentName($name);
-        if (array_key_exists($name, $this->arguments)) {
-            return $this->arguments[$name];
+        $name = self::sanitizeAttributeName($name);
+        if (array_key_exists($name, $this->attributes)) {
+            return $this->attributes[$name];
         }
         return null;
     }
@@ -172,7 +173,7 @@ abstract class Message implements IteratorAggregate, Countable
      */
     public function getIterator()
     {
-        return new ArrayObject($this->arguments);
+        return new ArrayObject($this->attributes);
     }
 
     /**
@@ -181,24 +182,26 @@ abstract class Message implements IteratorAggregate, Countable
      * @param int $mode The counter mode.
      *     Either COUNT_NORMAL or COUNT_RECURSIVE.
      *     When in normal mode, counts the number of arguments.
-     *     When in recursive mode, counts the number of API words.
+     *     When in recursive mode, counts the number of API words
+     *     (including the empty word at the end).
      * 
      * @return int The number of arguments/words.
      */
     public function count($mode = COUNT_NORMAL)
     {
-        $result = count($this->arguments);
+        $result = count($this->attributes);
         if ($mode !== COUNT_NORMAL) {
-            $result += 2/*first+last word*/ + (int)(string)$this->getTag();
+            $result += 2/*first+last word*/
+                + (int)(null !== $this->getTag());
         }
         return $result;
     }
 
     /**
-     * Sets an argument for the message.
+     * Sets an attribute for the message.
      * 
-     * @param string               $name  Name of the argument.
-     * @param string|resource|null $value Value of the argument as a string or
+     * @param string               $name  Name of the attribute.
+     * @param string|resource|null $value Value of the attribute as a string or
      *     seekable stream.
      *     Setting the value to NULL removes an argument of this name.
      *     If a seekable stream is provided, it is sent from its current
@@ -210,25 +213,25 @@ abstract class Message implements IteratorAggregate, Countable
      * @return $this The message object.
      * @see getArgument()
      */
-    protected function setArgument($name, $value = '')
+    protected function setAttribute($name, $value = '')
     {
         if (null === $value) {
-            unset($this->arguments[self::sanitizeArgumentName($name)]);
+            unset($this->attributes[self::sanitizeAttributeName($name)]);
         } else {
-            $this->arguments[self::sanitizeArgumentName($name)]
-                = self::sanitizeArgumentValue($value);
+            $this->attributes[self::sanitizeAttributeName($name)]
+                = self::sanitizeAttributeValue($value);
         }
         return $this;
     }
 
     /**
-     * Removes all arguments from the message.
+     * Removes all attributes from the message.
      * 
      * @return $this The message object.
      */
-    protected function removeAllArguments()
+    protected function removeAllAttributes()
     {
-        $this->arguments = array();
+        $this->attributes = array();
         return $this;
     }
 }

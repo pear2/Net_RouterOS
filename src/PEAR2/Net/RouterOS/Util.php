@@ -197,8 +197,8 @@ class Util implements Countable
      * you want to store it for later execution, perhaps by supplying it to
      * "/system scheduler".
      * 
-     * @param string|resource $source The source of the script, as a string or
-     *     stream. If a stream is provided, reading starts from the current
+     * @param string|resource $source The source of the script, as a string
+     *     or stream. If a stream is provided, reading starts from the current
      *     position to the end of the stream, and the pointer stays at the end
      *     after reading is done.
      * @param array           $params An array of parameters to make available
@@ -210,23 +210,52 @@ class Util implements Countable
      *     {@link static::escapeString()}. Processing starts from the current
      *     position to the end of the stream, and the stream's pointer stays at
      *     the end after reading is done.
-     * @param resource|null   $stream An existing stream to write the resulting
-     *     script to.
      * 
-     * @return resource|int If a $stream is not provided, a new php://temp
-     *     stream with the script is returned, where the stream's pointer is at
-     *     the start. If a $stream is provided, the number of bytes written to
-     *     it is returned, and the pointer remains where it was after the write
-     *     (i.e. it is not seeked back).
+     * @return resource A new PHP temporary stream with the script as contents,
+     *     with the pointer back at the start.
+     * @see static::appendScript()
      */
     public static function prepareScript(
         $source,
-        array $params = array(),
-        $stream = null
+        array $params = array()
     ) {
-        $isStreamGiven = Stream::isStream($stream);
-        $resultStream = $isStreamGiven ? $stream : fopen('php://temp', 'r+b');
-        $writer = new Stream($resultStream, false);
+        $resultStream = fopen('php://temp', 'r+b');
+        self::appendScript($resultStream, $source, $params);
+        rewind($resultStream);
+        return $resultStream;
+    }
+
+    /**
+     * Appends a script.
+     * 
+     * Appends a script to an existing stream.
+     * 
+     * @param resource        $stream An existing stream to write the resulting
+     *     script to.
+     * @param string|resource $source The source of the script, as a string
+     *     or stream. If a stream is provided, reading starts from the current
+     *     position to the end of the stream, and the pointer stays at the end
+     *     after reading is done.
+     * @param array           $params An array of parameters to make available
+     *     in the script as local variables.
+     *     Variable names are array keys, and variable values are array values.
+     *     Array values are automatically processed with
+     *     {@link static::escapeValue()}. Streams are also supported, and are
+     *     processed in chunks, each with
+     *     {@link static::escapeString()}. Processing starts from the current
+     *     position to the end of the stream, and the stream's pointer stays at
+     *     the end after reading is done.
+     * 
+     * @return int The number of bytes written to $stream is returned,
+     *     and the pointer remains where it was after the write
+     *     (i.e. it is not seeked back, even if seeking is supported).
+     */
+    public static function appendScript(
+        $stream,
+        $source,
+        array $params = array()
+    ) {
+        $writer = new Stream($stream, false);
         $bytes = 0;
 
         foreach ($params as $pname => $pvalue) {
@@ -248,12 +277,7 @@ class Util implements Countable
         }
 
         $bytes += $writer->send($source);
-        if ($isStreamGiven) {
-            return $bytes;
-        }
-
-        rewind($resultStream);
-        return $resultStream;
+        return $bytes;
     }
     
     /**
@@ -534,7 +558,7 @@ class Util implements Countable
                     ',',
                     $this->client->sendSync(
                         new Request($this->menu . '/find')
-                    )->getArgument('ret')
+                    )->getProperty('ret')
                 );
                 $this->idCache = explode(',', $idCache);
                 return $idCache;
@@ -547,7 +571,7 @@ class Util implements Countable
                 foreach ($this->client->sendSync(
                     new Request($this->menu . '/print .proplist=.id', $criteria)
                 ) as $response) {
-                    $idList .= $response->getArgument('.id') . ',';
+                    $idList .= $response->getProperty('.id') . ',';
                 }
             } elseif (is_callable($criteria)) {
                 $idCache = array();
@@ -555,9 +579,9 @@ class Util implements Countable
                     new Request($this->menu . '/print')
                 ) as $response) {
                     if ($criteria($response)) {
-                        $idList .= $response->getArgument('.id') . ',';
+                        $idList .= $response->getProperty('.id') . ',';
                     }
-                    $idCache[] = $response->getArgument('.id');
+                    $idCache[] = $response->getProperty('.id');
                 }
                 $this->idCache = $idCache;
             } else {
@@ -628,7 +652,7 @@ class Util implements Countable
         if (Response::TYPE_ERROR === $responses->getType()) {
             return false;
         }
-        $result = $responses->getArgument('ret');
+        $result = $responses->getProperty('ret');
         if (null !== $result) {
             return $result;
         }
@@ -652,7 +676,7 @@ class Util implements Countable
             return false;
             // @codeCoverageIgnoreEnd
         }
-        return $responses->getArgument($valueName);
+        return $responses->getProperty($valueName);
     }
 
     /**
@@ -815,7 +839,7 @@ class Util implements Countable
                     $addRequest->setArgument($name, $value);
                 }
             }
-            $id = $this->client->sendSync($addRequest)->getArgument('ret');
+            $id = $this->client->sendSync($addRequest)->getProperty('ret');
             if (null !== $this->idCache) {
                 $this->idCache[] = $id;
             }
@@ -874,16 +898,17 @@ class Util implements Countable
      */
     public function count($mode = COUNT_NORMAL, Query $query = null)
     {
-        $result = self::parseValue(
-            $this->client->sendSync(
-                new Request($this->menu . '/print count-only=""', $query)
-            )->getLast()->getArgument('ret')
-        );
+        $result = $this->client->sendSync(
+            new Request($this->menu . '/print count-only=""', $query)
+        )->end()->getProperty('ret');
 
         if (null === $result) {
             return -1;
         }
-        return $result;
+        if (Stream::isStream($result)) {
+            $result = stream_get_contents($result);
+        }
+        return (int)$result;
     }
 
     /**
@@ -899,8 +924,9 @@ class Util implements Countable
      *     specified using a numeric key, and the name of the argument as the
      *     array value.
      * @param Query|null               $query A query to filter items by.
+     *     NULL to get all items.
      * 
-     * @return ResponseCollection|bool A response collection with all
+     * @return ResponseCollection|false A response collection with all
      *     {@link Response::TYPE_DATA} responses. The collection will be empty
      *     when there are no matching items. FALSE on failure.
      */
@@ -991,10 +1017,19 @@ class Util implements Countable
         $this->client->sendSync($setRequest->setArgument('contents', $data));
         //Required for RouterOS to write the file's new contents.
         sleep(2);
-        return strlen($data) == $this->client->sendSync(
+
+        $fileSize = $this->client->sendSync(
             $printRequest->setArgument('file', null)
                 ->setArgument('.proplist', 'size')
-        )->getArgument('size');
+        )->getProperty('size');
+        if (Stream::isStream($fileSize)) {
+            $fileSize = stream_get_contents($fileSize);
+        }
+        if (Communicator::isSeekableStream($data)) {
+            return Communicator::seekableStreamLength($data) == $fileSize;
+        } else {
+            return sprintf('%u', strlen((string)$data)) === $fileSize;
+        };
     }
 
     /**
@@ -1007,8 +1042,10 @@ class Util implements Countable
      *     finally retrieved. To eliminate any possibility of name clashes, you
      *     can specify your own name for the script.
      * 
-     * @return string|bool The contents of the file or FALSE if there is no such
-     *     file.
+     * @return string|resource|false The contents of the file as a string or as
+     *     new PHP temp stream if the underliying
+     *     {@link Client::isStreamingResponses()} is set to TRUE.
+     *     FALSE is returned if there is no such file.
      */
     public function fileGetContents($filename, $tmpScriptName = null)
     {
@@ -1110,7 +1147,7 @@ class Util implements Countable
             $finalSource,
             '/' . str_replace('/', ' ', substr($this->menu, 1)). "\n"
         );
-        static::prepareScript($source, $params, $finalSource);
+        static::appendScript($finalSource, $source, $params);
         fwrite($finalSource, "\n");
         rewind($finalSource);
 
@@ -1128,7 +1165,7 @@ class Util implements Countable
                         '/system/script/print .proplist="source"',
                         Query::where('name', $name)
                     )
-                )->getArgument('source');
+                )->getProperty('source');
             }
             $request = new Request('/system/script/remove');
             $request->setArgument('numbers', $name);

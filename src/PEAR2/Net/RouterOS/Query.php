@@ -40,31 +40,31 @@ class Query
     /**
      * Checks if the property exists.
      */
-    const ACTION_EXIST = '';
+    const OP_EX = '';
     
     /**
      * Checks if the property does not exist.
      */
-    const ACTION_NOT_EXIST = '-';
+    const OP_NEX = '-';
     
     /**
      * Checks if the property equals a certain value.
      */
-    const ACTION_EQUALS = '=';
+    const OP_EQ = '=';
     
     /**
      * Checks if the property is less than a certain value.
      */
-    const ACTION_LESS_THAN = '<';
+    const OP_LT = '<';
     
     /**
      * Checks if the property is greather than a certain value.
      */
-    const ACTION_GREATHER_THAN = '>';
+    const OP_GT = '>';
 
     /**
      * @var array An array of the words forming the query. Each value is an
-     *     array with the first member being the predicate (action and name),
+     *     array with the first member being the predicate (operator and name),
      *     and the second member being the value for the predicate.
      */
     protected $words = array();
@@ -79,28 +79,28 @@ class Query
     }
 
     /**
-     * Sanitizes the action of a condition.
+     * Sanitizes the operator of a condition.
      * 
-     * @param string $action The action to sanitize.
+     * @param string $operator The operator to sanitize.
      * 
-     * @return string The sanitized action.
+     * @return string The sanitized operator.
      */
-    protected static function sanitizeAction($action)
+    protected static function sanitizeOperator($operator)
     {
-        $action = (string) $action;
-        switch ($action) {
-        case Query::ACTION_EXIST:
-        case Query::ACTION_NOT_EXIST:
-        case Query::ACTION_EQUALS:
-        case Query::ACTION_LESS_THAN:
-        case Query::ACTION_GREATHER_THAN:
-            return $action;
+        $operator = (string) $operator;
+        switch ($operator) {
+        case Query::OP_EX:
+        case Query::OP_NEX:
+        case Query::OP_EQ:
+        case Query::OP_LT:
+        case Query::OP_GT:
+            return $operator;
         default:
             throw new UnexpectedValueException(
-                'Unknown action specified',
+                'Unknown operator specified',
                 UnexpectedValueException::CODE_ACTION_UNKNOWN,
                 null,
-                $action
+                $operator
             );
         }
     }
@@ -108,21 +108,26 @@ class Query
     /**
      * Creates a new query with an initial condition.
      * 
-     * @param string $name   The name of the property to test.
-     * @param string $value  The value to test against. Not required for
-     *     existence tests.
-     * @param string $action One of the ACTION_* constants. Describes the
-     *     operation to perform.
+     * @param string               $name     The name of the property to test.
+     * @param string|resource|null $value    Value of the property as a string
+     *     or seekable stream. Not required for existence tests.
+     *     If a seekable stream is provided, it is sent from its current
+     *     posistion to its end, and the pointer is seeked back to its current
+     *     position after sending.
+     *     Non seekable streams, as well as all other types, are casted to a
+     *     string.
+     * @param string               $operator One of the OP_* constants.
+     *     Describes the operation to perform.
      * 
      * @return static A new query object.
      */
     public static function where(
         $name,
         $value = null,
-        $action = self::ACTION_EXIST
+        $operator = self::OP_EX
     ) {
         $query = new static;
-        return $query->addWhere($name, $value, $action);
+        return $query->addWhere($name, $value, $operator);
     }
 
     /**
@@ -139,44 +144,44 @@ class Query
     /**
      * Adds a condition as an alternative to the query.
      * 
-     * @param string               $name   The name of the property to test.
-     * @param string|resource|null $value  Value of the property as a string or
-     *     seekable stream. Not required for existence tests.
+     * @param string               $name     The name of the property to test.
+     * @param string|resource|null $value    Value of the property as a string
+     *     or seekable stream. Not required for existence tests.
      *     If a seekable stream is provided, it is sent from its current
      *     posistion to its end, and the pointer is seeked back to its current
      *     position after sending.
      *     Non seekable streams, as well as all other types, are casted to a
      *     string.
-     * @param string               $action One of the ACTION_* constants.
+     * @param string               $operator One of the OP_* constants.
      *     Describes the operation to perform.
      * 
      * @return $this The query object.
      */
-    public function orWhere($name, $value = null, $action = self::ACTION_EXIST)
+    public function orWhere($name, $value = null, $operator = self::OP_EX)
     {
-        $this->addWhere($name, $value, $action)->words[] = array('#|', null);
+        $this->addWhere($name, $value, $operator)->words[] = array('#|', null);
         return $this;
     }
 
     /**
      * Adds a condition in addition to the query.
      * 
-     * @param string               $name   The name of the property to test.
-     * @param string|resource|null $value  Value of the property as a string or
-     *     seekable stream. Not required for existence tests.
+     * @param string               $name     The name of the property to test.
+     * @param string|resource|null $value    Value of the property as a string
+     *     or seekable stream. Not required for existence tests.
      *     If a seekable stream is provided, it is sent from its current
      *     posistion to its end, and the pointer is seeked back to its current
      *     position after sending.
      *     Non seekable streams, as well as all other types, are casted to a
      *     string.
-     * @param string               $action One of the ACTION_* constants.
+     * @param string               $operator One of the OP_* constants.
      *     Describes the operation to perform.
      * 
      * @return $this The query object.
      */
-    public function andWhere($name, $value = null, $action = self::ACTION_EXIST)
+    public function andWhere($name, $value = null, $operator = self::OP_EX)
     {
-        $this->addWhere($name, $value, $action)->words[] = array('#&', null);
+        $this->addWhere($name, $value, $operator)->words[] = array('#&', null);
         return $this;
     }
 
@@ -237,25 +242,25 @@ class Query
     /**
      * Adds a condition.
      * 
-     * @param string               $name   The name of the property to test.
-     * @param string|resource|null $value  Value of the property as a string or
-     *     seekable stream. Not required for existence tests.
+     * @param string               $name     The name of the property to test.
+     * @param string|resource|null $value    Value of the property as a string
+     *     or seekable stream. Not required for existence tests.
      *     If a seekable stream is provided, it is sent from its current
      *     posistion to its end, and the pointer is seeked back to its current
      *     position after sending.
      *     Non seekable streams, as well as all other types, are casted to a
      *     string.
-     * @param string               $action One of the ACTION_* constants.
+     * @param string               $operator One of the ACTION_* constants.
      *     Describes the operation to perform.
      * 
      * @return $this The query object.
      */
-    protected function addWhere($name, $value, $action)
+    protected function addWhere($name, $value, $operator)
     {
         $this->words[] = array(
-            static::sanitizeAction($action)
-            . Message::sanitizeArgumentName($name),
-            (null === $value ? null : Message::sanitizeArgumentValue($value))
+            static::sanitizeOperator($operator)
+            . Message::sanitizeAttributeName($name),
+            (null === $value ? null : Message::sanitizeAttributeValue($value))
         );
         return $this;
     }

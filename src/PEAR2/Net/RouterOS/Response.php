@@ -80,9 +80,9 @@ class Response extends Message
      *     the new response.
      * @param bool         $asStream  Whether to populate the argument values
      *     with streams instead of strings.
-     * @param int          $timeoutS  If a response is not immediatly
+     * @param int          $sTimeout  If a response is not immediatly
      *     available, wait this many seconds. If NULL, wait indefinetly.
-     * @param int          $timeoutUs Microseconds to add to the waiting time.
+     * @param int          $usTimeout Microseconds to add to the waiting time.
      * @param Registry     $reg       An optional registry to sync the
      *     response with.
      * 
@@ -92,8 +92,8 @@ class Response extends Message
     public function __construct(
         Communicator $com,
         $asStream = false,
-        $timeoutS = 0,
-        $timeoutUs = null,
+        $sTimeout = 0,
+        $usTimeout = null,
         Registry $reg = null
     ) {
         if (null === $reg) {
@@ -101,18 +101,18 @@ class Response extends Message
                 $old = $com->getTransmitter()
                     ->lock(T\Stream::DIRECTION_RECEIVE);
                 try {
-                    $this->_receive($com, $asStream, $timeoutS, $timeoutUs);
+                    $this->_receive($com, $asStream, $sTimeout, $usTimeout);
                 } catch (E $e) {
                     $com->getTransmitter()->lock($old, true);
                     throw $e;
                 }
                 $com->getTransmitter()->lock($old, true);
             } else {
-                $this->_receive($com, $asStream, $timeoutS, $timeoutUs);
+                $this->_receive($com, $asStream, $sTimeout, $usTimeout);
             }
         } else {
             while (null === ($response = $reg->getNextResponse())) {
-                $newResponse = new self($com, true, $timeoutS, $timeoutUs);
+                $newResponse = new self($com, true, $sTimeout, $usTimeout);
                 $tagInfo = $reg::parseTag($newResponse->getTag());
                 $newResponse->setTag($tagInfo[1]);
                 if (!$reg->add($newResponse, $tagInfo[0])) {
@@ -122,13 +122,13 @@ class Response extends Message
             }
             
             $this->_type = $response->_type;
-            $this->arguments = $response->arguments;
+            $this->attributes = $response->attributes;
             $this->unrecognizedWords = $response->unrecognizedWords;
             $this->setTag($response->getTag());
             
             if (!$asStream) {
-                foreach ($this->arguments as $name => $value) {
-                    $this->setArgument(
+                foreach ($this->attributes as $name => $value) {
+                    $this->setAttribute(
                         $name,
                         stream_get_contents($value)
                     );
@@ -150,24 +150,24 @@ class Response extends Message
      *     the new response.
      * @param bool         $asStream  Whether to populate the argument values
      *     with streams instead of strings.
-     * @param int          $timeoutS  If a response is not immediatly
+     * @param int          $sTimeout  If a response is not immediatly
      *     available, wait this many seconds. If NULL, wait indefinetly.
      *     Note that if an empty sentence is received, the timeout will be
      *     reset for another sentence receiving.
-     * @param int          $timeoutUs Microseconds to add to the waiting time.
+     * @param int          $usTimeout Microseconds to add to the waiting time.
      * 
      * @return void
      */
     private function _receive(
         Communicator $com,
         $asStream = false,
-        $timeoutS = 0,
-        $timeoutUs = null
+        $sTimeout = 0,
+        $usTimeout = null
     ) {
         do {
             if (!$com->getTransmitter()->isDataAwaiting(
-                $timeoutS,
-                $timeoutUs
+                $sTimeout,
+                $usTimeout
             )) {
                 throw new SocketException(
                     'No data within the time limit',
@@ -202,7 +202,7 @@ class Response extends Message
                         );
                     }
                     rewind($value);
-                    $this->setArgument($prefix, $value);
+                    $this->setAttribute($prefix, $value);
                     continue;
                 }
                 if ('.' === $ind && 'tag' === $prefix) {
@@ -216,7 +216,7 @@ class Response extends Message
             for ($word = $com->getNextWord(); '' !== $word;
                 $word = $com->getNextWord()) {
                 if (preg_match('/^=([^=]+)=(.*)$/sS', $word, $matches)) {
-                    $this->setArgument($matches[1], $matches[2]);
+                    $this->setAttribute($matches[1], $matches[2]);
                 } elseif (preg_match('/^\.tag=(.*)$/sS', $word, $matches)) {
                     $this->setTag($matches[1]);
                 } else {
@@ -264,6 +264,44 @@ class Response extends Message
     public function getType()
     {
         return $this->_type;
+    }
+
+    /**
+     * Gets the value of an argument.
+     * 
+     * @param string $name The name of the argument.
+     * 
+     * @return string|resource|null The value of the specified argument.
+     *     Returns NULL if such an argument is not set.
+     * @deprecated 1.0.0b5 Use {@link static::getProperty()} instead.
+     *     This method will be removed upon final release, and is currently
+     *     left standing merely because it can't be easily search&replaced in
+     *     existing code, due to the fact the name "getArgument()" is shared
+     *     with {@link Request::getArgument()}, which is still valid.
+     * @codeCoverageIgnore
+     */
+    public function getArgument($name)
+    {
+        trigger_error(
+            'Response::getArgument() is deprecated in favor of ' .
+            'Response::getProperty() (but note that Request::getArgument() ' .
+            'is still valid)',
+            E_USER_DEPRECATED
+        );
+        return $this->getAttribute($name);
+    }
+
+    /**
+     * Gets the value of a property.
+     * 
+     * @param string $name The name of the property.
+     * 
+     * @return string|resource|null The value of the specified property.
+     *     Returns NULL if such a property is not set.
+     */
+    public function getProperty($name)
+    {
+        return parent::getAttribute($name);
     }
 
     /**

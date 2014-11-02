@@ -232,7 +232,21 @@ class Request extends Message
      */
     public function setArgument($name, $value = '')
     {
-        return parent::setArgument($name, $value);
+        return parent::setAttribute($name, $value);
+    }
+
+    /**
+     * Gets the value of an argument.
+     * 
+     * @param string $name The name of the argument.
+     * 
+     * @return string|resource|null The value of the specified argument.
+     *     Returns NULL if such an argument is not set.
+     * @see setAttribute()
+     */
+    public function getArgument($name)
+    {
+        return parent::getAttribute($name);
     }
 
     /**
@@ -242,7 +256,7 @@ class Request extends Message
      */
     public function removeAllArguments()
     {
-        return parent::removeAllArguments();
+        return parent::removeAllAttributes();
     }
 
     /**
@@ -300,7 +314,7 @@ class Request extends Message
         if (null !== ($tag = $this->getTag())) {
             $bytes += $com->sendWord('.tag=' . $tag);
         }
-        foreach ($this->arguments as $name => $value) {
+        foreach ($this->attributes as $name => $value) {
             $prefix = '=' . $name . '=';
             if (is_string($value)) {
                 $bytes += $com->sendWord($prefix . $value);

@@ -837,10 +837,21 @@ class HandlingTest extends PHPUnit_Framework_TestCase
             9 => array(chr(0xC0) . chr(0x40) . chr(0x01), 0x4001),
             10 => array(chr(0xDF) . chr(0xFF) . chr(0xFE), 0x1FFFFE),
             11 => array(chr(0xDF) . chr(0xFF) . chr(0xFF), 0x1FFFFF),
-            12 => array(chr(0xE0) . chr(0x20) . chr(0x00) . chr(0x00), 0x200000),
-            13 => array(chr(0xE0) . chr(0x20) . chr(0x00) . chr(0x01), 0x200001),
-            14 => array(chr(0xEF) . chr(0xFF) . chr(0xFF) . chr(0xFE), 0xFFFFFFE),
-            15 => array(chr(0xEF) . chr(0xFF) . chr(0xFF) . chr(0xFF), 0xFFFFFFF),
+            12 => array(
+                chr(0xE0) . chr(0x20) . chr(0x00) . chr(0x00), 0x200000
+            ),
+            13 => array(
+                chr(0xE0) . chr(0x20) . chr(0x00) . chr(0x01),
+                0x200001
+            ),
+            14 => array(
+                chr(0xEF) . chr(0xFF) . chr(0xFF) . chr(0xFE),
+                0xFFFFFFE
+            ),
+            15 => array(
+                chr(0xEF) . chr(0xFF) . chr(0xFF) . chr(0xFF),
+                0xFFFFFFF
+            ),
             16 => array(
                 chr(0xF0) . chr(0x10) . chr(0x00) . chr(0x00) . chr(0x00),
                 0x10000000

@@ -36,7 +36,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         );
         $this->assertInternalType(
             'string',
-            $list1[0]->getArgument('address'),
+            $list1[0]->getProperty('address'),
             'The address is not a string'
         );
         $this->assertInstanceOf(
@@ -67,7 +67,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         );
         $this->assertInternalType(
             'string',
-            $list2[0]->getArgument('address'),
+            $list2[0]->getProperty('address'),
             'The address is not a string'
         );
         $this->assertInstanceOf(
@@ -102,7 +102,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         );
         $this->assertInternalType(
             'resource',
-            $list[0]->getArgument('address'),
+            $list[0]->getProperty('address'),
             'The address is not a stream'
         );
     }
@@ -577,7 +577,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         );
         $this->assertInternalType(
             'resource',
-            $list[0]->getArgument('address'),
+            $list[0]->getProperty('address'),
             'The address is not a stream'
         );
     }
@@ -590,7 +590,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $arpPrint->setTag('arp');
         $list1 = $list2 = array();
         foreach ($this->object->sendSync($arpPrint) as $response) {
-            $list1[(string) $response->getArgument('.id')] = $response;
+            $list1[(string) $response->getProperty('.id')] = $response;
         }
         ksort($list1);
         
@@ -613,7 +613,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
                     $response->getTag(),
                     'The callback must only receive responses meant for it.'
                 );
-                $list2[(string) $response->getArgument('.id')] = $response;
+                $list2[(string) $response->getProperty('.id')] = $response;
             }
         );
 
@@ -815,7 +815,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             Query::where(
                 'target',
                 HOSTNAME_INVALID . '/32',
-                Query::ACTION_EQUALS
+                Query::OP_EQ
             )
         );
         $list = $this->object->sendSync($request);
@@ -853,7 +853,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             Query::where(
                 'target',
                 $invalidAddressStream,
-                Query::ACTION_EQUALS
+                Query::OP_EQ
             )
         );
         $list = $this->object->sendSync($request);
@@ -898,7 +898,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             Query::where(
                 'target',
                 HOSTNAME_INVALID . '/32',
-                Query::ACTION_EQUALS
+                Query::OP_EQ
             )->not()
         );
         $list = $this->object->sendSync($request);
@@ -946,7 +946,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             Query::where(
                 'target',
                 $invalidAddressStream,
-                Query::ACTION_EQUALS
+                Query::OP_EQ
             )->not()
         );
         $list = $this->object->sendSync($request);
@@ -1079,8 +1079,8 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $fullList = $this->object->sendSync($request);
 
         $request->setQuery(
-            Query::where('address', HOSTNAME, Query::ACTION_GREATHER_THAN)
-            ->andWhere('address', HOSTNAME_INVALID, Query::ACTION_LESS_THAN)
+            Query::where('address', HOSTNAME, Query::OP_GT)
+            ->andWhere('address', HOSTNAME_INVALID, Query::OP_LT)
         );
         $list = $this->object->sendSync($request);
         $this->assertInstanceOf(
@@ -1108,11 +1108,11 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         rewind($addressStream);
 
         $request->setQuery(
-            Query::where('address', $addressStream, Query::ACTION_GREATHER_THAN)
+            Query::where('address', $addressStream, Query::OP_GT)
             ->andWhere(
                 'address',
                 $invalidAddressStream,
-                Query::ACTION_LESS_THAN
+                Query::OP_LT
             )
         );
         $list = $this->object->sendSync($request);
@@ -1135,6 +1135,8 @@ abstract class Safe extends PHPUnit_Framework_TestCase
 
     /**
      * @requires PHP 5.6
+     * 
+     * @return void
      */
     public function testResponseCollectionWordCount()
     {
@@ -1171,27 +1173,26 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $fullList = $this->object->sendSync($request)
             ->getAllOfType(Response::TYPE_DATA);
 
-        $defaultFirst = $fullList[0]->getArgument('name');
-        $defaultLast = $fullList->getLast()->getArgument('name');
+        $defaultFirst = $fullList[0]->getProperty('name');
+        $defaultLast = $fullList[-1]->getProperty('name');
 
         $sortedByNameASC = $fullList->orderBy(array('name'));
-        $sortedByNameASCFirst = $sortedByNameASC[0]->getArgument('name');
-        $sortedByNameASCLast = $sortedByNameASC->getLast()->getArgument('name');
+        $sortedByNameASCFirst = $sortedByNameASC[0]->getProperty('name');
+        $sortedByNameASCLast = $sortedByNameASC[-1]->getProperty('name');
 
         $this->assertNotSame($defaultFirst, $sortedByNameASCFirst);
         $this->assertNotSame($defaultLast, $sortedByNameASCLast);
 
         $sortedByNameASC = $fullList->orderBy(array('name' => null));
-        $sortedByNameASCFirst = $sortedByNameASC[0]->getArgument('name');
-        $sortedByNameASCLast = $sortedByNameASC->getLast()->getArgument('name');
+        $sortedByNameASCFirst = $sortedByNameASC[0]->getProperty('name');
+        $sortedByNameASCLast = $sortedByNameASC[-1]->getProperty('name');
 
         $this->assertNotSame($defaultFirst, $sortedByNameASCFirst);
         $this->assertNotSame($defaultLast, $sortedByNameASCLast);
 
         $sortedByNameDESC = $fullList->orderBy(array('name' => SORT_DESC));
-        $sortedByNameDESCFirst = $sortedByNameDESC[0]->getArgument('name');
-        $sortedByNameDESCLast = $sortedByNameDESC->getLast()
-            ->getArgument('name');
+        $sortedByNameDESCFirst = $sortedByNameDESC[0]->getProperty('name');
+        $sortedByNameDESCLast = $sortedByNameDESC[-1]->getProperty('name');
 
         $this->assertSame($sortedByNameDESCFirst, $sortedByNameASCLast);
         $this->assertSame($sortedByNameDESCLast, $sortedByNameASCFirst);
@@ -1199,9 +1200,8 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $sortedByNameDESC = $fullList->orderBy(
             array('name' => array(SORT_DESC, SORT_REGULAR))
         );
-        $sortedByNameDESCFirst = $sortedByNameDESC[0]->getArgument('name');
-        $sortedByNameDESCLast = $sortedByNameDESC->getLast()
-            ->getArgument('name');
+        $sortedByNameDESCFirst = $sortedByNameDESC[0]->getProperty('name');
+        $sortedByNameDESCLast = $sortedByNameDESC[-1]->getProperty('name');
 
         $this->assertSame($sortedByNameDESCFirst, $sortedByNameASCLast);
         $this->assertSame($sortedByNameDESCLast, $sortedByNameASCFirst);
@@ -1210,9 +1210,9 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             array('max-limit', 'name')
         );
         $sortedByMaxLimitAndNameFirst = $sortedByMaxLimitAndName[0]
-            ->getArgument('name');
-        $sortedByMaxLimitAndNameLast = $sortedByMaxLimitAndName->getLast()
-            ->getArgument('name');
+            ->getProperty('name');
+        $sortedByMaxLimitAndNameLast = $sortedByMaxLimitAndName[-1]
+            ->getProperty('name');
 
         $this->assertNotSame($defaultFirst, $sortedByMaxLimitAndNameFirst);
         $this->assertNotSame(
@@ -1224,9 +1224,9 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             array('max-limit')
         );
         $sortedByMaxLimitFirst = $sortedByMaxLimit[0]
-            ->getArgument('name');
-        $sortedByMaxLimitLast = $sortedByMaxLimit->getLast()
-            ->getArgument('name');
+            ->getProperty('name');
+        $sortedByMaxLimitLast = $sortedByMaxLimit[-1]
+            ->getProperty('name');
 
         $this->assertNotSame($defaultFirst, $sortedByMaxLimitFirst);
         $this->assertNotSame(
@@ -1242,9 +1242,9 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             })
         );
         $sortedByMaxLimitDownloadFirst = $sortedByMaxLimitDownload[0]
-            ->getArgument('name');
-        $sortedByMaxLimitDownloadLast = $sortedByMaxLimitDownload->getLast()
-            ->getArgument('name');
+            ->getProperty('name');
+        $sortedByMaxLimitDownloadLast = $sortedByMaxLimitDownload[-1]
+            ->getProperty('name');
 
         $this->assertNotSame($defaultFirst, $sortedByMaxLimitDownloadFirst);
         $this->assertNotSame(

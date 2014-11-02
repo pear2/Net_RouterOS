@@ -47,11 +47,11 @@ use SeekableIterator;
  * @method string getType()
  *     Calls {@link Response::getType()}
  *     on the response pointed by the pointer.
- * @method string getUnrecognizedWords()
+ * @method string[] getUnrecognizedWords()
  *     Calls {@link Response::getUnrecognizedWords()}
  *     on the response pointed by the pointer.
- * @method string getArgument(string $name)
- *     Calls {@link Response::getArgument()}
+ * @method string|resource|null getProperty(string $name)
+ *     Calls {@link Response::getProperty()}
  *     on the response pointed by the pointer.
  * @method string getTag()
  *     Calls {@link Response::getTag()}
@@ -76,22 +76,22 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     protected $responseTags = array();
 
     /**
-     * @var array An array with positions of responses, based on an argument
-     *     name. The name of each argument is the array key, and the array value
-     *     is another array where the key is the value for that argument, and
+     * @var array An array with positions of responses, based on an property
+     *     name. The name of each property is the array key, and the array value
+     *     is another array where the key is the value for that property, and
      *     the value is the posistion of the response. For performance reasons,
      *     each key is built only when {@link static::setIndex()} is called with
-     *     that argument, and remains available for the lifetime of this
+     *     that property, and remains available for the lifetime of this
      *     collection.
      */
     protected $responsesIndex = array();
     
     /**
-     * @var array An array with all distinct arguments across all
+     * @var array An array with all distinct properties across all
      *     {@link Response} objects. Created at the first call of
-     *     {@link static::getArgumentMap()}.
+     *     {@link static::getPropertyMap()}.
      */
-    protected $argumentMap = null;
+    protected $propertyMap = null;
     
     /**
      * @var int A pointer, as required by SeekableIterator.
@@ -99,7 +99,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     protected $position = 0;
 
     /**
-     * @var string|null Name of argument to use as index. NULL when disabled.
+     * @var string|null Name of property to use as index. NULL when disabled.
      */
     protected $index = null;
 
@@ -134,25 +134,29 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * function. Depending on the argument given, one of the other functions in
      * the class is invoked and its returned value is returned by this function.
      * 
-     * @param int|string $offset The offset of the response to seek to.
+     * @param int|string|null $offset The offset of the response to seek to.
+     *     If the offset is negative, seek to that relative to the end.
      *     If the collection is indexed, you can also supply a value to seek to.
-     *     Setting NULL will seek to the last response.
+     *     Setting NULL will get the current response's interator.
      * 
-     * @return Response The {@link Response} at the specified index, last
-     *     reponse if no index is provided or FALSE if the index is invalid or the
-     *     collection is empty.
+     * @return Response|ArrayObject The {@link Response} at the specified
+     *     offset, the current response's iterator (which is an ArrayObject)
+     *     when NULL is given, or FALSE if the offset is invalid
+     *     or the collection is empty.
      */
     public function __invoke($offset = null)
     {
-        return null === $offset ? $this->end() : $this->seek($offset);
+        return null === $offset
+            ? $this->current()->getIterator()
+            : $this->seek($offset);
     }
 
     /**
-     * Sets an argument to be usable as a key in the collection.
+     * Sets a property to be usable as a key in the collection.
      * 
-     * @param string|null $name The name of the argument to use. Future calls
-     *     that accept a position will then also be able to search that argument
-     *     for a matching value.
+     * @param string|null $name The name of the property to use. Future calls
+     *     that accept a position will then also be able to search values of
+     *     that property for a matching value.
      *     Specifying NULL will disable such lookups (as is by default).
      *     Note that in case this value occures multiple times within the
      *     collection, only the last matching response will be accessible by
@@ -167,7 +171,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
             if (!isset($this->responsesIndex[$name])) {
                 $this->responsesIndex[$name] = array();
                 foreach ($this->responses as $pos => $response) {
-                    $val = $response->getArgument($name);
+                    $val = $response->getProperty($name);
                     if (null !== $val) {
                         $this->responsesIndex[$name][$val] = $pos;
                     }
@@ -179,9 +183,9 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     }
 
     /**
-     * Gets the name of the argument used as an index.
+     * Gets the name of the property used as an index.
      * 
-     * @return string|null Name of argument to use as index. NULL when disabled.
+     * @return string|null Name of property used as index. NULL when disabled.
      */
     public function getIndex()
     {
@@ -236,7 +240,9 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     /**
      * Checks if an offset exists.
      * 
-     * @param int|string $offset The offset to check.
+     * @param int|string $offset The offset to check. If the
+     *     collection is indexed, you can also supply a value to check.
+     *     Note that negative numeric offsets are NOT accepted.
      * 
      * @return bool TRUE if the offset exists, FALSE otherwise.
      */
@@ -258,7 +264,9 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     public function offsetGet($offset)
     {
         return is_int($offset)
-            ? $this->responses[$offset]
+            ? $this->responses[$offset >= 0
+            ? $offset
+            : count($this->responses) + $offset]
             : $this->responses[$this->responsesIndex[$this->index][$offset]];
     }
 
@@ -272,6 +280,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * @param Response   $value  N/A
      * 
      * @return void
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function offsetSet($offset, $value)
     {
@@ -287,6 +296,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * @param int|string $offset N/A
      * 
      * @return void
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function offsetUnset($offset)
     {
@@ -317,10 +327,12 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     public function seek($position)
     {
         $this->position = is_int($position)
+            ? ($position >= 0
             ? $position
+            : count($this->responses) + $position)
             : ($this->offsetExists($position)
-                ? $this->responsesIndex[$this->index][$position]
-                : -1);
+            ? $this->responsesIndex[$this->index][$position]
+            : -1);
         return $this->current();
     }
 
@@ -394,29 +406,29 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     }
 
     /**
-     * Gets all distinct argument names.
+     * Gets all distinct property names.
      * 
-     * Gets all distinct argument names across all responses.
+     * Gets all distinct property names across all responses.
      * 
-     * @return array An array with all distinct argument names as keys, and the
+     * @return array An array with all distinct property names as keys, and the
      *     indexes at which they occur as values.
      */
-    public function getArgumentMap()
+    public function getPropertyMap()
     {
-        if (null === $this->argumentMap) {
-            $arguments = array();
+        if (null === $this->propertyMap) {
+            $properties = array();
             foreach ($this->responses as $index => $response) {
                 $names = array_keys($response->getIterator()->getArrayCopy());
                 foreach ($names as $name) {
-                    if (!isset($arguments[$name])) {
-                        $arguments[$name] = array();
+                    if (!isset($properties[$name])) {
+                        $properties[$name] = array();
                     }
-                    $arguments[$name][] = $index;
+                    $properties[$name][] = $index;
                 }
             }
-            $this->argumentMap = $arguments;
+            $this->propertyMap = $properties;
         }
-        return $this->argumentMap;
+        return $this->propertyMap;
     }
 
     /**
@@ -452,18 +464,6 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
             $result[] = $this->responses[$index];
         }
         return new static($result);
-    }
-
-    /**
-     * Gets the last {@link Response} in the collection.
-     * 
-     * @return Response The last response in the collection or FALSE if the
-     *     collection is empty.
-     */
-    public function getLast()
-    {
-        $offset = count($this->responses) - 1;
-        return $offset >= 0 ? $this->responses[$offset] : false;
     }
 
     /**
@@ -538,8 +538,8 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
             }
 
             $members = array(
-                0 => $itemA->getArgument($name),
-                1 => $itemB->getArgument($name)
+                0 => $itemA->getProperty($name),
+                1 => $itemB->getProperty($name)
             );
 
             if (is_callable($spec)) {

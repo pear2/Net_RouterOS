@@ -1,23 +1,32 @@
-Console and some overall improvements.
+Console, some overall improvements, including BREAKING CHANGES.
 
 * The PHAR file is now also a console. When installed, the console is available from the executable "roscon".
 * __BREAKING CHANGES:__
-    - Removed Message::getAllArguments() in favor of IteratorAggregate implementation that returns an ArrayObject. For most intents and purposes, you should be able to just search&replace "->getAllArguments()" with an empty string (that will implicitly call getIterator()). If you require the arguments as a "real" array, you can replace "->getAllArguments()" with "->getIterator()->getArrayCopy()".
+    - Response::getArgument() is renamed to Response::getProperty() (Note: Request::getArgument() is still valid). Response::getArgument() is left issuing an E_USER_DEPRECATED notice, and will be removed in a later release.
+    - Message::getAllArguments() is removed in favor of IteratorAggregate implementation that returns an ArrayObject. For most intents and purposes, you should be able to just search&replace "->getAllArguments()" with an empty string (that will implicitly call getIterator()). If you require the arguments as a "real" array, you can replace "->getAllArguments()" with "->getIterator()->getArrayCopy()".
     - Message::\_\_invoke() without arguments is now a shortcut for getTag() instead of getting all arguments.
     - Util::changeMenu() is now renamed to Util::setMenu() and always returns the Util object itself.
+    - ResponseCollection::\_\_invoke() without arguments (or NULL) is now a shortcut for getting the iterator of the current response, instead of for seeking to the last response. Replace "()" with "(-1)" or "->end()" to achieve the old effect.
+    - ResponseCollection::getLast() is removed. To get the last response, you can instead use array access (or offsetGet()) with "-1" as the offset. Or simply search&replace "->getLast()" with "->offsetGet(-1)".
+    - ResponseCollection::getArgumentMap() is renamed to ResponseCollection::getPropertyMap().
+    - All Query::ACTION\_\* constants are renamed to Query::OP\_\*, and shortened (GREATHER_THAN is now GT, etc.).
 * New Util methods:
     - getMenu() (serves the same purpose as previously Util::changeMenu() with an emptry string)
     - getAll()
-    - count() (implementation of Countable, reports the number of items at the current menu)
+    - count() (makes Util an implementation of Countable, reports the number of items at the current menu)
     - prepareScript()
+    - appendScript()
 * Message now implements Countable, reporting the number of arguments (on COUNTER_NORMAL) or words (on COUNT_RECURSIVE).
 * Util::get() now uses RouterOS' "get" command, unless it returns an empty !done response (as it does for RouterOS versions prior to 6.0), in which case it automatically fallbacks to a print with a query.
 * Util::escapeValue() and Util::parseValue() now support associative arrays (introduced in RouterOS 6.2).
 * Util::escapeValue() now correctly converts DateTime objects to DateInterval objects relative to UNIX epoch time in UTC. Previously, the current time zone was used instead of UTC.
 * Util::add() and Util::set()/Util::edit() now support flags as values with a numeric key.
+* Util::filePutContents() now behaves correctly when the underlying Client has enabled streaming of responses and/or when the contents is in a stream. 
+* Responses in ResponseCollection can now be getted or seeked to a value relative from the end by supplying a negative offset.
 * ResponseCollection can now be searched by argument values, if you first designate an argument name with the new ResponseCollection::setIndex() method.
 * ResponseCollection can now produce a sorted response collection based on user defined criteria using the new ResponseCollection::orderBy() method.
 * Util::find() now always returns a comma separated list when used without arguments (as opposed to ";" separated, in more recent RouterOS versions).
 * Response receiving now resets if an empty sentence is received, instead of throwing an exception.
+* New Communicator::seekableStreamLength() method, used internally by Util::filePutContents().
 * Doc fixes (Notably: Clarified the acceptability of seekable streams as argument values, which has been present for a long time, but never documented).
 * CS fixes.

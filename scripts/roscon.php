@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 
 /**
@@ -47,13 +46,26 @@ use PEAR2\Net\RouterOS;
  */
 use PEAR2\Net\Transmitter\SocketException as SE;
 
-if (PHP_SAPI !== 'cli' && count(get_included_files()) === 1) {
-    header('Content-Type: text/plain;charset=UTF-8');
-    echo <<<HEREDOC
+//Detect disallowed direct runs of either this file or "roscon".
+if (PHP_SAPI !== 'cli') {
+    $includedFiles = get_included_files();
+    $rosconPos = array_search(
+        dirname(__FILE__) . DIRECTORY_SEPARATOR . 'roscon',
+        $includedFiles,
+        true
+    );
+    if (false !== $rosconPos) {
+        unset($includedFiles[$rosconPos]);
+    }
+
+    if (count($includedFiles) === 1) {
+        header('Content-Type: text/plain;charset=UTF-8');
+        echo <<<HEREDOC
 For security reasons, this file can not be ran DIRECTLY, except from the
 command line. It can be included however, even when not using the command line.
 HEREDOC;
-    return;
+        return;
+    }
 }
 
 //If there's no appropriate autoloader, add one
@@ -89,9 +101,6 @@ if (!class_exists('PEAR2\Net\RouterOS\Communicator', true)) {
                     realpath('../../Net_Transmitter.git/src')
                 );
                 Autoload::initialize(
-                    realpath('../../Cache_SHM.git/src')
-                );
-                Autoload::initialize(
                     realpath('../../Console_Color.git/src')
                 );
                 Autoload::initialize(
@@ -117,16 +126,21 @@ HEREDOC
 }
 
 // Locate the data dir, in preference as:
-// 1. The data folder at "mypear" (filled at install time by Pyrus/PEAR)
-// 2. The source layout's data folder (also used from PHAR)
-// 3. The PHP_PEAR_DATA_DIR environment variable, if available.
-$dataDir = realpath('@PEAR2_DATA_DIR@/@PACKAGE_CHANNEL@/@PACKAGE_NAME@')
-    ?: (realpath(__DIR__ . '/../data') ?:
-        (false != ($pearDataDir = getenv('PHP_PEAR_DATA_DIR'))
-            ? realpath($pearDataDir . '/@PACKAGE_CHANNEL@/@PACKAGE_NAME@')
-            : false
-        )
-    );
+// 1. The PHP_PEAR_DATA_DIR environment variable, if available
+// 2. The data folder at "mypear" (filled at install time by Pyrus/PEAR)
+// 3. The source layout's data folder (also used when running in PHAR).
+// NOTE: using dirname(__FILE__) instead of __DIR__ to elegantly support PHAR.
+$dataDir = (false != ($pearDataDir = getenv('PHP_PEAR_DATA_DIR')))
+    ? realpath($pearDataDir . '/@PACKAGE_CHANNEL@/@PACKAGE_NAME@')
+    : false;
+if (false === $dataDir) {
+    $dataDir = realpath('@PEAR2_DATA_DIR@/@PACKAGE_CHANNEL@/@PACKAGE_NAME@')
+        ?: (realpath('@PEAR2_DATA_DIR@/@PACKAGE_NAME@')
+        ?: (is_dir(__DIR__ . '/../data')
+        ? __DIR__ . '/../data'
+        : false));
+}
+
 if (false === $dataDir) {
     fwrite(
         STDERR,
@@ -134,7 +148,9 @@ if (false === $dataDir) {
     );
     exit(11);
 }
-$consoleDefFile = realpath($dataDir . '/roscon.xml');
+$consoleDefFile = is_file($dataDir . '/roscon.xml')
+    ? $dataDir . '/roscon.xml'
+    : false;
 if (false === $consoleDefFile) {
     fwrite(
         STDERR,
@@ -180,7 +196,7 @@ $comContext = null === $cmd->options['caPath']
           )
     );
 
-$c_colors = array(
+$cColors = array(
     'SEND' => '',
     'SENT' => '',
     'RECV' => '',
@@ -195,28 +211,26 @@ if ('auto' === $cmd->options['isColored']) {
 }
 if ('yes' === $cmd->options['isColored']) {
     if (class_exists('PEAR2\Console\Color', true)) {
-        $c_colors['SENT'] = new Color(
-            Color\Fonts::BLACK,
-            Color\Backgrounds::PURPLE
+        $cColors['SEND'] = new Color(
+            Color\Fonts::PURPLE
         );
-        $c_colors['SEND'] = clone $c_colors['SENT'];
-        $c_colors['SEND']->setStyles(Color\Styles::UNDERLINE, true);
-        $c_colors['RECV'] = new Color(
-            Color\Fonts::BLACK,
-            Color\Backgrounds::GREEN
+        $cColors['SENT'] = clone $cColors['SEND'];
+        $cColors['SENT']->setStyles(Color\Styles::UNDERLINE, true);
+        $cColors['RECV'] = new Color(
+            Color\Fonts::GREEN
         );
-        $c_colors['ERR'] = new Color(
+        $cColors['ERR'] = new Color(
             Color\Fonts::WHITE,
             Color\Backgrounds::RED
         );
-        $c_colors['NOTE'] = new Color(
+        $cColors['NOTE'] = new Color(
             Color\Fonts::BLUE,
             Color\Backgrounds::YELLOW
         );
-        $c_colors[''] = new Color();
+        $cColors[''] = new Color();
 
-        foreach ($c_colors as $mode => $color) {
-            $c_colors[$mode] = ((string)$color) . "\033[K";
+        foreach ($cColors as $mode => $color) {
+            $cColors[$mode] = ((string)$color) . "\033[K";
         }
     } else {
         fwrite(
@@ -343,38 +357,38 @@ HEREDOC
 }
 
 if ($cmd->options['verbose']) {
-    $c_sep = ' | ';
-    $c_columns = array(
+    $cSep = ' | ';
+    $cColumns = array(
         'mode' => 4,
         'length' => 11,
         'encodedLength' => 12
     );
-    $c_columns['contents'] = $cmd->options['size'] - 1//row length
-            - array_sum($c_columns)
-            - (3/*strlen($c_sep)*/ * count($c_columns));
+    $cColumns['contents'] = $cmd->options['size'] - 1//row length
+            - array_sum($cColumns)
+            - (3/*strlen($c_sep)*/ * count($cColumns));
     fwrite(
         STDOUT,
         implode(
             "\n",
             array(
                 implode(
-                    $c_sep,
+                    $cSep,
                     array(
                         str_pad(
                             'MODE',
-                            $c_columns['mode'],
+                            $cColumns['mode'],
                             ' ',
                             STR_PAD_RIGHT
                         ),
                         str_pad(
                             'LENGTH',
-                            $c_columns['length'],
+                            $cColumns['length'],
                             ' ',
                             STR_PAD_BOTH
                         ),
                         str_pad(
                             'LENGTH',
-                            $c_columns['encodedLength'],
+                            $cColumns['encodedLength'],
                             ' ',
                             STR_PAD_BOTH
                         ),
@@ -382,18 +396,18 @@ if ($cmd->options['verbose']) {
                     )
                 ),
                 implode(
-                    $c_sep,
+                    $cSep,
                     array(
-                        str_repeat(' ', $c_columns['mode']),
+                        str_repeat(' ', $cColumns['mode']),
                         str_pad(
                             '(decoded)',
-                            $c_columns['length'],
+                            $cColumns['length'],
                             ' ',
                             STR_PAD_BOTH
                         ),
                         str_pad(
                             '(encoded)',
-                            $c_columns['encodedLength'],
+                            $cColumns['encodedLength'],
                             ' ',
                             STR_PAD_BOTH
                         ),
@@ -403,30 +417,30 @@ if ($cmd->options['verbose']) {
                 implode(
                     '-|-',
                     array(
-                        str_repeat('-', $c_columns['mode']),
-                        str_repeat('-', $c_columns['length']),
-                        str_repeat('-', $c_columns['encodedLength']),
-                        str_repeat('-', $c_columns['contents'])
+                        str_repeat('-', $cColumns['mode']),
+                        str_repeat('-', $cColumns['length']),
+                        str_repeat('-', $cColumns['encodedLength']),
+                        str_repeat('-', $cColumns['contents'])
                     )
                 )
             )
         ) . "\n"
     );
 
-    $c_regexWrap = '/([^\n]{1,' . ($c_columns['contents']) . '})/sS';
+    $cRegexWrap = '/([^\n]{1,' . ($cColumns['contents']) . '})/sS';
     
     $printWord = function (
         $mode,
         $word,
         $msg = ''
     ) use (
-        $c_sep,
-        $c_columns,
-        $c_regexWrap,
-        $c_colors
+        $cSep,
+        $cColumns,
+        $cRegexWrap,
+        $cColors
     ) {
         $wordFragments = preg_split(
-            $c_regexWrap,
+            $cRegexWrap,
             $word,
             null,
             PREG_SPLIT_DELIM_CAPTURE
@@ -434,7 +448,7 @@ if ($cmd->options['verbose']) {
         for ($i = 0, $l = count($wordFragments); $i < $l; $i += 2) {
             unset($wordFragments[$i]);
         }
-        if ('' !== $c_colors['']) {
+        if ('' !== $cColors['']) {
             $wordFragments = str_replace("\033", "\033[27@", $wordFragments);
         }
 
@@ -442,7 +456,7 @@ if ($cmd->options['verbose']) {
         if ($isAbnormal) {
             $details = str_pad(
                 $msg,
-                $c_columns['length'] + $c_columns['encodedLength'] + 3,
+                $cColumns['length'] + $cColumns['encodedLength'] + 3,
                 ' ',
                 STR_PAD_BOTH
             );
@@ -461,54 +475,54 @@ if ($cmd->options['verbose']) {
 
             $details = str_pad(
                 $length,
-                $c_columns['length'],
+                $cColumns['length'],
                 ' ',
                 STR_PAD_LEFT
             ) .
-            $c_sep .
+            $cSep .
             str_pad(
                 '0x' . strtoupper($encodedLength),
-                $c_columns['encodedLength'],
+                $cColumns['encodedLength'],
                 ' ',
                 STR_PAD_LEFT
             );
         }
         fwrite(
             STDOUT,
-            $c_colors[$mode] .
-            str_pad($mode, $c_columns['mode'], ' ', STR_PAD_RIGHT) .
-            $c_colors[''] .
-            "{$c_sep}{$details}{$c_sep}{$c_colors[$mode]}" .
+            $cColors[$mode] .
+            str_pad($mode, $cColumns['mode'], ' ', STR_PAD_RIGHT) .
+            $cColors[''] .
+            "{$cSep}{$details}{$cSep}{$cColors[$mode]}" .
             implode(
-                "\n{$c_colors['']}" .
-                str_repeat(' ', $c_columns['mode']) .
-                $c_sep .
+                "\n{$cColors['']}" .
+                str_repeat(' ', $cColumns['mode']) .
+                $cSep .
                 implode(
-                    ($isAbnormal ? '   ' : $c_sep),
+                    ($isAbnormal ? '   ' : $cSep),
                     array(
-                        str_repeat(' ', $c_columns['length']),
-                        str_repeat(' ', $c_columns['encodedLength'])
+                        str_repeat(' ', $cColumns['length']),
+                        str_repeat(' ', $cColumns['encodedLength'])
                     )
-                ) . $c_sep . $c_colors[$mode],
+                ) . $cSep . $cColors[$mode],
                 $wordFragments
-            ) . "\n{$c_colors['']}"
+            ) . "\n{$cColors['']}"
         );
     };
 } else {
-    $printWord = function ($mode, $word, $msg = '') use ($c_colors) {
-        if ('' !== $c_colors['']) {
+    $printWord = function ($mode, $word, $msg = '') use ($cColors) {
+        if ('' !== $cColors['']) {
             $word = str_replace("\033", "\033[27@", $word);
             $msg = str_replace("\033", "\033[27@", $msg);
         }
 
         if ('ERR' === $mode || 'NOTE' === $mode) {
-            fwrite(STDERR, "{$c_colors[$mode]}-- {$msg}");
+            fwrite(STDERR, "{$cColors[$mode]}-- {$msg}");
             if ('' !== $word) {
                 fwrite(STDERR, ": {$word}");
             }
-            fwrite(STDERR, "{$c_colors['']}\n");
+            fwrite(STDERR, "{$cColors['']}\n");
         } elseif ('SENT' !== $mode) {
-            fwrite(STDOUT, "{$c_colors[$mode]}{$word}{$c_colors['']}\n");
+            fwrite(STDOUT, "{$cColors[$mode]}{$word}{$cColors['']}\n");
         }
     };
 }
@@ -530,22 +544,22 @@ while (true) {
     while (true) {
         if ($cmd->options['verbose']) {
             fwrite(
-                STDOUT,                
+                STDOUT,
                 implode(
-                    $c_sep,
+                    $cSep,
                     array(
-                        $c_colors['SEND'] .
-                        str_pad('SEND', $c_columns['mode'], ' ', STR_PAD_RIGHT)
-                        . $c_colors[''],
+                        $cColors['SEND'] .
+                        str_pad('SEND', $cColumns['mode'], ' ', STR_PAD_RIGHT)
+                        . $cColors[''],
                         str_pad(
                             '<prompt>',
-                            $c_columns['length'],
+                            $cColumns['length'],
                             ' ',
                             STR_PAD_LEFT
                         ),
                         str_pad(
                             '<prompt>',
-                            $c_columns['encodedLength'],
+                            $cColumns['encodedLength'],
                             ' ',
                             STR_PAD_LEFT
                         ),
@@ -555,7 +569,7 @@ while (true) {
             );
         }
 
-        fwrite(STDOUT, (string)$c_colors['SEND']);
+        fwrite(STDOUT, (string)$cColors['SEND']);
 
         if ($cmd->options['multiline']) {
             while (true) {
@@ -571,17 +585,17 @@ while (true) {
                 if ($cmd->options['verbose']) {
                     fwrite(
                         STDOUT,
-                        "\n{$c_colors['']}" .
+                        "\n{$cColors['']}" .
                         implode(
-                            $c_sep,
+                            $cSep,
                             array(
-                                str_repeat(' ', $c_columns['mode']),
-                                str_repeat(' ', $c_columns['length']),
-                                str_repeat(' ', $c_columns['encodedLength']),
+                                str_repeat(' ', $cColumns['mode']),
+                                str_repeat(' ', $cColumns['length']),
+                                str_repeat(' ', $cColumns['encodedLength']),
                                 ''
                             )
                         )
-                        . $c_colors['SEND']
+                        . $cColors['SEND']
                     );
                 }
             }
@@ -595,7 +609,7 @@ while (true) {
         if ($cmd->options['verbose']) {
             fwrite(STDOUT, "\n");
         }
-        fwrite(STDOUT, (string)$c_colors['']);
+        fwrite(STDOUT, (string)$cColors['']);
 
         $words[] = $word;
         if ('w' === $cmd->options['commandMode']) {

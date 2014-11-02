@@ -276,13 +276,13 @@ class Client
             'response',
             '00' . md5(
                 chr(0) . $password
-                . pack('H*', $response->getArgument('ret'))
+                . pack('H*', $response->getProperty('ret'))
             )
         );
         $request->send($com);
         $response = new Response($com, false, $timeout);
         return $response->getType() === Response::TYPE_FINAL
-            && null === $response->getArgument('ret');
+            && null === $response->getProperty('ret');
     }
     
     /**
@@ -527,41 +527,41 @@ class Client
      * are no more pending requests or when a specified timeout has passed
      * (whichever comes first).
      * 
-     * @param int $timeoutS  Timeout for the loop. If NULL, there is no time
+     * @param int $sTimeout  Timeout for the loop. If NULL, there is no time
      *     limit.
-     * @param int $timeoutUs Microseconds to add to the time limit.
+     * @param int $usTimeout Microseconds to add to the time limit.
      * 
      * @return bool TRUE when there are any more pending requests, FALSE
      *     otherwise.
      * @see extractNewResponses()
      * @see getPendingRequestsCount()
      */
-    public function loop($timeoutS = null, $timeoutUs = 0)
+    public function loop($sTimeout = null, $usTimeout = 0)
     {
         try {
-            if (null === $timeoutS) {
+            if (null === $sTimeout) {
                 while ($this->getPendingRequestsCount() !== 0) {
                     $this->dispatchNextResponse(null);
                 }
             } else {
-                list($startUs, $startS) = explode(' ', microtime());
+                list($usStart, $sStart) = explode(' ', microtime());
                 while ($this->getPendingRequestsCount() !== 0
-                    && ($timeoutS >= 0 || $timeoutUs >= 0)
+                    && ($sTimeout >= 0 || $usTimeout >= 0)
                 ) {
-                    $this->dispatchNextResponse($timeoutS, $timeoutUs);
-                    list($endUs, $endS) = explode(' ', microtime());
+                    $this->dispatchNextResponse($sTimeout, $usTimeout);
+                    list($usEnd, $sEnd) = explode(' ', microtime());
 
-                    $timeoutS -= $endS - $startS;
-                    $timeoutUs -= $endUs - $startUs;
-                    if ($timeoutUs <= 0) {
-                        if ($timeoutS > 0) {
-                            $timeoutUs = 1000000 + $timeoutUs;
-                            $timeoutS--;
+                    $sTimeout -= $sEnd - $sStart;
+                    $usTimeout -= $usEnd - $usStart;
+                    if ($usTimeout <= 0) {
+                        if ($sTimeout > 0) {
+                            $usTimeout = 1000000 + $usTimeout;
+                            $sTimeout--;
                         }
                     }
 
-                    $startS = $endS;
-                    $startUs = $endUs;
+                    $sStart = $sEnd;
+                    $usStart = $usEnd;
                 }
             }
         } catch (SocketException $e) {
@@ -775,20 +775,20 @@ class Client
      * Dispatches the next response in queue, i.e. it executes the associated
      * callback if there is one, or places the response in the response buffer.
      * 
-     * @param int $timeoutS  If a response is not immediatly available, wait
+     * @param int $sTimeout  If a response is not immediatly available, wait
      *     this many seconds. If NULL, wait indefinetly.
-     * @param int $timeoutUs Microseconds to add to the waiting time.
+     * @param int $usTimeout Microseconds to add to the waiting time.
      * 
      * @throws SocketException When there's no response within the time limit.
      * @return Response The dispatched response.
      */
-    protected function dispatchNextResponse($timeoutS = 0, $timeoutUs = 0)
+    protected function dispatchNextResponse($sTimeout = 0, $usTimeout = 0)
     {
         $response = new Response(
             $this->com,
             $this->_streamingResponses,
-            $timeoutS,
-            $timeoutUs,
+            $sTimeout,
+            $usTimeout,
             $this->registry
         );
         if ($response->getType() === Response::TYPE_FATAL) {

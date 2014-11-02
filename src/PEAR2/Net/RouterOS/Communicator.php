@@ -199,11 +199,13 @@ class Communicator
      * 
      * @param string   $inCharset  The charset of the stream.
      * @param string   $outCharset The desired resulting charset.
-     * @param resource $stream     The stream to convert.
+     * @param resource $stream     The stream to convert. The stream is assumed
+     *     to be seekable, and is read from its current position to its end,
+     *     after which, it is seeked back to its starting position.
      * 
      * @return resource A new stream that uses the $out_charset. The stream is a
      *     subset from the original stream, from its current position to its
-     *     end.
+     *     end, seeked at its start.
      */
     public static function iconvStream($inCharset, $outCharset, $stream)
     {
@@ -278,6 +280,27 @@ class Communicator
     {
         return array_key_exists($charsetType, self::$defaultCharsets)
             ? self::$defaultCharsets[$charsetType] : self::$defaultCharsets;
+    }
+
+    /**
+     * Gets the length of a seekable stream.
+     * 
+     * Gets the length of a seekable stream.
+     * 
+     * @param resource $stream The stream to check. The stream is assumed to be
+     *     seekable.
+     * 
+     * @return double The number of bytes in the stream between its current
+     *     position and its end.
+     */
+    public static function seekableStreamLength($stream)
+    {
+        $streamPosition = (double) sprintf('%u', ftell($stream));
+        fseek($stream, 0, SEEK_END);
+        $streamLength = ((double) sprintf('%u', ftell($stream)))
+            - $streamPosition;
+        fseek($stream, $streamPosition, SEEK_SET);
+        return $streamLength;
     }
     
     /**
@@ -420,13 +443,7 @@ class Communicator
         }
         
         flock($stream, LOCK_SH);
-        
-        $streamPosition = (double) sprintf('%u', ftell($stream));
-        fseek($stream, 0, SEEK_END);
-        $streamLength = ((double) sprintf('%u', ftell($stream)))
-            - $streamPosition;
-        fseek($stream, $streamPosition, SEEK_SET);
-        $totalLength = strlen($prefix) + $streamLength;
+        $totalLength = strlen($prefix) + self::seekableStreamLength($stream);
         static::verifyLengthSupport($totalLength);
 
         $bytes = $this->trans->send(self::encodeLength($totalLength) . $prefix);
@@ -591,7 +608,7 @@ class Communicator
      */
     public static function decodeLength(T\Stream $trans)
     {
-        if ($trans->isPersistent()) {
+        if ($trans->isPersistent() && $trans instanceof T\TcpClient) {
             $old = $trans->lock($trans::DIRECTION_RECEIVE);
             $length = self::_decodeLength($trans);
             $trans->lock($old, true);

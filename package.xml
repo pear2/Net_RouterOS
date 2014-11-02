@@ -2,8 +2,7 @@
 <package version="2.1" xmlns="http://pear.php.net/dtd/package-2.1" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0     http://pear.php.net/dtd/tasks-1.0.xsd     http://pear.php.net/dtd/package-2.1     http://pear.php.net/dtd/package-2.1.xsd">
  <name>PEAR2_Net_RouterOS</name>
  <channel>pear2.php.net</channel>
- <summary>RouterOS API client implementation.
-</summary>
+ <summary>RouterOS API client implementation.</summary>
  <description>RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.</description>
  <lead>
   <name>Vasil Rangelov</name>
@@ -11,8 +10,8 @@
   <email>boen.robot@gmail.com</email>
   <active>yes</active>
  </lead>
- <date>2013-10-26</date>
- <time>19:56:36</time>
+ <date>2014-11-02</date>
+ <time>07:37:22</time>
  <version>
   <release>1.0.0b5</release>
   <api>1.0.0</api>
@@ -22,18 +21,36 @@
   <api>stable</api>
  </stability>
  <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</license>
- <notes>Console and some overall improvements.
+ <notes>Console, some overall improvements, including BREAKING CHANGES.
 
 * The PHAR file is now also a console. When installed, the console is available from the executable &quot;roscon&quot;.
+* __BREAKING CHANGES:__
+    - Response::getArgument() is renamed to Response::getProperty() (Note: Request::getArgument() is still valid). Response::getArgument() is left issuing an E_USER_DEPRECATED notice, and will be removed in a later release.
+    - Message::getAllArguments() is removed in favor of IteratorAggregate implementation that returns an ArrayObject. For most intents and purposes, you should be able to just search&amp;replace &quot;-&gt;getAllArguments()&quot; with an empty string (that will implicitly call getIterator()). If you require the arguments as a &quot;real&quot; array, you can replace &quot;-&gt;getAllArguments()&quot; with &quot;-&gt;getIterator()-&gt;getArrayCopy()&quot;.
+    - Message::\_\_invoke() without arguments is now a shortcut for getTag() instead of getting all arguments.
+    - Util::changeMenu() is now renamed to Util::setMenu() and always returns the Util object itself.
+    - ResponseCollection::\_\_invoke() without arguments (or NULL) is now a shortcut for getting the iterator of the current response, instead of for seeking to the last response. Replace &quot;()&quot; with &quot;(-1)&quot; or &quot;-&gt;end()&quot; to achieve the old effect.
+    - ResponseCollection::getLast() is removed. To get the last response, you can instead use array access (or offsetGet()) with &quot;-1&quot; as the offset. Or simply search&amp;replace &quot;-&gt;getLast()&quot; with &quot;-&gt;offsetGet(-1)&quot;.
+    - ResponseCollection::getArgumentMap() is renamed to ResponseCollection::getPropertyMap().
+    - All Query::ACTION\_\* constants are renamed to Query::OP\_\*, and shortened (GREATHER_THAN is now GT, etc.).
 * New Util methods:
-    - getall()
-    - count()
+    - getMenu() (serves the same purpose as previously Util::changeMenu() with an emptry string)
+    - getAll()
+    - count() (makes Util an implementation of Countable, reports the number of items at the current menu)
     - prepareScript()
+    - appendScript()
+* Message now implements Countable, reporting the number of arguments (on COUNTER_NORMAL) or words (on COUNT_RECURSIVE).
 * Util::get() now uses RouterOS' &quot;get&quot; command, unless it returns an empty !done response (as it does for RouterOS versions prior to 6.0), in which case it automatically fallbacks to a print with a query.
 * Util::escapeValue() and Util::parseValue() now support associative arrays (introduced in RouterOS 6.2).
+* Util::escapeValue() now correctly converts DateTime objects to DateInterval objects relative to UNIX epoch time in UTC. Previously, the current time zone was used instead of UTC.
 * Util::add() and Util::set()/Util::edit() now support flags as values with a numeric key.
-* Util::changeMenu() now returns the Util object itself, except when you supply an empty string, when the current menu is returned (as before).
+* Util::filePutContents() now behaves correctly when the underlying Client has enabled streaming of responses and/or when the contents is in a stream. 
+* Responses in ResponseCollection can now be getted or seeked to a value relative from the end by supplying a negative offset.
 * ResponseCollection can now be searched by argument values, if you first designate an argument name with the new ResponseCollection::setIndex() method.
+* ResponseCollection can now produce a sorted response collection based on user defined criteria using the new ResponseCollection::orderBy() method.
+* Util::find() now always returns a comma separated list when used without arguments (as opposed to &quot;;&quot; separated, in more recent RouterOS versions).
+* Response receiving now resets if an empty sentence is received, instead of throwing an exception.
+* New Communicator::seekableStreamLength() method, used internally by Util::filePutContents().
 * Doc fixes (Notably: Clarified the acceptability of seekable streams as argument values, which has been present for a long time, but never documented).
 * CS fixes.</notes>
  <contents>
@@ -64,6 +81,11 @@
     <file role="doc" name="sync-request-simple.php"/>
    </dir>
    <dir name="scripts" baseinstalldir="/">
+    <file role="script" name="roscon">
+     <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+     <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+     <tasks:replace type="package-info" to="description" from="~~description~~"/>
+    </file>
     <file role="script" name="roscon.bat">
      <tasks:windowseol/>
     </file>
@@ -71,6 +93,7 @@
      <tasks:replace type="pear-config" to="php_dir" from="../src"/>
      <tasks:replace type="pear-config" to="php_dir" from="../../Net_Transmitter.git/src"/>
      <tasks:replace type="pear-config" to="php_dir" from="../../Console_Color.git/src"/>
+     <tasks:replace type="pear-config" to="php_dir" from="../../Console_CommandLine.git/src"/>
      <tasks:replace type="pear-config" to="data_dir" from="@PEAR2_DATA_DIR@"/>
      <tasks:replace type="package-info" to="channel" from="@PACKAGE_CHANNEL@"/>
      <tasks:replace type="package-info" to="name" from="@PACKAGE_NAME@"/>
@@ -196,6 +219,11 @@
      <file role="test" name="Safe.php"/>
      <file role="test" name="Unsafe.php"/>
     </dir>
+    <dir name="Extra">
+     <file role="test" name="isHostnameInvalid.php">
+      <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+     </file>
+    </dir>
     <dir name="Util">
      <dir name="Safe">
       <dir name="NonPersistent">
@@ -235,6 +263,7 @@
     <file role="test" name="phpunit.xml">
      <tasks:replace type="pear-config" to="php_dir" from="../src"/>
     </file>
+    <file role="test" name="RouterOS_SETTINGS.rsc"/>
    </dir>
   </dir>
  </contents>
@@ -249,10 +278,10 @@
    <package>
     <name>PEAR2_Net_Transmitter</name>
     <channel>pear2.php.net</channel>
-    <min>1.0.0a4</min>
+    <min>1.0.0a5</min>
    </package>
    <extension>
-    <name>PCRE</name>
+    <name>pcre</name>
    </extension>
   </required>
   <optional>
@@ -264,7 +293,17 @@
    <package>
     <name>PEAR2_Cache_SHM</name>
     <channel>pear2.php.net</channel>
-    <min>0.1.2</min>
+    <min>0.1.3</min>
+   </package>
+   <package>
+    <name>PEAR2_Console_CommandLine</name>
+    <channel>pear2.php.net</channel>
+    <min>0.2.1</min>
+   </package>
+   <package>
+    <name>PEAR2_Console_Color</name>
+    <channel>pear2.php.net</channel>
+    <min>1.0.0</min>
    </package>
    <extension>
     <name>iconv</name>
@@ -283,8 +322,9 @@
    <install name="examples/send-and-forget.php" as="examples/send-and-forget.php"/>
    <install name="examples/sync-request-arguments.php" as="examples/sync-request-arguments.php"/>
    <install name="examples/sync-request-simple.php" as="examples/sync-request-simple.php"/>
+   <install name="scripts/roscon" as="roscon"/>
    <install name="scripts/roscon.bat" as="roscon.bat"/>
-   <install name="scripts/roscon.php" as="roscon"/>
+   <install name="scripts/roscon.php" as="roscon.php"/>
    <install name="src/PEAR2/Net/RouterOS/Client.php" as="PEAR2/Net/RouterOS/Client.php"/>
    <install name="src/PEAR2/Net/RouterOS/Communicator.php" as="PEAR2/Net/RouterOS/Communicator.php"/>
    <install name="src/PEAR2/Net/RouterOS/DataFlowException.php" as="PEAR2/Net/RouterOS/DataFlowException.php"/>
@@ -317,8 +357,10 @@
    <install name="tests/Client/Unsafe/Persistent/EncryptedTest.php" as="Client/Unsafe/Persistent/EncryptedTest.php"/>
    <install name="tests/Client/Unsafe/Persistent/UnencryptedTest.php" as="Client/Unsafe/Persistent/UnencryptedTest.php"/>
    <install name="tests/ConnectionTest.php" as="ConnectionTest.php"/>
+   <install name="tests/Extra/isHostnameInvalid.php" as="Extra/isHostnameInvalid.php"/>
    <install name="tests/HandlingTest.php" as="HandlingTest.php"/>
    <install name="tests/phpunit.xml" as="phpunit.xml"/>
+   <install name="tests/RouterOS_SETTINGS.rsc" as="RouterOS_SETTINGS.rsc"/>
    <install name="tests/Util/Safe.php" as="Util/Safe.php"/>
    <install name="tests/Util/Safe/NonPersistent/EncryptedTest.php" as="Util/Safe/NonPersistent/EncryptedTest.php"/>
    <install name="tests/Util/Safe/NonPersistent/UnencryptedTest.php" as="Util/Safe/NonPersistent/UnencryptedTest.php"/>
