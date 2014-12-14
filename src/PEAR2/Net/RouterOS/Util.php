@@ -44,7 +44,7 @@ use PEAR2\Net\Transmitter\Stream;
  * Utility class.
  * 
  * Abstracts away frequently used functionality (particularly CRUD operations)
- * in convinient to use methods by wrapping around a connection.
+ * in convenient to use methods by wrapping around a connection.
  * 
  * @category Net
  * @package  PEAR2_Net_RouterOS
@@ -290,7 +290,7 @@ class Util implements Countable
      * type. A DateTime object will be converted to a time relative to the UNIX
      * epoch time. Note that if a DateInterval does not have the "days" property
      * ("a" in formatting), then its months and years will be ignored, because
-     * they can't be unambigiously converted to a "time" value.
+     * they can't be unambiguously converted to a "time" value.
      * 
      * Unrecognized types (i.e. resources and other objects) are casted to
      * strings.
@@ -404,7 +404,7 @@ class Util implements Countable
     /**
      * Creates a new Util instance.
      * 
-     * Wraps around a connection to provide convinience methods.
+     * Wraps around a connection to provide convenience methods.
      * 
      * @param Client $client The connection to wrap around.
      */
@@ -889,7 +889,7 @@ class Util implements Countable
      * {@link static::find()}, where numbers and callbacks are allowed also.
      * 
      * @param int   $mode  The counter mode.
-     *     Currently ignored, but present for compatiblity with PHP 5.6+.
+     *     Currently ignored, but present for compatibility with PHP 5.6+.
      * @param Query $query A query to filter items by. Without it, all items
      *     are included in the count.
      * 
@@ -970,7 +970,7 @@ class Util implements Countable
      *     as a string or a seekable stream.
      *     Setting the value to NULL removes a file of this name.
      *     If a seekable stream is provided, it is sent from its current
-     *     posistion to its end, and the pointer is seeked back to its current
+     *     position to its end, and the pointer is seeked back to its current
      *     position after sending.
      *     Non seekable streams, as well as all other types, are casted to a
      *     string.
@@ -1038,12 +1038,12 @@ class Util implements Countable
      * @param string $filename      The name of the file to get the contents of.
      * @param string $tmpScriptName In order to get the file's contents, a
      *     script is created at "/system script" with a random name, the
-     *     source of which is then overwriten with the file's contents, and
+     *     source of which is then overwritten with the file's contents, and
      *     finally retrieved. To eliminate any possibility of name clashes, you
      *     can specify your own name for the script.
      * 
      * @return string|resource|false The contents of the file as a string or as
-     *     new PHP temp stream if the underliying
+     *     new PHP temp stream if the underlying
      *     {@link Client::isStreamingResponses()} is set to TRUE.
      *     FALSE is returned if there is no such file.
      */

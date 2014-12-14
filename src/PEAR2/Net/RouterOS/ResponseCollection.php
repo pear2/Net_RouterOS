@@ -79,7 +79,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * @var array An array with positions of responses, based on an property
      *     name. The name of each property is the array key, and the array value
      *     is another array where the key is the value for that property, and
-     *     the value is the posistion of the response. For performance reasons,
+     *     the value is the position of the response. For performance reasons,
      *     each key is built only when {@link static::setIndex()} is called with
      *     that property, and remains available for the lifetime of this
      *     collection.
@@ -104,8 +104,8 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     protected $index = null;
 
     /**
-     * @var array Criterias used by {@link compare()} to determine the order
-     *     between two respones. See {@link orderBy()} for a detailed
+     * @var array Criteria used by {@link compare()} to determine the order
+     *     between two responses. See {@link orderBy()} for a detailed
      *     description of this array's format.
      */
     protected $compareBy = array();
@@ -137,7 +137,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * @param int|string|null $offset The offset of the response to seek to.
      *     If the offset is negative, seek to that relative to the end.
      *     If the collection is indexed, you can also supply a value to seek to.
-     *     Setting NULL will get the current response's interator.
+     *     Setting NULL will get the current response's iterator.
      * 
      * @return Response|ArrayObject The {@link Response} at the specified
      *     offset, the current response's iterator (which is an ArrayObject)
@@ -158,7 +158,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      *     that accept a position will then also be able to search values of
      *     that property for a matching value.
      *     Specifying NULL will disable such lookups (as is by default).
-     *     Note that in case this value occures multiple times within the
+     *     Note that in case this value occurs multiple times within the
      *     collection, only the last matching response will be accessible by
      *     that value.
      * 
@@ -469,7 +469,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     /**
      * Order resones by criteria.
      * 
-     * @param mixed[] $criteria The criteria to order respones by. It takes the
+     * @param mixed[] $criteria The criteria to order responses by. It takes the
      *     form of an array where each key is the name of the property to use
      *     as (N+1)th sorting key. The value of each member can be either NULL
      *     (for that property, sort normally in ascending order), a single sort
@@ -479,7 +479,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      *     array functions) or a callback.
      *     If a callback is provided, it must accept two arguments
      *     (the two values to be compared), and return -1, 0 or 1 if the first
-     *     value is respectively less than, equal to or greather than the second
+     *     value is respectively less than, equal to or greater than the second
      *     one.
      *     Each key of $criteria can also be numeric, in which case the
      *     value is the name of the property, and sorting is done normally in
@@ -517,15 +517,15 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     }
 
     /**
-     * Compares two respones.
+     * Compares two responses.
      * 
-     * Compares two respones, based on criteria defined in
+     * Compares two responses, based on criteria defined in
      * {@link static::$compareBy}.
      * 
      * @param Response $itemA The response to compare.
      * @param Response $itemB The response to compare $a against.
      * 
-     * @return int Returns 0 if the two respones are equal according to every
+     * @return int Returns 0 if the two responses are equal according to every
      *     criteria specified, -1 if $a should be placed before $b, and 1 if $b
      *     should be placed before $a.
      */

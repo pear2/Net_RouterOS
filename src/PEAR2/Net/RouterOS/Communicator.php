@@ -29,7 +29,7 @@ use PEAR2\Net\Transmitter as T;
  * A RouterOS communicator.
  * 
  * Implementation of the RouterOS API protocol. Unlike the other classes in this
- * package, this class doesn't provide any conviniences beyond the low level
+ * package, this class doesn't provide any conveniences beyond the low level
  * implementation details (automatic word length encoding/decoding, charset
  * translation and data integrity), and because of that, its direct usage is
  * strongly discouraged.
@@ -170,7 +170,7 @@ class Communicator
      *     next word as a string.
      * 
      * @return int|string If a string is provided, returns the number of bytes
-     *     sent, otherwise retuns the next word as a string.
+     *     sent, otherwise returns the next word as a string.
      */
     public function __invoke($string = null)
     {
@@ -310,7 +310,7 @@ class Communicator
      * used for all future words. When sending, {@link self::CHARSET_LOCAL} is
      * converted to {@link self::CHARSET_REMOTE}, and when receiving,
      * {@link self::CHARSET_REMOTE} is converted to {@link self::CHARSET_LOCAL}.
-     * Setting  NULL to either charset will disable charset convertion, and data
+     * Setting  NULL to either charset will disable charset conversion, and data
      * will be both sent and received "as is".
      * 
      * @param mixed $charset     The charset to set. If $charsetType is
@@ -478,7 +478,7 @@ class Communicator
     }
 
     /**
-     * Encodes the length as requred by the RouterOS API.
+     * Encodes the length as required by the RouterOS API.
      * 
      * @param int $length The length to encode.
      * 
@@ -596,9 +596,9 @@ class Communicator
     }
 
     /**
-     * Decodes the lenght of the incoming message.
+     * Decodes the length of the incoming message.
      * 
-     * Decodes the lenght of the incoming message, as specified by the RouterOS
+     * Decodes the length of the incoming message, as specified by the RouterOS
      * API.
      * 
      * @param T\Stream $trans The transmitter from which to decode the length of
@@ -618,9 +618,9 @@ class Communicator
     }
 
     /**
-     * Decodes the lenght of the incoming message.
+     * Decodes the length of the incoming message.
      * 
-     * Decodes the lenght of the incoming message, as specified by the RouterOS
+     * Decodes the length of the incoming message, as specified by the RouterOS
      * API.
      * 
      * Difference with the non private function is that this one doesn't perform

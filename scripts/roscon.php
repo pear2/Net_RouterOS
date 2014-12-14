@@ -129,7 +129,6 @@ HEREDOC
 // 1. The PHP_PEAR_DATA_DIR environment variable, if available
 // 2. The data folder at "mypear" (filled at install time by Pyrus/PEAR)
 // 3. The source layout's data folder (also used when running in PHAR).
-// NOTE: using dirname(__FILE__) instead of __DIR__ to elegantly support PHAR.
 $dataDir = (false != ($pearDataDir = getenv('PHP_PEAR_DATA_DIR')))
     ? realpath($pearDataDir . '/@PACKAGE_CHANNEL@/@PACKAGE_NAME@')
     : false;
@@ -301,13 +300,24 @@ Possible reasons:
    to allow you to make outgoing connections to the ip:port you've set the API
    service on.
 
-6. The router has a filter/mangle/nat rule that overrides the settings at
-   "/ip service".
-   This is a very rare scenario, but if you want to be sure, try to disable all
-   rules that may cause such a thing, or (if you can afford it) set up a fresh
-   RouterOS in place of the existing one, and see if you can connect to it
-   instead. If you still can't connect, such a rule is certainly not the (only)
-   reason.
+6. The router has a firewall filter/mangle/nat rule that overrides the settings
+   at "/ip service".
+   Usually, those are rules in the "input" chain.
+   Theoretically, rules in the "prerouting" and/or "output" chains can also
+   have such an effect.
+   By default, RouterBOARD devices have a filter rule in the "input" chain that
+   drops any incoming connections to the router from its WAN interface, so if
+   your web server is not in the LAN, the connection may be dropped because of
+   that.
+   If that's the case, either disable that rule, or explicitly whitelist the
+   API port. You can whitelist the API port on all interfaces by issuing the
+   following command from a terminal:
+   ```
+   /ip firewall filter
+       add place-before=[find where chain="input" && action="drop"] \
+           chain="input" action="accept" \
+           dst-port=[/ip service get "api" "port"]
+   ```
 
 HEREDOC
         );

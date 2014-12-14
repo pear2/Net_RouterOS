@@ -222,7 +222,7 @@ class Request extends Message
      *     seekable stream.
      *     Setting the value to NULL removes an argument of this name.
      *     If a seekable stream is provided, it is sent from its current
-     *     posistion to its end, and the pointer is seeked back to its current
+     *     position to its end, and the pointer is seeked back to its current
      *     position after sending.
      *     Non seekable streams, as well as all other types, are casted to a
      *     string.

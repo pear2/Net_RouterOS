@@ -7,7 +7,7 @@ REM 4. Whatever %PHP_PEAR_PHP_BIN% points to.
 REM
 REM Once a binary is found, a file is looked for that has the same name as
 REM this batch file.
-REM Prefered extensions are ".php" and then no extension.
+REM Preferred extensions are ".php" and then no extension.
 goto SET_BIN
 :PHP_ERR
 echo PHP interpreter not found. Please set the %%PHPBIN%% or %%PHP_PEAR_PHP_BIN%% environment variable to one, or add one to your %%PATH%%.

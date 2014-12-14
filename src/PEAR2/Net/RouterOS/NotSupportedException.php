@@ -41,7 +41,7 @@ class NotSupportedException extends E implements Exception
     const CODE_CONTROL_BYTE = 1601;
 
     /**
-     * @var mixed The unsuppported value.
+     * @var mixed The unsupported value.
      */
     private $_value;
 

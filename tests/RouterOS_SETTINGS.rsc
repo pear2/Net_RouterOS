@@ -6,7 +6,7 @@
 # If you adjust the PHPUnit settings, you may want to adjust this file also.
 #
 # You may need to manually type out the following part,
-# since it's required to estabilish ANY connection with the router.
+# since it's required to establish ANY connection with the router.
 # ```
 # /ip dhcp-client add disabled=no interface=ether1
 # ```

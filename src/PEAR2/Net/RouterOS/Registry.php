@@ -118,7 +118,7 @@ class Registry
     /**
      * Sets the "tagless mode" setting.
      * 
-     * While in tagless mode, this instance will claim owhership of any
+     * While in tagless mode, this instance will claim ownership of any
      * responses without a tag. While not in this mode, any requests without a
      * tag will be given to all instances.
      * 

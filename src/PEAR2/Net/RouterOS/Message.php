@@ -31,7 +31,7 @@ use Countable;
 use IteratorAggregate;
 
 /**
- * Requred for IteratorAggregate::getIterator() to work properly with foreach.
+ * Required for IteratorAggregate::getIterator() to work properly with foreach.
  */
 use ArrayObject;
 
@@ -49,7 +49,7 @@ abstract class Message implements IteratorAggregate, Countable
 
     /**
      * @var array An array with message attributes. Each array key is the the
-     *     name of an attribute, and the correspding array value is the value
+     *     name of an attribute, and the corresponding array value is the value
      *     for that attribute.
      */
     protected $attributes = array();
@@ -205,7 +205,7 @@ abstract class Message implements IteratorAggregate, Countable
      *     seekable stream.
      *     Setting the value to NULL removes an argument of this name.
      *     If a seekable stream is provided, it is sent from its current
-     *     posistion to its end, and the pointer is seeked back to its current
+     *     position to its end, and the pointer is seeked back to its current
      *     position after sending.
      *     Non seekable streams, as well as all other types, are casted to a
      *     string.

@@ -178,7 +178,7 @@ class Client
      * the class is invoked and its returned value is returned by this function.
      * 
      * @param mixed $arg Value can be either a {@link Request} to send, which
-     *     would be sent asynchoniously if it has a tag, and synchroniously if
+     *     would be sent asynchronously if it has a tag, and synchronously if
      *     not, a number to loop with or NULL to complete all pending requests.
      *     Any other value is converted to string and treated as the tag of a
      *     request to complete.
@@ -205,7 +205,7 @@ class Client
      * @param string       $username The RouterOS username.
      * @param string       $password The RouterOS password.
      * @param int|null     $timeout  The time to wait for each response. NULL
-     *     waits indefinetly.
+     *     waits indefinitely.
      * 
      * @return bool TRUE on success, FALSE on failure.
      */
@@ -258,7 +258,7 @@ class Client
      * @param string       $password The RouterOS password. Potentially parsed
      *     already by iconv.
      * @param int|null     $timeout  The time to wait for each response. NULL
-     *     waits indefinetly.
+     *     waits indefinitely.
      * 
      * @return bool TRUE on success, FALSE on failure.
      */
@@ -393,7 +393,7 @@ class Client
      * pending request and/or has responses that are not yet extracted.
      * 
      * @param string $tag    The tag of the request to look for.
-     * @param int    $filter One of the FILTER_* consntants. Limits the search
+     * @param int    $filter One of the FILTER_* constants. Limits the search
      *     to the specified places.
      * 
      * @return bool TRUE if the request is active, FALSE otherwise.
@@ -593,7 +593,7 @@ class Client
      * Cancels a request.
      * 
      * Cancels an active request. Using this function in favor of a plain call
-     * to the "/cancel" command is highly reccomended, as it also updates the
+     * to the "/cancel" command is highly recommended, as it also updates the
      * counter of pending requests properly. Note that canceling a request also
      * removes any responses for it that were not previously extracted with
      * {@link static::extractNewResponses()}.
@@ -775,8 +775,8 @@ class Client
      * Dispatches the next response in queue, i.e. it executes the associated
      * callback if there is one, or places the response in the response buffer.
      * 
-     * @param int $sTimeout  If a response is not immediatly available, wait
-     *     this many seconds. If NULL, wait indefinetly.
+     * @param int $sTimeout  If a response is not immediately available, wait
+     *     this many seconds. If NULL, wait indefinitely.
      * @param int $usTimeout Microseconds to add to the waiting time.
      * 
      * @throws SocketException When there's no response within the time limit.

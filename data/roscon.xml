@@ -21,7 +21,7 @@
     </option>
     <option name="conTime">
         <long_name>--cTimeout</long_name>
-        <description>Time in seconds to wait for the connection to be estabilished. If "--timeout" is specified, its value will be used when this option is not specified.
+        <description>Time in seconds to wait for the connection to be established. If "--timeout" is specified, its value will be used when this option is not specified.
 Defaults to PHP's default_socket_timeout ini option.</description>
         <action>StoreInt</action>
     </option>

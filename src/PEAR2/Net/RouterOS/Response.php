@@ -80,8 +80,8 @@ class Response extends Message
      *     the new response.
      * @param bool         $asStream  Whether to populate the argument values
      *     with streams instead of strings.
-     * @param int          $sTimeout  If a response is not immediatly
-     *     available, wait this many seconds. If NULL, wait indefinetly.
+     * @param int          $sTimeout  If a response is not immediately
+     *     available, wait this many seconds. If NULL, wait indefinitely.
      * @param int          $usTimeout Microseconds to add to the waiting time.
      * @param Registry     $reg       An optional registry to sync the
      *     response with.
@@ -150,8 +150,8 @@ class Response extends Message
      *     the new response.
      * @param bool         $asStream  Whether to populate the argument values
      *     with streams instead of strings.
-     * @param int          $sTimeout  If a response is not immediatly
-     *     available, wait this many seconds. If NULL, wait indefinetly.
+     * @param int          $sTimeout  If a response is not immediately
+     *     available, wait this many seconds. If NULL, wait indefinitely.
      *     Note that if an empty sentence is received, the timeout will be
      *     reset for another sentence receiving.
      * @param int          $usTimeout Microseconds to add to the waiting time.

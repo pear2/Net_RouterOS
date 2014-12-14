@@ -58,7 +58,7 @@ class Query
     const OP_LT = '<';
     
     /**
-     * Checks if the property is greather than a certain value.
+     * Checks if the property is greater than a certain value.
      */
     const OP_GT = '>';
 
@@ -112,7 +112,7 @@ class Query
      * @param string|resource|null $value    Value of the property as a string
      *     or seekable stream. Not required for existence tests.
      *     If a seekable stream is provided, it is sent from its current
-     *     posistion to its end, and the pointer is seeked back to its current
+     *     position to its end, and the pointer is seeked back to its current
      *     position after sending.
      *     Non seekable streams, as well as all other types, are casted to a
      *     string.
@@ -148,7 +148,7 @@ class Query
      * @param string|resource|null $value    Value of the property as a string
      *     or seekable stream. Not required for existence tests.
      *     If a seekable stream is provided, it is sent from its current
-     *     posistion to its end, and the pointer is seeked back to its current
+     *     position to its end, and the pointer is seeked back to its current
      *     position after sending.
      *     Non seekable streams, as well as all other types, are casted to a
      *     string.
@@ -170,7 +170,7 @@ class Query
      * @param string|resource|null $value    Value of the property as a string
      *     or seekable stream. Not required for existence tests.
      *     If a seekable stream is provided, it is sent from its current
-     *     posistion to its end, and the pointer is seeked back to its current
+     *     position to its end, and the pointer is seeked back to its current
      *     position after sending.
      *     Non seekable streams, as well as all other types, are casted to a
      *     string.
@@ -246,7 +246,7 @@ class Query
      * @param string|resource|null $value    Value of the property as a string
      *     or seekable stream. Not required for existence tests.
      *     If a seekable stream is provided, it is sent from its current
-     *     posistion to its end, and the pointer is seeked back to its current
+     *     position to its end, and the pointer is seeked back to its current
      *     position after sending.
      *     Non seekable streams, as well as all other types, are casted to a
      *     string.
