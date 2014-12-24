@@ -74,14 +74,15 @@ class Client
     protected $pendingRequestsCount = 0;
 
     /**
-     * @var array An array of responses that have not yet been extracted or
-     *     passed to a callback. Key is the tag of the request, and the value
-     *     is an array of associated responses.
+     * @var array<string,Response> An array of responses that have not yet been
+     *     extracted or passed to a callback. Key is the tag of the request,
+     *     and the value is an array of associated responses.
      */
     protected $responseBuffer = array();
 
     /**
-     * @var array An array of callbacks to be executed as responses come.
+     * @var array<string,callback> An array of callbacks to be executed
+     *     as responses come.
      *     Key is the tag of the request, and the value is the callback for it.
      */
     protected $callbacks = array();
@@ -438,8 +439,8 @@ class Client
      * Starts an event loop for the RouterOS callbacks and finishes when a
      * specified request is completed.
      * 
-     * @param string $tag The tag of the request to complete. Setting NULL
-     *     completes all requests.
+     * @param string|null $tag The tag of the request to complete.
+     *     Setting NULL completes all requests.
      * 
      * @return ResponseCollection A collection of {@link Response} objects that
      *     haven't been passed to a callback function or previously extracted
@@ -482,7 +483,8 @@ class Client
      * Gets all new responses for a request that haven't been passed to a
      * callback and clears the buffer from them.
      * 
-     * @param string $tag The tag of the request to extract new responses for.
+     * @param string|null $tag The tag of the request to extract
+     *     new responses for.
      *     Specifying NULL with extract new responses for all requests.
      * 
      * @return ResponseCollection A collection of {@link Response} objects for
@@ -527,9 +529,9 @@ class Client
      * are no more pending requests or when a specified timeout has passed
      * (whichever comes first).
      * 
-     * @param int $sTimeout  Timeout for the loop. If NULL, there is no time
-     *     limit.
-     * @param int $usTimeout Microseconds to add to the time limit.
+     * @param int|null $sTimeout  Timeout for the loop.
+     *     If NULL, there is no time limit.
+     * @param int      $usTimeout Microseconds to add to the time limit.
      * 
      * @return bool TRUE when there are any more pending requests, FALSE
      *     otherwise.
@@ -598,8 +600,8 @@ class Client
      * removes any responses for it that were not previously extracted with
      * {@link static::extractNewResponses()}.
      * 
-     * @param string $tag Tag of the request to cancel. Setting NULL will cancel
-     *     all requests.
+     * @param string|null $tag Tag of the request to cancel.
+     *     Setting NULL will cancel all requests.
      * 
      * @return $this The client object.
      * @see sendAsync()
@@ -775,9 +777,10 @@ class Client
      * Dispatches the next response in queue, i.e. it executes the associated
      * callback if there is one, or places the response in the response buffer.
      * 
-     * @param int $sTimeout  If a response is not immediately available, wait
-     *     this many seconds. If NULL, wait indefinitely.
-     * @param int $usTimeout Microseconds to add to the waiting time.
+     * @param int|null $sTimeout  If a response is not immediately available,
+     *     wait this many seconds.
+     *     If NULL, wait indefinitely.
+     * @param int      $usTimeout Microseconds to add to the waiting time.
      * 
      * @throws SocketException When there's no response within the time limit.
      * @return Response The dispatched response.

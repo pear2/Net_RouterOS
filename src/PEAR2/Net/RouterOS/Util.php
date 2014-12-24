@@ -65,9 +65,9 @@ class Util implements Countable
     protected $menu = '/';
 
     /**
-     * @var array|null An array with the numbers of items in the current menu as
-     *     keys, and the corresponding IDs as values. NULL when the cache needs
-     *     regenerating.
+     * @var array<int,string>|null An array with the numbers of items in
+     *     the current menu as keys, and the corresponding IDs as values.
+     *     NULL when the cache needs regenerating.
      */
     protected $idCache = null;
 
@@ -197,12 +197,12 @@ class Util implements Countable
      * you want to store it for later execution, perhaps by supplying it to
      * "/system scheduler".
      * 
-     * @param string|resource $source The source of the script, as a string
+     * @param string|resource     $source The source of the script, as a string
      *     or stream. If a stream is provided, reading starts from the current
      *     position to the end of the stream, and the pointer stays at the end
      *     after reading is done.
-     * @param array           $params An array of parameters to make available
-     *     in the script as local variables.
+     * @param array<string,mixed> $params An array of parameters to make
+     *     available in the script as local variables.
      *     Variable names are array keys, and variable values are array values.
      *     Array values are automatically processed with
      *     {@link static::escapeValue()}. Streams are also supported, and are
@@ -230,14 +230,14 @@ class Util implements Countable
      * 
      * Appends a script to an existing stream.
      * 
-     * @param resource        $stream An existing stream to write the resulting
-     *     script to.
-     * @param string|resource $source The source of the script, as a string
+     * @param resource            $stream An existing stream to write the
+     *     resulting script to.
+     * @param string|resource     $source The source of the script, as a string
      *     or stream. If a stream is provided, reading starts from the current
      *     position to the end of the stream, and the pointer stays at the end
      *     after reading is done.
-     * @param array           $params An array of parameters to make available
-     *     in the script as local variables.
+     * @param array<string,mixed> $params An array of parameters to make
+     *     available in the script as local variables.
      *     Variable names are array keys, and variable values are array values.
      *     Array values are automatically processed with
      *     {@link static::escapeValue()}. Streams are also supported, and are
@@ -465,12 +465,12 @@ class Util implements Countable
      * variables pre declared. This is achieved by prepending 1+count($params)
      * lines before your actual script.
      * 
-     * @param string|resource $source The source of the script, as a string or
-     *     stream. If a stream is provided, reading starts from the current
+     * @param string|resource     $source The source of the script, as a string
+     *     or stream. If a stream is provided, reading starts from the current
      *     position to the end of the stream, and the pointer stays at the end
      *     after reading is done.
-     * @param array           $params An array of parameters to make available
-     *     in the script as local variables.
+     * @param array<string,mixed> $params An array of parameters to make
+     *     available in the script as local variables.
      *     Variable names are array keys, and variable values are array values.
      *     Array values are automatically processed with
      *     {@link static::escapeValue()}. Streams are also supported, and are
@@ -481,14 +481,17 @@ class Util implements Countable
      *     Note that the script's (generated) name is always added as the
      *     variable "_", which will be inadvertently lost if you overwrite it
      *     from here.
-     * @param string          $policy Allows you to specify a policy the script
-     *     must follow. Has the same format as in terminal.
+     * @param string|null         $policy Allows you to specify a policy the
+     *     script must follow. Has the same format as in terminal.
      *     If left NULL, the script has no restrictions beyond those imposed by
      *     the username.
-     * @param string          $name   The script is executed after being saved
-     *     in "/system script" under a random name (prefixed with the computer's
-     *     name), and is removed after execution. To eliminate any possibility
-     *     of name clashes, you can specify your own name.
+     * @param string|null         $name   The script is executed after being
+     *     saved in "/system script" and is removed after execution.
+     *     If this argument is left NULL, a random string,
+     *     prefixed with the computer's name, is generated and used
+     *     as the script's name.
+     *     To eliminate any possibility of name clashes,
+     *     you can specify your own name instead.
      * 
      * @return ResponseCollection Returns the response collection of the
      *     run, allowing you to inspect errors, if any.
@@ -553,12 +556,17 @@ class Util implements Countable
     {
         if (func_num_args() === 0) {
             if (null === $this->idCache) {
+                $ret = $this->client->sendSync(
+                    new Request($this->menu . '/find')
+                )->getProperty('ret');
+                if (!is_string($ret)) {
+                    $ret = stream_get_contents($ret);
+                }
+
                 $idCache = str_replace(
                     ';',
                     ',',
-                    $this->client->sendSync(
-                        new Request($this->menu . '/find')
-                    )->getProperty('ret')
+                    $ret
                 );
                 $this->idCache = explode(',', $idCache);
                 return $idCache;
@@ -629,8 +637,10 @@ class Util implements Countable
      *     there are no items (e.g. "/system identity"), you can specify NULL.
      * @param string          $valueName The name of the value you want to get.
      * 
-     * @return string|null|bool The value of the specified property. If the
-     *     property is not set, NULL will be returned. FALSE on failure
+     * @return string|resource|null|false The value of the specified property as
+     *     a string or as new PHP temp stream if the underlying
+     *     {@link Client::isStreamingResponses()} is set to TRUE.
+     *     If the property is not set, NULL will be returned. FALSE on failure
      *     (e.g. no such item, invalid property, etc.).
      */
     public function get($number, $valueName)
@@ -730,16 +740,49 @@ class Util implements Countable
     }
 
     /**
+     * Comments items.
+     * 
+     * Sets new comments on all items at the current menu
+     * which match certain criteria, using the "comment" command.
+     * 
+     * Note that not all menus have a "comment" command. Most notably, those are
+     * menus without items in them (e.g. "/system identity"), and menus with
+     * fixed items (e.g. "/ip service").
+     * 
+     * @param mixed           $numbers Targeted items. Can be any criteria
+     *     accepted by {@link static::find()}.
+     * @param string|resource $comment The new comment to set on the item as a
+     *     string or a seekable stream.
+     *     If a seekable stream is provided, it is sent from its current
+     *     position to its end, and the pointer is seeked back to its current
+     *     position after sending.
+     *     Non seekable streams, as well as all other types, are casted to a
+     *     string.
+     * 
+     * @return ResponseCollection Returns the response collection, allowing you
+     *     to inspect errors, if any.
+     */
+    public function comment($numbers, $comment)
+    {
+        $commentRequest = new Request($this->menu . '/comment');
+        $commentRequest->setArgument('comment', $comment);
+        $commentRequest->setArgument('numbers', $this->find($numbers));
+        return $this->client->sendSync($commentRequest);
+    }
+
+    /**
      * Sets new values.
      * 
      * Sets new values on certain properties on all items at the current menu
      * which match certain criteria.
      * 
-     * @param mixed $numbers   Targeted items. Can be any criteria accepted by
-     *     {@link static::find()} or NULL in case the menu is one without items
-     *     (e.g. "/system identity").
-     * @param array $newValues An array with the names of each property to set
-     *     as an array key, and the new value as an array value.
+     * @param mixed                                           $numbers   Items
+     *     to be modified.
+     *     Can be any criteria accepted by {@link static::find()} or NULL
+     *     in case the menu is one without items (e.g. "/system identity").
+     * @param array<string,string|resource>|array<int,string> $newValues An
+     *     array with the names of each property to set as an array key, and the
+     *     new value as an array value.
      *     Flags (properties with a value "true" that is interpreted as
      *     equivalent of "yes" from CLI) can also be specified with a numeric
      *     index as the array key, and the name of the flag as the array value.
@@ -766,13 +809,13 @@ class Util implements Countable
     /**
      * Alias of {@link static::set()}
      * 
-     * @param mixed $numbers   Targeted items. Can be any criteria accepted by
-     *     {@link static::find()}.
-     * @param array $newValues An array with the names of each changed property
-     *     as an array key, and the new value as an array value.
-     *     Flags (properties with a value "true" that is interpreted as
-     *     equivalent of "yes" from CLI) can also be specified with a numeric
-     *     index as the array key, and the name of the flag as the array value.
+     * @param mixed                                           $numbers   Items
+     *     to be modified.
+     *     Can be any criteria accepted by {@link static::find()} or NULL
+     *     in case the menu is one without items (e.g. "/system identity").
+     * @param array<string,string|resource>|array<int,string> $newValues An
+     *     array with the names of each property to set as an array key, and the
+     *     new value as an array value.
      * 
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
@@ -808,14 +851,15 @@ class Util implements Countable
     /**
      * Adds a new item at the current menu.
      * 
-     * @param array $values Accepts one or more items to add to the
-     *     current menu. The data about each item is specified as an array with
-     *     the names of each property as an array key, and the value as an array
-     *     value.
+     * @param array<string,string|resource>|array<int,string> $values Accepts
+     *     one or more items to add to the current menu.
+     *     The data about each item is specified as an array with the names of
+     *     each property as an array key, and the value as an array value.
      *     Flags (properties with a value "true" that is interpreted as
      *     equivalent of "yes" from CLI) can also be specified with a numeric
      *     index as the array key, and the name of the flag as the array value.
-     * @param array $...    Additional items.
+     * @param array<string,string|resource>|array<int,string> $...    Additional
+     *     items.
      * 
      * @return string A comma separated list of the new items' IDs. If a
      *     particular item was not added, this will be indicated by an empty
@@ -888,9 +932,9 @@ class Util implements Countable
      * queries are allowed as a criteria, in contrast with
      * {@link static::find()}, where numbers and callbacks are allowed also.
      * 
-     * @param int   $mode  The counter mode.
+     * @param int        $mode  The counter mode.
      *     Currently ignored, but present for compatibility with PHP 5.6+.
-     * @param Query $query A query to filter items by. Without it, all items
+     * @param Query|null $query A query to filter items by. Without it, all items
      *     are included in the count.
      * 
      * @return int The number of items, or -1 on failure (e.g. if the
@@ -916,15 +960,15 @@ class Util implements Countable
      * 
      * Gets all items in the current menu, using a print request.
      * 
-     * @param array<int|string,string> $args  Additional arguments to pass
-     *     to the request.
+     * @param  array<string,string|resource>|array<int,string> $args  Additional
+     *     arguments to pass to the request.
      *     Each array key is the name of the argument, and each array value is
      *     the value of the argument to be passed.
      *     Arguments without a value (i.e. empty arguments) can also be
      *     specified using a numeric key, and the name of the argument as the
      *     array value.
-     * @param Query|null               $query A query to filter items by.
-     *     NULL to get all items.
+     * @param Query|null                        $query A query to filter items
+     *     by. NULL to get all items.
      * 
      * @return ResponseCollection|false A response collection with all
      *     {@link Response::TYPE_DATA} responses. The collection will be empty
@@ -1035,12 +1079,17 @@ class Util implements Countable
     /**
      * Gets the contents of a specified file.
      * 
-     * @param string $filename      The name of the file to get the contents of.
-     * @param string $tmpScriptName In order to get the file's contents, a
-     *     script is created at "/system script" with a random name, the
-     *     source of which is then overwritten with the file's contents, and
-     *     finally retrieved. To eliminate any possibility of name clashes, you
-     *     can specify your own name for the script.
+     * @param string      $filename      The name of the file to get
+     *     the contents of.
+     * @param string|null $tmpScriptName In order to get the file's contents, a
+     *     script is created at "/system script", the source of which is then
+     *     overwritten with the file's contents, then retrieved from there,
+     *     after which the script is removed.
+     *     If this argument is left NULL, a random string,
+     *     prefixed with the computer's name, is generated and used
+     *     as the script's name.
+     *     To eliminate any possibility of name clashes,
+     *     you can specify your own name instead.
      * 
      * @return string|resource|false The contents of the file as a string or as
      *     new PHP temp stream if the underlying
@@ -1094,12 +1143,12 @@ class Util implements Countable
      * Same as the public equivalent, with the addition of allowing you to get
      * the contents of the script post execution, instead of removing it.
      * 
-     * @param string|resource $source The source of the script, as a string or
-     *     stream. If a stream is provided, reading starts from the current
+     * @param string|resource     $source The source of the script, as a string
+     *     or stream. If a stream is provided, reading starts from the current
      *     position to the end of the stream, and the pointer stays at the end
      *     after reading is done.
-     * @param array           $params An array of parameters to make available
-     *     in the script as local variables.
+     * @param array<string,mixed> $params An array of parameters to make
+     *     available in the script as local variables.
      *     Variable names are array keys, and variable values are array values.
      *     Array values are automatically processed with
      *     {@link static::escapeValue()}. Streams are also supported, and are
@@ -1110,15 +1159,19 @@ class Util implements Countable
      *     Note that the script's (generated) name is always added as the
      *     variable "_", which will be inadvertently lost if you overwrite it
      *     from here.
-     * @param string          $policy Allows you to specify a policy the script
-     *     must follow. Has the same format as in terminal.
+     * @param string|null         $policy Allows you to specify a policy the
+     *     script must follow. Has the same format as in terminal.
      *     If left NULL, the script has no restrictions beyond those imposed by
      *     the username.
-     * @param string          $name   The script is executed after being saved
-     *     in "/system script" under a random name (prefixed with the computer's
-     *     name), and is removed after execution. To eliminate any possibility
-     *     of name clashes, you can specify your own name.
-     * @param bool            $get    Whether to get the source of the script.
+     * @param string|null         $name   The script is executed after being
+     *     saved in "/system script" and is removed after execution.
+     *     If this argument is left NULL, a random string,
+     *     prefixed with the computer's name, is generated and used
+     *     as the script's name.
+     *     To eliminate any possibility of name clashes,
+     *     you can specify your own name instead.
+     * @param bool                $get    Whether to get the source
+     *     of the script.
      * 
      * @return ResponseCollection|string Returns the response collection of the
      *     run, allowing you to inspect errors, if any.

@@ -272,14 +272,14 @@ Possible reasons:
 
 1. You haven't enabled the API service at RouterOS or you've enabled it on a
    different TCP port.
-   Make sure that the "api" service at "/ip service" is enabled, and with that
-   same TCP port (8728 by default or 8729 for "api-ssl").
+   Make sure the "api" service at the "/ip service" menu is enabled,
+   and with that same TCP port (8728 by default or 8729 for "api-ssl").
 
 2. You've mistyped the IP and/or port.
    Check the IP and port you've specified are the ones you intended.
 
 3. Your web server's IP is not in the list of subnets allowed to use the API.
-   Check the "address" property at "/ip service".
+   Check the "address" property at the "/ip service" menu.
    If it's empty, that's not the problem for sure. If it's non-empty however,
    make sure your IP is in that list, or is at least matched as part of an
    otherwise larger subnet.
@@ -301,10 +301,10 @@ Possible reasons:
    service on.
 
 6. The router has a firewall filter/mangle/nat rule that overrides the settings
-   at "/ip service".
+   at the "/ip service" menu.
    Usually, those are rules in the "input" chain.
-   Theoretically, rules in the "prerouting" and/or "output" chains can also
-   have such an effect.
+   Theoretically, rules in the "prerouting", "dstnat", "output" and/or
+   "postrouting" chains can also cause such an effect.
    By default, RouterBOARD devices have a filter rule in the "input" chain that
    drops any incoming connections to the router from its WAN interface, so if
    your web server is not in the LAN, the connection may be dropped because of
@@ -344,9 +344,10 @@ Login refused. Possible reasons:
    Check the permissions of the user's group at "/user group".
 
 3. The user is not allowed to access the router from your web server's IP.
-   Make sure your web server's IP address is within the subnets the user is
-   allowed to log in from. You can check them at the "address" property
-   of the user in the "/user" menu.
+   Check the "address" property at the "/user" menu.
+   If it's empty, that's not the problem for sure. If it's non-empty however,
+   make sure your IP is in that list, or is at least matched as part of an
+   otherwise larger subnet.
 
 4. Mistyped password.
    Make sure you have spelled it correctly.
