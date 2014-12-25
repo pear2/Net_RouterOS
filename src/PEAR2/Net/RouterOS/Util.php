@@ -963,15 +963,16 @@ class Util implements Countable
      * 
      * Gets all items in the current menu, using a print request.
      * 
-     * @param  array<string,string|resource>|array<int,string> $args  Additional
+     * @param array<string,string|resource>|array<int,string> $args  Additional
      *     arguments to pass to the request.
      *     Each array key is the name of the argument, and each array value is
      *     the value of the argument to be passed.
      *     Arguments without a value (i.e. empty arguments) can also be
      *     specified using a numeric key, and the name of the argument as the
      *     array value.
-     * @param Query|null                        $query A query to filter items
-     *     by. NULL to get all items.
+     * @param Query|null                                      $query A query to
+     *     filter items by.
+     *     NULL to get all items.
      * 
      * @return ResponseCollection|false A response collection with all
      *     {@link Response::TYPE_DATA} responses. The collection will be empty

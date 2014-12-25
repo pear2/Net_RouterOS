@@ -74,9 +74,10 @@ class Client
     protected $pendingRequestsCount = 0;
 
     /**
-     * @var array<string,Response> An array of responses that have not yet been
-     *     extracted or passed to a callback. Key is the tag of the request,
-     *     and the value is an array of associated responses.
+     * @var array<string,Response[]> An array of responses that have not yet
+     *     been extracted or passed to a callback.
+     *     Key is the tag of the request, and the value is an array of
+     *     associated responses.
      */
     protected $responseBuffer = array();
 
