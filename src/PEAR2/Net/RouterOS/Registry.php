@@ -84,8 +84,9 @@ class Registry
      * 
      * @param string $tag The tag (as received) to parse.
      * 
-     * @return array An array with the first member being the ownership tag, and
-     *     the second one being the original tag. 
+     * @return array<int,string|null> An array with
+     *     the first member being the ownership tag, and
+     *     the second one being the original tag.
      */
     public static function parseTag($tag)
     {

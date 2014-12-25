@@ -64,7 +64,7 @@ class Response extends Message
     const TYPE_FATAL = '!fatal';
 
     /**
-     * @var array An array of unrecognized words in network order.
+     * @var string[] An array of unrecognized words in network order.
      */
     protected $unrecognizedWords = array();
 
@@ -307,7 +307,7 @@ class Response extends Message
     /**
      * Gets a list of unrecognized words.
      * 
-     * @return array The list of unrecognized words.
+     * @return string[] The list of unrecognized words.
      */
     public function getUnrecognizedWords()
     {

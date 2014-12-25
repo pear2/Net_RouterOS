@@ -63,9 +63,10 @@ class Query
     const OP_GT = '>';
 
     /**
-     * @var array An array of the words forming the query. Each value is an
-     *     array with the first member being the predicate (operator and name),
-     *     and the second member being the value for the predicate.
+     * @var array<string,string|null>[] An array of the words forming the query.
+     *     Each value is an array with the first member being the predicate
+     *     (operator and name), and the second member being the value
+     *     for the predicate.
      */
     protected $words = array();
 

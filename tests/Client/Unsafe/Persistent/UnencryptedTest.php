@@ -2,7 +2,10 @@
 
 namespace PEAR2\Net\RouterOS\Test\Client\Unsafe\Persistent;
 
+use Exception;
 use PEAR2\Net\RouterOS\Client;
+use PEAR2\Net\RouterOS\Request;
+use PEAR2\Net\RouterOS\Response;
 use PEAR2\Net\RouterOS\Test\Client\Unsafe\Persistent;
 
 require_once __DIR__ . '/../Persistent.php';

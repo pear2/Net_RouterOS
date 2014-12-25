@@ -6,6 +6,7 @@ use PEAR2\Net\RouterOS\Communicator;
 use PEAR2\Net\RouterOS\DataFlowException;
 use PEAR2\Net\RouterOS\Exception;
 use PEAR2\Net\RouterOS\Query;
+use PEAR2\Net\RouterOS\Request;
 use PEAR2\Net\RouterOS\Response;
 use PEAR2\Net\RouterOS\SocketException;
 use PEAR2\Net\Transmitter as T;
@@ -50,34 +51,6 @@ abstract class Connection extends PHPUnit_Framework_TestCase
         ini_set('default_socket_timeout', static::$defaultSocketTimeout);
     }
 
-//    /**
-//     * ~
-//     *
-//     * @return void
-//     * @requires extension openssl
-//     */
-//    public function testNormalEncryptedConnection()
-//    {
-//        try {
-//            $routerOS = new Client(
-//                \HOSTNAME,
-//                USERNAME,
-//                PASSWORD,
-//                ENC_PORT,
-//                false,
-//                null,
-//                T\NetworkStream::CRYPTO_TLS
-//            );
-//            $this->assertInstanceOf(
-//                ROS_NAMESPACE . '\Client',
-//                $routerOS,
-//                'Object initialization failed.'
-//            );
-//        } catch (Exception $e) {
-//            $this->fail('Unable to connect normally:' . (string) $e);
-//        }
-//    }
-
     public function testNormalConnection()
     {
         try {
@@ -99,27 +72,6 @@ abstract class Connection extends PHPUnit_Framework_TestCase
             $this->fail('Unable to connect normally:' . (string) $e);
         }
     }
-
-//    /**
-//     * ~
-//     *
-//     * @return void
-//     * @requires PHP 5.3.9
-//     */
-//    public function testNormalPersistentConnection()
-//    {
-//        try {
-//            $routerOS = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT, true);
-//            $this->assertInstanceOf(
-//                ROS_NAMESPACE . '\Client',
-//                $routerOS,
-//                'Object initialization failed.'
-//            );
-//            $routerOS->close();
-//        } catch (Exception $e) {
-//            $this->fail('Unable to connect normally:' . (string) $e);
-//        }
-//    }
 
     public function testMultipleNormalConnection()
     {
@@ -157,36 +109,6 @@ abstract class Connection extends PHPUnit_Framework_TestCase
             $this->fail('Unable to connect normally:' . (string) $e);
         }
     }
-
-//    /**
-//     * ~
-//     *
-//     * @return void
-//     * @requires PHP 5.3.9
-//     */
-//    public function testMultiplePersistentConnection()
-//    {
-//        try {
-//            $routerOS1 = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT, true);
-//            $this->assertInstanceOf(
-//                ROS_NAMESPACE . '\Client',
-//                $routerOS1,
-//                'Object initialization failed.'
-//            );
-//
-//            $routerOS2 = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT, true);
-//            $this->assertInstanceOf(
-//                ROS_NAMESPACE . '\Client',
-//                $routerOS2,
-//                'Object initialization failed.'
-//            );
-//
-//            $routerOS1->close();
-//            $routerOS2->close();
-//        } catch (Exception $e) {
-//            $this->fail('Unable to connect normally:' . (string) $e);
-//        }
-//    }
 
     public function testNormalAnsiConnection()
     {
@@ -274,37 +196,6 @@ abstract class Connection extends PHPUnit_Framework_TestCase
         }
     }
 
-//    /**
-//     * ~
-//     *
-//     * @return void
-//     * @requires PHP 5.3.9
-//     */
-//    public function testInvalidUsernamePersistent()
-//    {
-//        try {
-//            $routerOS = new Client(
-//                \HOSTNAME,
-//                USERNAME_INVALID,
-//                PASSWORD,
-//                PORT,
-//                true
-//            );
-//
-//            $this->fail(
-//                'No proper connection with the username "'
-//                . USERNAME_INVALID
-//                . '" should be available.'
-//            );
-//        } catch (DataFlowException $e) {
-//            $this->assertEquals(
-//                DataFlowException::CODE_INVALID_CREDENTIALS,
-//                $e->getCode(),
-//                'Improper exception code.'
-//            );
-//        }
-//    }
-
     public function testInvalidPassword()
     {
         try {
@@ -331,37 +222,6 @@ abstract class Connection extends PHPUnit_Framework_TestCase
             );
         }
     }
-
-//    /**
-//     * ~
-//     *
-//     * @return void
-//     * @requires PHP 5.3.9
-//     */
-//    public function testInvalidPasswordPersistent()
-//    {
-//        try {
-//            $routerOS = new Client(
-//                \HOSTNAME,
-//                USERNAME,
-//                PASSWORD_INVALID,
-//                PORT,
-//                true
-//            );
-//
-//            $this->fail(
-//                'No proper connection with the password "'
-//                . PASSWORD_INVALID
-//                . '" should be available.'
-//            );
-//        } catch (DataFlowException $e) {
-//            $this->assertEquals(
-//                DataFlowException::CODE_INVALID_CREDENTIALS,
-//                $e->getCode(),
-//                'Improper exception code.'
-//            );
-//        }
-//    }
 
     public function testInvalidUsernameAndPassword()
     {
@@ -391,39 +251,6 @@ abstract class Connection extends PHPUnit_Framework_TestCase
             );
         }
     }
-
-//    /**
-//     * ~
-//     *
-//     * @return void
-//     * @requires PHP 5.3.9
-//     */
-//    public function testInvalidUsernameAndPasswordPersistent()
-//    {
-//        try {
-//            $routerOS = new Client(
-//                \HOSTNAME,
-//                USERNAME_INVALID,
-//                PASSWORD_INVALID,
-//                PORT,
-//                true
-//            );
-//
-//            $this->fail(
-//                'No proper connection with the username "'
-//                . USERNAME_INVALID
-//                . '" and password "'
-//                . PASSWORD_INVALID
-//                . '" should be available.'
-//            );
-//        } catch (DataFlowException $e) {
-//            $this->assertEquals(
-//                DataFlowException::CODE_INVALID_CREDENTIALS,
-//                $e->getCode(),
-//                'Improper exception code.'
-//            );
-//        }
-//    }
 
     public function testInvalidHost()
     {
@@ -713,5 +540,215 @@ abstract class Connection extends PHPUnit_Framework_TestCase
                 'Improper exception code.'
             );
         }
+    }
+
+    public function testQuitMessage()
+    {
+        $com = new Communicator(
+            HOSTNAME,
+            PORT,
+            static::$persistent,
+            null,
+            '',
+            static::$encryption
+        );
+        Client::login($com, USERNAME, PASSWORD);
+
+        $quitRequest = new Request('/quit');
+        $quitRequest->send($com);
+        $quitResponse = new Response(
+            $com,
+            false,
+            ini_get('default_socket_timeout')
+        );
+        $this->assertEquals(
+            1,
+            count($quitResponse->getUnrecognizedWords()),
+            'No message.'
+        );
+        $this->assertEquals(
+            0,
+            count($quitResponse),
+            'There should be no arguments.'
+        );
+        $com->close();
+    }
+
+    public function testQuitMessageStream()
+    {
+        $com = new Communicator(
+            HOSTNAME,
+            PORT,
+            static::$persistent,
+            null,
+            '',
+            static::$encryption
+        );
+        Client::login($com, USERNAME, PASSWORD);
+
+        $quitRequest = new Request('/quit');
+        $quitRequest->send($com);
+        $quitResponse = new Response(
+            $com,
+            true,
+            ini_get('default_socket_timeout')
+        );
+        $this->assertEquals(
+            1,
+            count($quitResponse->getUnrecognizedWords()),
+            'No message.'
+        );
+        $this->assertEquals(
+            0,
+            count($quitResponse),
+            'There should be no arguments.'
+        );
+        $com->close();
+    }
+    
+    public function testSetDefaultCharset()
+    {
+        $com = new Communicator(
+            HOSTNAME,
+            PORT,
+            static::$persistent,
+            null,
+            '',
+            static::$encryption
+        );
+        $this->assertNull($com->getCharset(Communicator::CHARSET_REMOTE));
+        $this->assertNull($com->getCharset(Communicator::CHARSET_LOCAL));
+        Communicator::setDefaultCharset('windows-1251');
+        $this->assertNull($com->getCharset(Communicator::CHARSET_REMOTE));
+        $this->assertNull($com->getCharset(Communicator::CHARSET_LOCAL));
+        
+        $com = new Communicator(
+            HOSTNAME,
+            PORT,
+            static::$persistent,
+            null,
+            '',
+            static::$encryption
+        );
+        $this->assertEquals(
+            'windows-1251',
+            $com->getCharset(Communicator::CHARSET_REMOTE)
+        );
+        $this->assertEquals(
+            'windows-1251',
+            $com->getCharset(Communicator::CHARSET_LOCAL)
+        );
+        Communicator::setDefaultCharset(
+            array(
+                Communicator::CHARSET_REMOTE => 'ISO-8859-1',
+                Communicator::CHARSET_LOCAL  => 'ISO-8859-1'
+            )
+        );
+        $this->assertEquals(
+            'windows-1251',
+            $com->getCharset(Communicator::CHARSET_REMOTE)
+        );
+        $this->assertEquals(
+            'windows-1251',
+            $com->getCharset(Communicator::CHARSET_LOCAL)
+        );
+        
+        $com = new Communicator(
+            HOSTNAME,
+            PORT,
+            static::$persistent,
+            null,
+            '',
+            static::$encryption
+        );
+        $this->assertEquals(
+            'ISO-8859-1',
+            $com->getCharset(Communicator::CHARSET_REMOTE)
+        );
+        $this->assertEquals(
+            'ISO-8859-1',
+            $com->getCharset(Communicator::CHARSET_LOCAL)
+        );
+        Communicator::setDefaultCharset(null);
+        $this->assertEquals(
+            'ISO-8859-1',
+            $com->getCharset(Communicator::CHARSET_REMOTE)
+        );
+        $this->assertEquals(
+            'ISO-8859-1',
+            $com->getCharset(Communicator::CHARSET_LOCAL)
+        );
+        
+        $com = new Communicator(
+            HOSTNAME,
+            PORT,
+            static::$persistent,
+            null,
+            '',
+            static::$encryption
+        );
+        $this->assertNull($com->getCharset(Communicator::CHARSET_REMOTE));
+        $this->assertNull($com->getCharset(Communicator::CHARSET_LOCAL));
+        Communicator::setDefaultCharset(
+            'windows-1251',
+            Communicator::CHARSET_REMOTE
+        );
+        Communicator::setDefaultCharset(
+            'ISO-8859-1',
+            Communicator::CHARSET_LOCAL
+        );
+        $this->assertNull($com->getCharset(Communicator::CHARSET_REMOTE));
+        $this->assertNull($com->getCharset(Communicator::CHARSET_LOCAL));
+        
+        $com = new Communicator(
+            HOSTNAME,
+            PORT,
+            static::$persistent,
+            null,
+            '',
+            static::$encryption
+        );
+        $this->assertEquals(
+            'windows-1251',
+            $com->getCharset(Communicator::CHARSET_REMOTE)
+        );
+        $this->assertEquals(
+            'ISO-8859-1',
+            $com->getCharset(Communicator::CHARSET_LOCAL)
+        );
+        Communicator::setDefaultCharset(null);
+    }
+    
+    public function testInvokability()
+    {
+        $com = new Communicator(
+            HOSTNAME,
+            PORT,
+            static::$persistent,
+            null,
+            '',
+            static::$encryption
+        );
+        Client::login($com, USERNAME, PASSWORD);
+        $request = new Request('/ping');
+        $request('address', HOSTNAME)->setTag('p');
+        $this->assertEquals(HOSTNAME, $request('address'));
+        $this->assertEquals('p', $request->getTag());
+        $this->assertEquals('p', $request());
+        $request($com);
+        $response = new Response(
+            $com,
+            false,
+            ini_get('default_socket_timeout')
+        );
+        $this->assertInternalType('string', $response());
+        $this->assertEquals(HOSTNAME, $response('host'));
+        
+        $request = new Request('/queue/simple/print');
+        $query = Query::where('target', HOSTNAME_INVALID . '/32');
+        $request($query);
+        $this->assertSame($query, $request->getQuery());
+        $com('/quit');
+        $com('');
     }
 }

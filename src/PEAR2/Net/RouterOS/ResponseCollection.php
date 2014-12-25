@@ -61,23 +61,24 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 {
     
     /**
-     * @var array An array with all {@link Response} objects.
+     * @var Response[] An array with all {@link Response} objects.
      */
     protected $responses = array();
     
     /**
-     * @var array An array with each {@link Response} object's type.
+     * @var string[] An array with each {@link Response} object's type.
      */
     protected $responseTypes = array();
     
     /**
-     * @var array An array with each {@link Response} object's tag.
+     * @var string[] An array with each {@link Response} object's tag.
      */
     protected $responseTags = array();
 
     /**
-     * @var array An array with positions of responses, based on an property
-     *     name. The name of each property is the array key, and the array value
+     * @var array<string,array<string,int>> An array with
+     *     positions of responses, based on an property name.
+     *     The name of each property is the array key, and the array value
      *     is another array where the key is the value for that property, and
      *     the value is the position of the response. For performance reasons,
      *     each key is built only when {@link static::setIndex()} is called with
@@ -87,7 +88,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     protected $responsesIndex = array();
     
     /**
-     * @var array An array with all distinct properties across all
+     * @var array<string,int[]> An array with all distinct properties across all
      *     {@link Response} objects. Created at the first call of
      *     {@link static::getPropertyMap()}.
      */
@@ -104,16 +105,17 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     protected $index = null;
 
     /**
-     * @var array Criteria used by {@link compare()} to determine the order
-     *     between two responses. See {@link orderBy()} for a detailed
-     *     description of this array's format.
+     * @var string[]|array<string,null|int|array<int|callable>> Criteria
+     *     used by {@link static::compare()} to determine
+     *     the order between two responses. See {@link static::orderBy()}
+     *     for a detailed description of this array's format.
      */
     protected $compareBy = array();
     
     /**
      * Creates a new collection.
      * 
-     * @param array $responses An array of responses, in network order.
+     * @param Response[] $responses An array of responses, in network order.
      */
     public function __construct(array $responses)
     {
@@ -198,7 +200,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * @param bool $useIndex Whether to use the index values as keys for the
      *     resulting array.
      * 
-     * @return array An array with all responses, in network order.
+     * @return Response[] An array with all responses, in network order.
      */
     public function toArray($useIndex = false)
     {
@@ -305,9 +307,9 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * Resets the pointer to 0, and returns the first response.
-     * 
-     * @return Response The first response in the collection, or FALSE if the
-     *     collection is empty.
+     *
+     * @return Response|false The first response in the collection,
+     *     or FALSE if the collection is empty.
      */
     public function rewind()
     {
@@ -320,9 +322,9 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * @param int|string $position The position to move to. If the collection is
      *     indexed, you can also supply a value to move the pointer to.
      *     A non-existent index will move the pointer to "-1".
-     * 
-     * @return Response The {@link Response} at the specified position, or FALSE
-     *     if the specified position is not valid.
+     *
+     * @return Response|false The {@link Response} at the specified position,
+     *     or FALSE if the specified position is not valid.
      */
     public function seek($position)
     {
@@ -338,9 +340,9 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * Moves the pointer forward by 1, and gets the next response.
-     * 
-     * @return Response The next {@link Response} object, or FALSE if the
-     *     position is not valid.
+     *
+     * @return Response|false The next {@link Response} object,
+     *     or FALSE if the position is not valid.
      */
     public function next()
     {
@@ -350,9 +352,9 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * Gets the response at the current pointer position.
-     * 
-     * @return Response The response at the current pointer position, or FALSE
-     *     if the position is not valid.
+     *
+     * @return Response|false The response at the current pointer position,
+     *     or FALSE if the position is not valid.
      */
     public function current()
     {
@@ -361,9 +363,9 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * Moves the pointer backwards by 1, and gets the previous response.
-     * 
-     * @return Response The next {@link Response} object, or FALSE if the
-     *     position is not valid.
+     *
+     * @return Response|false The next {@link Response} object,
+     *     or FALSE if the position is not valid.
      */
     public function prev()
     {
@@ -374,9 +376,9 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     /**
      * Moves the pointer to the last valid position, and returns the last
      * response.
-     * 
-     * @return Response The last response in the collection, or FALSE if the
-     *     collection is empty.
+     *
+     * @return Response|false The last response in the collection,
+     *     or FALSE if the collection is empty.
      */
     public function end()
     {
@@ -386,9 +388,10 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * Gets the key at the current pointer position.
-     * 
-     * @return int The key at the current pointer position, i.e. the pointer
-     *     position itself, or FALSE if the position is not valid.
+     *
+     * @return int|false The key at the current pointer position,
+     *     i.e. the pointer position itself, or FALSE if the position
+     *     is not valid.
      */
     public function key()
     {
@@ -410,8 +413,9 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * 
      * Gets all distinct property names across all responses.
      * 
-     * @return array An array with all distinct property names as keys, and the
-     *     indexes at which they occur as values.
+     * @return array<string,int[]> An array with
+     *     all distinct property names as keys, and
+     *     the indexes at which they occur as values.
      */
     public function getPropertyMap()
     {
@@ -469,7 +473,8 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     /**
      * Order resones by criteria.
      * 
-     * @param mixed[] $criteria The criteria to order responses by. It takes the
+     * @param string[]|array<string,null|int|array<int|callable>> $criteria The
+     *     criteria to order responses by. It takes the
      *     form of an array where each key is the name of the property to use
      *     as (N+1)th sorting key. The value of each member can be either NULL
      *     (for that property, sort normally in ascending order), a single sort

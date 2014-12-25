@@ -67,8 +67,9 @@ class Communicator
     const CHARSET_LOCAL = 1;
     
     /**
-     * @var array An array with the default charset types as keys, and the
-     *     default charsets as values.
+     * @var array<string,string|null> An array with
+     *     the default charset types as keys, and
+     *     the default charsets as values.
      */
     protected static $defaultCharsets = array(
         self::CHARSET_REMOTE => null,
@@ -76,8 +77,9 @@ class Communicator
     );
     
     /**
-     * @var array An array with the current charset types as keys, and the
-     * current charsets as values.
+     * @var array<string,string|null> An array with
+     *     the current charset types as keys, and
+     *     the current charsets as values.
      */
     protected $charsets = array();
 

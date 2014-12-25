@@ -48,9 +48,9 @@ abstract class Message implements IteratorAggregate, Countable
 {
 
     /**
-     * @var array An array with message attributes. Each array key is the the
-     *     name of an attribute, and the corresponding array value is the value
-     *     for that attribute.
+     * @var array<string,string|resource> An array with message attributes.
+     *     Each array key is the the name of an attribute,
+     *     and the corresponding array value is the value for that attribute.
      */
     protected $attributes = array();
 
@@ -106,7 +106,7 @@ abstract class Message implements IteratorAggregate, Countable
      * 
      * @param mixed $value The value to sanitize.
      * 
-     * @return string The sanitized value.
+     * @return string|resource The sanitized value.
      */
     public static function sanitizeAttributeValue($value)
     {
