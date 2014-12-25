@@ -1,6 +1,6 @@
 <?php
 
-namespace PEAR2\Net\RouterOS\Misc\Test;
+namespace PEAR2\Net\RouterOS\Test\Misc;
 
 use DateInterval;
 use PEAR2\Net\RouterOS\Client;
@@ -28,7 +28,7 @@ use PHPUnit_Framework_TestCase;
  * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
  * @link     http://pear2.php.net/PEAR2_Net_RouterOS
  */
-class HandlingTest extends PHPUnit_Framework_TestCase
+class ConnectionlessTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @param string $command
@@ -1117,7 +1117,11 @@ class HandlingTest extends PHPUnit_Framework_TestCase
         $com('/quit');
         $com('');
     }
-    
+
+    /**
+     * @group Persistent
+     * @requires PHP 5.3.9
+     */
     public function testTaglessModePassing()
     {
         $com1 = new Communicator(\HOSTNAME, PORT, true);

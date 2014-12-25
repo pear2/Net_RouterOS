@@ -126,7 +126,15 @@ class Communicator
             if (!isset($opts['ssl']['ciphers'])
                 || 'DEFAULT' === $opts['ssl']['ciphers']
             ) {
-                stream_context_set_option($context, 'ssl', 'ciphers', 'ADH');
+                stream_context_set_option(
+                    $context,
+                    array(
+                        'ssl' => array(
+                            'ciphers' => 'ADH',
+                            'verify_peer' => false
+                        )
+                    )
+                );
             }
         }
         // @codeCoverageIgnoreStart

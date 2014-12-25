@@ -1,6 +1,6 @@
 <?php
 
-namespace PEAR2\Net\RouterOS\Util\Test;
+namespace PEAR2\Net\RouterOS\Test\Util;
 
 use PEAR2\Net\RouterOS\Client;
 use PEAR2\Net\RouterOS\Query;

@@ -559,7 +559,10 @@ class Util implements Countable
                 $ret = $this->client->sendSync(
                     new Request($this->menu . '/find')
                 )->getProperty('ret');
-                if (!is_string($ret)) {
+                if (null === $ret) {
+                    $this->idCache = array();
+                    return '';
+                } elseif (!is_string($ret)) {
                     $ret = stream_get_contents($ret);
                 }
 

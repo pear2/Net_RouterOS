@@ -1,10 +1,10 @@
 <?php
 
-namespace PEAR2\Net\RouterOS\Util\Test\Safe\NonPersistent;
+namespace PEAR2\Net\RouterOS\Test\Util\Safe\NonPersistent;
 
 use PEAR2\Net\RouterOS\Client;
+use PEAR2\Net\RouterOS\Test\Util\Safe\NonPersistentTest;
 use PEAR2\Net\RouterOS\Util;
-use PEAR2\Net\RouterOS\Util\Test\Safe\NonPersistentTest;
 use PEAR2\Net\Transmitter\NetworkStream;
 
 require_once __DIR__ . '/../NonPersistentTest.php';
@@ -15,6 +15,8 @@ require_once __DIR__ . '/../NonPersistentTest.php';
  * @group Safe
  * @group NonPersistent
  * @group Encrypted
+ *
+ * @requires extension openssl
  * 
  * @category Net
  * @package  PEAR2_Net_RouterOS

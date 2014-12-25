@@ -1,6 +1,6 @@
 <?php
 
-namespace PEAR2\Net\RouterOS\Client\Test;
+namespace PEAR2\Net\RouterOS\Test\Client;
 
 use PEAR2\Net\RouterOS\Client;
 use PEAR2\Net\RouterOS\Communicator;

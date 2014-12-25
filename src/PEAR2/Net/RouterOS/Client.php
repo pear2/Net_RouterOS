@@ -281,9 +281,18 @@ class Client
             )
         );
         $request->send($com);
+
         $response = new Response($com, false, $timeout);
-        return $response->getType() === Response::TYPE_FINAL
-            && null === $response->getProperty('ret');
+        if ($response->getType() === Response::TYPE_FINAL) {
+            return null === $response->getProperty('ret');
+        } else {
+            while ($response->getType() !== Response::TYPE_FINAL
+                && $response->getType() !== Response::TYPE_FATAL
+            ) {
+                $response = new Response($com, false, $timeout);
+            }
+            return false;
+        }
     }
     
     /**

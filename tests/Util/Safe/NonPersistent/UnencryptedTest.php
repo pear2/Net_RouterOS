@@ -1,10 +1,10 @@
 <?php
 
-namespace PEAR2\Net\RouterOS\Util\Test\Safe\NonPersistent;
+namespace PEAR2\Net\RouterOS\Test\Util\Safe\NonPersistent;
 
 use PEAR2\Net\RouterOS\Client;
+use PEAR2\Net\RouterOS\Test\Util\Safe\NonPersistentTest;
 use PEAR2\Net\RouterOS\Util;
-use PEAR2\Net\RouterOS\Util\Test\Safe\NonPersistentTest;
 
 require_once __DIR__ . '/../NonPersistentTest.php';
 

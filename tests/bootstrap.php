@@ -77,15 +77,15 @@ if ($defineConstants) {
     foreach ($constants as $constant) {
         $value = $resolve(constant($constant));
         define(
-            __NAMESPACE__ . '\Client\Test\\' . $constant,
+            __NAMESPACE__ . '\Test\Client\\' . $constant,
             $value
         );
         define(
-            __NAMESPACE__ . '\Util\Test\\' . $constant,
+            __NAMESPACE__ . '\Test\Util\\' . $constant,
             $value
         );
         define(
-            __NAMESPACE__ . '\Misc\Test\\' . $constant,
+            __NAMESPACE__ . '\Test\Misc\\' . $constant,
             $value
         );
     }

@@ -19,7 +19,7 @@
  * Used at the function.
  */
 use PEAR2\Net\RouterOS\Response;
-use PEAR2\Net\RouterOS\Util\Test;
+use PEAR2\Net\RouterOS\Test\Util as Test;
 
 /**
  * Checks whether the queue item's target is the HOSTNAME_INVALID constant.

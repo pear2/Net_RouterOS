@@ -1,8 +1,8 @@
 <?php
 
-namespace PEAR2\Net\RouterOS\Client\Test\Safe;
+namespace PEAR2\Net\RouterOS\Test\Client\Safe;
 
-use PEAR2\Net\RouterOS\Client\Test\Safe;
+use PEAR2\Net\RouterOS\Test\Client\Safe;
 
 require_once __DIR__ . '/../Safe.php';
 

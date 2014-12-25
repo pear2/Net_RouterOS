@@ -1,9 +1,9 @@
 <?php
 
-namespace PEAR2\Net\RouterOS\Client\Test\Unsafe\NonPersistent;
+namespace PEAR2\Net\RouterOS\Test\Client\Unsafe\NonPersistent;
 
 use PEAR2\Net\RouterOS\Client;
-use PEAR2\Net\RouterOS\Client\Test\Unsafe\NonPersistent;
+use PEAR2\Net\RouterOS\Test\Client\Unsafe\NonPersistent;
 
 require_once __DIR__ . '/../NonPersistent.php';
 

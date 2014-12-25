@@ -1,6 +1,6 @@
 <?php
 
-namespace PEAR2\Net\RouterOS\Client\Test;
+namespace PEAR2\Net\RouterOS\Test\Client;
 
 use PEAR2\Net\RouterOS\Client;
 use PEAR2\Net\RouterOS\Communicator;
@@ -42,66 +42,6 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             } catch (SocketException $e) {
                 //Connection is expected to fail several times before success.
             }
-        }
-    }
-
-    public function testMultipleDifferentPersistentConnection()
-    {
-        try {
-
-            $routerOS1 = new Client(
-                \HOSTNAME,
-                USERNAME2,
-                PASSWORD2,
-                PORT,
-                true
-            );
-            $this->assertInstanceOf(
-                ROS_NAMESPACE . '\Client',
-                $routerOS1,
-                'Object initialization failed.'
-            );
-
-            $routerOS2 = new Client(
-                \HOSTNAME,
-                USERNAME,
-                PASSWORD,
-                PORT,
-                true
-            );
-            $this->assertInstanceOf(
-                ROS_NAMESPACE . '\Client',
-                $routerOS2,
-                'Object initialization failed.'
-            );
-
-
-            $addRequest = new Request('/queue/simple/add');
-            $addRequest->setArgument('name', TEST_QUEUE_NAME)
-                ->setArgument('target', '0.0.0.0/0');
-            $responses = $routerOS2->sendSync($addRequest);
-            $this->assertEquals(
-                1,
-                count($responses),
-                'There should be only one response.'
-            );
-            if (count($responses) === 1
-                && $responses->getType() === Response::TYPE_FINAL
-            ) {
-                $removeRequest = new Request('/queue/simple/remove');
-                $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
-                $responses = $routerOS2->sendSync($removeRequest);
-                $this->assertInstanceOf(
-                    ROS_NAMESPACE . '\ResponseCollection',
-                    $responses,
-                    'Response should be one.'
-                );
-            }
-
-            $routerOS1->close();
-            $routerOS2->close();
-        } catch (Exception $e) {
-            $this->fail('Unable to connect normally.');
         }
     }
 

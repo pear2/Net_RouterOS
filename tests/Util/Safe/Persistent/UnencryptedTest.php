@@ -1,10 +1,10 @@
 <?php
 
-namespace PEAR2\Net\RouterOS\Util\Test\Safe\Persistent;
+namespace PEAR2\Net\RouterOS\Test\Util\Safe\Persistent;
 
 use PEAR2\Net\RouterOS\Client;
+use PEAR2\Net\RouterOS\Test\Util\Safe\PersistentTest;
 use PEAR2\Net\RouterOS\Util;
-use PEAR2\Net\RouterOS\Util\Test\Safe\PersistentTest;
 
 require_once __DIR__ . '/../PersistentTest.php';
 
@@ -14,6 +14,8 @@ require_once __DIR__ . '/../PersistentTest.php';
  * @group Safe
  * @group Persistent
  * @group Unencrypted
+ *
+ * @requires PHP 5.3.9
  * 
  * @category Net
  * @package  PEAR2_Net_RouterOS

@@ -28,7 +28,7 @@ set [ find default-name=ether2 ] name=net
 set [ find default-name=ether3 ] name=local
 /ip dhcp-client
 add disabled=no interface=net
-
+:delay 1s
 /user
 add address="" disabled=no group=full name=apifull password=apifull
 add address="" disabled=no group=read name=api password=api

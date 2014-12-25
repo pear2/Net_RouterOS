@@ -1,8 +1,8 @@
 <?php
 
-namespace PEAR2\Net\RouterOS\Client\Test\Unsafe;
+namespace PEAR2\Net\RouterOS\Test\Client\Unsafe;
 
-use PEAR2\Net\RouterOS\Client\Test\Unsafe;
+use PEAR2\Net\RouterOS\Test\Client\Unsafe;
 
 require_once __DIR__ . '/../Unsafe.php';
 
