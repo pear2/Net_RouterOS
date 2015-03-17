@@ -2,11 +2,11 @@
 
 /**
  * ~~summary~~
- * 
+ *
  * ~~description~~
- * 
+ *
  * PHP version 5.3
- * 
+ *
  * @category  Net
  * @package   PEAR2_Net_RouterOS
  * @author    Vasil Rangelov <boen.robot@gmail.com>
@@ -439,7 +439,7 @@ if ($cmd->options['verbose']) {
     );
 
     $cRegexWrap = '/([^\n]{1,' . ($cColumns['contents']) . '})/sS';
-    
+
     $printWord = function (
         $mode,
         $word,
@@ -540,7 +540,6 @@ if ($cmd->options['verbose']) {
 
 //Input/Output cycle
 while (true) {
-
     $prevWord = null;
     $word = '';
     $words = array();

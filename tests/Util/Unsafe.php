@@ -56,7 +56,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
     /**
      * @depends testAdd
-     * 
+     *
      * @return void
      */
     public function testAddUpdatingCache()
@@ -80,7 +80,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
     /**
      * @depends testAdd
-     * 
+     *
      * @return void
      */
     public function testDisableAndEnable()
@@ -124,7 +124,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
     /**
      * @depends testDisableAndEnable
-     * 
+     *
      * @return void
      */
     public function testRemove()
@@ -152,7 +152,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
     /**
      * @depends testRemove
-     * 
+     *
      * @return void
      */
     public function testAddMultiple()
@@ -196,7 +196,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
     /**
      * @depends testRemove
-     * 
+     *
      * @return void
      */
     public function testSetAndEdit()
@@ -308,7 +308,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
     /**
      * @depends testAdd
      * @depends testRemove
-     * 
+     *
      * @return void
      */
     public function testFindByNumber()
@@ -333,7 +333,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
     /**
      * @depends testFindByNumber
-     * 
+     *
      * @return void
      */
     public function testGet()
@@ -379,7 +379,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
     /**
      * @depends testGet
-     * 
+     *
      * @return void
      */
     public function testUnsetValue()
@@ -405,7 +405,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
     /**
      * @depends testRemove
-     * 
+     *
      * @return void
      */
     public function testExec()
@@ -414,7 +414,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             '/queue/simple/print',
             Query::where('name', TEST_QUEUE_NAME)
         );
- 
+
         $this->util->setMenu('/queue/simple');
         $this->assertCount(
             0,
@@ -436,7 +436,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         );
 
         $this->util->remove(TEST_QUEUE_NAME);
- 
+
         $this->assertCount(
             0,
             $this->client->sendSync(
@@ -588,7 +588,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
     /**
      * @depends testExecArgTypes
-     * 
+     *
      * @return void
      */
     public function testExecArgValues()
@@ -816,7 +816,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         $this->assertTrue($putResult4);
         $this->assertFalse($getResult4);
         $this->assertFalse($putResult5);
-        
+
         //New and overwite stream
         $putResult1 = $this->util->filePutContents(TEST_FILE_NAME, $data1s);
         $getResult1 = $this->util->fileGetContents(TEST_FILE_NAME);
@@ -844,7 +844,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         $this->assertFalse($getResult4);
         $this->assertFalse($putResult5);
     }
-    
+
     public function testFilePutAndGetContentsStreamed()
     {
         $data1 = 'test';
@@ -883,7 +883,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         $this->assertTrue($putResult4);
         $this->assertFalse($getResult4);
         $this->assertFalse($putResult5);
-        
+
         //New and overwite stream
         $putResult1 = $this->util->filePutContents(TEST_FILE_NAME, $data1s);
         $getResult1 = $this->util->fileGetContents(TEST_FILE_NAME);

@@ -2,11 +2,11 @@
 
 /**
  * ~~summary~~
- * 
+ *
  * ~~description~~
- * 
+ *
  * PHP version 5
- * 
+ *
  * @category  Net
  * @package   PEAR2_Net_RouterOS
  * @author    Vasil Rangelov <boen.robot@gmail.com>
@@ -32,7 +32,7 @@ use Exception as E;
 
 /**
  * Represents a RouterOS response.
- * 
+ *
  * @category Net
  * @package  PEAR2_Net_RouterOS
  * @author   Vasil Rangelov <boen.robot@gmail.com>
@@ -41,22 +41,22 @@ use Exception as E;
  */
 class Response extends Message
 {
-    
+
     /**
      * The last response for a request.
      */
     const TYPE_FINAL = '!done';
-    
+
     /**
      * A response with data.
      */
     const TYPE_DATA = '!re';
-    
+
     /**
      * A response signifying error.
      */
     const TYPE_ERROR = '!trap';
-    
+
     /**
      * A response signifying a fatal error, due to which the connection would be
      * terminated.
@@ -75,7 +75,7 @@ class Response extends Message
 
     /**
      * Extracts a new response from a communicator.
-     * 
+     *
      * @param Communicator $com       The communicator from which to extract
      *     the new response.
      * @param bool         $asStream  Whether to populate the argument values
@@ -85,7 +85,7 @@ class Response extends Message
      * @param int          $usTimeout Microseconds to add to the waiting time.
      * @param Registry     $reg       An optional registry to sync the
      *     response with.
-     * 
+     *
      * @see getType()
      * @see getArgument()
      */
@@ -120,12 +120,12 @@ class Response extends Message
                     break;
                 }
             }
-            
+
             $this->_type = $response->_type;
             $this->attributes = $response->attributes;
             $this->unrecognizedWords = $response->unrecognizedWords;
             $this->setTag($response->getTag());
-            
+
             if (!$asStream) {
                 foreach ($this->attributes as $name => $value) {
                     $this->setAttribute(
@@ -139,13 +139,13 @@ class Response extends Message
             }
         }
     }
-    
+
     /**
      * Extracts a new response from a communicator.
-     * 
+     *
      * This is the function that performs the actual receiving, while the
      * constructor is also involved in locks and registry sync.
-     * 
+     *
      * @param Communicator $com       The communicator from which to extract
      *     the new response.
      * @param bool         $asStream  Whether to populate the argument values
@@ -155,7 +155,7 @@ class Response extends Message
      *     Note that if an empty sentence is received, the timeout will be
      *     reset for another sentence receiving.
      * @param int          $usTimeout Microseconds to add to the waiting time.
-     * 
+     *
      * @return void
      */
     private function _receive(
@@ -185,32 +185,32 @@ class Response extends Message
                     0,
                     SEEK_END
                 )) {
-                rewind($word);
-                $ind = fread($word, 1);
-                if ('=' === $ind || '.' === $ind) {
-                    $prefix = stream_get_line($word, null, '=');
-                }
-                if ('=' === $ind) {
-                    $value = fopen('php://temp', 'r+b');
-                    $bytesCopied = ftell($word);
-                    while (!feof($word)) {
-                        $bytesCopied += stream_copy_to_stream(
-                            $word,
-                            $value,
-                            0xFFFFF,
-                            $bytesCopied
-                        );
+                    rewind($word);
+                    $ind = fread($word, 1);
+                    if ('=' === $ind || '.' === $ind) {
+                        $prefix = stream_get_line($word, null, '=');
                     }
-                    rewind($value);
-                    $this->setAttribute($prefix, $value);
-                    continue;
-                }
-                if ('.' === $ind && 'tag' === $prefix) {
-                    $this->setTag(stream_get_contents($word, -1, -1));
-                    continue;
-                }
-                rewind($word);
-                $this->unrecognizedWords[] = $word;
+                    if ('=' === $ind) {
+                        $value = fopen('php://temp', 'r+b');
+                        $bytesCopied = ftell($word);
+                        while (!feof($word)) {
+                            $bytesCopied += stream_copy_to_stream(
+                                $word,
+                                $value,
+                                0xFFFFF,
+                                $bytesCopied
+                            );
+                        }
+                        rewind($value);
+                        $this->setAttribute($prefix, $value);
+                        continue;
+                    }
+                    if ('.' === $ind && 'tag' === $prefix) {
+                        $this->setTag(stream_get_contents($word, -1, -1));
+                        continue;
+                    }
+                    rewind($word);
+                    $this->unrecognizedWords[] = $word;
             }
         } else {
             for ($word = $com->getNextWord(); '' !== $word;
@@ -228,12 +228,13 @@ class Response extends Message
 
     /**
      * Sets the response type.
-     * 
+     *
      * Sets the response type. Valid values are the TYPE_* constants.
-     * 
+     *
      * @param string $type The new response type.
-     * 
+     *
      * @return $this The response object.
+     *
      * @see getType()
      */
     protected function setType($type)
@@ -257,8 +258,9 @@ class Response extends Message
 
     /**
      * Gets the response type.
-     * 
+     *
      * @return string The response type.
+     *
      * @see setType()
      */
     public function getType()
@@ -268,11 +270,12 @@ class Response extends Message
 
     /**
      * Gets the value of an argument.
-     * 
+     *
      * @param string $name The name of the argument.
-     * 
+     *
      * @return string|resource|null The value of the specified argument.
      *     Returns NULL if such an argument is not set.
+     *
      * @deprecated 1.0.0b5 Use {@link static::getProperty()} instead.
      *     This method will be removed upon final release, and is currently
      *     left standing merely because it can't be easily search&replaced in
@@ -293,9 +296,9 @@ class Response extends Message
 
     /**
      * Gets the value of a property.
-     * 
+     *
      * @param string $name The name of the property.
-     * 
+     *
      * @return string|resource|null The value of the specified property.
      *     Returns NULL if such a property is not set.
      */
@@ -306,7 +309,7 @@ class Response extends Message
 
     /**
      * Gets a list of unrecognized words.
-     * 
+     *
      * @return string[] The list of unrecognized words.
      */
     public function getUnrecognizedWords()
@@ -316,12 +319,12 @@ class Response extends Message
 
     /**
      * Counts the number of arguments or words.
-     * 
+     *
      * @param int $mode The counter mode.
      *     Either COUNT_NORMAL or COUNT_RECURSIVE.
      *     When in normal mode, counts the number of arguments.
      *     When in recursive mode, counts the number of API words.
-     * 
+     *
      * @return int The number of arguments/words.
      */
     public function count($mode = COUNT_NORMAL)

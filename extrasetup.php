@@ -1,10 +1,10 @@
 <?php
 
 /**
- * extrasetup.php for PEAR2_Net_RouterOS.
- * 
+ * File extrasetup.php for PEAR2_Net_RouterOS.
+ *
  * PHP version 5.3
- * 
+ *
  * @category  Net
  * @package   PEAR2_Net_RouterOS
  * @author    Vasil Rangelov <boen.robot@gmail.com>

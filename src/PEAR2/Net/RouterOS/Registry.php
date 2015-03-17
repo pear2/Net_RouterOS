@@ -2,11 +2,11 @@
 
 /**
  * ~~summary~~
- * 
+ *
  * ~~description~~
- * 
+ *
  * PHP version 5
- * 
+ *
  * @category  Net
  * @package   PEAR2_Net_RouterOS
  * @author    Vasil Rangelov <boen.robot@gmail.com>
@@ -27,12 +27,12 @@ use PEAR2\Cache\SHM;
 
 /**
  * A RouterOS registry.
- * 
+ *
  * Provides functionality for managing the request/response flow. Particularly
  * useful in persistent connections.
- * 
+ *
  * Note that this class is not meant to be called directly.
- * 
+ *
  * @category Net
  * @package  PEAR2_Net_RouterOS
  * @author   Vasil Rangelov <boen.robot@gmail.com>
@@ -42,28 +42,28 @@ use PEAR2\Cache\SHM;
 class Registry
 {
     /**
-     * @var SHM The storage. 
+     * @var SHM The storage.
      */
     protected $shm;
-    
+
     /**
      * @var int ID of request. Populated at first instance in request.
      */
     protected static $requestId = -1;
-    
+
     /**
      * @var int ID to be given to next instance, after incrementing it.
      */
     protected static $instanceIdSeed = -1;
-    
+
     /**
      * @var int ID of instance within the request.
      */
     protected $instanceId;
-    
+
     /**
      * Creates a registry.
-     * 
+     *
      * @param string $uri An URI to bind the registry to.
      */
     public function __construct($uri)
@@ -76,14 +76,14 @@ class Registry
         $this->instanceId = ++self::$instanceIdSeed;
         $this->shm->add('responseBuffer_' . $this->getOwnershipTag(), array());
     }
-    
+
     /**
      * Parses a tag.
-     * 
+     *
      * Parses a tag to reveal the ownership part of it, and the original tag.
-     * 
+     *
      * @param string $tag The tag (as received) to parse.
-     * 
+     *
      * @return array<int,string|null> An array with
      *     the first member being the ownership tag, and
      *     the second one being the original tag.
@@ -100,10 +100,10 @@ class Registry
         }
         return $result;
     }
-    
+
     /**
      * Checks if this instance is the tagless mode owner.
-     * 
+     *
      * @return bool TRUE if this instance is the tagless mode owner, FALSE
      *     otherwise.
      */
@@ -115,21 +115,21 @@ class Registry
         $this->shm->unlock('taglessModeOwner');
         return $result;
     }
-    
+
     /**
      * Sets the "tagless mode" setting.
-     * 
+     *
      * While in tagless mode, this instance will claim ownership of any
      * responses without a tag. While not in this mode, any requests without a
      * tag will be given to all instances.
-     * 
+     *
      * Regardless of mode, if the type of the response is
      * {@link Response::TYPE_FATAL}, it will be given to all instances.
-     * 
+     *
      * @param bool $taglessMode TRUE to claim tagless ownership, FALSE to
      *     release such ownership, if taken.
-     * 
-     * @return bool TRUE on success, FALSE on failure. 
+     *
+     * @return bool TRUE on success, FALSE on failure.
      */
     public function setTaglessMode($taglessMode)
     {
@@ -144,26 +144,26 @@ class Registry
                 && $this->shm->unlock('taglessModeOwner')
                 && $this->shm->unlock('taglessMode'));
     }
-    
+
     /**
      * Get the ownership tag for this instance.
-     * 
-     * @return string The ownership tag for this registry instance. 
+     *
+     * @return string The ownership tag for this registry instance.
      */
     public function getOwnershipTag()
     {
         return self::$requestId . '_' . $this->instanceId . '__';
     }
-    
+
     /**
      * Add a response to the registry.
-     * 
+     *
      * @param Response $response     The response to add. The caller of this
      *     function is responsible for ensuring that the ownership tag and the
      *     original tag are separated, so that only the original one remains in
      *     the response.
      * @param string   $ownershipTag The ownership tag that the response had.
-     * 
+     *
      * @return bool TRUE if the request was added to its buffer, FALSE if
      *     this instance owns the response, and therefore doesn't need to add
      *     the response to its buffer.
@@ -176,7 +176,7 @@ class Registry
         ) {
             return false;
         }
-        
+
         if (null === $ownershipTag) {
             $this->shm->lock('taglessModeOwner');
             if ($this->shm->exists('taglessModeOwner')
@@ -195,18 +195,18 @@ class Registry
                 return true;
             }
         }
-        
+
         $this->_add($response, 'responseBuffer_' . $ownershipTag);
         return true;
     }
-    
+
     /**
      * Adds a response to a buffer.
-     * 
+     *
      * @param Response $response         The response to add.
      * @param string   $targetBufferName The name of the buffer to add the
      *     response to.
-     * 
+     *
      * @return void
      */
     private function _add(Response $response, $targetBufferName)
@@ -218,11 +218,11 @@ class Registry
             $this->shm->unlock($targetBufferName);
         }
     }
-    
+
     /**
      * Gets the next response from this instance's buffer.
-     * 
-     * @return Response|null The next response, or NULL if there isn't one. 
+     *
+     * @return Response|null The next response, or NULL if there isn't one.
      */
     public function getNextResponse()
     {
@@ -240,13 +240,13 @@ class Registry
         }
         return $response;
     }
-    
+
     /**
      * Closes the registry.
-     * 
+     *
      * Closes the registry, meaning that all buffers are cleared.
-     * 
-     * @return void 
+     *
+     * @return void
      */
     public function close()
     {
@@ -254,12 +254,12 @@ class Registry
         self::$instanceIdSeed = -1;
         $this->shm->clear();
     }
-    
+
     /**
      * Removes a buffer.
-     * 
+     *
      * @param string $targetBufferName The buffer to remove.
-     * 
+     *
      * @return void
      */
     private function _close($targetBufferName)
@@ -269,9 +269,9 @@ class Registry
             $this->shm->unlock($targetBufferName);
         }
     }
-    
+
     /**
-     * Removes this instance's buffer. 
+     * Removes this instance's buffer.
      */
     public function __destruct()
     {

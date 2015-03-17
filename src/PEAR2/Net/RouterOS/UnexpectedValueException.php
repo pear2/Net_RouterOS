@@ -2,11 +2,11 @@
 
 /**
  * ~~summary~~
- * 
+ *
  * ~~description~~
- * 
+ *
  * PHP version 5
- * 
+ *
  * @category  Net
  * @package   PEAR2_Net_RouterOS
  * @author    Vasil Rangelov <boen.robot@gmail.com>
@@ -24,7 +24,7 @@ use UnexpectedValueException as U;
 
 /**
  * Exception thrown when encountering an invalid value in a function argument.
- * 
+ *
  * @category Net
  * @package  PEAR2_Net_RouterOS
  * @author   Vasil Rangelov <boen.robot@gmail.com>
@@ -44,7 +44,7 @@ class UnexpectedValueException extends U implements Exception
 
     /**
      * Creates a new UnexpectedValueException.
-     * 
+     *
      * @param string     $message  The Exception message to throw.
      * @param int        $code     The Exception code.
      * @param \Exception $previous The previous exception used for the exception
@@ -63,7 +63,7 @@ class UnexpectedValueException extends U implements Exception
 
     /**
      * Gets the unexpected value.
-     * 
+     *
      * @return mixed The unexpected value.
      */
     public function getValue()
@@ -76,7 +76,7 @@ class UnexpectedValueException extends U implements Exception
 
     /**
      * Returns a string representation of the exception.
-     * 
+     *
      * @return string The exception as a string.
      */
     public function __toString()

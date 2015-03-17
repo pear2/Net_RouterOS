@@ -19,13 +19,13 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
      * @var Client
      */
     protected $object;
-    
+
     /**
      * Runs the test in a separate process for the sake of
      * peristent connections.
-     * 
+     *
      * @runInSeparateProcess
-     * 
+     *
      * @return void
      */
     public function testSystemReboot()
@@ -107,7 +107,6 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         if (count($responses) === 1
             && $responses[-1]->getType() === Response::TYPE_FINAL
         ) {
-
             $removeRequest = new Request('/queue/simple/remove');
             $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
             $responses = $this->object->sendSync($removeRequest);
@@ -160,7 +159,6 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             if (count($responses) === 1
                 && $responses[-1]->getType() === Response::TYPE_FINAL
             ) {
-
                 $removeRequest = new Request('/queue/simple/remove');
                 $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
                 $responses = $this->object->sendSync($removeRequest);
@@ -214,7 +212,6 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             if (count($responses) === 1
                 && $responses[-1]->getType() === Response::TYPE_FINAL
             ) {
-
                 $removeRequest = new Request('/queue/simple/remove');
                 $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
                 $responses = $this->object->sendSync($removeRequest);
@@ -235,7 +232,6 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         //Required for this test
         $memoryLimit = ini_set('memory_limit', -1);
         try {
-
             $comment = fopen('php://temp', 'r+b');
             fwrite($comment, str_repeat('t', 0xFFFFFF));
             for ($i = 0; $i < 14; $i++) {
@@ -268,7 +264,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
                 $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
                 $response = $this->object->sendSync($removeRequest);
             }
-            
+
             //Clearing out for other tests.
             ini_set('memory_limit', $memoryLimit);
             $this->fail('Lengths above 0xFFFFFFF should not be supported.');
@@ -306,7 +302,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
                 $responses->getPropertyMap(),
                 'Improper format of the returned array'
             );
-            
+
             $removeRequest = new Request('/queue/simple/remove');
             $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
             $response = $this->object->sendSync($removeRequest);

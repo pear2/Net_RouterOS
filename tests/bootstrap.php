@@ -1,10 +1,10 @@
 <?php
 
 /**
- * bootstrap.php for PEAR2_Net_RouterOS.
- * 
+ * File bootstrap.php for PEAR2_Net_RouterOS.
+ *
  * PHP version 5.3
- * 
+ *
  * @category  Net
  * @package   PEAR2_Net_RouterOS
  * @author    Vasil Rangelov <boen.robot@gmail.com>
@@ -46,12 +46,12 @@ if ($defineConstants) {
 
 /**
  * Resolves a hostname to an IP address.
- * 
+ *
  * Resolves a hostname to an IP address. Used instead of gethostbyname() in
  * order to enable resolutions to IPv6 hosts.
- * 
+ *
  * @param string $hostname Hostname to resolve.
- * 
+ *
  * @return string An IP (v4 or v6) for this hostname.
  */
 $resolve = function ($hostname) use (&$resolve) {

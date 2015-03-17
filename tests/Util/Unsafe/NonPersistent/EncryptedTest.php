@@ -11,7 +11,7 @@ require_once __DIR__ . '/../NonPersistent.php';
 
 /**
  * ~
- * 
+ *
  * @group Util
  * @group Unsafe
  * @group NonPersistent

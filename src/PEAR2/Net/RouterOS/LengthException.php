@@ -2,11 +2,11 @@
 
 /**
  * ~~summary~~
- * 
+ *
  * ~~description~~
- * 
+ *
  * PHP version 5
- * 
+ *
  * @category  Net
  * @package   PEAR2_Net_RouterOS
  * @author    Vasil Rangelov <boen.robot@gmail.com>
@@ -27,7 +27,7 @@ use LengthException as L;
 
 /**
  * Exception thrown when there is a problem with a word's length.
- * 
+ *
  * @category Net
  * @package  PEAR2_Net_RouterOS
  * @author   Vasil Rangelov <boen.robot@gmail.com>
@@ -36,20 +36,19 @@ use LengthException as L;
  */
 class LengthException extends L implements Exception
 {
-    
+
     const CODE_UNSUPPORTED = 1200;
     const CODE_INVALID = 1300;
     const CODE_BEYOND_SHEME = 1301;
 
     /**
-     *
      * @var mixed The problematic length.
      */
     private $_length;
 
     /**
      * Creates a new LengthException.
-     * 
+     *
      * @param string     $message  The Exception message to throw.
      * @param int        $code     The Exception code.
      * @param \Exception $previous The previous exception used for the exception
@@ -68,7 +67,7 @@ class LengthException extends L implements Exception
 
     /**
      * Gets the length.
-     * 
+     *
      * @return number The length.
      */
     public function getLength()
@@ -81,7 +80,7 @@ class LengthException extends L implements Exception
 
     /**
      * Returns a string representation of the exception.
-     * 
+     *
      * @return string The exception as a string.
      */
     public function __toString()

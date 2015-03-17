@@ -1135,7 +1135,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
 
     /**
      * @requires PHP 5.6
-     * 
+     *
      * @return void
      */
     public function testResponseCollectionWordCount()
@@ -1295,7 +1295,6 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         //Required for this test
         $memoryLimit = ini_set('memory_limit', -1);
         try {
-
             $comment = fopen('php://temp', 'r+b');
             $fillerString = str_repeat('t', 0xFFFFFF);
             //fwrite($comment, $fillerString);

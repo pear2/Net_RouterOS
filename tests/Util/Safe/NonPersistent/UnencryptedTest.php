@@ -10,11 +10,11 @@ require_once __DIR__ . '/../NonPersistentTest.php';
 
 /**
  * ~
- * 
+ *
  * @group Safe
  * @group NonPersistent
  * @group Unencrypted
- * 
+ *
  * @category Net
  * @package  PEAR2_Net_RouterOS
  * @author   Vasil Rangelov <boen.robot@gmail.com>

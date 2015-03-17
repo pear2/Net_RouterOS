@@ -19,9 +19,9 @@ use PHPUnit_Framework_TestCase;
 
 /**
  * ~
- * 
+ *
  * @group Misc
- * 
+ *
  * @category Net
  * @package  PEAR2_Net_RouterOS
  * @author   Vasil Rangelov <boen.robot@gmail.com>
@@ -32,9 +32,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @param string $command
-     * 
+     *
      * @dataProvider providerNonAbsoluteCommand
-     * 
+     *
      * @return void
      */
     public function testNonAbsoluteCommand($command)
@@ -49,7 +49,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             );
         }
     }
-    
+
     public function providerNonAbsoluteCommand()
     {
         return array(
@@ -62,9 +62,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
 
     /**
      * @param string $command
-     * 
+     *
      * @dataProvider providerUnresolvableCommand
-     * 
+     *
      * @return void
      */
     public function testUnresolvableCommand($command)
@@ -79,7 +79,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             );
         }
     }
-    
+
     public function providerUnresolvableCommand()
     {
         return array(
@@ -90,9 +90,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
 
     /**
      * @param string $command
-     * 
+     *
      * @dataProvider providerInvalidCommand
-     * 
+     *
      * @return void
      */
     public function testInvalidCommand($command)
@@ -107,7 +107,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             );
         }
     }
-    
+
     public function providerInvalidCommand()
     {
         return array(
@@ -120,9 +120,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
     /**
      * @param string $command
      * @param string $expected
-     * 
+     *
      * @dataProvider providerCommandTranslation
-     * 
+     *
      * @return void
      */
     public function testCommandTranslation($command, $expected)
@@ -135,7 +135,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             "Command '{$command}' was not translated properly."
         );
     }
-    
+
     public function providerCommandTranslation()
     {
         return array(
@@ -148,14 +148,14 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             array('/login goback ..', '/login')
         );
     }
-    
+
     /**
      * @param string $command
      * @param string $expected
      * @param array  $args
-     * 
+     *
      * @dataProvider providerCommandAndArgumentParsing
-     * 
+     *
      * @return void
      */
     public function testCommandAndArgumentParsing($command, $expected, $args)
@@ -172,7 +172,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             "Command '{$command}' was not parsed properly."
         );
     }
-    
+
     public function providerCommandAndArgumentParsing()
     {
         return array(
@@ -212,7 +212,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
                     'world' => ''
                 )
             ),
-            
+
             5 => array(
                 '/ip arp add address=192.168.0.1 comment=hello world',
                 '/ip/arp/add',
@@ -349,7 +349,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
                     'comment' => '\~t\\"'
                 )
             ),
-            
+
             22 => array(
                 '/ip/arp/print detail=""',
                 '/ip/arp/print',
@@ -386,7 +386,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
                     'world' => ''
                 )
             ),
-            
+
             27 => array(
                 '/ip/arp/add address=192.168.0.1 comment=hello world',
                 '/ip/arp/add',
@@ -523,7 +523,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
                     'comment' => '\~t\\"'
                 )
             ),
-            
+
             44 => array(
                 '/ping address=192.168.0.1',
                 '/ping',
@@ -590,13 +590,13 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             )
         );
     }
-    
+
     /**
      * @param string $command
      * @param int    $code
-     * 
+     *
      * @dataProvider providerCommandArgumentParsingExceptions
-     * 
+     *
      * @return void
      */
     public function testCommandArgumentParsingExceptions($command, $code)
@@ -612,7 +612,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             );
         }
     }
-    
+
     public function providerCommandArgumentParsingExceptions()
     {
         return array(
@@ -629,9 +629,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
 
     /**
      * @param string $name
-     * 
+     *
      * @dataProvider providerInvalidArgumentName
-     * 
+     *
      * @return void
      */
     public function testInvalidArgumentName($name)
@@ -651,9 +651,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
 
     /**
      * @param string $name
-     * 
+     *
      * @dataProvider providerInvalidArgumentName
-     * 
+     *
      * @return void
      */
     public function testInvalidQueryArgumentName($name)
@@ -669,7 +669,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             );
         }
     }
-    
+
     public function providerInvalidArgumentName()
     {
         return array(
@@ -697,9 +697,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
 
     /**
      * @param string|int $action
-     * 
+     *
      * @dataProvider providerInvalidQueryArgumentAction
-     * 
+     *
      * @return void
      */
     public function testInvalidQueryArgumentAction($action)
@@ -716,7 +716,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             $this->assertEquals($action, $e->getValue());
         }
     }
-    
+
     public function providerInvalidQueryArgumentAction()
     {
         return array(
@@ -783,9 +783,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
     /**
      * @param string $expected
      * @param int    $length
-     * 
+     *
      * @dataProvider providerLengths
-     * 
+     *
      * @return void
      */
     public function testLengthEncoding($expected, $length)
@@ -804,9 +804,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
     /**
      * @param string $length
      * @param int    $expected
-     * 
+     *
      * @dataProvider providerLengths
-     * 
+     *
      * @return void
      */
     public function testLengthDecoding($length, $expected)
@@ -821,7 +821,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             "{$length} is not properly decoded."
         );
     }
-    
+
     public function providerLengths()
     {
         return array(
@@ -923,9 +923,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
 
     /**
      * @param int $controlByte
-     * 
+     *
      * @dataProvider providerControlByte
-     * 
+     *
      * @return void
      */
     public function testControlByteException($controlByte)
@@ -949,7 +949,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             );
         }
     }
-    
+
     public function providerControlByte()
     {
         return array(
@@ -993,9 +993,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
     /**
      * @param string $value
      * @param mixed  $expected
-     * 
+     *
      * @dataProvider providerUtilParseValue
-     * 
+     *
      * @return void
      */
     public function testUtilParseValue($value, $expected)
@@ -1004,7 +1004,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
         $this->assertInternalType(strtolower(gettype($expected)), $actual);
     }
-    
+
     public function providerUtilParseValue()
     {
         return array(

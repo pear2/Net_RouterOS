@@ -9,14 +9,14 @@ require_once __DIR__ . '/../Persistent.php';
 
 /**
  * ~
- * 
+ *
  * @group Client
  * @group Safe
  * @group Persistent
  * @group Unencrypted
  *
  * @requires PHP 5.3.9
- * 
+ *
  * @category Net
  * @package  PEAR2_Net_RouterOS
  * @author   Vasil Rangelov <boen.robot@gmail.com>

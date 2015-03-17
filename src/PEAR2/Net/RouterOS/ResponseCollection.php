@@ -2,11 +2,11 @@
 
 /**
  * ~~summary~~
- * 
+ *
  * ~~description~~
- * 
+ *
  * PHP version 5
- * 
+ *
  * @category  Net
  * @package   PEAR2_Net_RouterOS
  * @author    Vasil Rangelov <boen.robot@gmail.com>
@@ -37,13 +37,13 @@ use SeekableIterator;
 
 /**
  * Represents a collection of RouterOS responses.
- * 
+ *
  * @category Net
  * @package  PEAR2_Net_RouterOS
  * @author   Vasil Rangelov <boen.robot@gmail.com>
  * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
  * @link     http://pear2.php.net/PEAR2_Net_RouterOS
- * 
+ *
  * @method string getType()
  *     Calls {@link Response::getType()}
  *     on the response pointed by the pointer.
@@ -59,17 +59,17 @@ use SeekableIterator;
  */
 class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 {
-    
+
     /**
      * @var Response[] An array with all {@link Response} objects.
      */
     protected $responses = array();
-    
+
     /**
      * @var string[] An array with each {@link Response} object's type.
      */
     protected $responseTypes = array();
-    
+
     /**
      * @var string[] An array with each {@link Response} object's tag.
      */
@@ -86,14 +86,14 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      *     collection.
      */
     protected $responsesIndex = array();
-    
+
     /**
      * @var array<string,int[]> An array with all distinct properties across all
      *     {@link Response} objects. Created at the first call of
      *     {@link static::getPropertyMap()}.
      */
     protected $propertyMap = null;
-    
+
     /**
      * @var int A pointer, as required by SeekableIterator.
      */
@@ -111,10 +111,10 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      *     for a detailed description of this array's format.
      */
     protected $compareBy = array();
-    
+
     /**
      * Creates a new collection.
-     * 
+     *
      * @param Response[] $responses An array of responses, in network order.
      */
     public function __construct(array $responses)
@@ -131,16 +131,16 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * A shorthand gateway.
-     * 
+     *
      * This is a magic PHP method that allows you to call the object as a
      * function. Depending on the argument given, one of the other functions in
      * the class is invoked and its returned value is returned by this function.
-     * 
+     *
      * @param int|string|null $offset The offset of the response to seek to.
      *     If the offset is negative, seek to that relative to the end.
      *     If the collection is indexed, you can also supply a value to seek to.
      *     Setting NULL will get the current response's iterator.
-     * 
+     *
      * @return Response|ArrayObject The {@link Response} at the specified
      *     offset, the current response's iterator (which is an ArrayObject)
      *     when NULL is given, or FALSE if the offset is invalid
@@ -155,7 +155,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * Sets a property to be usable as a key in the collection.
-     * 
+     *
      * @param string|null $name The name of the property to use. Future calls
      *     that accept a position will then also be able to search values of
      *     that property for a matching value.
@@ -163,7 +163,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      *     Note that in case this value occurs multiple times within the
      *     collection, only the last matching response will be accessible by
      *     that value.
-     * 
+     *
      * @return $this The object itself.
      */
     public function setIndex($name)
@@ -186,7 +186,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * Gets the name of the property used as an index.
-     * 
+     *
      * @return string|null Name of property used as index. NULL when disabled.
      */
     public function getIndex()
@@ -196,10 +196,10 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * Gets the whole collection as an array.
-     * 
+     *
      * @param bool $useIndex Whether to use the index values as keys for the
      *     resulting array.
-     * 
+     *
      * @return Response[] An array with all responses, in network order.
      */
     public function toArray($useIndex = false)
@@ -218,12 +218,12 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * Counts the responses/words in the collection.
-     * 
+     *
      * @param int $mode The counter mode.
      *     Either COUNT_NORMAL or COUNT_RECURSIVE.
      *     When in normal mode, counts the number of responses.
      *     When in recursive mode, counts the total number of API words.
-     * 
+     *
      * @return int The number of responses in the collection.
      */
     public function count($mode = COUNT_NORMAL)
@@ -241,11 +241,11 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * Checks if an offset exists.
-     * 
+     *
      * @param int|string $offset The offset to check. If the
      *     collection is indexed, you can also supply a value to check.
      *     Note that negative numeric offsets are NOT accepted.
-     * 
+     *
      * @return bool TRUE if the offset exists, FALSE otherwise.
      */
     public function offsetExists($offset)
@@ -257,10 +257,10 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * Gets a {@link Response} from a specified offset.
-     * 
+     *
      * @param int|string $offset The offset of the desired response. If the
      *     collection is indexed, you can also supply the value to search for.
-     * 
+     *
      * @return Response The response at the specified offset.
      */
     public function offsetGet($offset)
@@ -274,35 +274,37 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * N/A
-     * 
+     *
      * This method exists only because it is required for ArrayAccess. The
      * collection is read only.
-     * 
+     *
      * @param int|string $offset N/A
      * @param Response   $value  N/A
-     * 
+     *
      * @return void
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function offsetSet($offset, $value)
     {
-        
+
     }
 
     /**
      * N/A
-     * 
+     *
      * This method exists only because it is required for ArrayAccess. The
      * collection is read only.
-     * 
+     *
      * @param int|string $offset N/A
-     * 
+     *
      * @return void
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function offsetUnset($offset)
     {
-        
+
     }
 
     /**
@@ -318,7 +320,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * Moves the position pointer to a specified position.
-     * 
+     *
      * @param int|string $position The position to move to. If the collection is
      *     indexed, you can also supply a value to move the pointer to.
      *     A non-existent index will move the pointer to "-1".
@@ -400,7 +402,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * Checks if the pointer is still pointing to an existing offset.
-     * 
+     *
      * @return bool TRUE if the pointer is valid, FALSE otherwise.
      */
     public function valid()
@@ -410,9 +412,9 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * Gets all distinct property names.
-     * 
+     *
      * Gets all distinct property names across all responses.
-     * 
+     *
      * @return array<string,int[]> An array with
      *     all distinct property names as keys, and
      *     the indexes at which they occur as values.
@@ -437,10 +439,10 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * Gets all responses of a specified type.
-     * 
+     *
      * @param string $type The response type to filter by. Valid values are the
      *     Response::TYPE_* constants.
-     * 
+     *
      * @return static A new collection with responses of the
      *     specified type.
      */
@@ -455,9 +457,9 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * Gets all responses with a specified tag.
-     * 
+     *
      * @param string $tag The tag to filter by.
-     * 
+     *
      * @return static A new collection with responses having the
      *     specified tag.
      */
@@ -472,7 +474,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * Order resones by criteria.
-     * 
+     *
      * @param string[]|array<string,null|int|array<int|callable>> $criteria The
      *     criteria to order responses by. It takes the
      *     form of an array where each key is the name of the property to use
@@ -489,7 +491,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      *     Each key of $criteria can also be numeric, in which case the
      *     value is the name of the property, and sorting is done normally in
      *     ascending order.
-     * 
+     *
      * @return static A new collection with the responses sorted in the
      *     specified order.
      */
@@ -503,14 +505,14 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * Calls a method of the response pointed by the pointer.
-     * 
+     *
      * Calls a method of the response pointed by the pointer. This is a magic
      * PHP method, thanks to which any function you call on the collection that
      * is not defined will be redirected to the response.
-     * 
+     *
      * @param string $method The name of the method to call.
      * @param array  $args   The arguments to pass to the method.
-     * 
+     *
      * @return mixed Whatever the called function returns.
      */
     public function __call($method, array $args)
@@ -523,13 +525,13 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 
     /**
      * Compares two responses.
-     * 
+     *
      * Compares two responses, based on criteria defined in
      * {@link static::$compareBy}.
-     * 
+     *
      * @param Response $itemA The response to compare.
      * @param Response $itemB The response to compare $a against.
-     * 
+     *
      * @return int Returns 0 if the two responses are equal according to every
      *     criteria specified, -1 if $a should be placed before $b, and 1 if $b
      *     should be placed before $a.

@@ -2,11 +2,11 @@
 
 /**
  * ~~summary~~
- * 
+ *
  * ~~description~~
- * 
+ *
  * PHP version 5
- * 
+ *
  * @category  Net
  * @package   PEAR2_Net_RouterOS
  * @author    Vasil Rangelov <boen.robot@gmail.com>
@@ -42,10 +42,10 @@ use PEAR2\Net\Transmitter\Stream;
 
 /**
  * Utility class.
- * 
+ *
  * Abstracts away frequently used functionality (particularly CRUD operations)
  * in convenient to use methods by wrapping around a connection.
- * 
+ *
  * @category Net
  * @package  PEAR2_Net_RouterOS
  * @author   Vasil Rangelov <boen.robot@gmail.com>
@@ -73,18 +73,18 @@ class Util implements Countable
 
     /**
      * Parses a value from a RouterOS scripting context.
-     * 
+     *
      * Turns a value from RouterOS into an equivalent PHP value, based on
      * determining the type in the same way RouterOS would determine it for a
      * literal.
-     * 
+     *
      * This method is intended to be the very opposite of
      * {@link static::escapeValue()}. hat is, results from that method, if
      * given to this method, should produce equivalent results.
-     * 
+     *
      * @param string $value The value to be parsed. Must be a literal of a
      *     value, e.g. what {@link static::escapeValue()} will give you.
-     * 
+     *
      * @return mixed Depending on RouterOS type detected:
      *     - "nil" or "nothing" - NULL.
      *     - "number" - int or double for large values.
@@ -97,7 +97,7 @@ class Util implements Countable
     public static function parseValue($value)
     {
         $value = (string)$value;
-        
+
         if (in_array($value, array('', 'nil'), true)) {
             return null;
         } elseif (in_array($value, array('true', 'false', 'yes', 'no'), true)) {
@@ -188,15 +188,15 @@ class Util implements Countable
 
     /**
      * Prepares a script.
-     * 
+     *
      * Prepares a script for eventual execution by prepending parameters as
      * variables to it.
-     * 
+     *
      * This is particularly useful when you're creating scripts that you don't
      * want to execute right now (as with {@link static::exec()}, but instead
      * you want to store it for later execution, perhaps by supplying it to
      * "/system scheduler".
-     * 
+     *
      * @param string|resource     $source The source of the script, as a string
      *     or stream. If a stream is provided, reading starts from the current
      *     position to the end of the stream, and the pointer stays at the end
@@ -210,9 +210,10 @@ class Util implements Countable
      *     {@link static::escapeString()}. Processing starts from the current
      *     position to the end of the stream, and the stream's pointer stays at
      *     the end after reading is done.
-     * 
+     *
      * @return resource A new PHP temporary stream with the script as contents,
      *     with the pointer back at the start.
+     *
      * @see static::appendScript()
      */
     public static function prepareScript(
@@ -227,9 +228,9 @@ class Util implements Countable
 
     /**
      * Appends a script.
-     * 
+     *
      * Appends a script to an existing stream.
-     * 
+     *
      * @param resource            $stream An existing stream to write the
      *     resulting script to.
      * @param string|resource     $source The source of the script, as a string
@@ -245,7 +246,7 @@ class Util implements Countable
      *     {@link static::escapeString()}. Processing starts from the current
      *     position to the end of the stream, and the stream's pointer stays at
      *     the end after reading is done.
-     * 
+     *
      * @return int The number of bytes written to $stream is returned,
      *     and the pointer remains where it was after the write
      *     (i.e. it is not seeked back, even if seeking is supported).
@@ -279,24 +280,24 @@ class Util implements Countable
         $bytes += $writer->send($source);
         return $bytes;
     }
-    
+
     /**
      * Escapes a value for a RouterOS scripting context.
-     * 
+     *
      * Turns any native PHP value into an equivalent whole value that can be
      * inserted as part of a RouterOS script.
-     * 
+     *
      * DateTime and DateInterval objects will be casted to RouterOS' "time"
      * type. A DateTime object will be converted to a time relative to the UNIX
      * epoch time. Note that if a DateInterval does not have the "days" property
      * ("a" in formatting), then its months and years will be ignored, because
      * they can't be unambiguously converted to a "time" value.
-     * 
+     *
      * Unrecognized types (i.e. resources and other objects) are casted to
      * strings.
-     * 
+     *
      * @param mixed $value The value to be escaped.
-     * 
+     *
      * @return string A string representation that can be directly inserted in a
      *     script as a whole value.
      */
@@ -357,14 +358,14 @@ class Util implements Countable
 
     /**
      * Escapes a string for a RouterOS scripting context.
-     * 
+     *
      * Escapes a string for a RouterOS scripting context. The value can then be
      * surrounded with quotes at a RouterOS script (or concatenated onto a
      * larger string first), and you can be sure there won't be any code
      * injections coming from it.
-     * 
+     *
      * @param string $value Value to be escaped.
-     * 
+     *
      * @return string The escaped value.
      */
     public static function escapeString($value)
@@ -375,16 +376,16 @@ class Util implements Countable
             $value
         );
     }
-    
+
     /**
      * Escapes a character for a RouterOS scripting context.
-     * 
+     *
      * Escapes a character for a RouterOS scripting context. Intended to only be
      * called for non-alphanumeric characters.
-     * 
+     *
      * @param string $chars The matches array, expected to contain exactly one
      *     member, in which is the whole string to be escaped.
-     * 
+     *
      * @return string The escaped characters.
      */
     private static function _escapeCharacters($chars)
@@ -403,9 +404,9 @@ class Util implements Countable
 
     /**
      * Creates a new Util instance.
-     * 
+     *
      * Wraps around a connection to provide convenience methods.
-     * 
+     *
      * @param Client $client The connection to wrap around.
      */
     public function __construct(Client $client)
@@ -415,27 +416,27 @@ class Util implements Countable
 
     /**
      * Gets the current menu.
-     * 
+     *
      * @return string The current menu.
      */
     public function getMenu()
     {
         return $this->menu;
     }
-    
+
     /**
      * Sets the current menu.
-     * 
+     *
      * Sets the current menu.
-     * 
+     *
      * @param string $newMenu The menu to change to. Can be specified with API
      *     or CLI syntax and can be either absolute or relative. If relative,
      *     it's relative to the current menu, which by default is the root.
-     * 
+     *
      * @return $this The object itself. If an empty string is given for
      *     a new menu, no change is performed,
      *     but the ID cache is cleared anyway.
-     * 
+     *
      * @see static::clearIdCache()
      */
     public function setMenu($newMenu)
@@ -458,13 +459,13 @@ class Util implements Countable
 
     /**
      * Executes a RouterOS script.
-     * 
+     *
      * Executes a RouterOS script, written as a string or a stream.
      * Note that in cases of errors, the line numbers will be off, because the
      * script is executed at the current menu as context, with the specified
      * variables pre declared. This is achieved by prepending 1+count($params)
      * lines before your actual script.
-     * 
+     *
      * @param string|resource     $source The source of the script, as a string
      *     or stream. If a stream is provided, reading starts from the current
      *     position to the end of the stream, and the pointer stays at the end
@@ -492,7 +493,7 @@ class Util implements Countable
      *     as the script's name.
      *     To eliminate any possibility of name clashes,
      *     you can specify your own name instead.
-     * 
+     *
      * @return ResponseCollection Returns the response collection of the
      *     run, allowing you to inspect errors, if any.
      *     If the script was not added successfully before execution, the
@@ -506,24 +507,24 @@ class Util implements Countable
     ) {
         return $this->_exec($source, $params, $policy, $name);
     }
-    
+
     /**
      * Clears the ID cache.
-     * 
+     *
      * Normally, the ID cache improves performance when targeting items by a
      * number. If you're using both Util's methods and other means (e.g.
      * {@link Client} or {@link Util::exec()}) to add/move/remove items, the
      * cache may end up being out of date. By calling this method right before
      * targeting an item with a number, you can ensure number accuracy.
-     * 
+     *
      * Note that Util's {@link static::move()} and {@link static::remove()}
      * methods automatically clear the cache before returning, while
      * {@link static::add()} adds the new item's ID to the cache as the next
      * number. A change in the menu also clears the cache.
-     * 
+     *
      * Note also that the cache is being rebuilt unconditionally every time you
      * use {@link static::find()} with a callback.
-     * 
+     *
      * @return $this The Util object itself.
      */
     public function clearIdCache()
@@ -534,10 +535,10 @@ class Util implements Countable
 
     /**
      * Finds the IDs of items at the current menu.
-     * 
+     *
      * Finds the IDs of items based on specified criteria, and returns them as
      * a comma separated string, ready for insertion at a "numbers" argument.
-     * 
+     *
      * Accepts zero or more criteria as arguments. If zero arguments are
      * specified, returns all items' IDs. The value of each criteria can be a
      * number (just as in Winbox), a literal ID to be included, a {@link Query}
@@ -548,7 +549,7 @@ class Util implements Countable
      * or callback names. Non-existent callback names are instead placed in the
      * result, which may be useful in menus that accept identifiers other than
      * IDs, but note that it can cause errors on other menus.
-     * 
+     *
      * @return string A comma separated list of all items matching the
      *     specified criteria.
      */
@@ -634,12 +635,12 @@ class Util implements Countable
 
     /**
      * Gets a value of a specified item at the current menu.
-     * 
+     *
      * @param int|string|null $number    A number identifying the item you're
      *     targeting. Can also be an ID or (in some menus) name. For menus where
      *     there are no items (e.g. "/system identity"), you can specify NULL.
      * @param string          $valueName The name of the value you want to get.
-     * 
+     *
      * @return string|resource|null|false The value of the specified property as
      *     a string or as new PHP temp stream if the underlying
      *     {@link Client::isStreamingResponses()} is set to TRUE.
@@ -694,12 +695,12 @@ class Util implements Countable
 
     /**
      * Enables all items at the current menu matching certain criteria.
-     * 
+     *
      * Zero or more arguments can be specified, each being a criteria.
      * If zero arguments are specified, enables all items.
      * See {@link static::find()} for a description of what criteria are
      * accepted.
-     * 
+     *
      * @return ResponseCollection returns the response collection, allowing you
      *     to inspect errors, if any.
      */
@@ -710,12 +711,12 @@ class Util implements Countable
 
     /**
      * Disables all items at the current menu matching certain criteria.
-     * 
+     *
      * Zero or more arguments can be specified, each being a criteria.
      * If zero arguments are specified, disables all items.
      * See {@link static::find()} for a description of what criteria are
      * accepted.
-     * 
+     *
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
      */
@@ -726,12 +727,12 @@ class Util implements Countable
 
     /**
      * Removes all items at the current menu matching certain criteria.
-     * 
+     *
      * Zero or more arguments can be specified, each being a criteria.
      * If zero arguments are specified, removes all items.
      * See {@link static::find()} for a description of what criteria are
      * accepted.
-     * 
+     *
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
      */
@@ -744,14 +745,14 @@ class Util implements Countable
 
     /**
      * Comments items.
-     * 
+     *
      * Sets new comments on all items at the current menu
      * which match certain criteria, using the "comment" command.
-     * 
+     *
      * Note that not all menus have a "comment" command. Most notably, those are
      * menus without items in them (e.g. "/system identity"), and menus with
      * fixed items (e.g. "/ip service").
-     * 
+     *
      * @param mixed           $numbers Targeted items. Can be any criteria
      *     accepted by {@link static::find()}.
      * @param string|resource $comment The new comment to set on the item as a
@@ -761,7 +762,7 @@ class Util implements Countable
      *     position after sending.
      *     Non seekable streams, as well as all other types, are casted to a
      *     string.
-     * 
+     *
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
      */
@@ -775,10 +776,10 @@ class Util implements Countable
 
     /**
      * Sets new values.
-     * 
+     *
      * Sets new values on certain properties on all items at the current menu
      * which match certain criteria.
-     * 
+     *
      * @param mixed                                           $numbers   Items
      *     to be modified.
      *     Can be any criteria accepted by {@link static::find()} or NULL
@@ -789,7 +790,7 @@ class Util implements Countable
      *     Flags (properties with a value "true" that is interpreted as
      *     equivalent of "yes" from CLI) can also be specified with a numeric
      *     index as the array key, and the name of the flag as the array value.
-     * 
+     *
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
      */
@@ -811,7 +812,7 @@ class Util implements Countable
 
     /**
      * Alias of {@link static::set()}
-     * 
+     *
      * @param mixed                                           $numbers   Items
      *     to be modified.
      *     Can be any criteria accepted by {@link static::find()} or NULL
@@ -819,7 +820,7 @@ class Util implements Countable
      * @param array<string,string|resource>|array<int,string> $newValues An
      *     array with the names of each property to set as an array key, and the
      *     new value as an array value.
-     * 
+     *
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
      */
@@ -830,15 +831,15 @@ class Util implements Countable
 
     /**
      * Unsets a value of a specified item at the current menu.
-     * 
+     *
      * Equivalent of scripting's "unset" command. The "Value" part in the method
      * name is added because "unset" is a language construct, and thus a
      * reserved word.
-     * 
+     *
      * @param mixed  $numbers   Targeted items. Can be any criteria accepted
      *     by {@link static::find()}.
      * @param string $valueName The name of the value you want to unset.
-     * 
+     *
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
      */
@@ -853,7 +854,7 @@ class Util implements Countable
 
     /**
      * Adds a new item at the current menu.
-     * 
+     *
      * @param array<string,string|resource>|array<int,string> $values Accepts
      *     one or more items to add to the current menu.
      *     The data about each item is specified as an array with the names of
@@ -863,7 +864,7 @@ class Util implements Countable
      *     index as the array key, and the name of the flag as the array value.
      * @param array<string,string|resource>|array<int,string> $...    Additional
      *     items.
-     * 
+     *
      * @return string A comma separated list of the new items' IDs. If a
      *     particular item was not added, this will be indicated by an empty
      *     string in its spot on the list. e.g. "*1D,,*1E" means that
@@ -898,19 +899,19 @@ class Util implements Countable
 
     /**
      * Moves items at the current menu before a certain other item.
-     * 
+     *
      * Moves items before a certain other item. Note that the "move"
      * command is not available on all menus. As a rule of thumb, if the order
      * of items in a menu is irrelevant to their interpretation, there won't
      * be a move command on that menu. If in doubt, check from a terminal.
-     * 
+     *
      * @param mixed $numbers     Targeted items. Can be any criteria accepted
      *     by {@link static::find()}.
      * @param mixed $destination item before which the targeted items will be
      *     moved to. Can be any criteria accepted by {@link static::find()}.
      *     If multiple items match the criteria, the targeted items will move
      *     above the first match.
-     * 
+     *
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
      */
@@ -929,17 +930,17 @@ class Util implements Countable
 
     /**
      * Counts items at the current menu.
-     * 
+     *
      * Counts items at the current menu. This executes a dedicated command
      * ("print" with a "count-only" argument) on RouterOS, which is why only
      * queries are allowed as a criteria, in contrast with
      * {@link static::find()}, where numbers and callbacks are allowed also.
-     * 
+     *
      * @param int        $mode  The counter mode.
      *     Currently ignored, but present for compatibility with PHP 5.6+.
      * @param Query|null $query A query to filter items by. Without it, all items
      *     are included in the count.
-     * 
+     *
      * @return int The number of items, or -1 on failure (e.g. if the
      *     current menu does not have a "print" command or items to be counted).
      */
@@ -960,9 +961,9 @@ class Util implements Countable
 
     /**
      * Gets all items in the current menu.
-     * 
+     *
      * Gets all items in the current menu, using a print request.
-     * 
+     *
      * @param array<string,string|resource>|array<int,string> $args  Additional
      *     arguments to pass to the request.
      *     Each array key is the name of the argument, and each array value is
@@ -973,7 +974,7 @@ class Util implements Countable
      * @param Query|null                                      $query A query to
      *     filter items by.
      *     NULL to get all items.
-     * 
+     *
      * @return ResponseCollection|false A response collection with all
      *     {@link Response::TYPE_DATA} responses. The collection will be empty
      *     when there are no matching items. FALSE on failure.
@@ -998,7 +999,7 @@ class Util implements Countable
 
     /**
      * Puts a file on RouterOS's file system.
-     * 
+     *
      * Puts a file on RouterOS's file system, regardless of the current menu.
      * Note that this is a **VERY VERY VERY** time consuming method - it takes a
      * minimum of a little over 4 seconds, most of which are in sleep. It waits
@@ -1007,12 +1008,12 @@ class Util implements Countable
      * (performed in order to verify success afterwards).
      * Similarly for removal (when $data is NULL) - there are two seconds in
      * sleep, used to verify the file was really deleted.
-     * 
+     *
      * If you want an efficient way of transferring files, use (T)FTP.
      * If you want an efficient way of removing files, use
      * {@link static::setMenu()} to move to the "/file" menu, and call
      * {@link static::remove()} without performing verification afterwards.
-     * 
+     *
      * @param string               $filename  The filename to write data in.
      * @param string|resource|null $data      The data the file is going to have
      *     as a string or a seekable stream.
@@ -1024,7 +1025,7 @@ class Util implements Countable
      *     string.
      * @param bool                 $overwrite Whether to overwrite the file if
      *     it exists.
-     * 
+     *
      * @return bool TRUE on success, FALSE on failure.
      */
     public function filePutContents($filename, $data, $overwrite = false)
@@ -1082,7 +1083,7 @@ class Util implements Countable
 
     /**
      * Gets the contents of a specified file.
-     * 
+     *
      * @param string      $filename      The name of the file to get
      *     the contents of.
      * @param string|null $tmpScriptName In order to get the file's contents, a
@@ -1094,7 +1095,7 @@ class Util implements Countable
      *     as the script's name.
      *     To eliminate any possibility of name clashes,
      *     you can specify your own name instead.
-     * 
+     *
      * @return string|resource|false The contents of the file as a string or as
      *     new PHP temp stream if the underlying
      *     {@link Client::isStreamingResponses()} is set to TRUE.
@@ -1121,13 +1122,13 @@ class Util implements Countable
 
     /**
      * Performs an action on a bulk of items at the current menu.
-     * 
+     *
      * @param string $what What action to perform.
      * @param array  $args Zero or more arguments can be specified, each being
      *     a criteria. If zero arguments are specified, removes all items.
      *     See {@link static::find()} for a description of what criteria are
      *     accepted.
-     * 
+     *
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
      */
@@ -1143,10 +1144,10 @@ class Util implements Countable
 
     /**
      * Executes a RouterOS script.
-     * 
+     *
      * Same as the public equivalent, with the addition of allowing you to get
      * the contents of the script post execution, instead of removing it.
-     * 
+     *
      * @param string|resource     $source The source of the script, as a string
      *     or stream. If a stream is provided, reading starts from the current
      *     position to the end of the stream, and the pointer stays at the end
@@ -1176,7 +1177,7 @@ class Util implements Countable
      *     you can specify your own name instead.
      * @param bool                $get    Whether to get the source
      *     of the script.
-     * 
+     *
      * @return ResponseCollection|string Returns the response collection of the
      *     run, allowing you to inspect errors, if any.
      *     If the script was not added successfully before execution, the

@@ -2,11 +2,11 @@
 
 /**
  * ~~summary~~
- * 
+ *
  * ~~description~~
- * 
+ *
  * PHP version 5
- * 
+ *
  * @category  Net
  * @package   PEAR2_Net_RouterOS
  * @author    Vasil Rangelov <boen.robot@gmail.com>
@@ -27,7 +27,7 @@ use PEAR2\Net\Transmitter as T;
 
 /**
  * Represents a query for RouterOS requests.
- * 
+ *
  * @category Net
  * @package  PEAR2_Net_RouterOS
  * @author   Vasil Rangelov <boen.robot@gmail.com>
@@ -41,22 +41,22 @@ class Query
      * Checks if the property exists.
      */
     const OP_EX = '';
-    
+
     /**
      * Checks if the property does not exist.
      */
     const OP_NEX = '-';
-    
+
     /**
      * Checks if the property equals a certain value.
      */
     const OP_EQ = '=';
-    
+
     /**
      * Checks if the property is less than a certain value.
      */
     const OP_LT = '<';
-    
+
     /**
      * Checks if the property is greater than a certain value.
      */
@@ -76,14 +76,14 @@ class Query
      */
     private function __construct()
     {
-        
+
     }
 
     /**
      * Sanitizes the operator of a condition.
-     * 
+     *
      * @param string $operator The operator to sanitize.
-     * 
+     *
      * @return string The sanitized operator.
      */
     protected static function sanitizeOperator($operator)
@@ -108,7 +108,7 @@ class Query
 
     /**
      * Creates a new query with an initial condition.
-     * 
+     *
      * @param string               $name     The name of the property to test.
      * @param string|resource|null $value    Value of the property as a string
      *     or seekable stream. Not required for existence tests.
@@ -119,7 +119,7 @@ class Query
      *     string.
      * @param string               $operator One of the OP_* constants.
      *     Describes the operation to perform.
-     * 
+     *
      * @return static A new query object.
      */
     public static function where(
@@ -133,7 +133,7 @@ class Query
 
     /**
      * Negates the query.
-     * 
+     *
      * @return $this The query object.
      */
     public function not()
@@ -144,7 +144,7 @@ class Query
 
     /**
      * Adds a condition as an alternative to the query.
-     * 
+     *
      * @param string               $name     The name of the property to test.
      * @param string|resource|null $value    Value of the property as a string
      *     or seekable stream. Not required for existence tests.
@@ -155,7 +155,7 @@ class Query
      *     string.
      * @param string               $operator One of the OP_* constants.
      *     Describes the operation to perform.
-     * 
+     *
      * @return $this The query object.
      */
     public function orWhere($name, $value = null, $operator = self::OP_EX)
@@ -166,7 +166,7 @@ class Query
 
     /**
      * Adds a condition in addition to the query.
-     * 
+     *
      * @param string               $name     The name of the property to test.
      * @param string|resource|null $value    Value of the property as a string
      *     or seekable stream. Not required for existence tests.
@@ -177,7 +177,7 @@ class Query
      *     string.
      * @param string               $operator One of the OP_* constants.
      *     Describes the operation to perform.
-     * 
+     *
      * @return $this The query object.
      */
     public function andWhere($name, $value = null, $operator = self::OP_EX)
@@ -188,9 +188,9 @@ class Query
 
     /**
      * Sends the query over a communicator.
-     * 
+     *
      * @param Communicator $com The communicator to send the query over.
-     * 
+     *
      * @return int The number of bytes sent.
      */
     public function send(Communicator $com)
@@ -206,12 +206,12 @@ class Query
 
     /**
      * Sends the query over a communicator.
-     * 
+     *
      * The only difference with the non private equivalent is that this one does
      * not do locking.
-     * 
+     *
      * @param Communicator $com The communicator to send the query over.
-     * 
+     *
      * @return int The number of bytes sent.
      */
     private function _send(Communicator $com)
@@ -242,7 +242,7 @@ class Query
 
     /**
      * Adds a condition.
-     * 
+     *
      * @param string               $name     The name of the property to test.
      * @param string|resource|null $value    Value of the property as a string
      *     or seekable stream. Not required for existence tests.
@@ -253,7 +253,7 @@ class Query
      *     string.
      * @param string               $operator One of the ACTION_* constants.
      *     Describes the operation to perform.
-     * 
+     *
      * @return $this The query object.
      */
     protected function addWhere($name, $value, $operator)

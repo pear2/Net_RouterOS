@@ -11,7 +11,7 @@ require_once __DIR__ . '/../PersistentTest.php';
 
 /**
  * ~
- * 
+ *
  * @group Safe
  * @group Persistent
  * @group Encrypted

@@ -11,7 +11,7 @@ require_once __DIR__ . '/../NonPersistent.php';
  * @group Misc
  * @group NonPersistent
  * @group Encrypted
- * 
+ *
  * @requires extension openssl
  */
 class EncryptedTest extends NonPersistent

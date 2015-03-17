@@ -10,14 +10,14 @@ require_once __DIR__ . '/../NonPersistent.php';
 
 /**
  * ~
- * 
+ *
  * @group Client
  * @group Unsafe
  * @group NonPersistent
  * @group Encrypted
  *
  * @requires extension openssl
- * 
+ *
  * @category Net
  * @package  PEAR2_Net_RouterOS
  * @author   Vasil Rangelov <boen.robot@gmail.com>

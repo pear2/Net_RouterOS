@@ -2,11 +2,11 @@
 
 /**
  * ~~summary~~
- * 
+ *
  * ~~description~~
- * 
+ *
  * PHP version 5
- * 
+ *
  * @category  Net
  * @package   PEAR2_Net_RouterOS
  * @author    Vasil Rangelov <boen.robot@gmail.com>
@@ -27,7 +27,7 @@ use PEAR2\Net\Transmitter as T;
 
 /**
  * Represents a RouterOS request.
- * 
+ *
  * @category Net
  * @package  PEAR2_Net_RouterOS
  * @author   Vasil Rangelov <boen.robot@gmail.com>
@@ -49,12 +49,12 @@ class Request extends Message
 
     /**
      * Creates a request to send to RouterOS.
-     * 
+     *
      * @param string $command The command to send. Can also contain arguments
      *     expressed in a shell-like syntax.
      * @param Query  $query   A query to associate with the request.
      * @param string $tag     The tag for the request.
-     * 
+     *
      * @see setCommand()
      * @see setArgument()
      * @see setTag()
@@ -75,20 +75,20 @@ class Request extends Message
         $this->setQuery($query);
         $this->setTag($tag);
     }
-    
+
     /**
      * A shorthand gateway.
-     * 
+     *
      * This is a magic PHP method that allows you to call the object as a
      * function. Depending on the argument given, one of the other functions in
      * the class is invoked and its returned value is returned by this function.
-     * 
+     *
      * @param Query|Communicator|string|null $arg A {@link Query} to associate
      *     the request with, a {@link Communicator} to send the request over,
      *     an argument to get the value of, or NULL to get the tag. If a
      *     second argument is provided, this becomes the name of the argument to
      *     set the value of, and the second argument is the value to set.
-     * 
+     *
      * @return string|resource|int|$this Whatever the long form
      *     function returns.
      */
@@ -108,14 +108,15 @@ class Request extends Message
 
     /**
      * Sets the command to send to RouterOS.
-     * 
+     *
      * Sets the command to send to RouterOS. The command can use the API or CLI
      * syntax of RouterOS, but either way, it must be absolute (begin  with a
      * "/") and without arguments.
-     * 
+     *
      * @param string $command The command to send.
-     * 
+     *
      * @return $this The request object.
+     *
      * @see getCommand()
      * @see setArgument()
      */
@@ -161,10 +162,11 @@ class Request extends Message
 
     /**
      * Gets the command that will be send to RouterOS.
-     * 
+     *
      * Gets the command that will be send to RouterOS in its API syntax.
-     * 
+     *
      * @return string The command to send.
+     *
      * @see setCommand()
      */
     public function getCommand()
@@ -174,11 +176,12 @@ class Request extends Message
 
     /**
      * Sets the query to send with the command.
-     * 
+     *
      * @param Query $query The query to be set. Setting NULL will remove the
      *     currently associated query.
-     * 
+     *
      * @return $this The request object.
+     *
      * @see getQuery()
      */
     public function setQuery(Query $query = null)
@@ -189,8 +192,9 @@ class Request extends Message
 
     /**
      * Gets the currently associated query
-     * 
+     *
      * @return Query The currently associated query.
+     *
      * @see setQuery()
      */
     public function getQuery()
@@ -200,13 +204,14 @@ class Request extends Message
 
     /**
      * Sets the tag to associate the request with.
-     * 
+     *
      * Sets the tag to associate the request with. Setting NULL erases the
      * currently set tag.
-     * 
+     *
      * @param string $tag The tag to set.
-     * 
+     *
      * @return $this The request object.
+     *
      * @see getTag()
      */
     public function setTag($tag)
@@ -216,7 +221,7 @@ class Request extends Message
 
     /**
      * Sets an argument for the request.
-     * 
+     *
      * @param string               $name  Name of the argument.
      * @param string|resource|null $value Value of the argument as a string or
      *     seekable stream.
@@ -226,8 +231,9 @@ class Request extends Message
      *     position after sending.
      *     Non seekable streams, as well as all other types, are casted to a
      *     string.
-     * 
+     *
      * @return $this The request object.
+     *
      * @see getArgument()
      */
     public function setArgument($name, $value = '')
@@ -237,11 +243,12 @@ class Request extends Message
 
     /**
      * Gets the value of an argument.
-     * 
+     *
      * @param string $name The name of the argument.
-     * 
+     *
      * @return string|resource|null The value of the specified argument.
      *     Returns NULL if such an argument is not set.
+     *
      * @see setAttribute()
      */
     public function getArgument($name)
@@ -251,7 +258,7 @@ class Request extends Message
 
     /**
      * Removes all arguments from the request.
-     * 
+     *
      * @return $this The request object.
      */
     public function removeAllArguments()
@@ -261,11 +268,12 @@ class Request extends Message
 
     /**
      * Sends a request over a communicator.
-     * 
+     *
      * @param Communicator $com The communicator to send the request over.
      * @param Registry     $reg An optional registry to sync the request with.
-     * 
+     *
      * @return int The number of bytes sent.
+     *
      * @see Client::sendSync()
      * @see Client::sendAsync()
      */
@@ -291,13 +299,14 @@ class Request extends Message
 
     /**
      * Sends a request over a communicator.
-     * 
+     *
      * The only difference with the non private equivalent is that this one does
      * not do locking.
-     * 
+     *
      * @param Communicator $com The communicator to send the request over.
-     * 
+     *
      * @return int The number of bytes sent.
+     *
      * @see Client::sendSync()
      * @see Client::sendAsync()
      */
@@ -329,19 +338,19 @@ class Request extends Message
         $bytes += $com->sendWord('');
         return $bytes;
     }
-    
+
     /**
      * Parses the arguments of a command.
-     * 
+     *
      * @param string $string The argument string to parse.
-     * 
+     *
      * @return void
      */
     protected function parseArgumentString($string)
     {
         /*
          * Grammar:
-         * 
+         *
          * <arguments> := (<<\s+>>, <argument>)*,
          * <argument> := <name>, <value>?
          * <name> := <<[^\=\s]+>>
@@ -349,7 +358,7 @@ class Request extends Message
          * <quotedString> := <<">>, <<([^"]|\\"|\\\\)*>>, <<">>
          * <unquotedString> := <<\S+>>
          */
-        
+
         $token = '';
         $name = null;
         while ($string = substr($string, strlen($token))) {
@@ -394,10 +403,10 @@ class Request extends Message
                 );
             }
         }
-        
+
         if (null !== $name && ('' !== ($name = trim($name)))) {
             $this->setArgument($name, '');
         }
-        
+
     }
 }

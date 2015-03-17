@@ -14,9 +14,9 @@ use PHPUnit_Framework_TestCase;
 
 /**
  * ~
- * 
+ *
  * @group Misc
- * 
+ *
  * @category Net
  * @package  PEAR2_Net_RouterOS
  * @author   Vasil Rangelov <boen.robot@gmail.com>
@@ -25,17 +25,17 @@ use PHPUnit_Framework_TestCase;
  */
 abstract class Connection extends PHPUnit_Framework_TestCase
 {
-    
+
     /**
      * @var int
      */
     public static $defaultSocketTimeout;
-    
+
     /**
      * @var bool
      */
     public static $persistent;
-    
+
     /**
      * @var string
      */
@@ -477,7 +477,8 @@ abstract class Connection extends PHPUnit_Framework_TestCase
                 static::$persistent,
                 null,
                 '',
-                static::$encryption);
+                static::$encryption
+            );
             Client::login($com, USERNAME, PASSWORD);
 
             new Response($com);
@@ -605,7 +606,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
         );
         $com->close();
     }
-    
+
     public function testSetDefaultCharset()
     {
         $com = new Communicator(
@@ -621,7 +622,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
         Communicator::setDefaultCharset('windows-1251');
         $this->assertNull($com->getCharset(Communicator::CHARSET_REMOTE));
         $this->assertNull($com->getCharset(Communicator::CHARSET_LOCAL));
-        
+
         $com = new Communicator(
             HOSTNAME,
             PORT,
@@ -652,7 +653,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
             'windows-1251',
             $com->getCharset(Communicator::CHARSET_LOCAL)
         );
-        
+
         $com = new Communicator(
             HOSTNAME,
             PORT,
@@ -678,7 +679,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
             'ISO-8859-1',
             $com->getCharset(Communicator::CHARSET_LOCAL)
         );
-        
+
         $com = new Communicator(
             HOSTNAME,
             PORT,
@@ -699,7 +700,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
         );
         $this->assertNull($com->getCharset(Communicator::CHARSET_REMOTE));
         $this->assertNull($com->getCharset(Communicator::CHARSET_LOCAL));
-        
+
         $com = new Communicator(
             HOSTNAME,
             PORT,
@@ -718,7 +719,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
         );
         Communicator::setDefaultCharset(null);
     }
-    
+
     public function testInvokability()
     {
         $com = new Communicator(
@@ -743,7 +744,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
         );
         $this->assertInternalType('string', $response());
         $this->assertEquals(HOSTNAME, $response('host'));
-        
+
         $request = new Request('/queue/simple/print');
         $query = Query::where('target', HOSTNAME_INVALID . '/32');
         $request($query);

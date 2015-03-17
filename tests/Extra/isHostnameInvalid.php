@@ -3,9 +3,9 @@
 /**
  * Test file, used to check whether Util::find() correctly handles
  * callback names in requests.
- * 
+ *
  * PHP version 5.3
- * 
+ *
  * @category  Net
  * @package   PEAR2_Net_RouterOS
  * @author    Vasil Rangelov <boen.robot@gmail.com>
@@ -23,9 +23,9 @@ use PEAR2\Net\RouterOS\Test\Util as Test;
 
 /**
  * Checks whether the queue item's target is the HOSTNAME_INVALID constant.
- * 
+ *
  * @param Response $item The item to check.
- * 
+ *
  * @return bool TRUE on success, FALSE on failure.
  */
 function isHostnameInvalid(Response $item)

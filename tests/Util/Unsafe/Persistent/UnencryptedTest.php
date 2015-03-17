@@ -10,7 +10,7 @@ require_once __DIR__ . '/../Persistent.php';
 
 /**
  * ~
- * 
+ *
  * @group Util
  * @group Unsafe
  * @group Persistent

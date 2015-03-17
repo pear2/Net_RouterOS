@@ -10,7 +10,7 @@ require_once __DIR__ . '/../Persistent.php';
 
 /**
  * ~
- * 
+ *
  * @group Client
  * @group Unsafe
  * @group Persistent
@@ -43,7 +43,6 @@ class EncryptedTest extends Persistent
     public function testMultipleDifferentPersistentConnection()
     {
         try {
-
             $routerOS1 = new Client(
                 \HOSTNAME,
                 USERNAME2,
@@ -103,5 +102,4 @@ class EncryptedTest extends Persistent
             $this->fail('Unable to connect normally.');
         }
     }
-
 }
