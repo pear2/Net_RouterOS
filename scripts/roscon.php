@@ -314,7 +314,7 @@ Possible reasons:
    following command from a terminal:
    ```
    /ip firewall filter
-       add place-before=[find where chain="input" && action="drop"] \
+       add place-before=[:pick [find where chain="input"] 0] \
            chain="input" action="accept" \
            dst-port=[/ip service get "api" "port"]
    ```

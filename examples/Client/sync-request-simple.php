@@ -3,7 +3,7 @@ use PEAR2\Net\RouterOS;
 
 require_once 'PEAR2/Autoload.php';
 
-$client = new RouterOS\Client('192.168.0.1', 'admin');
+$client = new RouterOS\Client('192.168.88.1', 'admin', 'password');
 
 $responses = $client->sendSync(new RouterOS\Request('/ip/arp/print'));
 

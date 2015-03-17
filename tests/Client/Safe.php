@@ -1140,6 +1140,9 @@ abstract class Safe extends PHPUnit_Framework_TestCase
      */
     public function testResponseCollectionWordCount()
     {
+        $this->markTestIncomplete(
+            'PHP reverted Countable::count($mode) support before the final 5.6'
+        );
         $this->assertEquals(
             3/*!re + .id*/+ 2/*!done*/,
             count(

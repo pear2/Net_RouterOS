@@ -263,6 +263,49 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @depends testRemove
+     *
+     * @return void
+     */
+    public function testComment()
+    {
+        $this->util->setMenu('/queue/simple');
+        $id = $this->util->add(
+            array(
+                'name' => TEST_QUEUE_NAME,
+                'target' => HOSTNAME_SILENT . '/32'
+            )
+        );
+
+        $printRequest = new Request(
+            '/queue/simple/print',
+            Query::where('.id', $id)
+        );
+
+        $responses = $this->client->sendSync($printRequest);
+        $this->assertSame(
+            HOSTNAME_SILENT . '/32',
+            $responses->getProperty('target')
+        );
+        $this->assertNull(
+            $responses->getProperty('comment')
+        );
+        $this->util->comment(TEST_QUEUE_NAME, 'test comment');
+
+        $responses = $this->client->sendSync($printRequest);
+        $this->assertSame(
+            HOSTNAME_SILENT . '/32',
+            $responses->getProperty('target')
+        );
+        $this->assertSame(
+            'test comment',
+            $responses->getProperty('comment')
+        );
+
+        $this->util->remove($id);
+    }
+
+    /**
      * @depends testAdd
      * @depends testRemove
      * 
