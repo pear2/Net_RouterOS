@@ -9,9 +9,7 @@ use PEAR2\Net\RouterOS\InvalidArgumentException;
 use PEAR2\Net\RouterOS\LengthException;
 use PEAR2\Net\RouterOS\NotSupportedException;
 use PEAR2\Net\RouterOS\Query;
-use PEAR2\Net\RouterOS\Registry;
 use PEAR2\Net\RouterOS\Request;
-use PEAR2\Net\RouterOS\Response;
 use PEAR2\Net\RouterOS\UnexpectedValueException;
 use PEAR2\Net\RouterOS\Util;
 use PEAR2\Net\Transmitter as T;
@@ -686,7 +684,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
 
     public function testNonSeekableArgumentValue()
     {
-        $value = fopen('php://input', 'r');
+        $value = fopen('php://output', 'a');
         $request = new Request('/ping');
         $request->setArgument('address', $value);
         $actual = $request->getArgument('address');
@@ -735,7 +733,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
 
     public function testNonSeekableCommunicatorWord()
     {
-        $value = fopen('php://input', 'r');
+        $value = fopen('php://output', 'a');
         $com = new Communicator(HOSTNAME, PORT);
         Client::login($com, USERNAME, PASSWORD);
         try {
@@ -752,7 +750,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
 
     public function testNonSeekableQueryArgumentValue()
     {
-        $value = fopen('php://input', 'r');
+        $value = fopen('php://output', 'a');
         $stringValue = (string) $value;
         $query1 = Query::where('address', $stringValue);
         $query2 = Query::where('address', $value);

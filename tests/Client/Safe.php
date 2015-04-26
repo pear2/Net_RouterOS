@@ -401,9 +401,10 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             ->setArgument('interval', '0.5')
             ->setTag('ping');
         $repliesCount = 0;
+        $mark = array();
         $this->object->sendAsync(
             $ping,
-            function ($response, $client) use (&$repliesCount, $limit) {
+            function ($response, $client) use (&$repliesCount, &$mark, $limit) {
                 PHPUnit_Framework_TestCase::assertInstanceOf(
                     ROS_NAMESPACE . '\Response',
                     $response,
@@ -421,12 +422,27 @@ abstract class Safe extends PHPUnit_Framework_TestCase
                     'The callback must only receive responses meant for it.'
                 );
                 $repliesCount++;
-                return $repliesCount === $limit;
+                if ($repliesCount <= $limit) {
+                    PHPUnit_Framework_TestCase::assertEquals(
+                        Response::TYPE_DATA,
+                        $response->getType(),
+                        'Callbacks inside must be of type ' .
+                            Response::TYPE_DATA
+                    );
+                    return $repliesCount === $limit;
+                } elseif ($response->getType() !== Response::TYPE_DATA) {
+                    $mark[] = $response->getType();
+                }
             }
         );
 
         $this->object->loop();
-        $this->assertEquals(
+        $this->assertSame(
+            array(Response::TYPE_ERROR, Response::TYPE_FINAL),
+            $mark,
+            print_r($mark, true)
+        );
+        $this->assertGreaterThanOrEqual(
             $limit + 2/* The !trap and !done*/,
             $repliesCount,
             "Extra callbacks were executed during second loop."

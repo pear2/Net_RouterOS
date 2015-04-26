@@ -22,7 +22,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
     /**
      * Runs the test in a separate process for the sake of
-     * peristent connections.
+     * persistent connections.
      *
      * @runInSeparateProcess
      *
@@ -33,7 +33,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         $this->object->sendSync(new Request('/system/reboot'));
         $this->object->close();
         $this->object = null;
-        sleep(1);
+        sleep(2);
         while (true) {
             try {
                 $this->object = new Client(\HOSTNAME, USERNAME, PASSWORD, PORT);
