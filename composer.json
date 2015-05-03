@@ -17,7 +17,7 @@
     },
     "require": {
         "php": ">=5.3.0",
-        "pear2/net_transmitter": ">=1.0.0a5"
+        "pear2/net_transmitter": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "@stable",
