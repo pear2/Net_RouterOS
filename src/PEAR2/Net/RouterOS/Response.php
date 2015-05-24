@@ -276,7 +276,7 @@ class Response extends Message
      * @return string|resource|null The value of the specified argument.
      *     Returns NULL if such an argument is not set.
      *
-     * @deprecated 1.0.0b5 Use {@link static::getProperty()} instead.
+     * @deprecated         1.0.0b5 Use {@link static::getProperty()} instead.
      *     This method will be removed upon final release, and is currently
      *     left standing merely because it can't be easily search&replaced in
      *     existing code, due to the fact the name "getArgument()" is shared

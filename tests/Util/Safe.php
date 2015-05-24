@@ -3,6 +3,8 @@
 namespace PEAR2\Net\RouterOS\Test\Util;
 
 use PEAR2\Net\RouterOS\Client;
+use PEAR2\Net\RouterOS\NotSupportedException;
+use PEAR2\Net\RouterOS\InvalidArgumentException;
 use PEAR2\Net\RouterOS\Query;
 use PEAR2\Net\RouterOS\Request;
 use PEAR2\Net\RouterOS\Response;
@@ -55,6 +57,72 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             '/ip/hotspot',
             $this->util->setMenu('/ip hotspot')->getMenu()
         );
+    }
+
+    public function testNewRequest()
+    {
+        //Simple request
+        $request = $this->util->setMenu('/queue simple')->newRequest('print');
+        $this->assertInstanceOf(ROS_NAMESPACE . '\Request', $request);
+        $this->assertSame('/queue/simple/print', $request->getCommand());
+        $this->assertEmpty($request->getIterator()->getArrayCopy());
+        $this->assertNull($request->getQuery());
+        $this->assertNull($request->getTag());
+
+        //Complex request
+        $request = $this->util->setMenu('/queue simple')->newRequest(
+            'print',
+            array('detail', 'from'=> TEST_QUEUE_NAME),
+            Query::where('target', HOSTNAME_INVALID . '/32'),
+            'test'
+        );
+        $this->assertInstanceOf(ROS_NAMESPACE . '\Request', $request);
+        $this->assertSame('/queue/simple/print', $request->getCommand());
+        $this->assertSame(
+            array(
+                'detail' => '',
+                'from'=> TEST_QUEUE_NAME
+            ),
+            $request->getIterator()->getArrayCopy()
+        );
+        $this->assertInstanceOf(ROS_NAMESPACE . '\Query', $request->getQuery());
+        $this->assertSame('test', $request->getTag());
+
+        //Failed request (API syntax)
+        try {
+            $request = $this->util->setMenu('/queue simple')->newRequest(
+                '../tree/print',
+                array('detail'),
+                Query::where('target', HOSTNAME_INVALID . '/32'),
+                'test'
+            );
+            $this->fail('Exception for invalid request not thrown');
+        } catch (NotSupportedException $e) {
+            $this->assertSame(
+                NotSupportedException::CODE_MENU_MISMATCH,
+                $e->getCode()
+            );
+            $this->assertSame(
+                '../tree/print',
+                $e->getValue()
+            );
+        }
+        
+        //Failed request (CLI syntax)
+        try {
+            $request = $this->util->setMenu('/queue simple')->newRequest(
+                '.. tree print',
+                array('detail'),
+                Query::where('target', HOSTNAME_INVALID . '/32'),
+                'test'
+            );
+            $this->fail('Exception for invalid request not thrown');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame(
+                InvalidArgumentException::CODE_CMD_INVALID,
+                $e->getCode()
+            );
+        }
     }
 
     public function testFindByQuery()

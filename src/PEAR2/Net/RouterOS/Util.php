@@ -417,7 +417,7 @@ class Util implements Countable
     /**
      * Gets the current menu.
      *
-     * @return string The current menu.
+     * @return string The absolute path to current menu, using API syntax.
      */
     public function getMenu()
     {
@@ -455,6 +455,50 @@ class Util implements Countable
         }
         $this->clearIdCache();
         return $this;
+    }
+
+    /**
+     * Creates a Request object.
+     * 
+     * Creates a {@link Request} object, with a command that's relative to the
+     * current menu. The request can then be sent using {@link Client}.
+     * 
+     * @param string      $command The command of the request, not including
+     *     the menu. The request will have that command at the current menu.
+     * @param array       $args    Arguments of the request.
+     *     Follows the same rules as with {@link Util::getAll()}.
+     * @param Query|null  $query   The {@link Query} of the request.
+     * @param string|null $tag     The tag of the request.
+     * 
+     * @return Request The {@link Request} object.
+     * 
+     * @throws NotSupportedException On an attempt to call a command in a
+     *     different menu.
+     */
+    public function newRequest(
+        $command,
+        array $args = array(),
+        Query $query = null,
+        $tag = null
+    ) {
+        if (false !== strpos($command, '/')) {
+            throw new NotSupportedException(
+                'Command tried to go to a different menu',
+                NotSupportedException::CODE_MENU_MISMATCH,
+                null,
+                $command
+            );
+        }
+        $request = new Request('/menu', $query, $tag);
+        $request->setCommand("{$this->menu}/{$command}");
+        foreach ($args as $name => $value) {
+            if (is_int($name)) {
+                $request->setArgument($value);
+            } else {
+                $request->setArgument($name, $value);
+            }
+        }
+        return $request;
     }
 
     /**
