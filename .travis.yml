@@ -1,0 +1,57 @@
+#
+# There's no way to use VirtualBox inside Travis-CI.
+# This file was an attempt in case Travis-CI did,
+# and it will be modified accordingly if a working way is found.
+# In the meantime, Travis-CI is disabled, and this file stands as more of a "how to"
+# for contributors wanting to make a testing environment.
+#
+language: php
+php:
+  - 5.3.3
+  - 5.3
+  - 5.4.0
+  - 5.4
+  - 5.5.0
+  - 5.5
+  - 5.6.0
+  # There are some known issues with streaming in the latest 5.6 versions.
+  #- 5.6
+env:
+  - ROS_VERSION=6.29.1 ROS_HASH=b8f3c93d9f139ee0deba74088c3ceab9
+addons:
+  hosts:
+    - 192.168.56.101 ros.example.com
+    - 127.0.0.1      invalid.ros.example.com
+    - 192.168.200.1  silent.ros.example.com
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install unzip
+  - sudo apt-get install gdebi-core
+  - wget -O ~/vbox.deb http://download.virtualbox.org/virtualbox/4.3.28/virtualbox-4.3_4.3.28-100309~Ubuntu~precise_i386.deb
+  - wget -O ~/packer.zip https://dl.bintray.com/mitchellh/packer/packer_0.7.5_linux_amd64.zip
+install:
+  # Install Packer
+  - unzip ~/packer.zip -d ~/packer
+  - export PATH=$PATH:~/packer
+  # Install Apache
+  - sudo apt-get install apache2
+  # Install VirtualBox
+  - sudo gdebi ~/vbox.deb
+before_script:
+  # Setup VM
+  - cd tests/vm
+  - packer build -var "v=${ROS_VERSION}" -var "h=${ROS_HASH}" RouterOS.packer.json
+  - VBoxManage register output-virtualbox-iso/RouterOS-${ROS_VERSION}.ova
+  - cd ../..
+  # Setup PHP dependencies
+  - composer self-update
+  - composer require pear2/net_transmitter:dev-develop
+  - composer install
+  # Configure Apache
+  - echo "Listen 8728,8729" >> /etc/apache2/ports.conf
+script:
+  - sudo service apache2 restart
+  - VBoxManage startvm --type=headless "RouterOS-${ROS_VERSION}" &
+  - sleep 15
+  - cd tests
+  - ../vendor/bin/phpunit
