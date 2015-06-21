@@ -1,2 +1,5 @@
 composer.phar
 vendor/
+/tests/vm/output-virtualbox-iso
+/tests/vm/output-qemu
+/tests/vm/packer_cache

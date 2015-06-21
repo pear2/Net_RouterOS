@@ -1,59 +1,99 @@
 {
-    "variables": {
-        "v": null,
-        "h": null
+  "variables": {
+    "v": null,
+    "h": null
+  },
+  "builders": [
+    {
+      "type": "virtualbox-iso",
+      "headless": true,
+      "vm_name": "RouterOS-{{user `v`}}",
+      "disk_size": 512,
+      "iso_url": "http://download2.mikrotik.com/routeros/{{user `v`}}/mikrotik-{{user `v`}}.iso",
+      "iso_checksum_type": "md5",
+      "iso_checksum": "{{user `h`}}",
+      "http_directory": ".",
+      "boot_command": [
+        "ainy<wait10><enter>",
+        "<wait10><wait10><wait10><wait10>",
+        "admin<enter><wait>",
+        "<enter><wait>",
+        "<enter><wait5>",
+        "/ip dhcp-client add disabled=no interface=ether1<enter>",
+        "<wait5>",
+        "/tool fetch url=\"http://{{ .HTTPIP }}:{{ .HTTPPort }}/RouterOS_SETTINGS.rsc\" keep-result=yes dst-path=\"RouterOS_SETTINGS.rsc\"<enter>",
+        "<wait5>",
+        "/import R<tab><enter>",
+        "<wait5>"
+      ],
+      "ssh_username": "admin",
+      "ssh_password": "",
+      "ssh_wait_timeout": "80s",
+      "guest_os_type": "Other",
+      "guest_additions_mode": "disable",
+      "vboxmanage": [
+        ["modifyvm", "{{.Name}}", "--memory", "128"],
+        ["modifyvm", "{{.Name}}", "--acpi", "on"],
+        ["modifyvm", "{{.Name}}", "--ioapic", "on"],
+        ["modifyvm", "{{.Name}}", "--hpet", "on"],
+        ["modifyvm", "{{.Name}}", "--rtcuseutc", "on"],
+        ["modifyvm", "{{.Name}}", "--pae", "on"],
+        ["modifyvm", "{{.Name}}", "--usb", "on"],
+        ["modifyvm", "{{.Name}}", "--usbehci", "off"],
+        ["modifyvm", "{{.Name}}", "--uart1", "0x3F8", "4"],
+
+        ["modifyvm", "{{.Name}}", "--nic2", "nat"],
+        ["modifyvm", "{{.Name}}", "--cableconnected2", "on"],
+        ["modifyvm", "{{.Name}}", "--nic3", "null"],
+        ["modifyvm", "{{.Name}}", "--cableconnected3", "off"]
+      ],
+      "vboxmanage_post": [
+        ["modifyvm", "{{.Name}}", "--nic1", "hostonly"],
+        ["modifyvm", "{{.Name}}", "--hostonlyadapter1", "VirtualBox Host-Only Ethernet Adapter"],
+        ["modifyvm", "{{.Name}}", "--cableconnected1", "on"]
+      ],
+      "format": "ova"
     },
-    "builders": [
-        {
-            "type": "virtualbox-iso",
-            "headless": true,
-            "vm_name": "RouterOS-{{user `v`}}",
-            "guest_os_type": "Other",
-            "disk_size": "1000",
-            "vboxmanage": [
-                ["modifyvm", "{{.Name}}", "--memory", "128"],
-                ["modifyvm", "{{.Name}}", "--acpi", "on"],
-                ["modifyvm", "{{.Name}}", "--ioapic", "on"],
-                ["modifyvm", "{{.Name}}", "--hpet", "on"],
-                ["modifyvm", "{{.Name}}", "--rtcuseutc", "on"],
-                ["modifyvm", "{{.Name}}", "--pae", "on"],
-                ["modifyvm", "{{.Name}}", "--usb", "on"],
-                ["modifyvm", "{{.Name}}", "--usbehci", "off"],
-                ["modifyvm", "{{.Name}}", "--uart1", "0x3F8", "4"],
-
-                ["modifyvm", "{{.Name}}", "--nic2", "nat"],
-                ["modifyvm", "{{.Name}}", "--cableconnected2", "on"],
-                ["modifyvm", "{{.Name}}", "--nic3", "null"],
-                ["modifyvm", "{{.Name}}", "--cableconnected3", "off"]
-            ],
-            "iso_url": "http://download2.mikrotik.com/routeros/{{user `v`}}/mikrotik-{{user `v`}}.iso",
-            "iso_checksum_type": "md5",
-            "iso_checksum": "{{user `h`}}",
-            "http_directory": ".",
-            "boot_command": [
-                "ainy<wait10><enter>",
-                "<wait10><wait10><wait10><wait10>",
-                "admin<enter><wait>",
-                "<enter><wait>",
-                "<enter><wait>",
-                "/ip dhcp-client add disabled=no interface=ether1<enter>",
-                "<wait5>",
-
-                "/tool fetch url=\"http://{{ .HTTPIP }}:{{ .HTTPPort }}/RouterOS_SETTINGS.rsc\" keep-result=yes dst-path=\"RouterOS_SETTINGS.rsc\"<enter>",
-                "<wait5>",
-                "/import R<tab><enter>",
-                "<wait5>"
-            ],
-            "guest_additions_mode": "disable",
-            "ssh_username": "admin",
-            "ssh_password": "",
-            "ssh_wait_timeout": "80s",
-            "vboxmanage_post": [
-                ["modifyvm", "{{.Name}}", "--nic1", "hostonly"],
-                ["modifyvm", "{{.Name}}", "--hostonlyadapter1", "VirtualBox Host-Only Ethernet Adapter"],
-                ["modifyvm", "{{.Name}}", "--cableconnected1", "on"]
-            ],
-            "format": "ova"
-        }
-    ]
+    {
+      "type": "qemu",
+      "headless": true,
+      "vm_name": "RouterOS-{{user `v`}}",
+      "disk_size": 512,
+      "iso_url": "http://download2.mikrotik.com/routeros/{{user `v`}}/mikrotik-{{user `v`}}.iso",
+      "iso_checksum_type": "md5",
+      "iso_checksum": "{{user `h`}}",
+      "http_directory": ".",
+      "boot_command": [
+        "ainy<wait10><enter>",
+        "<wait10><wait10><wait10><wait10>",
+        "<wait10><wait10><wait10><wait10>",
+        "admin<enter><wait>",
+        "<enter><wait>",
+        "<enter><wait5>",
+        "/ip dhcp-client add disabled=no interface=ether1<enter>",
+        "<wait5>",
+        "/tool fetch url=\"http://{{ .HTTPIP }}:{{ .HTTPPort }}/RouterOS_SETTINGS.rsc\" keep-result=yes dst-path=\"RouterOS_SETTINGS.rsc\"<enter>",
+        "<wait5>",
+        "/import R<tab><enter>",
+        "<wait5>"
+      ],
+      "ssh_username": "admin",
+      "ssh_password": "",
+      "ssh_wait_timeout": "80s",
+      "ssh_host_port_min": 3213,
+      "ssh_host_port_max": 3214,
+      "accelerator": "tcg",
+      "disk_interface": "ide",
+      "qemuargs": [
+        ["-netdev", "user,id=user.0,hostfwd=tcp::3213-:22,hostfwd=tcp::3214-:22,net=10.0.2.0/24,host=10.0.2.2"],
+        ["-device", "virtio-net,netdev=user.0,mac=DE:AD:BE:EF:00:01"],
+        ["-netdev", "user,id=user.1"],
+        ["-device", "virtio-net,netdev=user.1,mac=DE:AD:BE:EF:00:02"],
+        ["-netdev", "user,id=user.2"],
+        ["-device", "virtio-net,netdev=user.2,mac=DE:AD:BE:EF:00:03"],
+        ["-m", "128M"]
+      ],
+      "format": "raw"
+    }
+  ]
 }
