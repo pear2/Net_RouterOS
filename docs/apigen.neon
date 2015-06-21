@@ -1,6 +1,6 @@
 source: ../src
 
-destination: PEAR2_Net_RouterOS__ApiGen_Documentation
+destination: Reference/ApiGen/Doc
 
 extensions: php
 

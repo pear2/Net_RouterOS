@@ -1,0 +1,15 @@
+*.php text eol=lf
+/docs export-ignore
+/examples export-ignore
+/tests export-ignore
+.gitattributes export-ignore
+.gitignore export-ignore
+.scrutinizer.yml export-ignore
+.travis.yml export-ignore
+README.md export-ignore
+README export-ignore
+CREDITS export-ignore
+RELEASE-* export-ignore
+package.xml export-ignore
+packagexmlsetup.php export-ignore
+extrasetup.php export-ignore
