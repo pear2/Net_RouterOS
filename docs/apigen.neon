@@ -1,14 +1,17 @@
-source: ../src
+title: PEAR2_Net_RouterOS documentation
+
+source:
+  - ../src
 
 destination: Reference/ApiGen/Doc
 
-extensions: php
+extensions:
+  - php
 
-charset: UTF-8
+charset:
+  - UTF-8
 
-title: PEAR2_Net_RouterOS documentation
+accessLevels:
+  - public
 
-autocomplete:
-    - classes
-    - methods
-    - classconstants
+tree: true

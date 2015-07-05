@@ -8,8 +8,8 @@ return new Sami(
         ->files()
         ->name('*.php')
         ->exclude('docs')
-        ->exclude('examples')
         ->exclude('tests')
+        ->exclude('examples')
         ->in($dir = dirname(__DIR__)),
     array(
         'title'                => 'PEAR2_Net_RouterOS documentation',

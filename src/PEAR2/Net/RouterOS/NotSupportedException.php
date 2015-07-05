@@ -39,8 +39,10 @@ class NotSupportedException extends E implements Exception
 {
 
     const CODE_CONTROL_BYTE = 1601;
-    
-    const CODE_MENU_MISMATCH = 60000; 
+
+    const CODE_MENU_MISMATCH = 60000;
+
+    const CODE_ARG_PROHIBITED = 60001;
 
     /**
      * @var mixed The unsupported value.

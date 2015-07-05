@@ -91,6 +91,9 @@
         ["-device", "virtio-net,netdev=user.1,mac=DE:AD:BE:EF:00:02"],
         ["-netdev", "user,id=user.2"],
         ["-device", "virtio-net,netdev=user.2,mac=DE:AD:BE:EF:00:03"],
+        ["-chardev", "null,id=con0"],
+        ["-device", "virtio-serial"],
+        ["-device", "virtserialport,chardev=con0"],
         ["-m", "128M"]
       ],
       "format": "raw"

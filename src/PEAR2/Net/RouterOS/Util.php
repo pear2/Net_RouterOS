@@ -79,7 +79,7 @@ class Util implements Countable
      * literal.
      *
      * This method is intended to be the very opposite of
-     * {@link static::escapeValue()}. hat is, results from that method, if
+     * {@link static::escapeValue()}. That is, results from that method, if
      * given to this method, should produce equivalent results.
      *
      * @param string $value The value to be parsed. Must be a literal of a
@@ -459,21 +459,27 @@ class Util implements Countable
 
     /**
      * Creates a Request object.
-     * 
-     * Creates a {@link Request} object, with a command that's relative to the
+     *
+     * Creates a {@link Request} object, with a command that's at the
      * current menu. The request can then be sent using {@link Client}.
-     * 
+     *
      * @param string      $command The command of the request, not including
      *     the menu. The request will have that command at the current menu.
      * @param array       $args    Arguments of the request.
-     *     Follows the same rules as with {@link Util::getAll()}.
+     *     Each array key is the name of the argument, and each array value is
+     *     the value of the argument to be passed.
+     *     Arguments without a value (i.e. empty arguments) can also be
+     *     specified using a numeric key, and the name of the argument as the
+     *     array value.
      * @param Query|null  $query   The {@link Query} of the request.
      * @param string|null $tag     The tag of the request.
-     * 
+     *
      * @return Request The {@link Request} object.
-     * 
+     *
      * @throws NotSupportedException On an attempt to call a command in a
-     *     different menu.
+     *     different menu using API syntax.
+     * @throws InvalidArgumentException On an attempt to call a command in a
+     *     different menu using CLI syntax.
      */
     public function newRequest(
         $command,
@@ -1015,6 +1021,11 @@ class Util implements Countable
      *     Arguments without a value (i.e. empty arguments) can also be
      *     specified using a numeric key, and the name of the argument as the
      *     array value.
+     *     The "follow" and "follow-only" arguments are prohibited,
+     *     as they would cause a synchronous request to run forever, without
+     *     allowing the results to be observed.
+     *     If you need to use those arguments, use {@link static::newRequest()},
+     *     and pass the resulting {@link Request} to {@link Client::sendAsync()}.
      * @param Query|null                                      $query A query to
      *     filter items by.
      *     NULL to get all items.
@@ -1022,6 +1033,9 @@ class Util implements Countable
      * @return ResponseCollection|false A response collection with all
      *     {@link Response::TYPE_DATA} responses. The collection will be empty
      *     when there are no matching items. FALSE on failure.
+     *
+     * @throws NotSupportedException If $args contains prohibited arguments
+     *     ("follow" or "follow-only").
      */
     public function getAll(array $args = array(), Query $query = null)
     {
@@ -1032,6 +1046,14 @@ class Util implements Countable
             } else {
                 $printRequest->setArgument($name, $value);
             }
+        }
+        if ($printRequest->getArgument('follow') !== null
+            || $printRequest->getArgument('follow-only') !== null
+        ) {
+            throw new NotSupportedException(
+                'The "follow" and "follow-only" arguments are prohibited',
+                NotSupportedException::CODE_ARG_PROHIBITED
+            );
         }
         $responses = $this->client->sendSync($printRequest);
 
