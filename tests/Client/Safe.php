@@ -427,7 +427,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
                         Response::TYPE_DATA,
                         $response->getType(),
                         'Callbacks inside must be of type ' .
-                            Response::TYPE_DATA
+                        Response::TYPE_DATA
                     );
                     return $repliesCount === $limit;
                 } elseif ($response->getType() !== Response::TYPE_DATA) {

@@ -246,4 +246,33 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->util->getAll());
         $this->assertCount(-1, $this->util);
     }
+
+    public function providerProhibitedArgs()
+    {
+        return array(
+            0 => array(array('follow')),
+            1 => array(array('follow-only'))
+        );
+    }
+
+    /**
+     * @param array $args Arguments for the Util::getAll() call.
+     *
+     * @return void
+     *
+     * @dataProvider providerProhibitedArgs
+     */
+    public function testGetallArgExceptions(array $args)
+    {
+        $this->util->setMenu('/queue simple');
+        try {
+            $this->util->getAll($args);
+            $this->fail('Supplying these arguments should result in an exception');
+        } catch (NotSupportedException $e) {
+            $this->assertSame(
+                NotSupportedException::CODE_ARG_PROHIBITED,
+                $e->getCode()
+            );
+        }
+    }
 }

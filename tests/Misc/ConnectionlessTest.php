@@ -31,9 +31,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
     /**
      * @param string $command
      *
-     * @dataProvider providerNonAbsoluteCommand
-     *
      * @return void
+     *
+     * @dataProvider providerNonAbsoluteCommand
      */
     public function testNonAbsoluteCommand($command)
     {
@@ -61,9 +61,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
     /**
      * @param string $command
      *
-     * @dataProvider providerUnresolvableCommand
-     *
      * @return void
+     *
+     * @dataProvider providerUnresolvableCommand
      */
     public function testUnresolvableCommand($command)
     {
@@ -89,9 +89,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
     /**
      * @param string $command
      *
-     * @dataProvider providerInvalidCommand
-     *
      * @return void
+     *
+     * @dataProvider providerInvalidCommand
      */
     public function testInvalidCommand($command)
     {
@@ -119,9 +119,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
      * @param string $command
      * @param string $expected
      *
-     * @dataProvider providerCommandTranslation
-     *
      * @return void
+     *
+     * @dataProvider providerCommandTranslation
      */
     public function testCommandTranslation($command, $expected)
     {
@@ -152,9 +152,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
      * @param string $expected
      * @param array  $args
      *
-     * @dataProvider providerCommandAndArgumentParsing
-     *
      * @return void
+     *
+     * @dataProvider providerCommandAndArgumentParsing
      */
     public function testCommandAndArgumentParsing($command, $expected, $args)
     {
@@ -593,9 +593,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
      * @param string $command
      * @param int    $code
      *
-     * @dataProvider providerCommandArgumentParsingExceptions
-     *
      * @return void
+     *
+     * @dataProvider providerCommandArgumentParsingExceptions
      */
     public function testCommandArgumentParsingExceptions($command, $code)
     {
@@ -628,9 +628,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
     /**
      * @param string $name
      *
-     * @dataProvider providerInvalidArgumentName
-     *
      * @return void
+     *
+     * @dataProvider providerInvalidArgumentName
      */
     public function testInvalidArgumentName($name)
     {
@@ -650,9 +650,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
     /**
      * @param string $name
      *
-     * @dataProvider providerInvalidArgumentName
-     *
      * @return void
+     *
+     * @dataProvider providerInvalidArgumentName
      */
     public function testInvalidQueryArgumentName($name)
     {
@@ -696,9 +696,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
     /**
      * @param string|int $action
      *
-     * @dataProvider providerInvalidQueryArgumentAction
-     *
      * @return void
+     *
+     * @dataProvider providerInvalidQueryArgumentAction
      */
     public function testInvalidQueryArgumentAction($action)
     {
@@ -782,9 +782,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
      * @param string $expected
      * @param int    $length
      *
-     * @dataProvider providerLengths
-     *
      * @return void
+     *
+     * @dataProvider providerLengths
      */
     public function testLengthEncoding($expected, $length)
     {
@@ -803,9 +803,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
      * @param string $length
      * @param int    $expected
      *
-     * @dataProvider providerLengths
-     *
      * @return void
+     *
+     * @dataProvider providerLengths
      */
     public function testLengthDecoding($length, $expected)
     {
@@ -922,9 +922,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
     /**
      * @param int $controlByte
      *
-     * @dataProvider providerControlByte
-     *
      * @return void
+     *
+     * @dataProvider providerControlByte
      */
     public function testControlByteException($controlByte)
     {
@@ -992,9 +992,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
      * @param string $value
      * @param mixed  $expected
      *
-     * @dataProvider providerUtilParseValue
-     *
      * @return void
+     *
+     * @dataProvider providerUtilParseValue
      */
     public function testUtilParseValue($value, $expected)
     {

@@ -125,6 +125,20 @@ HEREDOC
     unset($autoloader, $cwd);
 }
 
+//PEAR2_Console_CommandLine is bundled in the archive, but may not be
+//available if this package was installed with a package manager.
+if (!class_exists('PEAR2\Console\CommandLine', true)) {
+    fwrite(
+        STDERR,
+        <<<HEREDOC
+PEAR2_Console_CommandLine was not found.
+Please install it with the package manager used to install PEAR2_Net_RouterOS.
+(i.e. Pyrus, PEAR or Composer)
+HEREDOC
+    );
+    exit(11);
+}
+
 // Locate the data dir, in preference as:
 // 1. The PHP_PEAR_DATA_DIR environment variable, if available
 // 2. The data folder at "mypear" (filled at install time by Pyrus/PEAR)
