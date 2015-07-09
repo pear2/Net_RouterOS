@@ -1,6 +1,5 @@
 <?php
 use Sami\Sami;
-use Sami\Version\GitVersionCollection;
 use Symfony\Component\Finder\Finder;
 
 return new Sami(

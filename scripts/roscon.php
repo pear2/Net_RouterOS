@@ -317,20 +317,20 @@ Possible reasons:
 6. The router has a firewall filter/mangle/nat rule that overrides the settings
    at the "/ip service" menu.
    Usually, those are rules in the "input" chain.
-   Theoretically, rules in the "prerouting", "dstnat", "output" and/or
-   "postrouting" chains can also cause such an effect.
-   By default, RouterBOARD devices have a filter rule in the "input" chain that
-   drops any incoming connections to the router from its WAN interface, so if
-   your web server is not in the LAN, the connection may be dropped because of
-   that.
-   If that's the case, either disable that rule, or explicitly whitelist the
-   API port. You can whitelist the API port on all interfaces by issuing the
-   following command from a terminal:
+   Theoretically (rarely in practice), rules in the "prerouting", "dstnat",
+   "output" and/or "postrouting" chains can also cause such an effect.
+   By default, many RouterBOARD devices have a filter rule in the "input" chain
+   that drops any incoming connections to the router from its WAN interface,
+   so if your web server is not in the LAN, the connection may be dropped
+   because of that.
+   If that's the case, either disable that rule (not recommended), or
+   explicitly whitelist the API port. You can whitelist the API port on all
+   interfaces by issuing the following command from a terminal:
    ```
-   /ip firewall filter
-       add place-before=[:pick [find where chain="input"] 0] \
-           chain="input" action="accept" \
-           dst-port=[/ip service get "api" "port"]
+   /ip firewall filter add \
+       place-before=[:pick [find where chain="input"] 0] \
+       chain="input" action="accept" \
+       protocol="tcp" dst-port=[/ip service get "api" "port"]
    ```
 
 HEREDOC
