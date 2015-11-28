@@ -81,6 +81,10 @@ if ($defineConstants) {
             $value
         );
         define(
+            __NAMESPACE__ . '\Test\Communicator\\' . $constant,
+            $value
+        );
+        define(
             __NAMESPACE__ . '\Test\Util\\' . $constant,
             $value
         );

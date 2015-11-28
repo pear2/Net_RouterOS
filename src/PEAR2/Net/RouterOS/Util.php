@@ -36,9 +36,14 @@ use DateInterval;
 use Countable;
 
 /**
- * Used to reliably write to streams at {@link static::prepareScript()}.
+ * Used to reliably write to streams at {@link Util::prepareScript()}.
  */
 use PEAR2\Net\Transmitter\Stream;
+
+/**
+ * Used to catch a DateInterval exception at {@link Util::parseValue()}.
+ */
+use Exception as E;
 
 /**
  * Utility class.
@@ -108,11 +113,19 @@ class Util implements Countable
             return $num;
         } elseif (preg_match(
             '/^
-               (?:(\d+)w)?
-               (?:(\d+)d)?
-               (?:(\d\d)\:)?
-               (\d\d)\:
-               (\d\d(:\.\d{1,6})?)
+                (?:(\d+)w)?
+                (?:(\d+)d)?
+                (?:(\d+)(?:\:|h))?
+                (?|
+                    (\d+)\:
+                    (\d*(?:\.\d{1,9})?)
+                |
+                    (?:(\d+)m)?
+                    (?:(\d+|\d*\.\d{1,9})s)?
+                    (?:((?5))ms)?
+                    (?:((?5))us)?
+                    (?:((?5))ns)?
+                )
             $/x',
             $value,
             $time
@@ -121,12 +134,55 @@ class Util implements Countable
             if (isset($time[1])) {
                 $days += 7 * (int)$time[1];
             }
-            if ('' === $time[3]) {
+            if (empty($time[3])) {
                 $time[3] = 0;
             }
-            return new DateInterval(
-                "P{$days}DT{$time[3]}H{$time[4]}M{$time[5]}S"
-            );
+            if (empty($time[4])) {
+                $time[4] = 0;
+            }
+            if (empty($time[5])) {
+                $time[5] = 0;
+            }
+            
+            $subsecondTime = 0.0;
+            //@codeCoverageIgnoreStart
+            // No PHP version currently supports sub-second DateIntervals,
+            // meaning this section is untestable, since no version constraints
+            // can be specified for test inputs.
+            // All inputs currently use integer seconds only, making this
+            // section unreachable during tests.
+            // Nevertheless, this section exists right now, in order to provide
+            // such support as soon as PHP has it.
+            if (!empty($time[6])) {
+                $subsecondTime += ((double)$time[6]) / 1000;
+            }
+            if (!empty($time[7])) {
+                $subsecondTime += ((double)$time[7]) / 1000000;
+            }
+            if (!empty($time[8])) {
+                $subsecondTime += ((double)$time[8]) / 1000000000;
+            }
+            //@codeCoverageIgnoreEnd
+
+            $secondsSpec = $time[5] + $subsecondTime;
+            try {
+                return new DateInterval(
+                    "P{$days}DT{$time[3]}H{$time[4]}M{$secondsSpec}S"
+                );
+            //@codeCoverageIgnoreStart
+            // See previous ignored section's note.
+            // 
+            // This section is added for backwards compatibility with current
+            // PHP versions, when in the future sub-second support is added.
+            // In that event, the test inputs for older versions will be
+            // expected to get a rounded up result of the sub-second data.
+            } catch (E $e) {
+                $secondsSpec = (int)round($secondsSpec);
+                return new DateInterval(
+                    "P{$days}DT{$time[3]}H{$time[4]}M{$secondsSpec}S"
+                );
+            }
+            //@codeCoverageIgnoreEnd
         } elseif (('"' === $value[0]) && substr(strrev($value), 0, 1) === '"') {
             return str_replace(
                 array('\"', '\\\\', "\\\n", "\\\r\n", "\\\r"),

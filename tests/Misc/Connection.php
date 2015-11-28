@@ -468,54 +468,6 @@ abstract class Connection extends PHPUnit_Framework_TestCase
         }
     }
 
-    public function testInvalidSocketOnReceive()
-    {
-        try {
-            $com = new Communicator(
-                \HOSTNAME,
-                PORT,
-                static::$persistent,
-                null,
-                '',
-                static::$encryption
-            );
-            Client::login($com, USERNAME, PASSWORD);
-
-            new Response($com);
-            $this->fail('Receiving had to fail.');
-        } catch (SocketException $e) {
-            $this->assertEquals(
-                SocketException::CODE_NO_DATA,
-                $e->getCode(),
-                'Improper exception code.'
-            );
-        }
-    }
-
-    public function testInvalidSocketOnStreamReceive()
-    {
-        try {
-            $com = new Communicator(
-                \HOSTNAME,
-                PORT,
-                static::$persistent,
-                null,
-                '',
-                static::$encryption
-            );
-            Client::login($com, USERNAME, PASSWORD);
-
-            $response = new Response($com, true);
-            $this->fail('Receiving had to fail.');
-        } catch (SocketException $e) {
-            $this->assertEquals(
-                SocketException::CODE_NO_DATA,
-                $e->getCode(),
-                'Improper exception code.'
-            );
-        }
-    }
-
     public function testInvalidQuerySending()
     {
         $com = new Communicator(
@@ -718,38 +670,5 @@ abstract class Connection extends PHPUnit_Framework_TestCase
             $com->getCharset(Communicator::CHARSET_LOCAL)
         );
         Communicator::setDefaultCharset(null);
-    }
-
-    public function testInvokability()
-    {
-        $com = new Communicator(
-            HOSTNAME,
-            PORT,
-            static::$persistent,
-            null,
-            '',
-            static::$encryption
-        );
-        Client::login($com, USERNAME, PASSWORD);
-        $request = new Request('/ping');
-        $request('address', HOSTNAME)->setTag('p');
-        $this->assertEquals(HOSTNAME, $request('address'));
-        $this->assertEquals('p', $request->getTag());
-        $this->assertEquals('p', $request());
-        $request($com);
-        $response = new Response(
-            $com,
-            false,
-            ini_get('default_socket_timeout')
-        );
-        $this->assertInternalType('string', $response());
-        $this->assertEquals(HOSTNAME, $response('host'));
-
-        $request = new Request('/queue/simple/print');
-        $query = Query::where('target', HOSTNAME_INVALID . '/32');
-        $request($query);
-        $this->assertSame($query, $request->getQuery());
-        $com('/quit');
-        $com('');
     }
 }

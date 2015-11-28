@@ -731,23 +731,6 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    public function testNonSeekableCommunicatorWord()
-    {
-        $value = fopen('php://output', 'a');
-        $com = new Communicator(HOSTNAME, PORT);
-        Client::login($com, USERNAME, PASSWORD);
-        try {
-            $com->sendWordFromStream('', $value);
-            $this->fail('Call had to fail.');
-        } catch (InvalidArgumentException $e) {
-            $this->assertEquals(
-                InvalidArgumentException::CODE_SEEKABLE_REQUIRED,
-                $e->getCode(),
-                'Improper exception code.'
-            );
-        }
-    }
-
     public function testNonSeekableQueryArgumentValue()
     {
         $value = fopen('php://output', 'a');
@@ -951,14 +934,14 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
     public function providerControlByte()
     {
         return array(
-            0=> array(0xF8),
-            1=> array(0xF9),
-            2=> array(0xFA),
-            3=> array(0xFB),
-            4=> array(0xFC),
-            5=> array(0xFD),
-            6=> array(0xFE),
-            7=> array(0xFF)
+            0 => array(0xF8),
+            1 => array(0xF9),
+            2 => array(0xFA),
+            3 => array(0xFB),
+            4 => array(0xFC),
+            5 => array(0xFD),
+            6 => array(0xFE),
+            7 => array(0xFF)
         );
     }
 
@@ -1006,69 +989,95 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
     public function providerUtilParseValue()
     {
         return array(
-            0 => array('', null),
-            1 => array('nil', null),
-            2 => array('1', 1),
-            3 => array('true', true),
-            4 => array('yes', true),
-            5 => array('false', false),
-            6 => array('no', false),
-            7 => array('"test"', 'test'),
-            8 => array('test', 'test'),
-            9 => array('00:00', new DateInterval('PT0H0M0S')),
-            10 => array('00:00:00', new DateInterval('PT0H0M0S')),
-            11 => array('1d00:00:00', new DateInterval('P1DT0H0M0S')),
-            12 => array('1w00:00:00', new DateInterval('P7DT0H0M0S')),
-            13 => array('1w1d00:00:00', new DateInterval('P8DT0H0M0S')),
-            14 => array('{}', array()),
-            15 => array('{a}', array('a')),
-            16 => array('{1;2}', array(1, 2)),
-            17 => array('{a;b}', array('a', 'b')),
-            18 => array('{"a";"b"}', array('a', 'b')),
-            19 => array('{"a;b";c}', array('a;b', 'c')),
-            20 => array('{a;"b;c"}', array('a', 'b;c')),
-            21 => array('{"a;b";c;d}', array('a;b', 'c', 'd')),
-            22 => array('{a;"b;c";d}', array('a', 'b;c', 'd')),
-            23 => array('{a;b;"c;d"}', array('a', 'b', 'c;d')),
-            24 => array('{{a;b};c}', array(array('a', 'b'), 'c')),
-            25 => array('{a;{b;c};d}', array('a', array('b', 'c'), 'd')),
-            26 => array('{a;b;{c;d}}', array('a', 'b', array('c', 'd'))),
-            27 => array(
+            //// This will be moved into a separate "legacy" test,
+            //// once PHP supports fractional secons in DateInterval...
+            //'legacy sub-second' => array(
+            //    '0s1ms2us3ns',
+            //    new DateInterval('PT0S')
+            //),
+            //// ...and this will be moved to a separate "current" test.
+            //'current sub-secong' => array(
+            //    '0s1ms2us3ns',
+            //    new DateInterval('PT0.001002003S')
+            //),
+            ''                      => array('', null),
+            'nil'                   => array('nil', null),
+            '1'                     => array('1', 1),
+            'true'                  => array('true', true),
+            'yes'                   => array('yes', true),
+            'false'                 => array('false', false),
+            'no'                    => array('no', false),
+            '"test"'                => array('"test"', 'test'),
+            'test'                  => array('test', 'test'),
+            '0:'                    => array('0:', new DateInterval('PT0H')),
+            '1:'                    => array('1:', new DateInterval('PT1H')),
+            '00:00'                 => array('00:00', new DateInterval('PT0M0S')),
+            '00:01'                 => array('00:01', new DateInterval('PT0M1S')),
+            '00:1'                  => array('00:1', new DateInterval('PT0M1S')),
+            '00:1'                  => array('1:1', new DateInterval('PT1M1S')),
+            '00:00:00'              => array('00:00:00', new DateInterval('PT0H0M0S')),
+            '01:02:03'              => array('01:02:03', new DateInterval('PT1H2M3S')),
+            '1:2:3'                 => array('1:2:3', new DateInterval('PT1H2M3S')),
+            '1d00:00:00'            => array('1d00:00:00', new DateInterval('P1DT0H0M0S')),
+            '1w00:00:00'            => array('1w00:00:00', new DateInterval('P7DT0H0M0S')),
+            '1w0d00:00:00'          => array('1w0d00:00:00', new DateInterval('P7DT0H0M0S')),
+            '1w1d00:00:00'          => array('1w1d00:00:00', new DateInterval('P8DT0H0M0S')),
+            '0s'                    => array('0s', new DateInterval('PT0S')),
+            '1s'                    => array('1s', new DateInterval('PT1S')),
+            '0m'                    => array('0m', new DateInterval('PT0M')),
+            '1m'                    => array('1m', new DateInterval('PT1M')),
+            '0h'                    => array('0h', new DateInterval('PT0H')),
+            '1h'                    => array('1h', new DateInterval('PT1H')),
+            '1m2s'                  => array('1m2s', new DateInterval('PT1M2S')),
+            '1h2m3s'                => array('1h2m3s', new DateInterval('PT1H2M3S')),
+            '1d2h3m4s'              => array('1d2h3m4s', new DateInterval('P1DT2H3M4S')),
+            '1w2s'                  => array('1w2s', new DateInterval('P7DT2S')),
+            '1w2m3s'                => array('1w2m3s', new DateInterval('P7DT2M3S')),
+            '1w2h3m4s'              => array('1w2h3m4s', new DateInterval('P7DT2H3M4S')),
+            '1w2d3h4m5s'            => array('1w2d3h4m5s', new DateInterval('P9DT3H4M5S')),
+            '{}'                    => array('{}', array()),
+            '{a}'                   => array('{a}', array('a')),
+            '{1;2}'                 => array('{1;2}', array(1, 2)),
+            '{a;b}'                 => array('{a;b}', array('a', 'b')),
+            '{"a";"b"}'             => array('{"a";"b"}', array('a', 'b')),
+            '{"a;b";c}'             => array('{"a;b";c}', array('a;b', 'c')),
+            '{a;"b;c"}'             => array('{a;"b;c"}', array('a', 'b;c')),
+            '{"a;b";c;d}'           => array('{"a;b";c;d}', array('a;b', 'c', 'd')),
+            '{a;"b;c";d}'           => array('{a;"b;c";d}', array('a', 'b;c', 'd')),
+            '{a;b;"c;d"}'           => array('{a;b;"c;d"}', array('a', 'b', 'c;d')),
+            '{{a;b};c}'             => array('{{a;b};c}', array(array('a', 'b'), 'c')),
+            '{a;{b;c};d}'           => array('{a;{b;c};d}', array('a', array('b', 'c'), 'd')),
+            '{a;b;{c;d}}'           => array('{a;b;{c;d}}', array('a', 'b', array('c', 'd'))),
+            '{{a;{b;c}};d}'         => array(
                 '{{a;{b;c}};d}',
                 array(array('a', array('b', 'c')), 'd')
             ),
-            28 => array(
+            '{a=1;b=2}'             => array(
                 '{a=1;b=2}',
                 array('a' => 1, 'b' => 2)
             ),
-            29 => array(
+            '{a="test1";b="test2"}' => array(
                 '{a="test1";b="test2"}',
                 array('a' => 'test1', 'b' => 'test2')
             ),
-            30 => array(
+            '{a=1;b;c=2}'           => array(
                 '{a=1;b;c=2}',
                 array('a' => 1, 'b', 'c' => 2)
             ),
-            31 => array(
+            '{a="b;c";d=2}'         => array(
                 '{a="b;c";d=2}',
                 array('a' => 'b;c', 'd' => 2)
             ),
-            32 => array(
+            '{a="b;c=2";d=2}'       => array(
                 '{a="b;c=2";d=2}',
                 array('a' => 'b;c=2', 'd' => 2)
             ),
-            33 => array(
+            '{a="b";c}'             => array(
                 '{a="b";c}',
                 array('a' => 'b', 'c')
             ),
-            34 => array(
-                '{1="test"}',
-                array(1 => 'test')
-            ),
-            35 => array(
-                '{a',
-                '{a'
-            )
+            '{1="test"}'            => array('{1="test"}', array(1 => 'test')),
+            '{a'                    => array('{a', '{a')
         );
     }
 }

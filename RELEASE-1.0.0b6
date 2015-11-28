@@ -1,0 +1,7 @@
+Bug fixes, mostly.
+
+* New Util methods:
+    - newRequest()
+    - comment()
+* Util::parseValue() now supports letter notation for time (1h2m3s), not just double colon notation (01:02:03), modeled after RouterOS. Related to that is also that leading zeroes, and zero minutes and seconds are now optional (e.g. "1:" is a valid way of saying 1 hour). Sub-second information is rounded up to the nearest second on current PHP versions (future versions are expected to support sub-second information in DateInterval by allowing seconds to be a double; The code currently attempts to give DateInterval a double, falling back to rounding to a second).
+* Client::login() consumes the !done or !fatal response even when called on an already logged in connection.
