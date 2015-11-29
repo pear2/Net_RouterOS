@@ -1,9 +1,14 @@
-Bug fixes, mostly.
+Util stuff, mostly.
 
+* __BREAKING CHANGES:__
+    - Util::edit() is no longer an alias of Util::set(). It's now its own method that can modify or unset a single specified property.
 * New Util methods:
     - comment()
     - getCurrentTime()
     - newRequest()
 * Util::parseValue() now supports letter notation for time (1h2m3s), not just double colon notation (01:02:03), modeled after RouterOS. Related to that is also that leading zeroes, and zero minutes and seconds are now optional (e.g. "1:" is a valid way of saying 1 hour). Sub-second information is rounded up to the nearest second on current PHP versions (future versions are expected to support sub-second information in DateInterval by allowing seconds to be a double; The code currently attempts to give DateInterval a double, falling back to rounding to a second).
-* Client::login() consumes the !done or !fatal response even when called on an already logged in connection.
+* Util::parseValue() now recognizes dates in the "M/j/Y" format (used across RouterOS), and translates them to a DateTime object that is midnight UTC time at the specified date.
+* Util::getAll() now throws a NotSupportedException if the arguments "follow", "follow-only" or "count-only" are used. The first two, because PHP would hang (since Client::sendSync() is used under the hood), and the last one because it's unredable in the returned output (use Util::count() instead).
 * Util::setMenu() can now go back to the root menu.
+* Client::login() consumes the !done or !fatal response even when called on an already logged in connection.
+* The console now checks whether PEAR2_CommandLine is installed, ensuring better error messages when this package is installed without its optional dependencies.

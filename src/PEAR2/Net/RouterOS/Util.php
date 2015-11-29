@@ -985,20 +985,21 @@ class Util implements Countable
     /**
      * Alias of {@link static::set()}
      *
-     * @param mixed                                           $numbers   Items
-     *     to be modified.
+     * @param mixed                $numbers   Items to be modified.
      *     Can be any criteria accepted by {@link static::find()} or NULL
      *     in case the menu is one without items (e.g. "/system identity").
-     * @param array<string,string|resource>|array<int,string> $newValues An
-     *     array with the names of each property to set as an array key, and the
-     *     new value as an array value.
+     * @param string               $valueName Name of property to be modified.
+     * @param string|resource|null $newValue  The new value to set.
+     *     If set to NULL, the property is unset.
      *
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
      */
-    public function edit($numbers, array $newValues)
+    public function edit($numbers, $valueName, $newValue)
     {
-        return $this->set($numbers, $newValues);
+        return null === $newValue
+            ? $this->unsetValue($numbers, $valueName)
+            : $this->set($numbers, array($valueName => $newValue));
     }
 
     /**
@@ -1169,13 +1170,16 @@ class Util implements Countable
                 $printRequest->setArgument($name, $value);
             }
         }
-        if ($printRequest->getArgument('follow') !== null
-            || $printRequest->getArgument('follow-only') !== null
-        ) {
-            throw new NotSupportedException(
-                'The "follow" and "follow-only" arguments are prohibited',
-                NotSupportedException::CODE_ARG_PROHIBITED
-            );
+        
+        foreach (array('follow', 'follow-only', 'count-only') as $arg) {
+            if ($printRequest->getArgument($arg) !== null) {
+                throw new NotSupportedException(
+                    "The argument '{$arg}' was specified, but is prohibited",
+                    NotSupportedException::CODE_ARG_PROHIBITED,
+                    null,
+                    $arg
+                );
+            }
         }
         $responses = $this->client->sendSync($printRequest);
 

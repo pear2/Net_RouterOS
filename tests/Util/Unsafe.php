@@ -199,115 +199,6 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function testSetAndEdit()
-    {
-        $this->util->setMenu('/queue/simple');
-        $id = $this->util->add(
-            array(
-                'name' => TEST_QUEUE_NAME,
-                'target' => HOSTNAME_SILENT . '/32'
-            )
-        );
-
-        $printRequest = new Request(
-            '/queue/simple/print',
-            Query::where('.id', $id)
-        );
-
-        $responses = $this->client->sendSync($printRequest);
-        $this->assertSame(
-            HOSTNAME_SILENT . '/32',
-            $responses->getProperty('target')
-        );
-        $this->assertNotSame(
-            'true',
-            $responses->getProperty('disabled')
-        );
-
-        $this->util->set(
-            $id,
-            array(
-                'target' => HOSTNAME_INVALID . '/32',
-                'disabled'
-            )
-        );
-
-        $responses = $this->client->sendSync($printRequest);
-        $this->assertSame(
-            HOSTNAME_INVALID . '/32',
-            $responses->getProperty('target')
-        );
-        $this->assertSame(
-            'true',
-            $responses->getProperty('disabled')
-        );
-
-        $this->util->edit(
-            $id,
-            array(
-                'target' => HOSTNAME_SILENT . '/32'
-            )
-        );
-
-        $responses = $this->client->sendSync($printRequest);
-        $this->assertSame(
-            HOSTNAME_SILENT . '/32',
-            $responses->getProperty('target')
-        );
-        $this->assertSame(
-            'true',
-            $responses->getProperty('disabled')
-        );
-
-        $this->util->remove($id);
-    }
-    
-    /**
-     * @depends testSetAndEdit
-     */
-    public function testGetCurrentTime()
-    {
-        $originalTimezone = $this->util->setMenu('/system clock')
-            ->get(null, 'time-zone-name');
-        $originalTimezoneAutodetect = $this->util
-            ->get(null, 'time-zone-autodetect');
-        
-        $this->util->set(
-            null,
-            array(
-                'time-zone-autodetect' => 'false',
-                'time-zone-name' => TEST_TIMEZONE
-            )
-        );
-        $curTime = $this->util->setMenu('/')->getCurrentTime();
-        $this->assertInstanceOf(
-            'DateTime',
-             $curTime
-        );
-        $this->assertSame(TEST_TIMEZONE, $curTime->getTimezone()->getName());
-        
-        $this->util->setMenu('/system clock')
-            ->set(null, array('time-zone-name' => 'manual'));
-        $curTimeInManual = $this->util->setMenu('/')->getCurrentTime();
-        $this->assertNotSame(
-            TEST_TIMEZONE,
-            $curTimeInManual->getTimezone()->getName()
-        );
-        
-        $this->util->setMenu('/system clock')->set(
-            null,
-            array(
-                'time-zone-name' => $originalTimezone,
-                'time-zone-autodetect' => $originalTimezoneAutodetect
-            )
-        );
-    }
-
-    /**
-     * @depends testRemove
-     *
-     * @return void
-     */
     public function testComment()
     {
         $this->util->setMenu('/queue/simple');
@@ -442,6 +333,108 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
         $this->assertSame($value, $targetBefore);
         $this->assertNull($targetAfter);
+    }
+
+    /**
+     * @depends testRemove
+     * @depends testUnsetValue
+     *
+     * @return void
+     */
+    public function testSetAndEdit()
+    {
+        $this->util->setMenu('/queue/simple');
+        $id = $this->util->add(
+            array(
+                'name' => TEST_QUEUE_NAME,
+                'target' => HOSTNAME_SILENT . '/32'
+            )
+        );
+
+        $printRequest = new Request(
+            '/queue/simple/print',
+            Query::where('.id', $id)
+        );
+
+        $responses = $this->client->sendSync($printRequest);
+        $this->assertNotSame('true', $responses->getProperty('disabled'));
+        $this->assertSame(
+            HOSTNAME_SILENT . '/32',
+            $responses->getProperty('target')
+        );
+
+        $this->util->set(
+            $id,
+            array(
+                'target' => HOSTNAME_INVALID . '/32',
+                'disabled'
+            )
+        );
+
+        $responses = $this->client->sendSync($printRequest);
+        $this->assertSame('true', $responses->getProperty('disabled'));
+        $this->assertSame(
+            HOSTNAME_INVALID . '/32',
+            $responses->getProperty('target')
+        );
+
+        $this->util->edit($id, 'target', HOSTNAME_SILENT . '/32');
+
+        $responses = $this->client->sendSync($printRequest);
+        $this->assertSame('true', $responses->getProperty('disabled'));
+        $this->assertSame(
+            HOSTNAME_SILENT . '/32',
+            $responses->getProperty('target')
+        );
+
+        $this->util->edit($id, 'target', null);
+
+        $responses = $this->client->sendSync($printRequest);
+        $this->assertSame('true', $responses->getProperty('disabled'));
+        $this->assertSame(null, $responses->getProperty('target'));
+
+        $this->util->remove($id);
+    }
+    
+    /**
+     * @depends testSetAndEdit
+     */
+    public function testGetCurrentTime()
+    {
+        $originalTimezone = $this->util->setMenu('/system clock')
+            ->get(null, 'time-zone-name');
+        $originalTimezoneAutodetect = $this->util
+            ->get(null, 'time-zone-autodetect');
+        
+        $this->util->set(
+            null,
+            array(
+                'time-zone-autodetect' => 'false',
+                'time-zone-name' => TEST_TIMEZONE
+            )
+        );
+        $curTime = $this->util->setMenu('/')->getCurrentTime();
+        $this->assertInstanceOf(
+            'DateTime',
+             $curTime
+        );
+        $this->assertSame(TEST_TIMEZONE, $curTime->getTimezone()->getName());
+        
+        $this->util->setMenu('/system clock')
+            ->set(null, array('time-zone-name' => 'manual'));
+        $curTimeInManual = $this->util->setMenu('/')->getCurrentTime();
+        $this->assertNotSame(
+            TEST_TIMEZONE,
+            $curTimeInManual->getTimezone()->getName()
+        );
+        
+        $this->util->setMenu('/system clock')->set(
+            null,
+            array(
+                'time-zone-name' => $originalTimezone,
+                'time-zone-autodetect' => $originalTimezoneAutodetect
+            )
+        );
     }
 
     /**

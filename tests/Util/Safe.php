@@ -251,8 +251,9 @@ abstract class Safe extends PHPUnit_Framework_TestCase
     public function providerProhibitedArgs()
     {
         return array(
-            0 => array(array('follow')),
-            1 => array(array('follow-only'))
+            'follow'        => array(array('follow'), 0),
+            'follow-only'   => array(array('follow-only'), 0),
+            'count-only'    => array(array('count-only'), 0)
         );
     }
 
@@ -263,13 +264,14 @@ abstract class Safe extends PHPUnit_Framework_TestCase
      *
      * @dataProvider providerProhibitedArgs
      */
-    public function testGetallArgExceptions(array $args)
+    public function testGetallArgExceptions(array $args, $argKey)
     {
         $this->util->setMenu('/queue simple');
         try {
             $this->util->getAll($args);
             $this->fail('Supplying these arguments should result in an exception');
         } catch (NotSupportedException $e) {
+            $this->assertSame($args[$argKey], $e->getValue());
             $this->assertSame(
                 NotSupportedException::CODE_ARG_PROHIBITED,
                 $e->getCode()
