@@ -29,6 +29,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
     public function testSetGetMenu()
     {
         $this->assertSame('/', $this->util->getMenu());
+        $this->assertSame('/', $this->util->setMenu('/')->getMenu());
         $this->assertSame(
             '/queue',
             $this->util->setMenu('queue')->getMenu()

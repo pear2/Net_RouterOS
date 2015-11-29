@@ -261,6 +261,47 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
         $this->util->remove($id);
     }
+    
+    /**
+     * @depends testSetAndEdit
+     */
+    public function testGetCurrentTime()
+    {
+        $originalTimezone = $this->util->setMenu('/system clock')
+            ->get(null, 'time-zone-name');
+        $originalTimezoneAutodetect = $this->util
+            ->get(null, 'time-zone-autodetect');
+        
+        $this->util->set(
+            null,
+            array(
+                'time-zone-autodetect' => 'false',
+                'time-zone-name' => TEST_TIMEZONE
+            )
+        );
+        $curTime = $this->util->setMenu('/')->getCurrentTime();
+        $this->assertInstanceOf(
+            'DateTime',
+             $curTime
+        );
+        $this->assertSame(TEST_TIMEZONE, $curTime->getTimezone()->getName());
+        
+        $this->util->setMenu('/system clock')
+            ->set(null, array('time-zone-name' => 'manual'));
+        $curTimeInManual = $this->util->setMenu('/')->getCurrentTime();
+        $this->assertNotSame(
+            TEST_TIMEZONE,
+            $curTimeInManual->getTimezone()->getName()
+        );
+        
+        $this->util->setMenu('/system clock')->set(
+            null,
+            array(
+                'time-zone-name' => $originalTimezone,
+                'time-zone-autodetect' => $originalTimezoneAutodetect
+            )
+        );
+    }
 
     /**
      * @depends testRemove

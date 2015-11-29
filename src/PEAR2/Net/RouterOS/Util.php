@@ -31,6 +31,11 @@ use DateTime;
 use DateInterval;
 
 /**
+ * Used at {@link Util::getCurrentTime()} to get the proper time.
+ */
+use DateTimeZone;
+
+/**
  * Implemented by this class.
  */
 use Countable;
@@ -86,6 +91,10 @@ class Util implements Countable
      * This method is intended to be the very opposite of
      * {@link static::escapeValue()}. That is, results from that method, if
      * given to this method, should produce equivalent results.
+     * 
+     * For better usefulness, in addition to "actual" RouterOS types, a pseudo
+     * "date" type is also recognized, whenever the string is in the form
+     * "M/j/Y".
      *
      * @param string $value The value to be parsed. Must be a literal of a
      *     value, e.g. what {@link static::escapeValue()} will give you.
@@ -97,6 +106,8 @@ class Util implements Countable
      *     - "time" - a {@link DateInterval} object.
      *     - "array" - an array, with the values processed recursively.
      *     - "str" - a string.
+     *     - "date" (pseudo type) - a DateTime object with the specified date,
+     *         at midnight UTC time.
      *     - Unrecognized type - treated as an unquoted string.
      */
     public static function parseValue($value)
@@ -169,13 +180,13 @@ class Util implements Countable
                 return new DateInterval(
                     "P{$days}DT{$time[3]}H{$time[4]}M{$secondsSpec}S"
                 );
-            //@codeCoverageIgnoreStart
-            // See previous ignored section's note.
-            // 
-            // This section is added for backwards compatibility with current
-            // PHP versions, when in the future sub-second support is added.
-            // In that event, the test inputs for older versions will be
-            // expected to get a rounded up result of the sub-second data.
+                //@codeCoverageIgnoreStart
+                // See previous ignored section's note.
+                // 
+                // This section is added for backwards compatibility with current
+                // PHP versions, when in the future sub-second support is added.
+                // In that event, the test inputs for older versions will be
+                // expected to get a rounded up result of the sub-second data.
             } catch (E $e) {
                 $secondsSpec = (int)round($secondsSpec);
                 return new DateInterval(
@@ -183,6 +194,26 @@ class Util implements Countable
                 );
             }
             //@codeCoverageIgnoreEnd
+        } elseif (preg_match(
+            '#^
+                (jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)
+                /
+                (\d\d?)
+                /
+                (\d{4})
+            $#uix',
+            $value,
+            $date
+        )) {
+            try {
+                return DateTime::createFromFormat(
+                    'M/j/Y',
+                    ucfirst($date[1]) . '/' . (int)$date[2] . '/' . $date[3],
+                    new DateTimeZone('UTC')
+                );
+            } catch (E $e) {
+                return $value;
+            }
         } elseif (('"' === $value[0]) && substr(strrev($value), 0, 1) === '"') {
             return str_replace(
                 array('\"', '\\\\', "\\\n", "\\\r\n", "\\\r"),
@@ -500,7 +531,9 @@ class Util implements Countable
         $newMenu = (string)$newMenu;
         if ('' !== $newMenu) {
             $menuRequest = new Request('/menu');
-            if ('/' === $newMenu[0]) {
+            if ('/' === $newMenu) {
+                $this->menu = '/';
+            } elseif ('/' === $newMenu[0]) {
                 $this->menu = $menuRequest->setCommand($newMenu)->getCommand();
             } else {
                 $this->menu = $menuRequest->setCommand(
@@ -637,6 +670,39 @@ class Util implements Countable
     {
         $this->idCache = null;
         return $this;
+    }
+
+    /**
+     * Gets the current time on the router.
+     * 
+     * Gets the current time on the router, regardless of the current menu.
+     * 
+     * If your router uses a "manual" timezone, the resulting object will use
+     * the "gmt-offset" as the timezone identifier.
+     * 
+     * @return DateTime The current time of the router, as a DateTime object.
+     */
+    public function getCurrentTime()
+    {
+        $clock = $this->client->sendSync(
+            new Request('/system/clock/print')
+        )->current();
+        $datetime = ucfirst($clock->getProperty('date')) . ' ' .
+            $clock->getProperty('time');
+        if ('manual' === $clock->getProperty('time-zone-name')) {
+            $result = DateTime::createFromFormat(
+                'M/j/Y H:i:s P',
+                $datetime . ' ' . $clock->getProperty('gmt-offset'),
+                new DateTimeZone('UTC')
+            );
+        } else {
+            $result = DateTime::createFromFormat(
+                'M/j/Y H:i:s',
+                $datetime,
+                new DateTimeZone($clock->getProperty('time-zone-name'))
+            );
+        }
+        return $result;
     }
 
     /**

@@ -117,6 +117,12 @@
         -->
         <const name="TEST_FILE_NAME" value="API_TEST.txt" />
 
+        <!--
+        A name for a test timezone. It should be a name not in use by the
+        router or server, but not necesarily, and must NOT be UTC.
+        -->
+        <const name="TEST_TIMEZONE" value="Europe/Sofia" />
+
     </php>
     <testsuites>
         <testsuite name="All Tests">
