@@ -196,19 +196,26 @@ class Util implements Countable
             //@codeCoverageIgnoreEnd
         } elseif (preg_match(
             '#^
-                (jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)
+                (?<mon>jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)
                 /
-                (\d\d?)
+                (?<day>\d\d?)
                 /
-                (\d{4})
+                (?<year>\d{4})
+                (?:
+                    \s+(?<time>\d{2}\:\d{2}:\d{2})
+                )?
             $#uix',
             $value,
             $date
         )) {
             try {
+                if (!isset($date['time'])) {
+                    $date['time'] = '00:00:00';
+                }
                 return DateTime::createFromFormat(
-                    'M/j/Y',
-                    ucfirst($date[1]) . '/' . (int)$date[2] . '/' . $date[3],
+                    'M/j/Y H:i:s',
+                    ucfirst($date['mon']) . '/' . (int)$date['day'] .
+                    "/{$date['year']} {$date['time']}",
                     new DateTimeZone('UTC')
                 );
             } catch (E $e) {
@@ -677,8 +684,9 @@ class Util implements Countable
      * 
      * Gets the current time on the router, regardless of the current menu.
      * 
-     * If your router uses a "manual" timezone, the resulting object will use
-     * the "gmt-offset" as the timezone identifier.
+     * If the timezone is one known to both RouterOS and PHP, it will be used
+     * as the timezone identifier. Otherwise (e.g. "manual"), the current GMT
+     * offset will be used as a timezone, without any DST awareness.
      * 
      * @return DateTime The current time of the router, as a DateTime object.
      */
@@ -687,19 +695,19 @@ class Util implements Countable
         $clock = $this->client->sendSync(
             new Request('/system/clock/print')
         )->current();
-        $datetime = ucfirst($clock->getProperty('date')) . ' ' .
+        $datetime = ucfirst(strtolower($clock->getProperty('date'))) . ' ' .
             $clock->getProperty('time');
-        if ('manual' === $clock->getProperty('time-zone-name')) {
-            $result = DateTime::createFromFormat(
-                'M/j/Y H:i:s P',
-                $datetime . ' ' . $clock->getProperty('gmt-offset'),
-                new DateTimeZone('UTC')
-            );
-        } else {
+        try {
             $result = DateTime::createFromFormat(
                 'M/j/Y H:i:s',
                 $datetime,
                 new DateTimeZone($clock->getProperty('time-zone-name'))
+            );
+        } catch (E $e) {
+            $result = DateTime::createFromFormat(
+                'M/j/Y H:i:s P',
+                $datetime . ' ' . $clock->getProperty('gmt-offset'),
+                new DateTimeZone('UTC')
             );
         }
         return $result;
