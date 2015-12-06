@@ -208,14 +208,14 @@ class Util implements Countable
             $value,
             $date
         )) {
+            if (!isset($date['time'])) {
+                $date['time'] = '00:00:00';
+            }
             try {
-                if (!isset($date['time'])) {
-                    $date['time'] = '00:00:00';
-                }
-                return DateTime::createFromFormat(
-                    'M/j/Y H:i:s',
-                    ucfirst($date['mon']) . '/' . (int)$date['day'] .
-                    "/{$date['year']} {$date['time']}",
+                return new DateTime(
+                    $date['year'] .
+                    '-' . ucfirst($date['mon']) .
+                    "-{$date['day']} {$date['time']}",
                     new DateTimeZone('UTC')
                 );
             } catch (E $e) {
@@ -693,20 +693,37 @@ class Util implements Countable
     public function getCurrentTime()
     {
         $clock = $this->client->sendSync(
-            new Request('/system/clock/print')
+            new Request(
+                '/system/clock/print 
+                .proplist=date,time,time-zone-name,gmt-offset'
+            )
         )->current();
-        $datetime = ucfirst(strtolower($clock->getProperty('date'))) . ' ' .
-            $clock->getProperty('time');
+        $clockParts = array();
+        foreach (array(
+            'date',
+            'time',
+            'time-zone-name',
+            'gmt-offset'
+        ) as $clockPart) {
+            $clockParts[$clockPart] = $clock->getProperty($clockPart);
+            if (is_resource($clockParts[$clockPart])) {
+                $clockParts[$clockPart] = stream_get_contents(
+                    $clockParts[$clockPart]
+                );
+            }
+        }
+        $datetime = ucfirst(strtolower($clockParts['date'])) . ' ' .
+            $clockParts['time'];
         try {
             $result = DateTime::createFromFormat(
                 'M/j/Y H:i:s',
                 $datetime,
-                new DateTimeZone($clock->getProperty('time-zone-name'))
+                new DateTimeZone($clockParts['time-zone-name'])
             );
         } catch (E $e) {
             $result = DateTime::createFromFormat(
                 'M/j/Y H:i:s P',
-                $datetime . ' ' . $clock->getProperty('gmt-offset'),
+                $datetime . ' ' . $clockParts['gmt-offset'],
                 new DateTimeZone('UTC')
             );
         }
@@ -762,18 +779,25 @@ class Util implements Countable
             if ($criteria instanceof Query) {
                 foreach ($this->client->sendSync(
                     new Request($this->menu . '/print .proplist=.id', $criteria)
-                ) as $response) {
-                    $idList .= $response->getProperty('.id') . ',';
+                )->getAllOfType(Response::TYPE_DATA) as $response) {
+                    $newId = $response->getProperty('.id');
+                    $idList .= is_string($newId)
+                        ? $newId . ','
+                        : stream_get_contents($newId) . ',';
                 }
             } elseif (is_callable($criteria)) {
                 $idCache = array();
                 foreach ($this->client->sendSync(
                     new Request($this->menu . '/print')
-                ) as $response) {
+                )->getAllOfType(Response::TYPE_DATA) as $response) {
+                    $newId = $response->getProperty('.id');
+                    $newId = is_string($newId)
+                        ? $newId
+                        : stream_get_contents($newId);
                     if ($criteria($response)) {
-                        $idList .= $response->getProperty('.id') . ',';
+                        $idList .= $newId . ',';
                     }
-                    $idCache[] = $response->getProperty('.id');
+                    $idCache[] = $newId;
                 }
                 $this->idCache = $idCache;
             } else {

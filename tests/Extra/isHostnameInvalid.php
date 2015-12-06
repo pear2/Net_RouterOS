@@ -30,7 +30,9 @@ use PEAR2\Net\RouterOS\Test\Util as Test;
  */
 function isHostnameInvalid(Response $item)
 {
-    return $item->getProperty(
-        'target'
-    ) === Test\HOSTNAME_INVALID . '/32';
+    $target = $item->getProperty('target');
+    if (!is_string($target)) {
+        $target = stream_get_contents($target);
+    }
+    return $target === Test\HOSTNAME_INVALID . '/32';
 }

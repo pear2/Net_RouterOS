@@ -135,10 +135,35 @@ abstract class Safe extends PHPUnit_Framework_TestCase
                 Query::where('target', HOSTNAME_INVALID . '/32')
             )
         );
+
+        $this->client->setStreamingResponses(true);
+        $this->util->setMenu('/queue/simple');
+        $this->assertRegExp(
+            '/^' . self::REGEX_ID . '$/',
+            $this->util->find(
+                Query::where('target', HOSTNAME_INVALID . '/32')
+            )
+        );
     }
 
     public function testFindNoCriteria()
     {
+        $this->util->setMenu('/queue/simple');
+        $findResults = $this->util->find();
+        $this->assertRegExp(
+            self::REGEX_IDLIST,
+            $findResults
+        );
+        $this->assertSame(
+            count(explode(',', $findResults)),
+            count(
+                $this->client->sendSync(
+                    new Request('/queue/simple/print')
+                )->getAllOfType(Response::TYPE_DATA)
+            )
+        );
+
+        $this->client->setStreamingResponses(true);
         $this->util->setMenu('/queue/simple');
         $findResults = $this->util->find();
         $this->assertRegExp(
@@ -178,9 +203,34 @@ abstract class Safe extends PHPUnit_Framework_TestCase
                 )
             )->getProperty('.id')
         );
+
+        $this->client->setStreamingResponses(true);
+        $this->util->setMenu('/queue/simple');
+        $findResults = $this->util->find(
+            function ($entry) {
+                return stream_get_contents(
+                    $entry->getProperty('target')
+                ) === HOSTNAME_INVALID . '/32';
+            }
+        );
+        $this->assertRegExp(
+            '/^' . self::REGEX_ID . '$/',
+            $findResults
+        );
+        $this->assertSame(
+            $findResults,
+            stream_get_contents(
+                $this->client->sendSync(
+                    new Request(
+                        '/queue/simple/print',
+                        Query::where('target', HOSTNAME_INVALID . '/32')
+                    )
+                )->getProperty('.id')
+            )
+        );
     }
     
-    public function testByCallbackName()
+    public function testFindByCallbackName()
     {
         include_once __DIR__ . '/../Extra/isHostnameInvalid.php';
 
@@ -199,6 +249,25 @@ abstract class Safe extends PHPUnit_Framework_TestCase
                 )
             )->getProperty('.id')
         );
+
+        $this->client->setStreamingResponses(true);
+        $this->util->setMenu('/queue/simple');
+        $findResults = $this->util->find('isHostnameInvalid');
+        $this->assertRegExp(
+            '/^' . self::REGEX_ID . '$/',
+            $findResults
+        );
+        $this->assertSame(
+            $findResults,
+            stream_get_contents(
+                $this->client->sendSync(
+                    new Request(
+                        '/queue/simple/print',
+                        Query::where('target', HOSTNAME_INVALID . '/32')
+                    )
+                )->getProperty('.id')
+            )
+        );
     }
 
     public function testFindById()
@@ -209,6 +278,13 @@ abstract class Safe extends PHPUnit_Framework_TestCase
                 Query::where('target', HOSTNAME_INVALID . '/32')
             )
         );
+
+        $this->assertSame(
+            $originalResult->getProperty('.id'),
+            $this->util->find($originalResult->getProperty('.id'))
+        );
+
+        $this->client->setStreamingResponses(true);
         $this->assertSame(
             $originalResult->getProperty('.id'),
             $this->util->find($originalResult->getProperty('.id'))
@@ -231,10 +307,33 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             $findResults
         );
         $this->assertCount(2, explode(',', $findResults));
+
+
+        $this->client->setStreamingResponses(true);
+        $this->util->setMenu('/queue/simple');
+        $findResults = $this->util->find('0,1');
+        $this->assertRegExp(
+            self::REGEX_IDLIST,
+            $findResults
+        );
+        $this->assertCount(2, explode(',', $findResults));
+
+        $findResults = $this->util->find('0,,1');
+        $this->assertRegExp(
+            self::REGEX_IDLIST,
+            $findResults
+        );
+        $this->assertCount(2, explode(',', $findResults));
     }
 
     public function testGetallAndCount()
     {
+        $this->util->setMenu('/queue/simple');
+        $queues = $this->util->getAll();
+        $this->assertInstanceOf(ROS_NAMESPACE . '\ResponseCollection', $queues);
+        $this->assertSameSize($queues, $this->util);
+
+        $this->client->setStreamingResponses(true);
         $this->util->setMenu('/queue/simple');
         $queues = $this->util->getAll();
         $this->assertInstanceOf(ROS_NAMESPACE . '\ResponseCollection', $queues);

@@ -3,7 +3,8 @@
 namespace PEAR2\Net\RouterOS\Test\Misc;
 
 use DateInterval;
-use PEAR2\Net\RouterOS\Client;
+use DateTime;
+use DateTimeZone;
 use PEAR2\Net\RouterOS\Communicator;
 use PEAR2\Net\RouterOS\InvalidArgumentException;
 use PEAR2\Net\RouterOS\LengthException;
@@ -1035,6 +1036,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             '1w2m3s'                => array('1w2m3s', new DateInterval('P7DT2M3S')),
             '1w2h3m4s'              => array('1w2h3m4s', new DateInterval('P7DT2H3M4S')),
             '1w2d3h4m5s'            => array('1w2d3h4m5s', new DateInterval('P9DT3H4M5S')),
+            'Dec/21/2012'           => array('Dec/21/2012', new DateTime('2012-12-21 00:00:00', new DateTimeZone('UTC'))),
+            'Dec/21/2012 12:34:56'  => array('Dec/21/2012 12:34:56', new DateTime('2012-12-21 12:34:56', new DateTimeZone('UTC'))),
+            'Dec/99/9999 99:99:99'  => array('Dec/99/9999 99:99:99', 'Dec/99/9999 99:99:99'),
             '{}'                    => array('{}', array()),
             '{a}'                   => array('{a}', array('a')),
             '{1;2}'                 => array('{1;2}', array(1, 2)),

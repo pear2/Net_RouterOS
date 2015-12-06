@@ -10,5 +10,6 @@ Util stuff, mostly.
 * Util::parseValue() now recognizes dates in the "M/j/Y H:i:s" format (used across RouterOS), and turns that into a DateTime object for that time (or midnight if the time part is omitted) in UTC.
 * Util::getAll() now throws a NotSupportedException if the arguments "follow", "follow-only" or "count-only" are used. The first two, because PHP would hang (since Client::sendSync() is used under the hood), and the last one because it's unredable in the returned output (use Util::count() instead).
 * Util::setMenu() can now go back to the root menu.
+* Util::find() now works even when the underlying Client streams responses.
 * Client::login() consumes the !done or !fatal response even when called on an already logged in connection.
 * The console now checks whether PEAR2_CommandLine is installed, ensuring better error messages when this package is installed without its optional dependencies.

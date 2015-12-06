@@ -436,6 +436,12 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             )
         );
     }
+    
+    public function testGetCurrentTimeFromStreamClient()
+    {
+        $this->client->setStreamingResponses(true);
+        $this->testGetCurrentTime();
+    }
 
     /**
      * @depends testRemove
