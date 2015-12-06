@@ -992,12 +992,12 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
         return array(
             //// This will be moved into a separate "legacy" test,
             //// once PHP supports fractional secons in DateInterval...
-            //'legacy sub-second' => array(
+            //'0s1ms2us3ns' => array(
             //    '0s1ms2us3ns',
             //    new DateInterval('PT0S')
             //),
             //// ...and this will be moved to a separate "current" test.
-            //'current sub-secong' => array(
+            //'0s1ms2us3ns' => array(
             //    '0s1ms2us3ns',
             //    new DateInterval('PT0.001002003S')
             //),

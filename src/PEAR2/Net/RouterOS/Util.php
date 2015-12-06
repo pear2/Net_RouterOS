@@ -381,11 +381,11 @@ class Util implements Countable
      * Turns any native PHP value into an equivalent whole value that can be
      * inserted as part of a RouterOS script.
      *
-     * DateTime and DateInterval objects will be casted to RouterOS' "time"
-     * type. A DateTime object will be converted to a time relative to the UNIX
-     * epoch time. Note that if a DateInterval does not have the "days" property
-     * ("a" in formatting), then its months and years will be ignored, because
-     * they can't be unambiguously converted to a "time" value.
+     * DateInterval objects will be casted to RouterOS' "time" type.
+     * 
+     * DateTime objects will be casted to a string following the "M/d/Y H:i:s"
+     * format. If the time is exactly midnight (including microseconds), and
+     * the timezone is UTC, the string will include only the "M/d/Y" date.
      *
      * Unrecognized types (i.e. resources and other objects) are casted to
      * strings.
@@ -425,20 +425,16 @@ class Util implements Countable
         case 'object':
             if ($value instanceof DateTime) {
                 $usec = $value->format('u');
-                if ('000000' === $usec) {
-                    unset($usec);
-                }
-                $unixEpoch = new DateTime('@0');
-                $value = $unixEpoch->diff($value);
+                $usec = '000000' === $usec ? '' : '.' . $usec;
+                $value = '00:00:00.000000 UTC' === $value->format('H:i:s.u e')
+                    ? $value->format('M/d/Y')
+                    : $value->format('M/d/Y H:i:s') . $usec;
             }
             if ($value instanceof DateInterval) {
                 if (false === $value->days || $value->days < 0) {
                     $value = $value->format('%r%dd%H:%I:%S');
                 } else {
                     $value = $value->format('%r%ad%H:%I:%S');
-                }
-                if (strpos('.', $value) === false && isset($usec)) {
-                    $value .= '.' . $usec;
                 }
                 break;
             }
@@ -706,7 +702,7 @@ class Util implements Countable
             'gmt-offset'
         ) as $clockPart) {
             $clockParts[$clockPart] = $clock->getProperty($clockPart);
-            if (is_resource($clockParts[$clockPart])) {
+            if (Stream::isStream($clockParts[$clockPart])) {
                 $clockParts[$clockPart] = stream_get_contents(
                     $clockParts[$clockPart]
                 );

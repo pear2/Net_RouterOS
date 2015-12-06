@@ -581,7 +581,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('time', $results->getProperty('comment'));
+        $this->assertSame('str', $results->getProperty('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=[:typeof $comment]',
@@ -738,7 +738,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('00:00:00.000001', $results->getProperty('comment'));
+        $this->assertSame('Jan/01/1970 00:00:00.000001', $results->getProperty('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=$comment',
@@ -755,14 +755,50 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('1d00:00:01', $results->getProperty('comment'));
+        $this->assertSame('Jan/02/1970 00:00:01', $results->getProperty('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=$comment',
             array(
                 'name' => TEST_QUEUE_NAME,
                 'comment' => new DateTime(
-                    '1970-01-10 01:02:03',
+                    '1970-01-10 00:00:00',
+                    new DateTimezone(TEST_TIMEZONE)
+                )
+            )
+        );
+        $results = $this->client->sendSync(
+            $printRequest
+        )->getAllOfType(Response::TYPE_DATA);
+        $this->util->remove(TEST_QUEUE_NAME);
+        $this->assertCount(1, $results);
+        $this->assertSame('Jan/10/1970 00:00:00', $results->getProperty('comment'));
+
+        $datePrime = new DateTime(
+            '1970-01-10 12:34:56',
+            new DateTimezone('UTC')
+        );
+        $unixEpoch = new DateTime('@0', new DateTimezone('UTC'));
+        $this->util->exec(
+            'add name=$name target=0.0.0.0/0 comment=$comment',
+            array(
+                'name' => TEST_QUEUE_NAME,
+                'comment' => $unixEpoch->diff($datePrime)
+            )
+        );
+        $results = $this->client->sendSync(
+            $printRequest
+        )->getAllOfType(Response::TYPE_DATA);
+        $this->util->remove(TEST_QUEUE_NAME);
+        $this->assertCount(1, $results);
+        $this->assertSame('1w2d12:34:56', $results->getProperty('comment'));
+
+        $this->util->exec(
+            'add name=$name target=0.0.0.0/0 comment=$comment',
+            array(
+                'name' => TEST_QUEUE_NAME,
+                'comment' => new DateTime(
+                    '1970-01-02 00:00:00',
                     new DateTimezone('UTC')
                 )
             )
@@ -772,7 +808,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         )->getAllOfType(Response::TYPE_DATA);
         $this->util->remove(TEST_QUEUE_NAME);
         $this->assertCount(1, $results);
-        $this->assertSame('1w2d01:02:03', $results->getProperty('comment'));
+        $this->assertSame('Jan/02/1970', $results->getProperty('comment'));
 
         $this->util->exec(
             'add name=$name target=0.0.0.0/0 comment=$comment',
