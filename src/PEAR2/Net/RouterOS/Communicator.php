@@ -91,24 +91,25 @@ class Communicator
     /**
      * Creates a new connection with the specified options.
      *
-     * @param string   $host    Hostname (IP or domain) of the RouterOS server.
-     * @param int|null $port    The port on which the RouterOS server provides
-     *     the API service. You can also specify NULL, in which case the port
-     *     will automatically be chosen between 8728 and 8729, depending on the
-     *     value of $crypto.
-     * @param bool     $persist Whether or not the connection should be a
+     * @param string        $host    Hostname (IP or domain) of RouterOS.
+     * @param int|null      $port    The port on which the RouterOS host
+     *     provides the API service. You can also specify NULL, in which case
+     *     the port will automatically be chosen between 8728 and 8729,
+     *     depending on the value of $crypto.
+     * @param bool          $persist Whether or not the connection should be a
      *     persistent one.
-     * @param float    $timeout The timeout for the connection.
-     * @param string   $key     A string that uniquely identifies the
+     * @param double|null   $timeout The timeout for the connection.
+     * @param string        $key     A string that uniquely identifies the
      *     connection.
-     * @param string   $crypto  The encryption for this connection. Must be one
-     *     of the PEAR2\Net\Transmitter\NetworkStream::CRYPTO_* constants. Off
-     *     by default. RouterOS currently supports only TLS, but the setting is
-     *     provided in this fashion for forward compatibility's sake. And for
-     *     the sake of simplicity, if you specify an encryption, don't specify a
-     *     context and your default context uses the value "DEFAULT" for
-     *     ciphers, "ADH" will be automatically added to the list of ciphers.
-     * @param resource $context A context for the socket.
+     * @param string        $crypto  The encryption for this connection.
+     *     Must be one of the PEAR2\Net\Transmitter\NetworkStream::CRYPTO_*
+     *     constants. Off by default. RouterOS currently supports only TLS, but
+     *     the setting is provided in this fashion for forward compatibility's
+     *     sake. And for the sake of simplicity, if you specify an encryption,
+     *     don't specify a context and your default context uses the value
+     *     "DEFAULT" for ciphers, "ADH" will be automatically added to the list
+     *     of ciphers.
+     * @param resource|null $context A context for the socket.
      *
      * @see sendWord()
      */
@@ -176,8 +177,8 @@ class Communicator
      * function. Depending on the argument given, one of the other functions in
      * the class is invoked and its returned value is returned by this function.
      *
-     * @param string $string A string of the word to send, or NULL to get the
-     *     next word as a string.
+     * @param string|null $string A string of the word to send, or NULL to get
+     *     the next word as a string.
      *
      * @return int|string If a string is provided, returns the number of bytes
      *     sent, otherwise returns the next word as a string.

@@ -76,14 +76,14 @@ class Response extends Message
     /**
      * Extracts a new response from a communicator.
      *
-     * @param Communicator $com       The communicator from which to extract
+     * @param Communicator  $com       The communicator from which to extract
      *     the new response.
-     * @param bool         $asStream  Whether to populate the argument values
+     * @param bool          $asStream  Whether to populate the argument values
      *     with streams instead of strings.
-     * @param int          $sTimeout  If a response is not immediately
+     * @param int           $sTimeout  If a response is not immediately
      *     available, wait this many seconds. If NULL, wait indefinitely.
-     * @param int          $usTimeout Microseconds to add to the waiting time.
-     * @param Registry     $reg       An optional registry to sync the
+     * @param int|null      $usTimeout Microseconds to add to the waiting time.
+     * @param Registry|null $reg       An optional registry to sync the
      *     response with.
      *
      * @see getType()
@@ -154,7 +154,7 @@ class Response extends Message
      *     available, wait this many seconds. If NULL, wait indefinitely.
      *     Note that if an empty sentence is received, the timeout will be
      *     reset for another sentence receiving.
-     * @param int          $usTimeout Microseconds to add to the waiting time.
+     * @param int|null     $usTimeout Microseconds to add to the waiting time.
      *
      * @return void
      */

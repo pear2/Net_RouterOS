@@ -50,10 +50,10 @@ class Request extends Message
     /**
      * Creates a request to send to RouterOS.
      *
-     * @param string $command The command to send. Can also contain arguments
-     *     expressed in a shell-like syntax.
-     * @param Query  $query   A query to associate with the request.
-     * @param string $tag     The tag for the request.
+     * @param string      $command The command to send.
+     *     Can also contain arguments expressed in a shell-like syntax.
+     * @param Query|null  $query   A query to associate with the request.
+     * @param string|null $tag     The tag for the request.
      *
      * @see setCommand()
      * @see setArgument()
@@ -177,8 +177,8 @@ class Request extends Message
     /**
      * Sets the query to send with the command.
      *
-     * @param Query $query The query to be set. Setting NULL will remove the
-     *     currently associated query.
+     * @param Query|null $query The query to be set.
+     *     Setting NULL will remove the  currently associated query.
      *
      * @return $this The request object.
      *
@@ -193,7 +193,7 @@ class Request extends Message
     /**
      * Gets the currently associated query
      *
-     * @return Query The currently associated query.
+     * @return Query|null The currently associated query.
      *
      * @see setQuery()
      */
@@ -208,7 +208,7 @@ class Request extends Message
      * Sets the tag to associate the request with. Setting NULL erases the
      * currently set tag.
      *
-     * @param string $tag The tag to set.
+     * @param string|null $tag The tag to set.
      *
      * @return $this The request object.
      *
@@ -269,8 +269,8 @@ class Request extends Message
     /**
      * Sends a request over a communicator.
      *
-     * @param Communicator $com The communicator to send the request over.
-     * @param Registry     $reg An optional registry to sync the request with.
+     * @param Communicator  $com The communicator to send the request over.
+     * @param Registry|null $reg An optional registry to sync the request with.
      *
      * @return int The number of bytes sent.
      *

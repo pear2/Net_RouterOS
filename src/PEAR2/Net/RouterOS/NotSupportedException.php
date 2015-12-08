@@ -52,16 +52,16 @@ class NotSupportedException extends E implements Exception
     /**
      * Creates a new NotSupportedException.
      *
-     * @param string     $message  The Exception message to throw.
-     * @param int        $code     The Exception code.
-     * @param \Exception $previous The previous exception used for the exception
+     * @param string $message  The Exception message to throw.
+     * @param int    $code     The Exception code.
+     * @param E|null $previous The previous exception used for the exception
      *     chaining.
-     * @param mixed      $value    The unsupported value.
+     * @param mixed  $value    The unsupported value.
      */
     public function __construct(
         $message,
         $code = 0,
-        $previous = null,
+        E $previous = null,
         $value = null
     ) {
         parent::__construct($message, $code, $previous);

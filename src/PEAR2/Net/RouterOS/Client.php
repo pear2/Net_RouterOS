@@ -105,24 +105,25 @@ class Client
      * Creates a new instance of a RouterOS API client with the specified
      * settings.
      *
-     * @param string   $host     Hostname (IP or domain) of the RouterOS server.
-     * @param string   $username The RouterOS username.
-     * @param string   $password The RouterOS password.
-     * @param int|null $port     The port on which the RouterOS server provides
-     *     the API service. You can also specify NULL, in which case the port
-     *     will automatically be chosen between 8728 and 8729, depending on the
-     *     value of $crypto.
-     * @param bool     $persist  Whether or not the connection should be a
+     * @param string        $host     Hostname (IP or domain) of RouterOS.
+     * @param string        $username The RouterOS username.
+     * @param string        $password The RouterOS password.
+     * @param int|null      $port     The port on which the RouterOS host
+     *     provides the API service. You can also specify NULL, in which case
+     *     the port will automatically be chosen between 8728 and 8729,
+     *     depending on the value of $crypto.
+     * @param bool          $persist  Whether or not the connection should be a
      *     persistent one.
-     * @param float    $timeout  The timeout for the connection.
-     * @param string   $crypto   The encryption for this connection. Must be one
-     *     of the PEAR2\Net\Transmitter\NetworkStream::CRYPTO_* constants. Off
-     *     by default. RouterOS currently supports only TLS, but the setting is
-     *     provided in this fashion for forward compatibility's sake. And for
-     *     the sake of simplicity, if you specify an encryption, don't specify a
-     *     context and your default context uses the value "DEFAULT" for
-     *     ciphers, "ADH" will be automatically added to the list of ciphers.
-     * @param resource $context  A context for the socket.
+     * @param double|null   $timeout  The timeout for the connection.
+     * @param string        $crypto   The encryption for this connection.
+     *     Must be one of the PEAR2\Net\Transmitter\NetworkStream::CRYPTO_*
+     *     constants. Off by default. RouterOS currently supports only TLS, but
+     *     the setting is provided in this fashion for forward compatibility's
+     *     sake. And for the sake of simplicity, if you specify an encryption,
+     *     don't specify a context and your default context uses the value
+     *     "DEFAULT" for ciphers, "ADH" will be automatically added to the list
+     *     of ciphers.
+     * @param resource|null $context  A context for the socket.
      *
      * @see sendSync()
      * @see sendAsync()
@@ -350,14 +351,15 @@ class Client
     /**
      * Sends a request and waits for responses.
      *
-     * @param Request  $request  The request to send.
-     * @param callback $callback Optional. A function that is to be executed
-     *     when new responses for this request are available. The callback takes
-     *     two parameters. The {@link Response} object as the first, and the
-     *     {@link Client} object as the second one. If the function returns
-     *     TRUE, the request is canceled. Note that the callback may be executed
-     *     one last time after that with a response that notifies about the
-     *     canceling.
+     * @param Request       $request  The request to send.
+     * @param callback|null $callback Optional. A function that is to be
+     *     executed when new responses for this request are available.
+     *     The callback takes two parameters. The {@link Response} object as
+     *     the first, and the {@link Client} object as the second one. If the
+     *     callback returns TRUE, the request is canceled. Note that the
+     *     callback may be executed at least two times after that. Once with a
+     *     {@link Response::TYPE_ERROR} response that notifies about the
+     *     canceling, plus the {@link Response::TYPE_FINAL} response.
      *
      * @return $this The client object.
      *

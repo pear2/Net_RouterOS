@@ -66,8 +66,8 @@ abstract class Message implements IteratorAggregate, Countable
      * function. Depending on the argument given, one of the other functions in
      * the class is invoked and its returned value is returned by this function.
      *
-     * @param string $name The name of an attribute to get the value of, or NULL
-     *     to get the tag.
+     * @param string|null $name The name of an attribute to get the value of,
+     *     or NULL to get the tag.
      *
      * @return string|resource The value of the specified attribute,
      *     or the tag if NULL is provided.

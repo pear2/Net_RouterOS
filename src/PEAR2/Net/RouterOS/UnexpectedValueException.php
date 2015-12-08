@@ -20,7 +20,15 @@
  */
 namespace PEAR2\Net\RouterOS;
 
+/**
+ * The base for this exception.
+ */
 use UnexpectedValueException as U;
+
+/**
+ * Used in $previous.
+ */
+use Exception as E;
 
 /**
  * Exception thrown when encountering an invalid value in a function argument.
@@ -45,16 +53,16 @@ class UnexpectedValueException extends U implements Exception
     /**
      * Creates a new UnexpectedValueException.
      *
-     * @param string     $message  The Exception message to throw.
-     * @param int        $code     The Exception code.
-     * @param \Exception $previous The previous exception used for the exception
+     * @param string $message  The Exception message to throw.
+     * @param int    $code     The Exception code.
+     * @param E|null $previous The previous exception used for the exception
      *     chaining.
-     * @param mixed      $value    The unexpected value.
+     * @param mixed  $value    The unexpected value.
      */
     public function __construct(
         $message,
         $code = 0,
-        $previous = null,
+        E $previous = null,
         $value = null
     ) {
         parent::__construct($message, $code, $previous);

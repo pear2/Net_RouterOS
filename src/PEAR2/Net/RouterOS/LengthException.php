@@ -26,6 +26,11 @@ namespace PEAR2\Net\RouterOS;
 use LengthException as L;
 
 /**
+ * Used in $previous
+ */
+use Exception as E;
+
+/**
  * Exception thrown when there is a problem with a word's length.
  *
  * @category Net
@@ -42,23 +47,23 @@ class LengthException extends L implements Exception
     const CODE_BEYOND_SHEME = 1301;
 
     /**
-     * @var mixed The problematic length.
+     * @var int|double|null The problematic length.
      */
     private $_length;
 
     /**
      * Creates a new LengthException.
      *
-     * @param string     $message  The Exception message to throw.
-     * @param int        $code     The Exception code.
-     * @param \Exception $previous The previous exception used for the exception
-     *     chaining.
-     * @param number     $length   The length.
+     * @param string          $message  The Exception message to throw.
+     * @param int             $code     The Exception code.
+     * @param E|null          $previous The previous exception used for the
+     *     exception chaining.
+     * @param int|double|null $length   The length.
      */
     public function __construct(
         $message,
         $code = 0,
-        $previous = null,
+        E $previous = null,
         $length = null
     ) {
         parent::__construct($message, $code, $previous);
@@ -68,7 +73,7 @@ class LengthException extends L implements Exception
     /**
      * Gets the length.
      *
-     * @return number The length.
+     * @return int|double|null The length.
      */
     public function getLength()
     {

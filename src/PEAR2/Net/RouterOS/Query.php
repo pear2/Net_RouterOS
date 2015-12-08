@@ -74,7 +74,7 @@ class Query
      * This class is not to be instantiated normally, but by static methods
      * instead. Use {@link static::where()} to create an instance of it.
      */
-    private function __construct()
+    protected function __construct()
     {
 
     }
