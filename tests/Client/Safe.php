@@ -1271,8 +1271,8 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             $sortedByMaxLimitDownloadFirst
         );
         $this->assertNotSame(
-            $sortedByMaxLimitFirst,
-            $sortedByMaxLimitDownloadFirst
+            $sortedByMaxLimitLast,
+            $sortedByMaxLimitDownloadLast
         );
     }
 

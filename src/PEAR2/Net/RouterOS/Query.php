@@ -241,6 +241,39 @@ class Query
     }
 
     /**
+     * Verifies the query.
+     * 
+     * Verifies the query against a communicator, i.e. whether the query
+     * could successfully be sent (assuming the connection is still opened).
+     * 
+     * @param Communicator $com The Communicator to check against.
+     * 
+     * @return $this The query object itself.
+     * 
+     * @throws LengthException If the resulting length of an API word is not
+     *     supported.
+     */
+    public function verify(Communicator $com)
+    {
+        foreach ($this->words as $queryWord) {
+            list($predicate, $value) = $queryWord;
+            if (null === $value) {
+                $com::verifyLengthSupport(strlen('?' . $predicate));
+            } elseif (is_string($value)) {
+                $com::verifyLengthSupport(
+                    strlen('?' . $predicate . '=' . $value)
+                );
+            } else {
+                $com::verifyLengthSupport(
+                    strlen('?' . $predicate . '=') +
+                    $com::seekableStreamLength($value)
+                );
+            }
+        }
+        return $this;
+    }
+
+    /**
      * Adds a condition.
      *
      * @param string               $name     The name of the property to test.

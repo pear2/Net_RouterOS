@@ -134,7 +134,8 @@ class Communicator
                     array(
                         'ssl' => array(
                             'ciphers' => 'ADH',
-                            'verify_peer' => false
+                            'verify_peer' => false,
+                            'verify_peer_name' => false
                         )
                     )
                 );
@@ -482,7 +483,7 @@ class Communicator
      *
      * @return void
      */
-    protected static function verifyLengthSupport($length)
+    public static function verifyLengthSupport($length)
     {
         if ($length > 0xFFFFFFFF) {
             throw new LengthException(

@@ -182,7 +182,7 @@ class Util implements Countable
                 );
                 //@codeCoverageIgnoreStart
                 // See previous ignored section's note.
-                // 
+                //
                 // This section is added for backwards compatibility with current
                 // PHP versions, when in the future sub-second support is added.
                 // In that event, the test inputs for older versions will be

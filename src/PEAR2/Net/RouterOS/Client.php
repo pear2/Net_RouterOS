@@ -282,7 +282,7 @@ class Client
                 . pack('H*', $response->getProperty('ret'))
             )
         );
-        $request->send($com);
+        $request->verify($com)->send($com);
 
         $response = new Response($com, false, $timeout);
         if ($response->getType() === Response::TYPE_FINAL) {
@@ -790,7 +790,7 @@ class Client
      */
     protected function send(Request $request)
     {
-        $request->send($this->com, $this->registry);
+        $request->verify($this->com)->send($this->com, $this->registry);
         $this->pendingRequestsCount++;
         return $this;
     }

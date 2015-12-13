@@ -120,9 +120,8 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
     public function testSendSyncReturningResponseLarge3bytesLength()
     {
-        $this->markTestIncomplete(
-            'For some reason, my RouterOS v5.6 doesn not work with this (bug?).'
-        );
+        $memoryLimit = ini_set('memory_limit', -1);
+
         $systemResource = $this->object->sendSync(
             new Request('/system/resource/print')
         );
@@ -169,13 +168,18 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
                 );
             }
         }
+
+        //Clearing out for other tests.
+        ini_set('memory_limit', $memoryLimit);
     }
 
     public function testSendSyncReturningResponseLarge4bytesLength()
     {
         $this->markTestIncomplete(
-            'For some reason, my RouterOS v5.6 doesn not work with this (bug?).'
+            'For some reason, my RouterOS v6.* doesn not work with this (bug?).'
         );
+        $memoryLimit = ini_set('memory_limit', -1);
+
         $systemResource = $this->object->sendSync(
             new Request('/system/resource/print')
         );
@@ -222,19 +226,19 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
                 );
             }
         }
+
+        //Clearing out for other tests.
+        ini_set('memory_limit', $memoryLimit);
     }
 
     public function testSendSyncReturningResponseLargeDataException()
     {
-        $this->markTestIncomplete(
-            'TODO: A known issue; Requests with excessively long words "leak".'
-        );
         //Required for this test
         $memoryLimit = ini_set('memory_limit', -1);
         try {
             $comment = fopen('php://temp', 'r+b');
             fwrite($comment, str_repeat('t', 0xFFFFFF));
-            for ($i = 0; $i < 14; $i++) {
+            for ($i = 0; $i < 255; $i++) {
                 fwrite($comment, str_repeat('t', 0xFFFFFF));
             }
             fwrite(
@@ -243,14 +247,12 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             );
             rewind($comment);
 
-            $commentString = stream_get_contents($comment);
-            $maxArgL = 0xFFFFFFF - strlen('=comment=');
+            $maxArgL = 0xFFFFFFFF - strlen('=comment=');
             $this->assertGreaterThan(
                 $maxArgL,
-                strlen($commentString),
+                Communicator::seekableStreamLength($comment),
                 '$comment is not long enough.'
             );
-            unset($commentString);
             rewind($comment);
             $addRequest = new Request('/queue/simple/add');
             $addRequest->setArgument('name', TEST_QUEUE_NAME)

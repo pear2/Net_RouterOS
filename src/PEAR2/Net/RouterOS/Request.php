@@ -340,6 +340,40 @@ class Request extends Message
     }
 
     /**
+     * Verifies the request.
+     * 
+     * Verifies the request against a communicator, i.e. whether the request
+     * could successfully be sent (assuming the connection is still opened).
+     * 
+     * @param Communicator $com The Communicator to check against.
+     * 
+     * @return $this The request object itself.
+     * 
+     * @throws LengthException If the resulting length of an API word is not
+     *     supported.
+     */
+    public function verify(Communicator $com)
+    {
+        $com::verifyLengthSupport(strlen($this->getCommand()));
+        $com::verifyLengthSupport(strlen('.tag=' . (string)$this->getTag()));
+        foreach ($this->attributes as $name => $value) {
+            if (is_string($value)) {
+                $com::verifyLengthSupport(strlen('=' . $name . '=' . $value));
+            } else {
+                $com::verifyLengthSupport(
+                    strlen('=' . $name . '=') +
+                    $com::seekableStreamLength($value)
+                );
+            }
+        }
+        $query = $this->getQuery();
+        if ($query instanceof Query) {
+            $query->verify($com);
+        }
+        return $this;
+    }
+
+    /**
      * Parses the arguments of a command.
      *
      * @param string $string The argument string to parse.
