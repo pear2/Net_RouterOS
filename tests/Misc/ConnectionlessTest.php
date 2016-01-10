@@ -11,6 +11,7 @@ use PEAR2\Net\RouterOS\LengthException;
 use PEAR2\Net\RouterOS\NotSupportedException;
 use PEAR2\Net\RouterOS\Query;
 use PEAR2\Net\RouterOS\Request;
+use PEAR2\Net\RouterOS\Script;
 use PEAR2\Net\RouterOS\UnexpectedValueException;
 use PEAR2\Net\RouterOS\Util;
 use PEAR2\Net\Transmitter as T;
@@ -949,7 +950,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
     public function testPrepareScript()
     {
         $msg = 'testing';
-        $result = Util::prepareScript(
+        $result = Script::prepare(
             '/log print $msg',
             array('msg' => $msg)
         );
@@ -961,7 +962,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
         $testParam = fopen('php://temp', 'r+b');
         fwrite($testParam, $msg);
         rewind($testParam);
-        $result = Util::prepareScript(
+        $result = Script::prepare(
             '/log print $msg',
             array('msg' => $testParam)
         );
@@ -982,7 +983,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
      */
     public function testUtilParseValue($value, $expected)
     {
-        $actual = Util::parseValue($value);
+        $actual = Script::parseValue($value);
         $this->assertEquals($expected, $actual);
         $this->assertInternalType(strtolower(gettype($expected)), $actual);
     }

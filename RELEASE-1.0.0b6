@@ -2,13 +2,14 @@ Util stuff, mostly.
 
 * __BREAKING CHANGES:__
     - Util::edit() is no longer an alias of Util::set(). It's now its own method that can modify or unset a single specified property.
-    - Util::escapeValue() now converts DateTime objects into a string having the "M/d/Y H:i:s" format (used across RouterOS), or just "M/d/Y" if the time is exactly midnight, and the timezone is UTC. The old behaviour can be achieved by "manually" adding the DateTime to "new DateTime('@0')".
+    - Util's escapeValue(), escapeString(), parseValue(), prepareScript() and appendScript() methods are now in their own new class called "Script", with the last two now being called just prepare() and append().
+    - Script::escapeValue() now converts DateTime objects into a string having the "M/d/Y H:i:s" format (used across RouterOS), or just "M/d/Y" if the time is exactly midnight, and the timezone is UTC. The old behaviour can be achieved by "manually" adding the DateTime to "new DateTime('@0')".
 * New Util methods:
     - comment()
     - getCurrentTime()
     - newRequest()
-* Util::parseValue() now supports letter notation for time (1h2m3s), not just double colon notation (01:02:03), modeled after RouterOS. Related to that is also that leading zeroes, and zero minutes and seconds are now optional (e.g. "1:" is a valid way of saying 1 hour). Sub-second information is rounded up to the nearest second on current PHP versions (future versions are expected to support sub-second information in DateInterval by allowing seconds to be a double; The code currently attempts to give DateInterval a double, falling back to rounding to a second).
-* Util::parseValue() now recognizes dates in the "M/d/Y H:i:s" format (used across RouterOS), and turns that into a DateTime object for that time (or midnight if the time part is omitted) in UTC.
+* Script::parseValue() now supports letter notation for time (1h2m3s), not just double colon notation (01:02:03), modeled after RouterOS. Related to that is also that leading zeroes, and zero minutes and seconds are now optional (e.g. "1:" is a valid way of saying 1 hour). Sub-second information is rounded up to the nearest second on current PHP versions (future versions are expected to support sub-second information in DateInterval by allowing seconds to be a double; The code currently attempts to give DateInterval a double, falling back to rounding to a second).
+* Script::parseValue() now recognizes dates in the "M/d/Y H:i:s" format (used across RouterOS), and turns that into a DateTime object for that time (or midnight if the time part is omitted) in UTC.
 * Util::getAll() now throws a NotSupportedException if the arguments "follow", "follow-only" or "count-only" are used. The first two, because PHP would hang (since Client::sendSync() is used under the hood), and the last one because it's unredable in the returned output (use Util::count() instead).
 * Util::setMenu() can now go back to the root menu.
 * Util::find() now works even when the underlying Client streams responses.

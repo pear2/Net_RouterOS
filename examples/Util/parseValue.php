@@ -8,7 +8,7 @@ $util = new RouterOS\Util(
 );
 
 $util->setMenu('/system resource');
-$uptime = RouterOS\Util::parseValue($util->get(null, 'uptime'));
+$uptime = RouterOS\Script::parseValue($util->get(null, 'uptime'));
 
 $now = new DateTime;
 
