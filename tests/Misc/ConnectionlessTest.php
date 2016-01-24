@@ -1003,7 +1003,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             //    new DateInterval('PT0.001002003S')
             //),
             ''                      => array('', null),
-            'nil'                   => array('nil', null),
+            '[]'                   => array('[]', null),
             '1'                     => array('1', 1),
             'true'                  => array('true', true),
             'yes'                   => array('yes', true),

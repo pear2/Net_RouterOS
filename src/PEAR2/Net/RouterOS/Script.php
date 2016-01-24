@@ -70,30 +70,69 @@ class Script
      * This method is intended to be the very opposite of
      * {@link static::escapeValue()}. That is, results from that method, if
      * given to this method, should produce equivalent results.
-     * 
-     * For better usefulness, in addition to "actual" RouterOS types, a pseudo
-     * "date" type is also recognized, whenever the string is in the form
-     * "M/j/Y".
      *
      * @param string $value The value to be parsed. Must be a literal of a
      *     value, e.g. what {@link static::escapeValue()} will give you.
      *
      * @return mixed Depending on RouterOS type detected:
-     *     - "nil" or "nothing" - NULL.
+     *     - "nil" (the string "[]") or "nothing" (empty string) - NULL.
      *     - "number" - int or double for large values.
      *     - "bool" - a boolean.
-     *     - "time" - a {@link DateInterval} object.
-     *     - "array" - an array, with the values processed recursively.
+     *     - "array" - an array, with the keys and values processed recursively.
      *     - "str" - a string.
-     *     - "date" (pseudo type) - a DateTime object with the specified date,
-     *         at midnight UTC time.
+     *     - "time" - a {@link DateInterval} object.
+     *     - "date" (pseudo type; string in the form "M/j/Y") - a DateTime
+     *         object with the specified date, at midnight UTC time.
+     *     - "datetime" (pseudo type; string in the form "M/j/Y H:i:s") - a
+     *         DateTime object with the specified date and UTC time.
      *     - Unrecognized type - treated as an unquoted string.
      */
     public static function parseValue($value)
     {
+        $value = static::parseValueToSimple($value);
+        if (!is_string($value)) {
+            return $value;
+        } elseif ('{' === $value[0] && '}' === $value[strlen($value) - 1]) {
+            $value = static::parseValueToArray($value);
+            if (!is_string($value)) {
+                return $value;
+            }
+        } elseif ('"' === $value[0] && '"' === $value[strlen($value) - 1]) {
+            return str_replace(
+                array('\"', '\\\\', "\\\n", "\\\r\n", "\\\r"),
+                array('"', '\\'),
+                substr($value, 1, -1)
+            );
+        }
+
+        $value = static::parseValueToObject($value);
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        return $value;
+    }
+
+    /**
+     * Parses a RouterOS value into a PHP simple type.
+     * 
+     * Parses a RouterOS value into a PHP simple type. "Simple" types being
+     * scalar types, plus NULL.
+     * 
+     * @param string $value The value to be parsed. Must be a literal of a
+     *     value, e.g. what {@link static::escapeValue()} will give you.
+     * 
+     * @return string|bool|int|double|null Depending on RouterOS type detected:
+     *     - "nil" (the string "[]") or "nothing" (empty string) - NULL.
+     *     - "number" - int or double for large values.
+     *     - "bool" - a boolean.
+     *     - Unrecognized type - treated as an unquoted string.
+     */
+    public static function parseValueToSimple($value)
+    {
         $value = (string)$value;
 
-        if (in_array($value, array('', 'nil'), true)) {
+        if (in_array($value, array('', '[]'), true)) {
             return null;
         } elseif (in_array($value, array('true', 'false', 'yes', 'no'), true)) {
             return $value === 'true' || $value === 'yes';
@@ -101,7 +140,34 @@ class Script
             || $value === (string)($num = (double)$value)
         ) {
             return $num;
-        } elseif (preg_match(
+        }
+        return $value;
+    }
+
+    /**
+     * Parses a RouterOS value into a PHP object.
+     * 
+     * Parses a RouterOS value into a PHP object.
+     * 
+     * @param string $value The value to be parsed. Must be a literal of a
+     *     value, e.g. what {@link static::escapeValue()} will give you.
+     * 
+     * @return string|DateInterval|DateTime Depending on RouterOS type detected:
+     *     - "time" - a {@link DateInterval} object.
+     *     - "date" (pseudo type; string in the form "M/j/Y") - a DateTime
+     *         object with the specified date, at midnight UTC time.
+     *     - "datetime" (pseudo type; string in the form "M/j/Y H:i:s") - a
+     *         DateTime object with the specified date and UTC time.
+     *     - Unrecognized type - treated as an unquoted string.
+     */
+    public static function parseValueToObject($value)
+    {
+        $value = (string)$value;
+        if ('' === $value) {
+            return $value;
+        }
+
+        if (preg_match(
             '/^
                 (?:(\d+)w)?
                 (?:(\d+)d)?
@@ -200,61 +266,71 @@ class Script
             } catch (E $e) {
                 return $value;
             }
-        } elseif (('"' === $value[0]) && substr(strrev($value), 0, 1) === '"') {
-            return str_replace(
-                array('\"', '\\\\', "\\\n", "\\\r\n", "\\\r"),
-                array('"', '\\'),
-                substr($value, 1, -1)
-            );
-        } elseif ('{' === $value[0]) {
-            $len = strlen($value);
-            if ($value[$len - 1] === '}') {
-                $value = substr($value, 1, -1);
-                if ('' === $value) {
-                    return array();
-                }
-                $parsedValue = preg_split(
-                    '/
-                        (\"(?:\\\\\\\\|\\\\"|[^"])*\")
-                        |
-                        (\{[^{}]*(?2)?\})
-                        |
-                        ([^;=]+)
-                    /sx',
-                    $value,
-                    null,
-                    PREG_SPLIT_DELIM_CAPTURE
-                );
-                $result = array();
-                $newVal = null;
-                $newKey = null;
-                for ($i = 0, $l = count($parsedValue); $i < $l; ++$i) {
-                    switch ($parsedValue[$i]) {
-                    case '':
-                        break;
-                    case ';':
-                        if (null === $newKey) {
-                            $result[] = $newVal;
-                        } else {
-                            $result[$newKey] = $newVal;
-                        }
-                        $newKey = $newVal = null;
-                        break;
-                    case '=':
-                        $newKey = static::parseValue($parsedValue[$i - 1]);
-                        $newVal = static::parseValue($parsedValue[++$i]);
-                        break;
-                    default:
-                        $newVal = static::parseValue($parsedValue[$i]);
-                    }
-                }
-                if (null === $newKey) {
-                    $result[] = $newVal;
-                } else {
-                    $result[$newKey] = $newVal;
-                }
-                return $result;
+        }
+        return $value;
+    }
+
+    /**
+     * Parses a RouterOS value into a PHP array.
+     * 
+     * Parses a RouterOS value into a PHP array.
+     * 
+     * @param string $value The value to be parsed. Must be a literal of a
+     *     value, e.g. what {@link static::escapeValue()} will give you.
+     * 
+     * @return string|array Depending on RouterOS type detected:
+     *     - "array" - an array, with the keys and values processed recursively.
+     *     - Unrecognized type - treated as an unquoted string.
+     */
+    public static function parseValueToArray($value)
+    {
+        $value = (string)$value;
+        if ('{' === $value[0] && '}' === $value[strlen($value) - 1]) {
+            $value = substr($value, 1, -1);
+            if ('' === $value) {
+                return array();
             }
+            $parsedValue = preg_split(
+                '/
+                    (\"(?:\\\\\\\\|\\\\"|[^"])*\")
+                    |
+                    (\{[^{}]*(?2)?\})
+                    |
+                    ([^;=]+)
+                /sx',
+                $value,
+                null,
+                PREG_SPLIT_DELIM_CAPTURE
+            );
+            $result = array();
+            $newVal = null;
+            $newKey = null;
+            for ($i = 0, $l = count($parsedValue); $i < $l; ++$i) {
+                switch ($parsedValue[$i]) {
+                case '':
+                    break;
+                case ';':
+                    if (null === $newKey) {
+                        $result[] = $newVal;
+                    } else {
+                        $result[$newKey] = $newVal;
+                    }
+                    $newKey = $newVal = null;
+                    break;
+                case '=':
+                    $newKey = static::parseValueToSimple($parsedValue[$i - 1]);
+                    $newVal = static::parseValue($parsedValue[++$i]);
+                    break;
+                default:
+                    $newVal = static::parseValue($parsedValue[$i]);
+                }
+            }
+            if (null === $newKey) {
+                $result[] = $newVal;
+            } else {
+                $result[$newKey] = $newVal;
+            }
+            return $result;
         }
         return $value;
     }
