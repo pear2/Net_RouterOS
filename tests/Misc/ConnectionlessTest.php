@@ -13,7 +13,6 @@ use PEAR2\Net\RouterOS\Query;
 use PEAR2\Net\RouterOS\Request;
 use PEAR2\Net\RouterOS\Script;
 use PEAR2\Net\RouterOS\UnexpectedValueException;
-use PEAR2\Net\RouterOS\Util;
 use PEAR2\Net\Transmitter as T;
 use PHPUnit_Framework_TestCase;
 
@@ -979,16 +978,16 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      *
-     * @dataProvider providerUtilParseValue
+     * @dataProvider providerScriptParseValue
      */
-    public function testUtilParseValue($value, $expected)
+    public function testScriptParseValue($value, $expected)
     {
         $actual = Script::parseValue($value);
         $this->assertEquals($expected, $actual);
         $this->assertInternalType(strtolower(gettype($expected)), $actual);
     }
 
-    public function providerUtilParseValue()
+    public function providerScriptParseValue()
     {
         return array(
             //// This will be moved into a separate "legacy" test,

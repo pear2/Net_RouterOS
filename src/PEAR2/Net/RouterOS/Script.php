@@ -71,62 +71,88 @@ class Script
      * {@link static::escapeValue()}. That is, results from that method, if
      * given to this method, should produce equivalent results.
      *
-     * @param string $value The value to be parsed. Must be a literal of a
-     *     value, e.g. what {@link static::escapeValue()} will give you.
+     * @param string            $value    The value to be parsed.
+     *     Must be a literal of a value,
+     *     e.g. what {@link static::escapeValue()} will give you.
+     * @param DateTimeZone|null $timezone The timezone which any resulting
+     *     DateTime object (either the main value, or values within an array)
+     *     will use. Defaults to UTC.
      *
      * @return mixed Depending on RouterOS type detected:
      *     - "nil" (the string "[]") or "nothing" (empty string) - NULL.
      *     - "number" - int or double for large values.
      *     - "bool" - a boolean.
      *     - "array" - an array, with the keys and values processed recursively.
-     *     - "str" - a string.
      *     - "time" - a {@link DateInterval} object.
      *     - "date" (pseudo type; string in the form "M/j/Y") - a DateTime
-     *         object with the specified date, at midnight UTC time.
+     *         object with the specified date, at midnight.
      *     - "datetime" (pseudo type; string in the form "M/j/Y H:i:s") - a
-     *         DateTime object with the specified date and UTC time.
-     *     - Unrecognized type - treated as an unquoted string.
+     *         DateTime object with the specified date and time.
+     *     - "str" (a quoted string) - a string, with the contents escaped.
+     *     - Unrecognized type - casted to a string, unmodified.
      */
-    public static function parseValue($value)
+    public static function parseValue($value, DateTimeZone $timezone = null)
     {
         $value = static::parseValueToSimple($value);
         if (!is_string($value)) {
             return $value;
-        } elseif ('{' === $value[0] && '}' === $value[strlen($value) - 1]) {
-            $value = static::parseValueToArray($value);
-            if (!is_string($value)) {
-                return $value;
-            }
-        } elseif ('"' === $value[0] && '"' === $value[strlen($value) - 1]) {
+        }
+        
+        $value = static::parseValueToArray($value, $timezone);
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        $value = static::parseValueToDateInterval($value);
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        $value = static::parseValueToDateTime($value, $timezone);
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        return static::parseValueToString($value);
+    }
+
+    /**
+     * Parses a RouterOS value into a PHP string.
+     * 
+     * @param string $value The value to be parsed.
+     *     Must be a literal of a value,
+     *     e.g. what {@link static::escapeValue()} will give you.
+     * 
+     * @return string If a quoted string is provided, it would be parsed.
+     *     Otherwise, the value is casted to a string, and returned unmodified.
+     */
+    public static function parseValueToString($value)
+    {
+        $value = (string)$value;
+        if ('"' === $value[0] && '"' === $value[strlen($value) - 1]) {
             return str_replace(
                 array('\"', '\\\\', "\\\n", "\\\r\n", "\\\r"),
                 array('"', '\\'),
                 substr($value, 1, -1)
             );
         }
-
-        $value = static::parseValueToObject($value);
-        if (!is_string($value)) {
-            return $value;
-        }
-
         return $value;
     }
 
     /**
      * Parses a RouterOS value into a PHP simple type.
-     * 
+     *
      * Parses a RouterOS value into a PHP simple type. "Simple" types being
      * scalar types, plus NULL.
-     * 
+     *
      * @param string $value The value to be parsed. Must be a literal of a
      *     value, e.g. what {@link static::escapeValue()} will give you.
-     * 
+     *
      * @return string|bool|int|double|null Depending on RouterOS type detected:
      *     - "nil" (the string "[]") or "nothing" (empty string) - NULL.
      *     - "number" - int or double for large values.
      *     - "bool" - a boolean.
-     *     - Unrecognized type - treated as an unquoted string.
+     *     - Unrecognized type - casted to a string, unmodified.
      */
     public static function parseValueToSimple($value)
     {
@@ -145,22 +171,79 @@ class Script
     }
 
     /**
-     * Parses a RouterOS value into a PHP object.
-     * 
-     * Parses a RouterOS value into a PHP object.
-     * 
+     * Parses a RouterOS value into a PHP DateTime object
+     *
+     * Parses a RouterOS value into a PHP DateTime object.
+     *
+     * @param string            $value    The value to be parsed.
+     *     Must be a literal of a value,
+     *     e.g. what {@link static::escapeValue()} will give you.
+     * @param DateTimeZone|null $timezone The timezone which the resulting
+     *     DateTime object will use. Defaults to UTC.
+     *
+     * @return string|DateTime Depending on RouterOS type detected:
+     *     - "date" (pseudo type; string in the form "M/j/Y") - a DateTime
+     *         object with the specified date, at midnight UTC time (regardless
+     *         of timezone provided).
+     *     - "datetime" (pseudo type; string in the form "M/j/Y H:i:s") - a
+     *         DateTime object with the specified date and time.
+     *     - Unrecognized type - casted to a string, unmodified.
+     */
+    public static function parseValueToDateTime(
+        $value,
+        DateTimeZone $timezone = null
+    ) {
+        $value = (string)$value;
+        if ('' === $value) {
+            return $value;
+        }
+        if (preg_match(
+            '#^
+                (?<mon>jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)
+                /
+                (?<day>\d\d?)
+                /
+                (?<year>\d{4})
+                (?:
+                    \s+(?<time>\d{2}\:\d{2}:\d{2})
+                )?
+            $#uix',
+            $value,
+            $date
+        )) {
+            if (!isset($date['time'])) {
+                $date['time'] = '00:00:00';
+                $timezone = new DateTimeZone('UTC');
+            } elseif (null === $timezone) {
+                $timezone = new DateTimeZone('UTC');
+            }
+            try {
+                return new DateTime(
+                    $date['year'] .
+                    '-' . ucfirst($date['mon']) .
+                    "-{$date['day']} {$date['time']}",
+                    $timezone
+                );
+            } catch (E $e) {
+                return $value;
+            }
+        }
+        return $value;
+    }
+
+    /**
+     * Parses a RouterOS value into a PHP DateInterval.
+     *
+     * Parses a RouterOS value into a PHP DateInterval.
+     *
      * @param string $value The value to be parsed. Must be a literal of a
      *     value, e.g. what {@link static::escapeValue()} will give you.
-     * 
+     *
      * @return string|DateInterval|DateTime Depending on RouterOS type detected:
      *     - "time" - a {@link DateInterval} object.
-     *     - "date" (pseudo type; string in the form "M/j/Y") - a DateTime
-     *         object with the specified date, at midnight UTC time.
-     *     - "datetime" (pseudo type; string in the form "M/j/Y H:i:s") - a
-     *         DateTime object with the specified date and UTC time.
-     *     - Unrecognized type - treated as an unquoted string.
+     *     - Unrecognized type - casted to a string, unmodified.
      */
-    public static function parseValueToObject($value)
+    public static function parseValueToDateInterval($value)
     {
         $value = (string)$value;
         if ('' === $value) {
@@ -199,7 +282,7 @@ class Script
             if (empty($time[5])) {
                 $time[5] = 0;
             }
-            
+
             $subsecondTime = 0.0;
             //@codeCoverageIgnoreStart
             // No PHP version currently supports sub-second DateIntervals,
@@ -239,51 +322,32 @@ class Script
                 );
             }
             //@codeCoverageIgnoreEnd
-        } elseif (preg_match(
-            '#^
-                (?<mon>jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)
-                /
-                (?<day>\d\d?)
-                /
-                (?<year>\d{4})
-                (?:
-                    \s+(?<time>\d{2}\:\d{2}:\d{2})
-                )?
-            $#uix',
-            $value,
-            $date
-        )) {
-            if (!isset($date['time'])) {
-                $date['time'] = '00:00:00';
-            }
-            try {
-                return new DateTime(
-                    $date['year'] .
-                    '-' . ucfirst($date['mon']) .
-                    "-{$date['day']} {$date['time']}",
-                    new DateTimeZone('UTC')
-                );
-            } catch (E $e) {
-                return $value;
-            }
         }
+
         return $value;
     }
 
     /**
      * Parses a RouterOS value into a PHP array.
-     * 
+     *
      * Parses a RouterOS value into a PHP array.
-     * 
-     * @param string $value The value to be parsed. Must be a literal of a
-     *     value, e.g. what {@link static::escapeValue()} will give you.
-     * 
+     *
+     * @param string            $value    The value to be parsed.
+     *     Must be a literal of a value,
+     *     e.g. what {@link static::escapeValue()} will give you.
+     * @param DateTimeZone|null $timezone The timezone which any resulting
+     *     DateTime object within the array will use. Defaults to UTC.
+     *
      * @return string|array Depending on RouterOS type detected:
-     *     - "array" - an array, with the keys and values processed recursively.
-     *     - Unrecognized type - treated as an unquoted string.
+     *     - "array" - an array, with the and values processed recursively,
+     *         the keys with {@link static::parseValueToSimple()},
+     *         and the values with {@link static::parseValue()}
+     *     - Unrecognized type - casted to a string, unmodified.
      */
-    public static function parseValueToArray($value)
-    {
+    public static function parseValueToArray(
+        $value,
+        DateTimeZone $timezone = null
+    ) {
         $value = (string)$value;
         if ('{' === $value[0] && '}' === $value[strlen($value) - 1]) {
             $value = substr($value, 1, -1);
@@ -319,10 +383,10 @@ class Script
                     break;
                 case '=':
                     $newKey = static::parseValueToSimple($parsedValue[$i - 1]);
-                    $newVal = static::parseValue($parsedValue[++$i]);
+                    $newVal = static::parseValue($parsedValue[++$i], $timezone);
                     break;
                 default:
-                    $newVal = static::parseValue($parsedValue[$i]);
+                    $newVal = static::parseValue($parsedValue[$i], $timezone);
                 }
             }
             if (null === $newKey) {
@@ -437,13 +501,13 @@ class Script
      * inserted as part of a RouterOS script.
      *
      * DateInterval objects will be casted to RouterOS' "time" type.
-     * 
+     *
      * DateTime objects will be casted to a string following the "M/d/Y H:i:s"
      * format. If the time is exactly midnight (including microseconds), and
      * the timezone is UTC, the string will include only the "M/d/Y" date.
      *
      * Unrecognized types (i.e. resources and other objects) are casted to
-     * strings.
+     * strings, and those strings are then escaped.
      *
      * @param mixed $value The value to be escaped.
      *
@@ -508,10 +572,18 @@ class Script
      * surrounded with quotes at a RouterOS script (or concatenated onto a
      * larger string first), and you can be sure there won't be any code
      * injections coming from it.
+     * 
+     * For the sake of brevity of the output, alphanumeric characters and
+     * underscores are left untouched
      *
      * @param string $value Value to be escaped.
      *
      * @return string The escaped value.
+     * 
+     * @internal Why leave ONLY those characters and not also others?
+     *     Because those can't in any way be mistaken for language constructs,
+     *     unlike many other "safe inside strings, but not outside" ASCII
+     *     characters, like ",", ".", "+", "-", "~", etc.
      */
     public static function escapeString($value)
     {

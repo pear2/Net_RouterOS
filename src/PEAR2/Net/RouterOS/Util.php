@@ -692,23 +692,27 @@ class Util implements Countable
      *
      * @param mixed $numbers     Targeted items. Can be any criteria accepted
      *     by {@link static::find()}.
-     * @param mixed $destination item before which the targeted items will be
+     * @param mixed $destination Item before which the targeted items will be
      *     moved to. Can be any criteria accepted by {@link static::find()}.
      *     If multiple items match the criteria, the targeted items will move
      *     above the first match.
+     *     If NULL is given (or this argument is omitted), the targeted items
+     *     will be moved to the bottom of the menu.
      *
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
      */
-    public function move($numbers, $destination)
+    public function move($numbers, $destination = null)
     {
         $moveRequest = new Request($this->menu . '/move');
         $moveRequest->setArgument('numbers', $this->find($numbers));
-        $destination = $this->find($destination);
-        if (false !== strpos($destination, ',')) {
-            $destination = strstr($destination, ',', true);
+        if (null !== $destination) {
+            $destination = $this->find($destination);
+            if (false !== strpos($destination, ',')) {
+                $destination = strstr($destination, ',', true);
+            }
+            $moveRequest->setArgument('destination', $destination);
         }
-        $moveRequest->setArgument('destination', $destination);
         $this->clearIdCache();
         return $this->client->sendSync($moveRequest);
     }
