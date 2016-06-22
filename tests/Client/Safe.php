@@ -764,6 +764,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $this->assertEquals(count($arpResponses1), count($arpResponses2));
         $this->assertEquals(count($arpResponses2), count($arpResponses3));
         $this->assertInstanceOf(ROS_NAMESPACE . '\Response', $arpResponses1(0));
+        $this->assertInstanceOf('ArrayObject', $arpResponses1());
     }
 
     public function testStreamEquality()

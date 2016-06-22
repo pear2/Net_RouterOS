@@ -123,10 +123,14 @@ class Util implements Countable
             } elseif ('/' === $newMenu[0]) {
                 $this->menu = $menuRequest->setCommand($newMenu)->getCommand();
             } else {
-                $this->menu = $menuRequest->setCommand(
-                    '/' . str_replace('/', ' ', substr($this->menu, 1)) . ' ' .
-                    str_replace('/', ' ', $newMenu)
-                )->getCommand();
+                $this->menu = '/' . substr(
+                    $menuRequest->setCommand(
+                        '/' . str_replace('/', ' ', substr($this->menu, 1)) .
+                        ' ' . str_replace('/', ' ', $newMenu) . ' ?'
+                    )->getCommand(),
+                    1,
+                    -2/*strlen('/?')*/
+                );
             }
         }
         $this->clearIdCache();
