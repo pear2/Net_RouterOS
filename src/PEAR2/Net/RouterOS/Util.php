@@ -769,6 +769,8 @@ class Util implements Countable
      *     allowing the results to be observed.
      *     If you need to use those arguments, use {@link static::newRequest()},
      *     and pass the resulting {@link Request} to {@link Client::sendAsync()}.
+     *     The "count-only" argument is also prohibited, as results from it
+     *     would not be consumable. Use {@link static::count()} for that.
      * @param Query|null                                      $query A query to
      *     filter items by.
      *     NULL to get all items.
@@ -778,7 +780,7 @@ class Util implements Countable
      *     when there are no matching items. FALSE on failure.
      *
      * @throws NotSupportedException If $args contains prohibited arguments
-     *     ("follow" or "follow-only").
+     *     ("follow", "follow-only" or "count-only").
      */
     public function getAll(array $args = array(), Query $query = null)
     {
@@ -890,7 +892,7 @@ class Util implements Countable
             return Communicator::seekableStreamLength($data) == $fileSize;
         } else {
             return sprintf('%u', strlen((string)$data)) === $fileSize;
-        };
+        }
     }
 
     /**

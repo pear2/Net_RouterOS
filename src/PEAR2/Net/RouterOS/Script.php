@@ -98,22 +98,19 @@ class Script
             return $value;
         }
         
-        $value = static::parseValueToArray($value, $timezone);
-        if (!is_string($value)) {
-            return $value;
+        try {
+            return static::parseValueToArray($value, $timezone);
+        } catch (ParserException $e) {
+            try {
+                return static::parseValueToDateInterval($value);
+            } catch (ParserException $e) {
+                try {
+                    return static::parseValueToDateTime($value, $timezone);
+                } catch (ParserException $e) {
+                    return static::parseValueToString($value);
+                }
+            }
         }
-
-        $value = static::parseValueToDateInterval($value);
-        if (!is_string($value)) {
-            return $value;
-        }
-
-        $value = static::parseValueToDateTime($value, $timezone);
-        if (!is_string($value)) {
-            return $value;
-        }
-
-        return static::parseValueToString($value);
     }
 
     /**
@@ -181,23 +178,22 @@ class Script
      * @param DateTimeZone|null $timezone The timezone which the resulting
      *     DateTime object will use. Defaults to UTC.
      *
-     * @return string|DateTime Depending on RouterOS type detected:
+     * @return DateTime Depending on RouterOS type detected:
      *     - "date" (pseudo type; string in the form "M/j/Y") - a DateTime
      *         object with the specified date, at midnight UTC time (regardless
      *         of timezone provided).
      *     - "datetime" (pseudo type; string in the form "M/j/Y H:i:s") - a
-     *         DateTime object with the specified date and time.
-     *     - Unrecognized type - casted to a string, unmodified.
+     *         DateTime object with the specified date and time,
+     *         with the specified timezone.
+     * 
+     * @throws ParserException When the value is not of a recognized type.
      */
     public static function parseValueToDateTime(
         $value,
         DateTimeZone $timezone = null
     ) {
         $value = (string)$value;
-        if ('' === $value) {
-            return $value;
-        }
-        if (preg_match(
+        if ('' !== $value && preg_match(
             '#^
                 (?<mon>jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)
                 /
@@ -228,7 +224,10 @@ class Script
                 return $value;
             }
         }
-        return $value;
+        throw new ParserException(
+            'The supplied value can not be converted to a DateTime',
+            ParserException::CODE_DATETIME
+        );
     }
 
     /**
@@ -239,18 +238,14 @@ class Script
      * @param string $value The value to be parsed. Must be a literal of a
      *     value, e.g. what {@link static::escapeValue()} will give you.
      *
-     * @return string|DateInterval|DateTime Depending on RouterOS type detected:
-     *     - "time" - a {@link DateInterval} object.
-     *     - Unrecognized type - casted to a string, unmodified.
+     * @return DateInterval The value as a DateInterval object.
+     * 
+     * @throws ParserException When the value is not of a recognized type.
      */
     public static function parseValueToDateInterval($value)
     {
         $value = (string)$value;
-        if ('' === $value) {
-            return $value;
-        }
-
-        if (preg_match(
+        if ('' !== $value && preg_match(
             '/^
                 (?:(\d+)w)?
                 (?:(\d+)d)?
@@ -323,8 +318,10 @@ class Script
             }
             //@codeCoverageIgnoreEnd
         }
-
-        return $value;
+        throw new ParserException(
+            'The supplied value can not be converted to DateInterval',
+            ParserException::CODE_DATEINTERVAL
+        );
     }
 
     /**
@@ -338,11 +335,11 @@ class Script
      * @param DateTimeZone|null $timezone The timezone which any resulting
      *     DateTime object within the array will use. Defaults to UTC.
      *
-     * @return string|array Depending on RouterOS type detected:
-     *     - "array" - an array, with the and values processed recursively,
+     * @return array An array, with the keys and values processed recursively,
      *         the keys with {@link static::parseValueToSimple()},
-     *         and the values with {@link static::parseValue()}
-     *     - Unrecognized type - casted to a string, unmodified.
+     *         and the values with {@link static::parseValue()}.
+     * 
+     * @throws ParserException When the value is not of a recognized type.
      */
     public static function parseValueToArray(
         $value,
@@ -396,7 +393,10 @@ class Script
             }
             return $result;
         }
-        return $value;
+        throw new ParserException(
+            'The supplied value can not be converted to an array',
+            ParserException::CODE_DATETIME
+        );
     }
 
     /**
