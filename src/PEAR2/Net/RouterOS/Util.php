@@ -128,14 +128,19 @@ class Util implements Countable
             } else {
                 $newMenu = substr(
                     $menuRequest->setCommand(
-                        '/' . str_replace('/', ' ', substr($this->menu, 1)) .
-                        ' ' . str_replace('/', ' ', $newMenu) . ' ?'
+                        '/' .
+                        str_replace('/', ' ', (string)substr($this->menu, 1)) .
+                        ' ' .
+                        str_replace('/', ' ', $newMenu)
+                        . ' ?'
                     )->getCommand(),
                     1,
                     -2/*strlen('/?')*/
                 );
                 if ('' !== $newMenu) {
                     $this->menu = '/' . $newMenu;
+                } else {
+                    $this->menu = '';
                 }
             }
         }
@@ -598,12 +603,24 @@ class Util implements Countable
      * See {@link static::find()} for a description of what criteria are
      * accepted.
      *
-     * @return ResponseCollection returns the response collection, allowing you
-     *     to inspect errors, if any.
+     * @return ResponseCollection Returns the response collection, allowing you
+     *     to inspect the output. Current RouterOS versions don't return
+     *     anything useful, but if future ones do, you can read it right away.
+     * 
+     * @throws RouterErrorException When the router returns one or more errors.
      */
     public function enable()
     {
-        return $this->doBulk('enable', func_get_args());
+        $responses = $this->doBulk('enable', func_get_args());
+        if (count($responses->getAllOfType(Response::TYPE_ERROR)) > 0) {
+            throw new RouterErrorException(
+                'Error when enabling items',
+                RouterErrorException::CODE_ENABLE_ERROR,
+                null,
+                $responses
+            );
+        }
+        return $responses;
     }
 
     /**
@@ -615,11 +632,23 @@ class Util implements Countable
      * accepted.
      *
      * @return ResponseCollection Returns the response collection, allowing you
-     *     to inspect errors, if any.
+     *     to inspect the output. Current RouterOS versions don't return
+     *     anything useful, but if future ones do, you can read it right away.
+     * 
+     * @throws RouterErrorException When the router returns one or more errors.
      */
     public function disable()
     {
-        return $this->doBulk('disable', func_get_args());
+        $responses = $this->doBulk('disable', func_get_args());
+        if (count($responses->getAllOfType(Response::TYPE_ERROR)) > 0) {
+            throw new RouterErrorException(
+                'Error when disabling items',
+                RouterErrorException::CODE_DISABLE_ERROR,
+                null,
+                $responses
+            );
+        }
+        return $responses;
     }
 
     /**
@@ -631,13 +660,24 @@ class Util implements Countable
      * accepted.
      *
      * @return ResponseCollection Returns the response collection, allowing you
-     *     to inspect errors, if any.
+     *     to inspect the output. Current RouterOS versions don't return
+     *     anything useful, but if future ones do, you can read it right away.
+     * 
+     * @throws RouterErrorException When the router returns one or more errors.
      */
     public function remove()
     {
-        $result = $this->doBulk('remove', func_get_args());
+        $responses = $this->doBulk('remove', func_get_args());
         $this->clearIdCache();
-        return $result;
+        if (count($responses->getAllOfType(Response::TYPE_ERROR)) > 0) {
+            throw new RouterErrorException(
+                'Error when removing items',
+                RouterErrorException::CODE_REMOVE_ERROR,
+                null,
+                $responses
+            );
+        }
+        return $responses;
     }
 
     /**
@@ -661,14 +701,26 @@ class Util implements Countable
      *     string.
      *
      * @return ResponseCollection Returns the response collection, allowing you
-     *     to inspect errors, if any.
+     *     to inspect the output. Current RouterOS versions don't return
+     *     anything useful, but if future ones do, you can read it right away.
+     * 
+     * @throws RouterErrorException When the router returns one or more errors.
      */
     public function comment($numbers, $comment)
     {
         $commentRequest = new Request($this->menu . '/comment');
         $commentRequest->setArgument('comment', $comment);
         $commentRequest->setArgument('numbers', $this->find($numbers));
-        return $this->client->sendSync($commentRequest);
+        $responses = $this->client->sendSync($commentRequest);
+        if (count($responses->getAllOfType(Response::TYPE_ERROR)) > 0) {
+            throw new RouterErrorException(
+                'Error when commenting items',
+                RouterErrorException::CODE_COMMENT_ERROR,
+                null,
+                $responses
+            );
+        }
+        return $responses;
     }
 
     /**
@@ -704,7 +756,16 @@ class Util implements Countable
         if (null !== $numbers) {
             $setRequest->setArgument('numbers', $this->find($numbers));
         }
-        return $this->client->sendSync($setRequest);
+        $responses = $this->client->sendSync($setRequest);
+        if (count($responses->getAllOfType(Response::TYPE_ERROR)) > 0) {
+            throw new RouterErrorException(
+                'Error when setting items',
+                RouterErrorException::CODE_SET_ERROR,
+                null,
+                $responses
+            );
+        }
+        return $responses;
     }
 
     /**
@@ -744,10 +805,19 @@ class Util implements Countable
     public function unsetValue($numbers, $valueName)
     {
         $unsetRequest = new Request($this->menu . '/unset');
-        return $this->client->sendSync(
+        $responses = $this->client->sendSync(
             $unsetRequest->setArgument('numbers', $this->find($numbers))
                 ->setArgument('value-name', $valueName)
         );
+        if (count($responses->getAllOfType(Response::TYPE_ERROR)) > 0) {
+            throw new RouterErrorException(
+                'Error when unsetting value of items',
+                RouterErrorException::CODE_UNSET_ERROR,
+                null,
+                $responses
+            );
+        }
+        return $responses;
     }
 
     /**
@@ -842,7 +912,16 @@ class Util implements Countable
             $moveRequest->setArgument('destination', $destination);
         }
         $this->clearIdCache();
-        return $this->client->sendSync($moveRequest);
+        $responses = $this->client->sendSync($moveRequest);
+        if (count($responses->getAllOfType(Response::TYPE_ERROR)) > 0) {
+            throw new RouterErrorException(
+                'Error when moving items',
+                RouterErrorException::CODE_MOVE_ERROR,
+                null,
+                $responses
+            );
+        }
+        return $responses;
     }
 
     /**
@@ -1069,18 +1148,19 @@ class Util implements Countable
     /**
      * Performs an action on a bulk of items at the current menu.
      *
-     * @param string $what What action to perform.
-     * @param array  $args Zero or more arguments can be specified, each being
-     *     a criteria. If zero arguments are specified, removes all items.
+     * @param string $command What command to perform.
+     * @param array  $args    Zero or more arguments can be specified,
+     *     each being a criteria.
+     *     If zero arguments are specified, matches all items.
      *     See {@link static::find()} for a description of what criteria are
      *     accepted.
      *
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect errors, if any.
      */
-    protected function doBulk($what, array $args = array())
+    protected function doBulk($command, array $args = array())
     {
-        $bulkRequest = new Request($this->menu . '/' . $what);
+        $bulkRequest = new Request("{$this->menu}/{$command}");
         $bulkRequest->setArgument(
             'numbers',
             call_user_func_array(array($this, 'find'), $args)
