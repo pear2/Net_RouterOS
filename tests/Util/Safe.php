@@ -352,10 +352,9 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $this->assertSameSize($queues, $this->util);
     }
 
-    public function testInvalidGetallAndCount()
+    public function testInvalidCount()
     {
         $this->util->setMenu('/queue');
-        $this->assertFalse($this->util->getAll());
         $this->assertCount(-1, $this->util);
     }
 

@@ -65,9 +65,12 @@ class Util implements Countable
     protected $client;
 
     /**
-     * @var string The current menu.
+     * @var string The current menu. Note that the root menu (only) uses an
+     *     empty string. This is done to enable commands executed at it without
+     *     special casing it at all commands. Instead, only
+     *     {@link static::setMenu()} is special cased.
      */
-    protected $menu = '/';
+    protected $menu = '';
 
     /**
      * @var array<int,string>|null An array with the numbers of items in
@@ -95,7 +98,7 @@ class Util implements Countable
      */
     public function getMenu()
     {
-        return $this->menu;
+        return '' === $this->menu ? '/' : $this->menu;
     }
 
     /**
@@ -119,11 +122,11 @@ class Util implements Countable
         if ('' !== $newMenu) {
             $menuRequest = new Request('/menu');
             if ('/' === $newMenu) {
-                $this->menu = '/';
+                $this->menu = '';
             } elseif ('/' === $newMenu[0]) {
                 $this->menu = $menuRequest->setCommand($newMenu)->getCommand();
             } else {
-                $this->menu = '/' . substr(
+                $newMenu = substr(
                     $menuRequest->setCommand(
                         '/' . str_replace('/', ' ', substr($this->menu, 1)) .
                         ' ' . str_replace('/', ' ', $newMenu) . ' ?'
@@ -131,6 +134,9 @@ class Util implements Countable
                     1,
                     -2/*strlen('/?')*/
                 );
+                if ('' !== $newMenu) {
+                    $this->menu = '/' . $newMenu;
+                }
             }
         }
         $this->clearIdCache();
@@ -224,10 +230,16 @@ class Util implements Countable
      *     To eliminate any possibility of name clashes,
      *     you can specify your own name instead.
      *
-     * @return ResponseCollection Returns the response collection of the
-     *     run, allowing you to inspect errors, if any.
-     *     If the script was not added successfully before execution, the
-     *     ResponseCollection from the add attempt is going to be returned.
+     * @return string|resource The source of the script, as it appears after
+     *     the run, right before it is removed.
+     *     This can be used for easily retrieving basic output,
+     *     by modifying the script from inside the script
+     *     (use the $"_" variable to refer to the script's name within the
+     *     "/system script" menu).
+     * 
+     * @throws RouterErrorException When there is an error in any step of the
+     *     way. The reponses include all successful commands prior to the error
+     *     as well.
      */
     public function exec(
         $source,
@@ -235,7 +247,90 @@ class Util implements Countable
         $policy = null,
         $name = null
     ) {
-        return $this->_exec($source, $params, $policy, $name);
+        if (null === $name) {
+            $name = uniqid(gethostname(), true);
+        }
+
+        $request = new Request('/system/script/add');
+        $request->setArgument('name', $name);
+        $request->setArgument('policy', $policy);
+
+        $params += array('_' => $name);
+
+        $finalSource = fopen('php://temp', 'r+b');
+        fwrite(
+            $finalSource,
+            '/' . str_replace('/', ' ', substr($this->menu, 1)). "\n"
+        );
+        Script::append($finalSource, $source, $params);
+        fwrite($finalSource, "\n");
+        rewind($finalSource);
+
+        $request->setArgument('source', $finalSource);
+        $addResult = $this->client->sendSync($request);
+
+        if (count($addResult->getAllOfType(Response::TYPE_ERROR)) > 0) {
+            throw new RouterErrorException(
+                'Error when trying to add script',
+                RouterErrorException::CODE_SCRIPT_ADD_ERROR,
+                null,
+                $addResult
+            );
+        }
+
+        $request = new Request('/system/script/run');
+        $request->setArgument('number', $name);
+        $runResult = $this->client->sendSync($request);
+        if (count($runResult->getAllOfType(Response::TYPE_ERROR)) > 0) {
+            throw new RouterErrorException(
+                'Error when running script',
+                RouterErrorException::CODE_SCRIPT_RUN_ERROR,
+                null,
+                new ResponseCollection(
+                    array_merge($addResult->toArray(), $runResult->toArray())
+                )
+            );
+        }
+
+        $request = new Request('/system/script/get');
+        $request->setArgument('number', $name);
+        $request->setArgument('value-name', 'source');
+        $getResult = $this->client->sendSync($request);
+        if (count($getResult->getAllOfType(Response::TYPE_ERROR)) > 0) {
+            throw new RouterErrorException(
+                'Error when getting script source',
+                RouterErrorException::CODE_SCRIPT_GET_ERROR,
+                null,
+                new ResponseCollection(
+                    array_merge(
+                        $addResult->toArray(),
+                        $runResult->toArray(),
+                        $getResult->toArray()
+                    )
+                )
+            );
+        }
+        $postSource = $getResult->end()->getProperty('ret');
+        
+        $request = new Request('/system/script/remove');
+        $request->setArgument('numbers', $name);
+        $removeResult = $this->client->sendSync($request);
+        if (count($removeResult->getAllOfType(Response::TYPE_ERROR)) > 0) {
+            throw new RouterErrorException(
+                'Error when getting script source',
+                RouterErrorException::CODE_SCRIPT_GET_ERROR,
+                null,
+                new ResponseCollection(
+                    array_merge(
+                        $addResult->toArray(),
+                        $runResult->toArray(),
+                        $getResult->toArray(),
+                        $removeResult->toArray()
+                    )
+                )
+            );
+        }
+        return $postSource;
     }
 
     /**
@@ -265,20 +360,20 @@ class Util implements Countable
 
     /**
      * Gets the current time on the router.
-     * 
+     *
      * Gets the current time on the router, regardless of the current menu.
-     * 
+     *
      * If the timezone is one known to both RouterOS and PHP, it will be used
      * as the timezone identifier. Otherwise (e.g. "manual"), the current GMT
      * offset will be used as a timezone, without any DST awareness.
-     * 
+     *
      * @return DateTime The current time of the router, as a DateTime object.
      */
     public function getCurrentTime()
     {
         $clock = $this->client->sendSync(
             new Request(
-                '/system/clock/print 
+                '/system/clock/print
                 .proplist=date,time,time-zone-name,gmt-offset'
             )
         )->current();
@@ -351,7 +446,7 @@ class Util implements Countable
                 $idCache = str_replace(
                     ';',
                     ',',
-                    $ret
+                    strtolower($ret)
                 );
                 $this->idCache = explode(',', $idCache);
                 return $idCache;
@@ -365,9 +460,11 @@ class Util implements Countable
                     new Request($this->menu . '/print .proplist=.id', $criteria)
                 )->getAllOfType(Response::TYPE_DATA) as $response) {
                     $newId = $response->getProperty('.id');
-                    $idList .= is_string($newId)
-                        ? $newId . ','
-                        : stream_get_contents($newId) . ',';
+                    $idList .= strtolower(
+                        is_string($newId)
+                        ? $newId
+                        : stream_get_contents($newId) . ','
+                    );
                 }
             } elseif (is_callable($criteria)) {
                 $idCache = array();
@@ -375,9 +472,11 @@ class Util implements Countable
                     new Request($this->menu . '/print')
                 )->getAllOfType(Response::TYPE_DATA) as $response) {
                     $newId = $response->getProperty('.id');
-                    $newId = is_string($newId)
+                    $newId = strtolower(
+                        is_string($newId)
                         ? $newId
-                        : stream_get_contents($newId);
+                        : stream_get_contents($newId)
+                    );
                     if ($criteria($response)) {
                         $idList .= $newId . ',';
                     }
@@ -424,61 +523,71 @@ class Util implements Countable
     /**
      * Gets a value of a specified item at the current menu.
      *
-     * @param int|string|null $number    A number identifying the item you're
-     *     targeting. Can also be an ID or (in some menus) name. For menus where
+     * @param int|string|null|Query $number    A number identifying the target
+     *     item. Can also be an ID or (in some menus) name. For menus where
      *     there are no items (e.g. "/system identity"), you can specify NULL.
-     * @param string          $valueName The name of the value you want to get.
+     *     You can also specify a query, in which case the first match will be
+     *     considered the target item.
+     * @param string|null           $valueName The name of the value to get.
+     *     If omitted, or set to NULL, gets all properties of the target item.
+     *     Note that for versions that don't support omitting $valueName
+     *     natively, a "print" with "detail" argument is used as a fallback,
+     *     which may not contain certain properties. 
      *
-     * @return string|resource|null|false The value of the specified property as
-     *     a string or as new PHP temp stream if the underlying
+     * @return string|resource|null|array The value of the specified
+     *     property as a string or as new PHP temp stream if the underlying
      *     {@link Client::isStreamingResponses()} is set to TRUE.
-     *     If the property is not set, NULL will be returned. FALSE on failure
+     *     If the property is not set, NULL will be returned.
+     *     If $valueName is NULL, returns all properties as an array, where
+     *     the result is parsed with {@link Script::parseValueToArray()}.
+     * 
+     * @throws RouterErrorException When the router returns an error response
      *     (e.g. no such item, invalid property, etc.).
      */
-    public function get($number, $valueName)
+    public function get($number, $valueName = null)
     {
         if (is_int($number) || ((string)$number === (string)(int)$number)) {
             $this->find();
             if (isset($this->idCache[(int)$number])) {
                 $number = $this->idCache[(int)$number];
             } else {
-                return false;
+                throw new RouterErrorException(
+                    'Unable to resolve number from ID cache (no such item maybe)',
+                    RouterErrorException::CODE_CACHE_ERROR
+                );
             }
+        } elseif ($number instanceof Query) {
+            $number = explode(',', $this->find($number));
+            $number = $number[0];
         }
 
-        //For new RouterOS versions
         $request = new Request($this->menu . '/get');
         $request->setArgument('number', $number);
         $request->setArgument('value-name', $valueName);
         $responses = $this->client->sendSync($request);
         if (Response::TYPE_ERROR === $responses->getType()) {
-            return false;
+            throw new RouterErrorException(
+                'Error getting property',
+                RouterErrorException::CODE_GET_ERROR,
+                null,
+                $responses
+            );
         }
+
         $result = $responses->getProperty('ret');
-        if (null !== $result) {
-            return $result;
+        if (Stream::isStream($result)) {
+            $result = stream_get_contents($result);
         }
-
-        // The "get" of old RouterOS versions returns an empty !done response.
-        // New versions return such only when the property is not set.
-        // This is a backup for old versions' sake.
-        $query = null;
-        if (null !== $number) {
-            $number = (string)$number;
-            $query = Query::where('.id', $number)->orWhere('name', $number);
+        if (null === $valueName) {
+            //Some earlier RouterOS versions use "," instead of ";" as separator
+            if (false === strpos($result, ';')
+                && 1 === preg_match('/^([^=,]+\=[^=,]*)(?:\,(?1))+$/', $result)
+            ) {
+                $result = str_replace(',', ';', $result);
+            }
+            return Script::parseValueToArray('{' . $result . '}');
         }
-        $responses = $this->getAll(
-            array('.proplist' => $valueName, 'detail'),
-            $query
-        );
-
-        if (0 === count($responses)) {
-            // @codeCoverageIgnoreStart
-            // New versions of RouterOS can't possibly reach this section.
-            return false;
-            // @codeCoverageIgnoreEnd
-        }
-        return $responses->getProperty($valueName);
+        return $result;
     }
 
     /**
@@ -654,18 +763,18 @@ class Util implements Countable
      * @param array<string,string|resource>|array<int,string> $...    Additional
      *     items.
      *
-     * @return string A comma separated list of the new items' IDs. If a
-     *     particular item was not added, this will be indicated by an empty
-     *     string in its spot on the list. e.g. "*1D,,*1E" means that
-     *     you supplied three items to be added, of which the second one was
-     *     not added for some reason.
+     * @return string A comma separated list of the new items' IDs.
+     * 
+     * @throws RouterErrorException When one or more items were not succesfully
+     *     added. Note that the response collection will include all replies of
+     *     all add commands, including the successful ones, in order.
      */
     public function add(array $values)
     {
         $addRequest = new Request($this->menu . '/add');
-        $idList = '';
+        $hasErrors = false;
+        $results = array();
         foreach (func_get_args() as $values) {
-            $idList .= ',';
             if (!is_array($values)) {
                 continue;
             }
@@ -676,12 +785,27 @@ class Util implements Countable
                     $addRequest->setArgument($name, $value);
                 }
             }
-            $id = $this->client->sendSync($addRequest)->getProperty('ret');
-            if (null !== $this->idCache) {
-                $this->idCache[] = $id;
+            $result = $this->client->sendSync($addRequest);
+            if (count($result->getAllOfType(Response::TYPE_ERROR)) > 0) {
+                $hasErrors = true;
             }
-            $idList .= $id;
+            $results = array_merge($results, $result->toArray());
             $addRequest->removeAllArguments();
+        }
+
+        $this->clearIdCache();
+        if ($hasErrors) {
+            throw new RouterErrorException(
+                'Router returned error when adding items',
+                RouterErrorException::CODE_ADD_ERROR,
+                null,
+                new ResponseCollection($results)
+            );
+        }
+        $results = new ResponseCollection($results);
+        $idList = '';
+        foreach ($results->getAllOfType(Response::TYPE_FINAL) as $final) {
+            $idList .= ',' . strtolower($final->getProperty('ret'));
         }
         return substr($idList, 1);
     }
@@ -729,15 +853,13 @@ class Util implements Countable
      * queries are allowed as a criteria, in contrast with
      * {@link static::find()}, where numbers and callbacks are allowed also.
      *
-     * @param int        $mode  The counter mode.
-     *     Currently ignored, but present for compatibility with PHP 5.6+.
      * @param Query|null $query A query to filter items by. Without it, all items
      *     are included in the count.
      *
      * @return int The number of items, or -1 on failure (e.g. if the
      *     current menu does not have a "print" command or items to be counted).
      */
-    public function count($mode = COUNT_NORMAL, Query $query = null)
+    public function count(Query $query = null)
     {
         $result = $this->client->sendSync(
             new Request($this->menu . '/print count-only=""', $query)
@@ -775,12 +897,16 @@ class Util implements Countable
      *     filter items by.
      *     NULL to get all items.
      *
-     * @return ResponseCollection|false A response collection with all
+     * @return ResponseCollection A response collection with all
      *     {@link Response::TYPE_DATA} responses. The collection will be empty
-     *     when there are no matching items. FALSE on failure.
+     *     when there are no matching items.
      *
      * @throws NotSupportedException If $args contains prohibited arguments
      *     ("follow", "follow-only" or "count-only").
+     *
+     * @throws RouterErrorException When there's an error upon attempting to
+     *     call the "print" command on the specified menu (e.g. if there's no
+     *     "print" command at the menu to begin with).
      */
     public function getAll(array $args = array(), Query $query = null)
     {
@@ -792,7 +918,7 @@ class Util implements Countable
                 $printRequest->setArgument($name, $value);
             }
         }
-        
+
         foreach (array('follow', 'follow-only', 'count-only') as $arg) {
             if ($printRequest->getArgument($arg) !== null) {
                 throw new NotSupportedException(
@@ -806,7 +932,12 @@ class Util implements Countable
         $responses = $this->client->sendSync($printRequest);
 
         if (count($responses->getAllOfType(Response::TYPE_ERROR)) > 0) {
-            return false;
+            throw new RouterErrorException(
+                'Error when reading items',
+                RouterErrorException::CODE_GETALL_ERROR,
+                null,
+                $responses
+            );
         }
         return $responses->getAllOfType(Response::TYPE_DATA);
     }
@@ -914,24 +1045,25 @@ class Util implements Countable
      *     new PHP temp stream if the underlying
      *     {@link Client::isStreamingResponses()} is set to TRUE.
      *     FALSE is returned if there is no such file.
+     *
+     * @throws RouterErrorException When there's an error with the temporary
+     *     script used to get the file.
      */
     public function fileGetContents($filename, $tmpScriptName = null)
     {
         $checkRequest = new Request(
-            '/file/print',
+            '/file/print .proplist=""',
             Query::where('name', $filename)
         );
         if (1 === count($this->client->sendSync($checkRequest))) {
             return false;
         }
-        $contents = $this->_exec(
+        return $this->exec(
             '/system script set $"_" source=[/file get $filename contents]',
             array('filename' => $filename),
             null,
-            $tmpScriptName,
-            true
+            $tmpScriptName
         );
-        return $contents;
     }
 
     /**
@@ -954,96 +1086,5 @@ class Util implements Countable
             call_user_func_array(array($this, 'find'), $args)
         );
         return $this->client->sendSync($bulkRequest);
-    }
-
-    /**
-     * Executes a RouterOS script.
-     *
-     * Same as the public equivalent, with the addition of allowing you to get
-     * the contents of the script post execution, instead of removing it.
-     *
-     * @param string|resource     $source The source of the script, as a string
-     *     or stream. If a stream is provided, reading starts from the current
-     *     position to the end of the stream, and the pointer stays at the end
-     *     after reading is done.
-     * @param array<string,mixed> $params An array of parameters to make
-     *     available in the script as local variables.
-     *     Variable names are array keys, and variable values are array values.
-     *     Array values are automatically processed with
-     *     {@link Script::escapeValue()}. Streams are also supported, and are
-     *     processed in chunks, each processed with
-     *     {@link Script::escapeString()}. Processing starts from the current
-     *     position to the end of the stream, and the stream's pointer is left
-     *     untouched after the reading is done.
-     *     Note that the script's (generated) name is always added as the
-     *     variable "_", which will be inadvertently lost if you overwrite it
-     *     from here.
-     * @param string|null         $policy Allows you to specify a policy the
-     *     script must follow. Has the same format as in terminal.
-     *     If left NULL, the script has no restrictions beyond those imposed by
-     *     the username.
-     * @param string|null         $name   The script is executed after being
-     *     saved in "/system script" and is removed after execution.
-     *     If this argument is left NULL, a random string,
-     *     prefixed with the computer's name, is generated and used
-     *     as the script's name.
-     *     To eliminate any possibility of name clashes,
-     *     you can specify your own name instead.
-     * @param bool                $get    Whether to get the source
-     *     of the script.
-     *
-     * @return ResponseCollection|string Returns the response collection of the
-     *     run, allowing you to inspect errors, if any.
-     *     If the script was not added successfully before execution, the
-     *     ResponseCollection from the add attempt is going to be returned.
-     *     If $get is TRUE, returns the source of the script on success.
-     */
-    private function _exec(
-        $source,
-        array $params = array(),
-        $policy = null,
-        $name = null,
-        $get = false
-    ) {
-        $request = new Request('/system/script/add');
-        if (null === $name) {
-            $name = uniqid(gethostname(), true);
-        }
-        $request->setArgument('name', $name);
-        $request->setArgument('policy', $policy);
-
-        $params += array('_' => $name);
-
-        $finalSource = fopen('php://temp', 'r+b');
-        fwrite(
-            $finalSource,
-            '/' . str_replace('/', ' ', substr($this->menu, 1)). "\n"
-        );
-        Script::append($finalSource, $source, $params);
-        fwrite($finalSource, "\n");
-        rewind($finalSource);
-
-        $request->setArgument('source', $finalSource);
-        $result = $this->client->sendSync($request);
-
-        if (0 === count($result->getAllOfType(Response::TYPE_ERROR))) {
-            $request = new Request('/system/script/run');
-            $request->setArgument('number', $name);
-            $result = $this->client->sendSync($request);
-
-            if ($get) {
-                $result = $this->client->sendSync(
-                    new Request(
-                        '/system/script/print .proplist="source"',
-                        Query::where('name', $name)
-                    )
-                )->getProperty('source');
-            }
-            $request = new Request('/system/script/remove');
-            $request->setArgument('numbers', $name);
-            $this->client->sendSync($request);
-        }
-
-        return $result;
     }
 }

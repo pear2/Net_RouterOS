@@ -181,24 +181,13 @@ abstract class Message implements IteratorAggregate, Countable
     }
 
     /**
-     * Counts the number of arguments.
+     * Counts the number of attributes.
      *
-     * @param int $mode The counter mode.
-     *     Either COUNT_NORMAL or COUNT_RECURSIVE.
-     *     When in normal mode, counts the number of arguments.
-     *     When in recursive mode, counts the number of API words
-     *     (including the empty word at the end).
-     *
-     * @return int The number of arguments/words.
+     * @return int The number of attributes.
      */
-    public function count($mode = COUNT_NORMAL)
+    public function count()
     {
-        $result = count($this->attributes);
-        if ($mode !== COUNT_NORMAL) {
-            $result += 2/*first+last word*/
-                + (int)(null !== $this->getTag());
-        }
-        return $result;
+        return count($this->attributes);
     }
 
     /**

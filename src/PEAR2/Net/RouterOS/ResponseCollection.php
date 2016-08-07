@@ -217,26 +217,13 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     }
 
     /**
-     * Counts the responses/words in the collection.
-     *
-     * @param int $mode The counter mode.
-     *     Either COUNT_NORMAL or COUNT_RECURSIVE.
-     *     When in normal mode, counts the number of responses.
-     *     When in recursive mode, counts the total number of API words.
+     * Counts the responses in the collection.
      *
      * @return int The number of responses in the collection.
      */
-    public function count($mode = COUNT_NORMAL)
+    public function count()
     {
-        if ($mode !== COUNT_NORMAL) {
-            $result = 0;
-            foreach ($this->responses as $response) {
-                $result += $response->count($mode);
-            }
-            return $result;
-        } else {
-            return count($this->responses);
-        }
+        return count($this->responses);
     }
 
     /**

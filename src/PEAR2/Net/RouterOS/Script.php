@@ -395,7 +395,7 @@ class Script
         }
         throw new ParserException(
             'The supplied value can not be converted to an array',
-            ParserException::CODE_DATETIME
+            ParserException::CODE_ARRAY
         );
     }
 

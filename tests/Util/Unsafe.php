@@ -9,13 +9,14 @@ use PEAR2\Net\RouterOS\Client;
 use PEAR2\Net\RouterOS\Query;
 use PEAR2\Net\RouterOS\Request;
 use PEAR2\Net\RouterOS\Response;
+use PEAR2\Net\RouterOS\RouterErrorException;
 use PEAR2\Net\RouterOS\Util;
 use PHPUnit_Framework_TestCase;
 
 abstract class Unsafe extends PHPUnit_Framework_TestCase
 {
-    const REGEX_ID = '\*[A-F0-9]+';
-    const REGEX_IDLIST = '/^((\*[A-F0-9]+)?\,)*(\*[A-F0-9]+)$/';
+    const REGEX_ID = '\*[a-f0-9]+';
+    const REGEX_IDLIST = '/^((\*[a-f0-9]+)\,)*(\*[a-f0-9]+)$/';
 
     /**
      * @var Util
@@ -94,13 +95,15 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             )
         );
         $printRequest = new Request(
-            '/queue/simple/print',
-            Query::where('.id', $id)
+            '/queue/simple/print'
         );
+        $printRequest->setArgument('from', $id);
 
+        $result = $this->client->sendSync($printRequest);
         $this->assertSame(
             'false',
-            $this->client->sendSync($printRequest)->getProperty('disabled')
+            $result->getProperty('disabled'),
+            print_r($result->toArray(), true) . ';;' . print_r($printRequest, true)
         );
 
         $this->util->disable($id);
@@ -210,9 +213,9 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         );
 
         $printRequest = new Request(
-            '/queue/simple/print',
-            Query::where('.id', $id)
+            '/queue/simple/print'
         );
+        $printRequest->setArgument('from', $id);
 
         $responses = $this->client->sendSync($printRequest);
         $this->assertSame(
@@ -280,22 +283,42 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         );
 
         $numberName = $this->util->get($itemCount, 'name');
-        $numberNameNot = $this->util->get(1 + $itemCount, 'name');
+        try {
+            $this->util->get(1 + $itemCount, 'name');
+        } catch (RouterErrorException $e) {
+            $this->assertSame(
+                RouterErrorException::CODE_CACHE_ERROR,
+                $e->getCode()
+            );
+        }
         $idName = $this->util->get($id, 'name');
         $nameTarget = $this->util->get(TEST_QUEUE_NAME, 'target');
         $nameNot = $this->util->get(TEST_QUEUE_NAME, 'total-max-limit');
-        $nameInvalid = $this->util->get(TEST_QUEUE_NAME, 'p2p');
+        try {
+            $this->util->get(TEST_QUEUE_NAME, 'p2p');
+        } catch (RouterErrorException $e) {
+            $this->assertSame(
+                RouterErrorException::CODE_GET_ERROR,
+                $e->getCode()
+            );
+        }
         $this->util->remove($id);
-        $nameTargetNot = $this->util->get(
-            TEST_QUEUE_NAME,
-            'target'
-        );
+        try {
+            $this->util->get(
+                TEST_QUEUE_NAME,
+                'target'
+            );
+        } catch (RouterErrorException $e) {
+            $this->assertSame(
+                RouterErrorException::CODE_GET_ERROR,
+                $e->getCode()
+            );
+        }
 
         $this->assertSame(
             TEST_QUEUE_NAME,
             $numberName
         );
-        $this->assertFalse($numberNameNot);
         $this->assertSame(
             TEST_QUEUE_NAME,
             $idName
@@ -305,8 +328,6 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             $nameTarget
         );
         $this->assertNull($nameNot);
-        $this->assertFalse($nameInvalid);
-        $this->assertFalse($nameTargetNot);
     }
 
     /**
@@ -352,15 +373,16 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         );
 
         $printRequest = new Request(
-            '/queue/simple/print',
-            Query::where('.id', $id)
+            '/queue/simple/print'
         );
+        $printRequest->setArgument('from', $id);
 
         $responses = $this->client->sendSync($printRequest);
         $this->assertNotSame('true', $responses->getProperty('disabled'));
         $this->assertSame(
             HOSTNAME_SILENT . '/32',
-            $responses->getProperty('target')
+            $responses->getProperty('target'),
+            print_r($responses->toArray(), true) . ';;' . print_r($printRequest, true)
         );
 
         $this->util->set(

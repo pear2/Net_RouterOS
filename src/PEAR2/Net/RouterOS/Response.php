@@ -316,23 +316,4 @@ class Response extends Message
     {
         return $this->unrecognizedWords;
     }
-
-    /**
-     * Counts the number of arguments or words.
-     *
-     * @param int $mode The counter mode.
-     *     Either COUNT_NORMAL or COUNT_RECURSIVE.
-     *     When in normal mode, counts the number of arguments.
-     *     When in recursive mode, counts the number of API words.
-     *
-     * @return int The number of arguments/words.
-     */
-    public function count($mode = COUNT_NORMAL)
-    {
-        $result = parent::count($mode);
-        if ($mode !== COUNT_NORMAL) {
-            $result += count($this->unrecognizedWords);
-        }
-        return $result;
-    }
 }
