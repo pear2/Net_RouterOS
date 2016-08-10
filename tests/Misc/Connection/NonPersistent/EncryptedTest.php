@@ -10,7 +10,7 @@ require_once __DIR__ . '/../NonPersistent.php';
 /**
  * @group Misc
  * @group NonPersistent
- * @group Encrypted
+ * @group EncryptedNonPersistentStart
  *
  * @requires extension openssl
  */

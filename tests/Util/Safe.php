@@ -3,11 +3,12 @@
 namespace PEAR2\Net\RouterOS\Test\Util;
 
 use PEAR2\Net\RouterOS\Client;
-use PEAR2\Net\RouterOS\NotSupportedException;
 use PEAR2\Net\RouterOS\InvalidArgumentException;
+use PEAR2\Net\RouterOS\NotSupportedException;
 use PEAR2\Net\RouterOS\Query;
 use PEAR2\Net\RouterOS\Request;
 use PEAR2\Net\RouterOS\Response;
+use PEAR2\Net\RouterOS\RouterErrorException;
 use PEAR2\Net\RouterOS\Util;
 use PHPUnit_Framework_TestCase;
 
@@ -30,6 +31,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
     {
         $this->assertSame('/', $this->util->getMenu());
         $this->assertSame('/', $this->util->setMenu('/')->getMenu());
+        $this->assertSame('/', $this->util->setMenu('')->getMenu());
         $this->assertSame(
             '/queue',
             $this->util->setMenu('queue')->getMenu()
@@ -350,6 +352,19 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $queues = $this->util->getAll();
         $this->assertInstanceOf(ROS_NAMESPACE . '\ResponseCollection', $queues);
         $this->assertSameSize($queues, $this->util);
+
+        $this->client->setStreamingResponses(false);
+        $this->util->setMenu('/');
+        try {
+            $this->util->getAll();
+            $this->fail(
+                'There should not be "print" at the root menu'
+            );
+        } catch (RouterErrorException $e) {
+            $this->assertSame(RouterErrorException::CODE_GETALL_ERROR, $e->getCode());
+            $this->assertInstanceof(ROS_NAMESPACE . '\ResponseCollection', $e->getResponses());
+            $this->assertSame(Response::TYPE_ERROR, $e->getResponses()->getType());
+        }
     }
 
     public function testInvalidCount()

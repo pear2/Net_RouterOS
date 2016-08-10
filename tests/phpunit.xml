@@ -180,6 +180,10 @@
             <group>Communicator</group>
             <group>Util</group>
             <group>Misc</group>
+            
+            <!-- Special case -->
+            <!-- Encrypted connections should start though they are unstable -->
+            <group>EncryptedNonPersistentStart</group>
         </include>
         <exclude>
             <!-- Connection -->
@@ -188,6 +192,10 @@
             <!-- Actions on router -->
 
             <!-- Interaction class used -->
+
+            <!-- Special case -->
+            <!-- Encrypted persistent connections start... and nothing more -->
+            <group>EncryptedPersistentStart</group>
         </exclude>
     </groups>
     <filter>

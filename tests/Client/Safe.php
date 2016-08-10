@@ -825,7 +825,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $this->assertEquals(
             2,
             count($list),
-            'The list should have only one item and a "done" reply.'
+            'The list should have only one item and a "done" reply. target=' . HOSTNAME_INVALID . ';list=' . print_r($list->toArray(), true)
         );
 
         $request->setQuery(

@@ -58,7 +58,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
                 \HOSTNAME,
                 USERNAME,
                 PASSWORD,
-                PORT,
+                static::$encryption ? ENC_PORT : PORT,
                 static::$persistent,
                 null,
                 static::$encryption
@@ -80,7 +80,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
                 \HOSTNAME,
                 USERNAME,
                 PASSWORD,
-                PORT,
+                static::$encryption ? ENC_PORT : PORT,
                 static::$persistent,
                 null,
                 static::$encryption
@@ -95,7 +95,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
                 \HOSTNAME,
                 USERNAME,
                 PASSWORD,
-                PORT,
+                static::$encryption ? ENC_PORT : PORT,
                 static::$persistent,
                 null,
                 static::$encryption
@@ -123,7 +123,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
                 \HOSTNAME,
                 ANSI_USERNAME,
                 ANSI_PASSWORD,
-                PORT,
+                static::$encryption ? ENC_PORT : PORT,
                 static::$persistent,
                 null,
                 static::$encryption
@@ -161,7 +161,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
                 PORT,
                 static::$persistent,
                 null,
-                static::$encryption,
+                null,//Encrypted connections are too sensitive to their contexts
                 $context
             );
         } catch (SocketException $e) {
@@ -176,7 +176,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
                 \HOSTNAME,
                 USERNAME_INVALID,
                 PASSWORD,
-                PORT,
+                static::$encryption ? ENC_PORT : PORT,
                 static::$persistent,
                 null,
                 static::$encryption
@@ -203,7 +203,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
                 \HOSTNAME,
                 USERNAME,
                 PASSWORD_INVALID,
-                PORT,
+                static::$encryption ? ENC_PORT : PORT,
                 static::$persistent,
                 null,
                 static::$encryption
@@ -230,7 +230,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
                 \HOSTNAME,
                 USERNAME_INVALID,
                 PASSWORD_INVALID,
-                PORT,
+                static::$encryption ? ENC_PORT : PORT,
                 static::$persistent,
                 null,
                 static::$encryption
@@ -262,7 +262,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
                 PORT,
                 static::$persistent,
                 null,
-                static::$encryption
+                null//Encryption errors cause a connection fail instead
             );
 
             $this->fail(
@@ -286,7 +286,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
                 \HOSTNAME_SILENT,
                 USERNAME,
                 PASSWORD,
-                PORT,
+                static::$encryption ? ENC_PORT : PORT,
                 static::$persistent,
                 null,
                 static::$encryption
@@ -321,7 +321,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
                 PORT_INVALID,
                 static::$persistent,
                 null,
-                static::$encryption
+                null//Encryption errors cause a connection fail instead
             );
 
             $this->fail(
@@ -376,7 +376,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
                 \HOSTNAME,
                 USERNAME,
                 PASSWORD,
-                PORT,
+                static::$encryption ? ENC_PORT : PORT,
                 static::$persistent,
                 'invalidTimeout',
                 static::$encryption
@@ -448,7 +448,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
         try {
             $com = new Communicator(
                 \HOSTNAME,
-                PORT,
+                static::$encryption ? ENC_PORT : PORT,
                 static::$persistent,
                 null,
                 '',
@@ -472,7 +472,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
     {
         $com = new Communicator(
             \HOSTNAME,
-            PORT,
+            static::$encryption ? ENC_PORT : PORT,
             static::$persistent,
             null,
             '',
@@ -499,7 +499,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
     {
         $com = new Communicator(
             HOSTNAME,
-            PORT,
+            static::$encryption ? ENC_PORT : PORT,
             static::$persistent,
             null,
             '',
@@ -531,7 +531,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
     {
         $com = new Communicator(
             HOSTNAME,
-            PORT,
+            static::$encryption ? ENC_PORT : PORT,
             static::$persistent,
             null,
             '',
@@ -563,7 +563,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
     {
         $com = new Communicator(
             HOSTNAME,
-            PORT,
+            static::$encryption ? ENC_PORT : PORT,
             static::$persistent,
             null,
             '',
@@ -577,7 +577,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
 
         $com = new Communicator(
             HOSTNAME,
-            PORT,
+            static::$encryption ? ENC_PORT : PORT,
             static::$persistent,
             null,
             '',
@@ -608,7 +608,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
 
         $com = new Communicator(
             HOSTNAME,
-            PORT,
+            static::$encryption ? ENC_PORT : PORT,
             static::$persistent,
             null,
             '',
@@ -634,7 +634,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
 
         $com = new Communicator(
             HOSTNAME,
-            PORT,
+            static::$encryption ? ENC_PORT : PORT,
             static::$persistent,
             null,
             '',
@@ -655,7 +655,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
 
         $com = new Communicator(
             HOSTNAME,
-            PORT,
+            static::$encryption ? ENC_PORT : PORT,
             static::$persistent,
             null,
             '',

@@ -59,10 +59,10 @@ class RouterErrorException extends RuntimeException implements Exception
     const CODE_COMMENT_ERROR        = 0x120042;
     const CODE_UNSET_ERROR          = 0x120082;
     const CODE_MOVE_ERROR           = 0x120107;
-    const CODE_SCRIPT_GET_ERROR     = 0x210001;
     const CODE_SCRIPT_ADD_ERROR     = 0x220001;
     const CODE_SCRIPT_REMOVE_ERROR  = 0x220004;
     const CODE_SCRIPT_RUN_ERROR     = 0x240001;
+    const CODE_SCRIPT_FILE_ERROR    = 0x240003;
 
     /**
      * @var ResponseCollection|null The complete response returned by the router.

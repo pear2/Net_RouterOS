@@ -126,7 +126,7 @@ class Util implements Countable
             } elseif ('/' === $newMenu[0]) {
                 $this->menu = $menuRequest->setCommand($newMenu)->getCommand();
             } else {
-                $newMenu = substr(
+                $newMenu = (string)substr(
                     $menuRequest->setCommand(
                         '/' .
                         str_replace('/', ' ', (string)substr($this->menu, 1)) .
@@ -235,16 +235,13 @@ class Util implements Countable
      *     To eliminate any possibility of name clashes,
      *     you can specify your own name instead.
      *
-     * @return string|resource The source of the script, as it appears after
-     *     the run, right before it is removed.
-     *     This can be used for easily retrieving basic output,
-     *     by modifying the script from inside the script
-     *     (use the $"_" variable to refer to the script's name within the
-     *     "/system script" menu).
+     * @return ResponseCollection The responses of all requests involved, i.e.
+     *     the add, the run and the remove.
      * 
      * @throws RouterErrorException When there is an error in any step of the
      *     way. The reponses include all successful commands prior to the error
-     *     as well.
+     *     as well. If the error occurs during the run, there will also be a
+     *     remove attempt, and the results will include its results as well.
      */
     public function exec(
         $source,
@@ -286,56 +283,46 @@ class Util implements Countable
         $request = new Request('/system/script/run');
         $request->setArgument('number', $name);
         $runResult = $this->client->sendSync($request);
+        $request = new Request('/system/script/remove');
+        $request->setArgument('numbers', $name);
+        $removeResult = $this->client->sendSync($request);
+
         if (count($runResult->getAllOfType(Response::TYPE_ERROR)) > 0) {
             throw new RouterErrorException(
                 'Error when running script',
                 RouterErrorException::CODE_SCRIPT_RUN_ERROR,
                 null,
                 new ResponseCollection(
-                    array_merge($addResult->toArray(), $runResult->toArray())
-                )
-            );
-        }
-
-        $request = new Request('/system/script/get');
-        $request->setArgument('number', $name);
-        $request->setArgument('value-name', 'source');
-        $getResult = $this->client->sendSync($request);
-        if (count($getResult->getAllOfType(Response::TYPE_ERROR)) > 0) {
-            throw new RouterErrorException(
-                'Error when getting script source',
-                RouterErrorException::CODE_SCRIPT_GET_ERROR,
-                null,
-                new ResponseCollection(
                     array_merge(
                         $addResult->toArray(),
                         $runResult->toArray(),
-                        $getResult->toArray()
-                    )
-                )
-            );
-        }
-        $postSource = $getResult->end()->getProperty('ret');
-        
-        $request = new Request('/system/script/remove');
-        $request->setArgument('numbers', $name);
-        $removeResult = $this->client->sendSync($request);
-        if (count($removeResult->getAllOfType(Response::TYPE_ERROR)) > 0) {
-            throw new RouterErrorException(
-                'Error when getting script source',
-                RouterErrorException::CODE_SCRIPT_GET_ERROR,
-                null,
-                new ResponseCollection(
-                    array_merge(
-                        $addResult->toArray(),
-                        $runResult->toArray(),
-                        $getResult->toArray(),
                         $removeResult->toArray()
                     )
                 )
             );
         }
-        return $postSource;
+        if (count($removeResult->getAllOfType(Response::TYPE_ERROR)) > 0) {
+            throw new RouterErrorException(
+                'Error when removing script',
+                RouterErrorException::CODE_SCRIPT_REMOVE_ERROR,
+                null,
+                new ResponseCollection(
+                    array_merge(
+                        $addResult->toArray(),
+                        $runResult->toArray(),
+                        $removeResult->toArray()
+                    )
+                )
+            );
+        }
+
+        return new ResponseCollection(
+            array_merge(
+                $addResult->toArray(),
+                $runResult->toArray(),
+                $removeResult->toArray()
+            )
+        );
     }
 
     /**
@@ -535,9 +522,6 @@ class Util implements Countable
      *     considered the target item.
      * @param string|null           $valueName The name of the value to get.
      *     If omitted, or set to NULL, gets all properties of the target item.
-     *     Note that for versions that don't support omitting $valueName
-     *     natively, a "print" with "detail" argument is used as a fallback,
-     *     which may not contain certain properties. 
      *
      * @return string|resource|null|array The value of the specified
      *     property as a string or as new PHP temp stream if the underlying
@@ -551,7 +535,10 @@ class Util implements Countable
      */
     public function get($number, $valueName = null)
     {
-        if (is_int($number) || ((string)$number === (string)(int)$number)) {
+        if ($number instanceof Query) {
+            $number = explode(',', $this->find($number));
+            $number = $number[0];
+        } elseif (is_int($number) || ((string)$number === (string)(int)$number)) {
             $this->find();
             if (isset($this->idCache[(int)$number])) {
                 $number = $this->idCache[(int)$number];
@@ -561,9 +548,6 @@ class Util implements Countable
                     RouterErrorException::CODE_CACHE_ERROR
                 );
             }
-        } elseif ($number instanceof Query) {
-            $number = explode(',', $this->find($number));
-            $number = $number[0];
         }
 
         $request = new Request($this->menu . '/get');
@@ -584,12 +568,15 @@ class Util implements Countable
             $result = stream_get_contents($result);
         }
         if (null === $valueName) {
+            // @codeCoverageIgnoreStart
             //Some earlier RouterOS versions use "," instead of ";" as separator
+            //Newer versions can't possibly enter this condition
             if (false === strpos($result, ';')
-                && 1 === preg_match('/^([^=,]+\=[^=,]*)(?:\,(?1))+$/', $result)
+                && preg_match('/^([^=,]+\=[^=,]*)(?:\,(?1))+$/', $result)
             ) {
                 $result = str_replace(',', ';', $result);
             }
+            // @codeCoverageIgnoreEnd
             return Script::parseValueToArray('{' . $result . '}');
         }
         return $result;
@@ -1120,29 +1107,45 @@ class Util implements Countable
      *     To eliminate any possibility of name clashes,
      *     you can specify your own name instead.
      *
-     * @return string|resource|false The contents of the file as a string or as
+     * @return string|resource The contents of the file as a string or as
      *     new PHP temp stream if the underlying
      *     {@link Client::isStreamingResponses()} is set to TRUE.
-     *     FALSE is returned if there is no such file.
      *
      * @throws RouterErrorException When there's an error with the temporary
-     *     script used to get the file.
+     *     script used to get the file, or if the file doesn't exist.
      */
     public function fileGetContents($filename, $tmpScriptName = null)
     {
-        $checkRequest = new Request(
-            '/file/print .proplist=""',
-            Query::where('name', $filename)
-        );
-        if (1 === count($this->client->sendSync($checkRequest))) {
-            return false;
+        try {
+            $responses = $this->exec(
+                ':error ("&" . [/file get $filename contents]);',
+                array('filename' => $filename),
+                null,
+                $tmpScriptName
+            );
+            throw new RouterErrorException(
+                'Unable to read file through script (no error returned)',
+                RouterErrorException::CODE_SCRIPT_FILE_ERROR,
+                null,
+                $responses
+            );
+        } catch (RouterErrorException $e) {
+            if ($e->getCode() !== RouterErrorException::CODE_SCRIPT_RUN_ERROR) {
+                throw $e;
+            }
+            $message = $e->getResponses()->getAllOfType(Response::TYPE_ERROR)
+                ->getProperty('message');
+            if (Stream::isStream($message)) {
+                $successToken = fread($message, 1/*strlen('&')*/);
+                if ('&' === $successToken) {
+                    return $message;
+                }
+                rewind($message);
+            } elseif (strpos($message, '&') === 0) {
+                return substr($message, 1/*strlen('&')*/);
+            }
+            throw $e;
         }
-        return $this->exec(
-            '/system script set $"_" source=[/file get $filename contents]',
-            array('filename' => $filename),
-            null,
-            $tmpScriptName
-        );
     }
 
     /**

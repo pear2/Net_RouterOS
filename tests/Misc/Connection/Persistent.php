@@ -30,7 +30,7 @@ abstract class Persistent extends Connection
     {
         $com1 = new Communicator(
             \HOSTNAME,
-            PORT,
+            static::$encryption ? ENC_PORT : PORT,
             true,
             null,
             static::$encryption
@@ -40,7 +40,7 @@ abstract class Persistent extends Connection
         
         $com2 = new Communicator(
             \HOSTNAME,
-            PORT,
+            static::$encryption ? ENC_PORT : PORT,
             true,
             null,
             static::$encryption

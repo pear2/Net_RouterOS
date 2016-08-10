@@ -10,7 +10,7 @@ require_once __DIR__ . '/../Persistent.php';
 /**
  * @group Misc
  * @group Persistent
- * @group Encrypted
+ * @group EncryptedPersistentStart
  *
  * @requires PHP 5.3.9
  * @requires extension openssl

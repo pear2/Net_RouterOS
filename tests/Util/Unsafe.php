@@ -9,6 +9,7 @@ use PEAR2\Net\RouterOS\Client;
 use PEAR2\Net\RouterOS\Query;
 use PEAR2\Net\RouterOS\Request;
 use PEAR2\Net\RouterOS\Response;
+use PEAR2\Net\RouterOS\ResponseCollection;
 use PEAR2\Net\RouterOS\RouterErrorException;
 use PEAR2\Net\RouterOS\Util;
 use PHPUnit_Framework_TestCase;
@@ -46,6 +47,17 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             )->getProperty('disabled')
         );
         $printRequest->setQuery(null);
+
+        try {
+            $this->util->add(array('name' => TEST_QUEUE_NAME, 'disabled'));
+            $this->fail(
+                'Creating a queue with a duplicated name should throw an exception.'
+            );
+        } catch (RouterErrorException $e) {
+            $this->assertSame(RouterErrorException::CODE_ADD_ERROR, $e->getCode());
+            $this->assertInstanceof(ROS_NAMESPACE . '\ResponseCollection', $e->getResponses());
+            $this->assertSame(Response::TYPE_ERROR, $e->getResponses()->getType());
+        }
 
         $removeRequest = new Request('/queue/simple/remove');
         $removeRequest->setArgument('numbers', $id);
@@ -126,7 +138,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @depends testDisableAndEnable
+     * @depends testAdd
      *
      * @return void
      */
@@ -293,6 +305,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         }
         $idName = $this->util->get($id, 'name');
         $nameTarget = $this->util->get(TEST_QUEUE_NAME, 'target');
+        $queryTarget = $this->util->get(Query::where('name', TEST_QUEUE_NAME), 'target');
         $nameNot = $this->util->get(TEST_QUEUE_NAME, 'total-max-limit');
         try {
             $this->util->get(TEST_QUEUE_NAME, 'p2p');
@@ -302,6 +315,10 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
                 $e->getCode()
             );
         }
+        $idAll = $this->util->get($id);
+        $nameAll = $this->util->get(TEST_QUEUE_NAME);
+        $queryAll = $this->util->get(Query::where('name', TEST_QUEUE_NAME));
+        
         $this->util->remove($id);
         try {
             $this->util->get(
@@ -327,7 +344,36 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             HOSTNAME_SILENT . '/32',
             $nameTarget
         );
+        $this->assertSame(
+            HOSTNAME_SILENT . '/32',
+            $queryTarget
+        );
         $this->assertNull($nameNot);
+
+        $this->assertInternalType('array', $idAll);
+        $this->assertArraySubset(
+            array(
+                'name' => TEST_QUEUE_NAME, 
+                'target' => HOSTNAME_SILENT . '/32'
+            ),
+            $idAll
+        );
+        $this->assertInternalType('array', $nameAll);
+        $this->assertArraySubset(
+            array(
+                'name' => TEST_QUEUE_NAME, 
+                'target' => HOSTNAME_SILENT . '/32'
+            ),
+            $nameAll
+        );
+        $this->assertInternalType('array', $queryAll);
+        $this->assertArraySubset(
+            array(
+                'name' => TEST_QUEUE_NAME, 
+                'target' => HOSTNAME_SILENT . '/32'
+            ),
+            $queryAll
+        );
     }
 
     /**
@@ -847,6 +893,75 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         $this->assertSame('1w1d00:00:00', $results->getProperty('comment'));
     }
 
+    /**
+     * @depends testExec
+     * @depends testAdd
+     *
+     * @return void
+     */
+    public function testExecExceptions()
+    {
+        $this->util->setMenu('/system script')->add(
+            array(
+                'name' => TEST_SCRIPT_NAME,
+                'source' => '#TEST'
+            )
+        );
+        try {
+            $this->util->exec(
+                '#TESTING',
+                array(),
+                null,
+                TEST_SCRIPT_NAME
+            );
+            $this->fail(
+                'Adding a script with duplicated name should throw an exception'
+            );
+        } catch (RouterErrorException $e) {
+            $this->assertSame(RouterErrorException::CODE_SCRIPT_ADD_ERROR, $e->getCode());
+            $this->assertInstanceof(ROS_NAMESPACE . '\ResponseCollection', $e->getResponses());
+            $this->assertSame(Response::TYPE_ERROR, $e->getResponses()->getType());
+        }
+        $this->util->remove(TEST_SCRIPT_NAME);
+
+        try {
+            $this->util->exec(
+                ':error "My error message";',
+                array(),
+                null,
+                TEST_SCRIPT_NAME
+            );
+            $this->fail(
+                'Uncaught errors from the result should throw an exception'
+            );
+        } catch (RouterErrorException $e) {
+            $this->assertSame(RouterErrorException::CODE_SCRIPT_RUN_ERROR, $e->getCode());
+            $this->assertInstanceof(ROS_NAMESPACE . '\ResponseCollection', $e->getResponses());
+            $this->assertSame(Response::TYPE_FINAL, $e->getResponses()->getType());
+            $this->assertSame(Response::TYPE_ERROR, $e->getResponses()->seek(1)->getType());
+            $this->assertSame(Response::TYPE_FINAL, $e->getResponses()->seek(-2)->getType());
+            $this->assertSame(Response::TYPE_FINAL, $e->getResponses()->seek(-1)->getType());
+        }
+
+        try {
+            $this->util->exec(
+                '/system script remove $"_"',
+                array(),
+                null,
+                TEST_SCRIPT_NAME
+            );
+            $this->fail(
+                'Removing the script from inside should throw an exception'
+            );
+        } catch (RouterErrorException $e) {
+            $this->assertSame(RouterErrorException::CODE_SCRIPT_REMOVE_ERROR, $e->getCode());
+            $this->assertInstanceof(ROS_NAMESPACE . '\ResponseCollection', $e->getResponses());
+            $this->assertSame(Response::TYPE_FINAL, $e->getResponses()->getType());
+            $this->assertSame(Response::TYPE_FINAL, $e->getResponses()->seek(1)->getType());
+            $this->assertSame(Response::TYPE_ERROR, $e->getResponses()->seek(2)->getType());
+        }
+    }
+
     public function testMove()
     {
         $this->util->setMenu('/queue/simple');
@@ -877,6 +992,106 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         $this->assertCount(1, $result);
     }
 
+    /**
+     * @depends testDisableAndEnable
+     * @depends testRemove
+     * @depends testComment
+     * @depends testUnsetValue
+     * @depends testMove
+     * @depends testSetAndEdit
+     * @depends testGet
+     *
+     * @return void
+     */
+    public function testAbsenseExceptions()
+    {
+        try {
+            $this->util->disable('');
+            $this->fail(
+                'There should not be "disable" at the root menu'
+            );
+        } catch (RouterErrorException $e) {
+            $this->assertSame(RouterErrorException::CODE_DISABLE_ERROR, $e->getCode());
+            $this->assertInstanceof(ROS_NAMESPACE . '\ResponseCollection', $e->getResponses());
+            $this->assertSame(Response::TYPE_ERROR, $e->getResponses()->getType());
+        }
+        try {
+            $this->util->enable('');
+            $this->fail(
+                'There should not be "enable" at the root menu'
+            );
+        } catch (RouterErrorException $e) {
+            $this->assertSame(RouterErrorException::CODE_ENABLE_ERROR, $e->getCode());
+            $this->assertInstanceof(ROS_NAMESPACE . '\ResponseCollection', $e->getResponses());
+            $this->assertSame(Response::TYPE_ERROR, $e->getResponses()->getType());
+        }
+        try {
+            $this->util->remove('');
+            $this->fail(
+                'There should not be "remove" at the root menu'
+            );
+        } catch (RouterErrorException $e) {
+            $this->assertSame(RouterErrorException::CODE_REMOVE_ERROR, $e->getCode());
+            $this->assertInstanceof(ROS_NAMESPACE . '\ResponseCollection', $e->getResponses());
+            $this->assertSame(Response::TYPE_ERROR, $e->getResponses()->getType());
+        }
+        try {
+            $this->util->comment('', 'TEST');
+            $this->fail(
+                'There should not be "comment" at the root menu'
+            );
+        } catch (RouterErrorException $e) {
+            $this->assertSame(RouterErrorException::CODE_COMMENT_ERROR, $e->getCode());
+            $this->assertInstanceof(ROS_NAMESPACE . '\ResponseCollection', $e->getResponses());
+            $this->assertSame(Response::TYPE_ERROR, $e->getResponses()->getType());
+        }
+        try {
+            $this->util->unsetValue('', 'TEST');
+            $this->fail(
+                'There should not be "unset" at the root menu'
+            );
+        } catch (RouterErrorException $e) {
+            $this->assertSame(RouterErrorException::CODE_UNSET_ERROR, $e->getCode());
+            $this->assertInstanceof(ROS_NAMESPACE . '\ResponseCollection', $e->getResponses());
+            $this->assertSame(Response::TYPE_ERROR, $e->getResponses()->getType());
+        }
+        try {
+            $this->util->move('', '');
+            $this->fail(
+                'There should not be "move" at the root menu'
+            );
+        } catch (RouterErrorException $e) {
+            $this->assertSame(RouterErrorException::CODE_MOVE_ERROR, $e->getCode());
+            $this->assertInstanceof(ROS_NAMESPACE . '\ResponseCollection', $e->getResponses());
+            $this->assertSame(Response::TYPE_ERROR, $e->getResponses()->getType());
+        }
+
+        try {
+            $this->util->get('', 'TEST');
+            $this->fail(
+                'The "get" at the root menu should not be for items'
+            );
+        } catch (RouterErrorException $e) {
+            $this->assertSame(RouterErrorException::CODE_GET_ERROR, $e->getCode());
+            $this->assertInstanceof(ROS_NAMESPACE . '\ResponseCollection', $e->getResponses());
+            $this->assertSame(Response::TYPE_ERROR, $e->getResponses()->getType());
+        }
+        try {
+            $this->util->set('', array('TEST'));
+            $this->fail(
+                'The "set" at the root menu should not be for items'
+            );
+        } catch (RouterErrorException $e) {
+            $this->assertSame(RouterErrorException::CODE_SET_ERROR, $e->getCode());
+            $this->assertInstanceof(ROS_NAMESPACE . '\ResponseCollection', $e->getResponses());
+            $this->assertSame(Response::TYPE_ERROR, $e->getResponses()->getType());
+        }
+    }
+
+    /**
+     * @depends testAdd
+     * @depends testRemove
+     */
     public function testFilePutAndGetContents()
     {
         $data1 = 'test';
@@ -909,11 +1124,20 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
         //Removal
         $putResult4 = $this->util->filePutContents(TEST_FILE_NAME, null);
-        $getResult4 = $this->util->fileGetContents(TEST_FILE_NAME);
         $putResult5 = $this->util->filePutContents(TEST_FILE_NAME, null);
         $this->assertTrue($putResult4);
-        $this->assertFalse($getResult4);
         $this->assertFalse($putResult5);
+        try {
+            $this->util->fileGetContents(TEST_FILE_NAME);
+        } catch (RouterErrorException $e) {
+            $this->assertSame(RouterErrorException::CODE_SCRIPT_RUN_ERROR, $e->getCode());
+            $this->assertInstanceof(ROS_NAMESPACE . '\ResponseCollection', $e->getResponses());
+            $this->assertSame(Response::TYPE_FINAL, $e->getResponses()->getType());
+            $this->assertSame(Response::TYPE_ERROR, $e->getResponses()->seek(1)->getType());
+            $this->assertInternalType('string', $e->getResponses()->seek(1)->getProperty('message'));
+            $this->assertSame(Response::TYPE_FINAL, $e->getResponses()->seek(-2)->getType());
+            $this->assertSame(Response::TYPE_FINAL, $e->getResponses()->seek(-1)->getType());
+        }
 
         //New and overwite stream
         $putResult1 = $this->util->filePutContents(TEST_FILE_NAME, $data1s);
@@ -936,11 +1160,39 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
         //Removal
         $putResult4 = $this->util->filePutContents(TEST_FILE_NAME, null);
-        $getResult4 = $this->util->fileGetContents(TEST_FILE_NAME);
         $putResult5 = $this->util->filePutContents(TEST_FILE_NAME, null);
         $this->assertTrue($putResult4);
-        $this->assertFalse($getResult4);
         $this->assertFalse($putResult5);
+        try {
+            $this->util->fileGetContents(TEST_FILE_NAME);
+        } catch (RouterErrorException $e) {
+            $this->assertSame(RouterErrorException::CODE_SCRIPT_RUN_ERROR, $e->getCode());
+            $this->assertInstanceof(ROS_NAMESPACE . '\ResponseCollection', $e->getResponses());
+            $this->assertSame(Response::TYPE_FINAL, $e->getResponses()->getType());
+            $this->assertSame(Response::TYPE_ERROR, $e->getResponses()->seek(1)->getType());
+            $this->assertInternalType('string', $e->getResponses()->seek(1)->getProperty('message'));
+            $this->assertSame(Response::TYPE_FINAL, $e->getResponses()->seek(-2)->getType());
+            $this->assertSame(Response::TYPE_FINAL, $e->getResponses()->seek(-1)->getType());
+        }
+        
+        //Add failing attempts
+        $this->util->setMenu('/system script')->add(
+            array(
+                'name' => TEST_SCRIPT_NAME,
+                'source' => '#TEST'
+            )
+        );
+        try {
+            $this->util->fileGetContents(TEST_FILE_NAME, TEST_SCRIPT_NAME);
+            $this->fail(
+                'Getting file through existing script should throw an exception'
+            );
+        } catch (RouterErrorException $e) {
+            $this->assertSame(RouterErrorException::CODE_SCRIPT_ADD_ERROR, $e->getCode());
+            $this->assertInstanceof(ROS_NAMESPACE . '\ResponseCollection', $e->getResponses());
+            $this->assertSame(Response::TYPE_ERROR, $e->getResponses()->getType());
+        }
+        $this->util->remove(TEST_SCRIPT_NAME);
     }
 
     public function testFilePutAndGetContentsStreamed()
@@ -976,11 +1228,20 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
         //Removal
         $putResult4 = $this->util->filePutContents(TEST_FILE_NAME, null);
-        $getResult4 = $this->util->fileGetContents(TEST_FILE_NAME);
         $putResult5 = $this->util->filePutContents(TEST_FILE_NAME, null);
         $this->assertTrue($putResult4);
-        $this->assertFalse($getResult4);
         $this->assertFalse($putResult5);
+        try {
+            $this->util->fileGetContents(TEST_FILE_NAME);
+        } catch (RouterErrorException $e) {
+            $this->assertSame(RouterErrorException::CODE_SCRIPT_RUN_ERROR, $e->getCode());
+            $this->assertInstanceof(ROS_NAMESPACE . '\ResponseCollection', $e->getResponses());
+            $this->assertSame(Response::TYPE_FINAL, $e->getResponses()->getType());
+            $this->assertSame(Response::TYPE_ERROR, $e->getResponses()->seek(1)->getType());
+            $this->assertInternalType('resource', $e->getResponses()->seek(1)->getProperty('message'));
+            $this->assertSame(Response::TYPE_FINAL, $e->getResponses()->seek(-2)->getType());
+            $this->assertSame(Response::TYPE_FINAL, $e->getResponses()->seek(-1)->getType());
+        }
 
         //New and overwite stream
         $putResult1 = $this->util->filePutContents(TEST_FILE_NAME, $data1s);
@@ -1003,11 +1264,20 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
 
         //Removal
         $putResult4 = $this->util->filePutContents(TEST_FILE_NAME, null);
-        $getResult4 = $this->util->fileGetContents(TEST_FILE_NAME);
         $putResult5 = $this->util->filePutContents(TEST_FILE_NAME, null);
         $this->assertTrue($putResult4);
-        $this->assertFalse($getResult4);
         $this->assertFalse($putResult5);
+        try {
+            $this->util->fileGetContents(TEST_FILE_NAME);
+        } catch (RouterErrorException $e) {
+            $this->assertSame(RouterErrorException::CODE_SCRIPT_RUN_ERROR, $e->getCode());
+            $this->assertInstanceof(ROS_NAMESPACE . '\ResponseCollection', $e->getResponses());
+            $this->assertSame(Response::TYPE_FINAL, $e->getResponses()->getType());
+            $this->assertSame(Response::TYPE_ERROR, $e->getResponses()->seek(1)->getType());
+            $this->assertInternalType('resource', $e->getResponses()->seek(1)->getProperty('message'));
+            $this->assertSame(Response::TYPE_FINAL, $e->getResponses()->seek(-2)->getType());
+            $this->assertSame(Response::TYPE_FINAL, $e->getResponses()->seek(-1)->getType());
+        }
 
         $this->client->setStreamingResponses(false);
     }
@@ -1016,5 +1286,24 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
     {
         $this->setUp(USERNAME2, PASSWORD2);
         $this->assertFalse($this->util->filePutContents(TEST_FILE_NAME, 'ok'));
+    }
+
+    public function testFileGetContentsNoExec()
+    {
+        $mockResult = new ResponseCollection(array());
+        $utilMock = $this->getMockBuilder(ROS_NAMESPACE . '\Util')
+            ->setConstructorArgs(array($this->client))
+            ->setMethods(array('exec'))
+            ->getMock();
+        $utilMock->method('exec')->willReturn($mockResult);
+        
+        
+        try {
+            $utilMock->fileGetContents(TEST_FILE_NAME);
+        } catch (RouterErrorException $e) {
+            $this->assertSame(RouterErrorException::CODE_SCRIPT_FILE_ERROR, $e->getCode());
+            $this->assertInstanceof(ROS_NAMESPACE . '\ResponseCollection', $e->getResponses());
+            $this->assertSame($mockResult, $e->getResponses());
+        }
     }
 }
