@@ -15,4 +15,4 @@ echo count($util) . "\n";
 echo $util->count() . "\n";
 
 //Count only disabled ARP items
-echo $util->count(COUNT_NORMAL, RouterOS\Query::where('disabled', 'true')) . "\n";
+echo $util->count(RouterOS\Query::where('disabled', 'true')) . "\n";

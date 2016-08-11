@@ -624,7 +624,8 @@ class Communicator
      * @param T\Stream $trans The transmitter from which to decode the length of
      * the incoming message.
      *
-     * @return int The decoded length.
+     * @return int|double The decoded length.
+     *     Is of type "double" only for values above "2 << 31".
      */
     public static function decodeLength(T\Stream $trans)
     {
@@ -649,7 +650,8 @@ class Communicator
      * @param T\Stream $trans The transmitter from which to decode the length of
      *     the incoming message.
      *
-     * @return int The decoded length.
+     * @return int|double The decoded length.
+     *     Is of type "double" only for values above "2 << 31".
      */
     private static function _decodeLength(T\Stream $trans)
     {

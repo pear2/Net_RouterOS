@@ -833,7 +833,13 @@ class Client
         if ('' != $tag) {
             if ($this->isRequestActive($tag, self::FILTER_CALLBACK)) {
                 if ($this->callbacks[$tag]($response, $this)) {
-                    $this->cancelRequest($tag);
+                    try {
+                        $this->cancelRequest($tag);
+                    } catch (DataFlowException $e) {
+                        if ($e->getCode() !== DataFlowException::CODE_UNKNOWN_REQUEST) {
+                            throw $e;
+                        }
+                    }
                 } elseif ($isLastForRequest) {
                     unset($this->callbacks[$tag]);
                 }

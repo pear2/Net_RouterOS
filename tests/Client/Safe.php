@@ -301,6 +301,25 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             'Improper active request count after cancel test.'
         );
     }
+    
+    public function testSendAsyncAndMultipleCancelFromCallback()
+    {
+        $printRequest = new Request('/queue/simple/print');
+        $printRequest->setArgument('follow')
+            ->setArgument('.proplist')
+            ->setTag('f');
+        $repliesCount = 0;
+        $this->object->sendAsync(
+            $printRequest,
+            function () use (&$repliesCount) {
+                $repliesCount++;
+                return 1 < $repliesCount && $repliesCount < 6;
+            }
+        );
+        $this->object->loop();
+        $this->assertGreaterThanOrEqual(5, $repliesCount);
+        $this->assertFalse($this->object->isRequestActive('f'));
+    }
 
     public function testSendAsyncAndFullExtract()
     {

@@ -21,4 +21,5 @@ Util stuff, mostly.
 * Util::find() now works even when the underlying Client streams responses.
 * Util::move()'s second argument $destination is now optional, and without it (or if set to NULL), the item is moved at the bottom of the menu.
 * Client::login() consumes the !done or !fatal response even when called on an already logged in connection.
+* Client::sendAsync() no longer throws an exception if a request is canceled multiple times by the returned value of a callback.
 * The console now checks whether PEAR2_CommandLine is installed, ensuring better error messages when this package is installed without its optional dependencies.
