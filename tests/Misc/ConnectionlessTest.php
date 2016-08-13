@@ -5,12 +5,14 @@ namespace PEAR2\Net\RouterOS\Test\Misc;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
+use PEAR2\Net\RouterOS\Client;
 use PEAR2\Net\RouterOS\Communicator;
 use PEAR2\Net\RouterOS\InvalidArgumentException;
 use PEAR2\Net\RouterOS\LengthException;
 use PEAR2\Net\RouterOS\NotSupportedException;
 use PEAR2\Net\RouterOS\Query;
 use PEAR2\Net\RouterOS\Request;
+use PEAR2\Net\RouterOS\Response;
 use PEAR2\Net\RouterOS\Script;
 use PEAR2\Net\RouterOS\UnexpectedValueException;
 use PEAR2\Net\Transmitter as T;
@@ -944,6 +946,66 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             6 => array(0xFE),
             7 => array(0xFF)
         );
+    }
+
+    public function testInvalidResponseType()
+    {
+        $transMock = $this->createMock('PEAR2\Net\Transmitter\TcpClient');
+        $transMock->method('isPersistent')->will(
+            $this->onConsecutiveCalls(false, true)
+        );
+        $transMock->method('isAvailable')->willReturn(true);
+        $transMock->method('isDataAwaiting')->willReturn(true);
+
+        $comMock = $this->createMock(ROS_NAMESPACE . '\Communicator');
+        $comMock->method('getTransmitter')->willReturn($transMock);
+        $comMock->method('getNextWord')->willReturn('TEST');
+
+        //Non persistent connection
+        try {
+            new Response($comMock);
+            $this->fail('Getting unknown types should throw an exception.');
+        } catch (UnexpectedValueException $e) {
+            $this->assertSame(
+                UnexpectedValueException::CODE_RESPONSE_TYPE_UNKNOWN,
+                $e->getCode()
+            );
+        }
+
+        //Persistent connection
+        try {
+            new Response($comMock);
+            $this->fail('Getting unknown types should throw an exception.');
+        } catch (UnexpectedValueException $e) {
+            $this->assertSame(
+                UnexpectedValueException::CODE_RESPONSE_TYPE_UNKNOWN,
+                $e->getCode()
+            );
+        }
+    }
+    
+    public function testUnexpectedLoginException()
+    {
+        $newLockException = new T\LockException('TEST');
+        $transMock = $this->createMock('PEAR2\Net\Transmitter\TcpClient');
+        $transMock->method('isPersistent')->willReturn(true);
+        $transMock->method('isAvailable')->willReturn(true);
+        $transMock->method('isDataAwaiting')->willReturn(true);
+        $transMock->method('lock')->will(
+            $this->throwException($newLockException)
+        );
+
+        $comMock = $this->createMock(ROS_NAMESPACE . '\Communicator');
+        $comMock->method('getTransmitter')->willReturn($transMock);
+        
+        try {
+            Client::login($comMock, 'TEST', 'TEST');
+            $this->fail(
+                'Unexpected exceptions during login should be re-thrown'
+            );
+        } catch (T\LockException $e) {
+            $this->assertSame($e, $newLockException);
+        }
     }
 
     public function testPrepareScript()
