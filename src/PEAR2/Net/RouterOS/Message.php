@@ -48,14 +48,19 @@ abstract class Message implements IteratorAggregate, Countable
 {
 
     /**
-     * @var array<string,string|resource> An array with message attributes.
-     *     Each array key is the the name of an attribute,
-     *     and the corresponding array value is the value for that attribute.
+     * An array with message attributes.
+     *
+     * Each array key is the the name of an attribute,
+     * and the corresponding array value is the value for that attribute.
+     *
+     * @var array<string,string|resource>
      */
     protected $attributes = array();
 
     /**
-     * @var string An optional tag to associate the message with.
+     * An optional tag to associate the message with.
+     *
+     * @var string
      */
     private $_tag = null;
 

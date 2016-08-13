@@ -63,10 +63,13 @@ class Query
     const OP_GT = '>';
 
     /**
-     * @var array<string,string|null>[] An array of the words forming the query.
-     *     Each value is an array with the first member being the predicate
-     *     (operator and name), and the second member being the value
-     *     for the predicate.
+     * An array of the words forming the query.
+     *
+     * Each value is an array with the first member being the predicate
+     * (operator and name), and the second member being the value
+     * for the predicate.
+     *
+     * @var array<string,string|null>[]
      */
     protected $words = array();
 
@@ -242,14 +245,14 @@ class Query
 
     /**
      * Verifies the query.
-     * 
+     *
      * Verifies the query against a communicator, i.e. whether the query
      * could successfully be sent (assuming the connection is still opened).
-     * 
+     *
      * @param Communicator $com The Communicator to check against.
-     * 
+     *
      * @return $this The query object itself.
-     * 
+     *
      * @throws LengthException If the resulting length of an API word is not
      *     supported.
      */

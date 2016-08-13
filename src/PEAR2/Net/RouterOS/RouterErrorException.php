@@ -65,7 +65,11 @@ class RouterErrorException extends RuntimeException implements Exception
     const CODE_SCRIPT_FILE_ERROR    = 0x240003;
 
     /**
-     * @var ResponseCollection|null The complete response returned by the router.
+     * The complete response returned by the router.
+     *
+     * NULL when the router was not contacted at all.
+     *
+     * @var ResponseCollection|null
      */
     private $_responses = null;
 

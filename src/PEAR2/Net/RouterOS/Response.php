@@ -64,12 +64,16 @@ class Response extends Message
     const TYPE_FATAL = '!fatal';
 
     /**
-     * @var string[] An array of unrecognized words in network order.
+     * An array of unrecognized words in network order.
+     *
+     * @var string[]
      */
     protected $unrecognizedWords = array();
 
     /**
-     * @var string The response type.
+     * The response type.
+     *
+     * @var string
      */
     private $_type;
 

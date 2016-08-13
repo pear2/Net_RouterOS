@@ -15,6 +15,7 @@ Util stuff, mostly.
 * Script::parseValue() now recognizes dates in the "M/d/Y H:i:s" format (used across RouterOS), and turns that into a DateTime object for that time (or midnight in UTC if the time part is omitted).
 * Util::getAll() now throws a NotSupportedException if the arguments "follow", "follow-only" or "count-only" are used. The first two, because PHP would hang (since Client::sendSync() is used under the hood), and the last one because it's unredable in the returned output (use Util::count() instead).
 * Util::setMenu() can now go back to the root menu.
+* Util::exec() and stream valued arguments in both Util and Client no longer cause a hang when using charset conversion.
 * Util::get() can now accept a query as an argument for $number
 * Util::get() can have $valueName set to NULL (as is now by default), in which case all properties are retrieved in an array, parsed with Script::parseValueToArray().
 * Util::get() no longer fallbacks automatically with a "print" request for buggy versions. You may "manually" call Util::getAll() if you suspect that's an issue.

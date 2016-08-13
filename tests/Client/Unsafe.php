@@ -4,7 +4,6 @@ namespace PEAR2\Net\RouterOS\Test\Client;
 
 use PEAR2\Net\RouterOS\Client;
 use PEAR2\Net\RouterOS\Communicator;
-use PEAR2\Net\RouterOS\Exception;
 use PEAR2\Net\RouterOS\LengthException;
 use PEAR2\Net\RouterOS\Query;
 use PEAR2\Net\RouterOS\Request;
@@ -98,6 +97,34 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         $addRequest->setArgument('name', TEST_QUEUE_NAME)
             ->setArgument('target', '0.0.0.0/0');
         $addRequest->setArgument('comment', $comment);
+
+        //No charset conversion
+        $responses = $this->object->sendSync($addRequest);
+        $this->assertEquals(
+            1,
+            count($responses),
+            'There should be only one response.'
+        );
+        if (count($responses) === 1
+            && $responses[-1]->getType() === Response::TYPE_FINAL
+        ) {
+            $removeRequest = new Request('/queue/simple/remove');
+            $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
+            $responses = $this->object->sendSync($removeRequest);
+            $this->assertInstanceOf(
+                ROS_NAMESPACE . '\ResponseCollection',
+                $responses,
+                'Response should be one.'
+            );
+        }
+
+        //With charset conversion
+        $this->object->setCharset(
+            array(
+                Communicator::CHARSET_REMOTE => 'windows-1251',
+                Communicator::CHARSET_LOCAL => 'UTF-8'
+            )
+        );
         $responses = $this->object->sendSync($addRequest);
         $this->assertEquals(
             1,

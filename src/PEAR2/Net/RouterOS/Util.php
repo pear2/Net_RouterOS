@@ -60,22 +60,31 @@ use Exception as E;
 class Util implements Countable
 {
     /**
-     * @var Client The connection to wrap around.
+     * The connection to wrap around.
+     *
+     * @var Client
      */
     protected $client;
 
     /**
-     * @var string The current menu. Note that the root menu (only) uses an
-     *     empty string. This is done to enable commands executed at it without
-     *     special casing it at all commands. Instead, only
-     *     {@link static::setMenu()} is special cased.
+     * The current menu.
+     *
+     * Note that the root menu (only) uses an empty string.
+     * This is done to enable commands executed at it without special casing it
+     * at all commands.
+     * Instead, only {@link static::setMenu()} is special cased.
+     *
+     * @var string
      */
     protected $menu = '';
 
     /**
-     * @var array<int,string>|null An array with the numbers of items in
-     *     the current menu as keys, and the corresponding IDs as values.
-     *     NULL when the cache needs regenerating.
+     * An array with the numbers of items in the current menu.
+     *
+     * Numbers as keys, and the corresponding IDs as values.
+     * NULL when the cache needs regenerating.
+     *
+     * @var array<int,string>|null
      */
     protected $idCache = null;
 
@@ -237,7 +246,7 @@ class Util implements Countable
      *
      * @return ResponseCollection The responses of all requests involved, i.e.
      *     the add, the run and the remove.
-     * 
+     *
      * @throws RouterErrorException When there is an error in any step of the
      *     way. The reponses include all successful commands prior to the error
      *     as well. If the error occurs during the run, there will also be a
@@ -518,8 +527,8 @@ class Util implements Countable
      * @param int|string|null|Query $number    A number identifying the target
      *     item. Can also be an ID or (in some menus) name. For menus where
      *     there are no items (e.g. "/system identity"), you can specify NULL.
-     *     You can also specify a query, in which case the first match will be
-     *     considered the target item.
+     *     You can also specify a {@link Query}, in which case the first match
+     *     will be considered the target item.
      * @param string|null           $valueName The name of the value to get.
      *     If omitted, or set to NULL, gets all properties of the target item.
      *
@@ -529,7 +538,7 @@ class Util implements Countable
      *     If the property is not set, NULL will be returned.
      *     If $valueName is NULL, returns all properties as an array, where
      *     the result is parsed with {@link Script::parseValueToArray()}.
-     * 
+     *
      * @throws RouterErrorException When the router returns an error response
      *     (e.g. no such item, invalid property, etc.).
      */
@@ -593,7 +602,7 @@ class Util implements Countable
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect the output. Current RouterOS versions don't return
      *     anything useful, but if future ones do, you can read it right away.
-     * 
+     *
      * @throws RouterErrorException When the router returns one or more errors.
      */
     public function enable()
@@ -621,7 +630,7 @@ class Util implements Countable
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect the output. Current RouterOS versions don't return
      *     anything useful, but if future ones do, you can read it right away.
-     * 
+     *
      * @throws RouterErrorException When the router returns one or more errors.
      */
     public function disable()
@@ -649,7 +658,7 @@ class Util implements Countable
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect the output. Current RouterOS versions don't return
      *     anything useful, but if future ones do, you can read it right away.
-     * 
+     *
      * @throws RouterErrorException When the router returns one or more errors.
      */
     public function remove()
@@ -690,7 +699,7 @@ class Util implements Countable
      * @return ResponseCollection Returns the response collection, allowing you
      *     to inspect the output. Current RouterOS versions don't return
      *     anything useful, but if future ones do, you can read it right away.
-     * 
+     *
      * @throws RouterErrorException When the router returns one or more errors.
      */
     public function comment($numbers, $comment)
@@ -821,7 +830,7 @@ class Util implements Countable
      *     items.
      *
      * @return string A comma separated list of the new items' IDs.
-     * 
+     *
      * @throws RouterErrorException When one or more items were not succesfully
      *     added. Note that the response collection will include all replies of
      *     all add commands, including the successful ones, in order.

@@ -67,9 +67,11 @@ class Communicator
     const CHARSET_LOCAL = 1;
 
     /**
-     * @var array<string,string|null> An array with
-     *     the default charset types as keys, and
-     *     the default charsets as values.
+     * An array with the default charset.
+     *
+     * Charset types as keys, and the default charsets as values.
+     *
+     * @var array<string,string|null>
      */
     protected static $defaultCharsets = array(
         self::CHARSET_REMOTE => null,
@@ -77,14 +79,18 @@ class Communicator
     );
 
     /**
-     * @var array<string,string|null> An array with
-     *     the current charset types as keys, and
-     *     the current charsets as values.
+     * An array with the current charset.
+     *
+     * Charset types as keys, and the current charsets as values.
+     *
+     * @var array<string,string|null>
      */
     protected $charsets = array();
 
     /**
-     * @var T\TcpClient The transmitter for the connection.
+     * The transmitter for the connection.
+     *
+     * @var T\TcpClient
      */
     protected $trans;
 
@@ -230,8 +236,11 @@ class Communicator
         );
 
         flock($stream, LOCK_SH);
-        while (!feof($stream)) {
-            $bytes += stream_copy_to_stream($stream, $result, 0xFFFFF);
+        $reader = new T\Stream($stream, false);
+        $writer = new T\Stream($result, false);
+        $chunkSize = $reader->getChunk(T\Stream::DIRECTION_RECEIVE);
+        while ($reader->isAvailable() && $reader->isDataAwaiting()) {
+            $bytes += $writer->send(fread($stream, $chunkSize));
         }
         fseek($stream, -$bytes, SEEK_CUR);
         flock($stream, LOCK_UN);

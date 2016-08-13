@@ -42,22 +42,30 @@ use PEAR2\Cache\SHM;
 class Registry
 {
     /**
-     * @var SHM The storage.
+     * The storage.
+     *
+     * @var SHM
      */
     protected $shm;
 
     /**
-     * @var int ID of request. Populated at first instance in request.
+     * ID of request. Populated at first instance in request.
+     *
+     * @var int
      */
     protected static $requestId = -1;
 
     /**
-     * @var int ID to be given to next instance, after incrementing it.
+     * ID to be given to next instance, after incrementing it.
+     *
+     * @var int
      */
     protected static $instanceIdSeed = -1;
 
     /**
-     * @var int ID of instance within the request.
+     * ID of instance within the request.
+     *
+     * @var int
      */
     protected $instanceId;
 

@@ -45,7 +45,9 @@ class NotSupportedException extends E implements Exception
     const CODE_ARG_PROHIBITED = 60001;
 
     /**
-     * @var mixed The unsupported value.
+     * The unsupported value.
+     *
+     * @var mixed
      */
     private $_value;
 

@@ -38,12 +38,16 @@ class Request extends Message
 {
 
     /**
-     * @var string The command to be executed.
+     * The command to be executed.
+     *
+     * @var string
      */
     private $_command;
 
     /**
-     * @var Query A query for the command.
+     * A query for the command.
+     *
+     * @var Query
      */
     private $_query;
 
@@ -341,14 +345,14 @@ class Request extends Message
 
     /**
      * Verifies the request.
-     * 
+     *
      * Verifies the request against a communicator, i.e. whether the request
      * could successfully be sent (assuming the connection is still opened).
-     * 
+     *
      * @param Communicator $com The Communicator to check against.
-     * 
+     *
      * @return $this The request object itself.
-     * 
+     *
      * @throws LengthException If the resulting length of an API word is not
      *     supported.
      */

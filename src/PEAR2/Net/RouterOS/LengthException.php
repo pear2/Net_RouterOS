@@ -47,7 +47,9 @@ class LengthException extends L implements Exception
     const CODE_BEYOND_SHEME = 1301;
 
     /**
-     * @var int|double|null The problematic length.
+     * The problematic length.
+     *
+     * @var int|double|null
      */
     private $_length;
 

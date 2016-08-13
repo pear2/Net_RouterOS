@@ -64,38 +64,52 @@ class Client
     const FILTER_ALL = 3;
 
     /**
-     * @var Communicator The communicator for this client.
+     * The communicator for this client.
+     *
+     * @var Communicator
      */
     protected $com;
 
     /**
-     * @var int The number of currently pending requests.
+     * The number of currently pending requests.
+     *
+     * @var int
      */
     protected $pendingRequestsCount = 0;
 
     /**
-     * @var array<string,Response[]> An array of responses that have not yet
-     *     been extracted or passed to a callback.
-     *     Key is the tag of the request, and the value is an array of
-     *     associated responses.
+     * An array of responses that have not yet been extracted
+     * or passed to a callback.
+     *
+     * Key is the tag of the request, and the value is an array of
+     * associated responses.
+     *
+     * @var array<string,Response[]>
      */
     protected $responseBuffer = array();
 
     /**
-     * @var array<string,callback> An array of callbacks to be executed
-     *     as responses come.
-     *     Key is the tag of the request, and the value is the callback for it.
+     * An array of callbacks to be executed as responses come.
+     *
+     * Key is the tag of the request, and the value is the callback for it.
+     *
+     * @var array<string,callback>
      */
     protected $callbacks = array();
 
     /**
-     * @var Registry A registry for the operations. Particularly helpful at
-     *     persistent connections.
+     * A registry for the operations.
+     *
+     * Particularly helpful at persistent connections.
+     *
+     * @var Registry
      */
     protected $registry = null;
 
     /**
-     * @var bool Whether to stream future responses.
+     * Whether to stream future responses.
+     *
+     * @var bool
      */
     private $_streamingResponses = false;
 
@@ -836,7 +850,8 @@ class Client
                     try {
                         $this->cancelRequest($tag);
                     } catch (DataFlowException $e) {
-                        if ($e->getCode() !== DataFlowException::CODE_UNKNOWN_REQUEST) {
+                        if ($e->getCode() !== DataFlowException::CODE_UNKNOWN_REQUEST
+                        ) {
                             throw $e;
                         }
                     }

@@ -61,54 +61,79 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 {
 
     /**
-     * @var Response[] An array with all {@link Response} objects.
+     * An array with all {@link Response} objects.
+     *
+     * An array with all Response objects.
+     *
+     * @var Response[]
      */
     protected $responses = array();
 
     /**
-     * @var string[] An array with each {@link Response} object's type.
+     * An array with each Response object's type.
+     *
+     * An array with each {@link Response} object's type.
+     *
+     * @var string[]
      */
     protected $responseTypes = array();
 
     /**
-     * @var string[] An array with each {@link Response} object's tag.
+     * An array with each Response object's tag.
+     *
+     * An array with each {@link Response} object's tag.
+     *
+     * @var string[]
      */
     protected $responseTags = array();
 
     /**
-     * @var array<string,array<string,int>> An array with
-     *     positions of responses, based on an property name.
-     *     The name of each property is the array key, and the array value
-     *     is another array where the key is the value for that property, and
-     *     the value is the position of the response. For performance reasons,
-     *     each key is built only when {@link static::setIndex()} is called with
-     *     that property, and remains available for the lifetime of this
-     *     collection.
+     * An array with positions of responses, based on an property name.
+     *
+     * The name of each property is the array key, and the array value
+     * is another array where the key is the value for that property, and
+     * the value is the position of the response. For performance reasons,
+     * each key is built only when {@link static::setIndex()} is called with
+     * that property, and remains available for the lifetime of this collection.
+     *
+     * @var array<string,array<string,int>>
      */
     protected $responsesIndex = array();
 
     /**
-     * @var array<string,int[]> An array with all distinct properties across all
-     *     {@link Response} objects. Created at the first call of
-     *     {@link static::getPropertyMap()}.
+     * An array with all distinct properties.
+     *
+     * An array with all distinct properties across all {@link Response}
+     * objects. Created at the first call of {@link static::getPropertyMap()}.
+     *
+     * @var array<string,int[]>
      */
     protected $propertyMap = null;
 
     /**
-     * @var int A pointer, as required by SeekableIterator.
+     * A pointer, as required by SeekableIterator.
+     *
+     * @var int
      */
     protected $position = 0;
 
     /**
-     * @var string|null Name of property to use as index. NULL when disabled.
+     * Name of property to use as index
+     *
+     * NULL when disabled.
+     *
+     * @var string|null
      */
     protected $index = null;
 
     /**
-     * @var string[]|array<string,null|int|array<int|callable>> Criteria
-     *     used by {@link static::compare()} to determine
-     *     the order between two responses. See {@link static::orderBy()}
-     *     for a detailed description of this array's format.
+     * Compare criteria.
+     *
+     * Used by {@link static::compare()} to determine the order between
+     * two responses. See {@link static::orderBy()} for a detailed description
+     * of this array's format.
+     *
+     * @var string[]|array<string,null|int|array<int|callable>>
      */
     protected $compareBy = array();
 

@@ -46,7 +46,9 @@ class UnexpectedValueException extends U implements Exception
     const CODE_RESPONSE_TYPE_UNKNOWN = 50100;
 
     /**
-     * @var mixed The unexpected value.
+     * The unexpected value.
+     *
+     * @var mixed
      */
     private $_value;
 

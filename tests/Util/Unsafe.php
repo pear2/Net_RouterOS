@@ -5,12 +5,14 @@ namespace PEAR2\Net\RouterOS\Test\Util;
 use DateInterval;
 use DateTime;
 use DateTimezone;
+use PEAR2\Net\RouterOS\Communicator;
 use PEAR2\Net\RouterOS\Client;
 use PEAR2\Net\RouterOS\Query;
 use PEAR2\Net\RouterOS\Request;
 use PEAR2\Net\RouterOS\Response;
 use PEAR2\Net\RouterOS\ResponseCollection;
 use PEAR2\Net\RouterOS\RouterErrorException;
+use PEAR2\Net\RouterOS\Script;
 use PEAR2\Net\RouterOS\Util;
 use PHPUnit_Framework_TestCase;
 
@@ -960,6 +962,45 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             $this->assertSame(Response::TYPE_FINAL, $e->getResponses()->seek(1)->getType());
             $this->assertSame(Response::TYPE_ERROR, $e->getResponses()->seek(2)->getType());
         }
+    }
+
+    public function testExecWithCharset()
+    {
+        $this->client->setCharset(
+            array(
+                Communicator::CHARSET_REMOTE => 'windows-1251',
+                Communicator::CHARSET_LOCAL => 'UTF-8'
+            )
+        );
+
+        $this->util->setMenu('/queue simple');
+        $this->util->exec(
+            'add name=$name target=0.0.0.0/0 comment=("йес! " . $comment)',
+            array(
+                'name' => TEST_QUEUE_NAME,
+                'comment' => 'уф' . iconv('UTF-8', 'windows-1251', ' ягода')
+            ),
+            null,
+            TEST_SCRIPT_NAME
+        );
+        $this->assertSame(
+            'йес! ' . iconv('windows-1251', 'UTF-8', 'уф') . ' ягода',
+            $this->util->get(TEST_QUEUE_NAME, 'comment')
+        );
+        $this->client->setCharset(
+            array(
+                Communicator::CHARSET_REMOTE => null,
+                Communicator::CHARSET_LOCAL => null
+            )
+        );
+        $this->assertSame(
+            iconv('UTF-8', 'windows-1251', 'йес! ') .
+            'уф' .
+            iconv('UTF-8', 'windows-1251', ' ягода'),
+            $this->util->get(TEST_QUEUE_NAME, 'comment')
+        );
+        $this->util->remove(TEST_QUEUE_NAME);
+        
     }
 
     public function testMove()

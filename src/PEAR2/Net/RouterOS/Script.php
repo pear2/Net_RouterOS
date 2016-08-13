@@ -97,7 +97,7 @@ class Script
         if (!is_string($value)) {
             return $value;
         }
-        
+
         try {
             return static::parseValueToArray($value, $timezone);
         } catch (ParserException $e) {
@@ -115,11 +115,11 @@ class Script
 
     /**
      * Parses a RouterOS value into a PHP string.
-     * 
+     *
      * @param string $value The value to be parsed.
      *     Must be a literal of a value,
      *     e.g. what {@link static::escapeValue()} will give you.
-     * 
+     *
      * @return string If a quoted string is provided, it would be parsed.
      *     Otherwise, the value is casted to a string, and returned unmodified.
      */
@@ -185,7 +185,7 @@ class Script
      *     - "datetime" (pseudo type; string in the form "M/j/Y H:i:s") - a
      *         DateTime object with the specified date and time,
      *         with the specified timezone.
-     * 
+     *
      * @throws ParserException When the value is not of a recognized type.
      */
     public static function parseValueToDateTime(
@@ -239,7 +239,7 @@ class Script
      *     value, e.g. what {@link static::escapeValue()} will give you.
      *
      * @return DateInterval The value as a DateInterval object.
-     * 
+     *
      * @throws ParserException When the value is not of a recognized type.
      */
     public static function parseValueToDateInterval($value)
@@ -338,7 +338,7 @@ class Script
      * @return array An array, with the keys and values processed recursively,
      *         the keys with {@link static::parseValueToSimple()},
      *         and the values with {@link static::parseValue()}.
-     * 
+     *
      * @throws ParserException When the value is not of a recognized type.
      */
     public static function parseValueToArray(
@@ -572,14 +572,14 @@ class Script
      * surrounded with quotes at a RouterOS script (or concatenated onto a
      * larger string first), and you can be sure there won't be any code
      * injections coming from it.
-     * 
+     *
      * For the sake of brevity of the output, alphanumeric characters and
      * underscores are left untouched
      *
      * @param string $value Value to be escaped.
      *
      * @return string The escaped value.
-     * 
+     *
      * @internal Why leave ONLY those characters and not also others?
      *     Because those can't in any way be mistaken for language constructs,
      *     unlike many other "safe inside strings, but not outside" ASCII
@@ -600,12 +600,12 @@ class Script
      * Escapes a character for a RouterOS scripting context. Intended to only be
      * called for non-alphanumeric characters.
      *
-     * @param string $chars The matches array, expected to contain exactly one
+     * @param array $chars The matches array, expected to contain exactly one
      *     member, in which is the whole string to be escaped.
      *
      * @return string The escaped characters.
      */
-    private static function _escapeCharacters($chars)
+    private static function _escapeCharacters(array $chars)
     {
         $result = '';
         for ($i = 0, $l = strlen($chars[0]); $i < $l; ++$i) {
