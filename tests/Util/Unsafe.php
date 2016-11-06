@@ -974,17 +974,22 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         );
 
         $this->util->setMenu('/queue simple');
+        $stream = fopen('php://temp', 'r+b');
+        fwrite($stream, iconv('UTF-8', 'windows-1251', 'уф'));
+        rewind($stream);
         $this->util->exec(
-            'add name=$name target=0.0.0.0/0 comment=("йес! " . $comment)',
+            'add name=$name target=0.0.0.0/0 comment=("йес! " . $comment . " " . $stream)',
             array(
                 'name' => TEST_QUEUE_NAME,
-                'comment' => 'уф' . iconv('UTF-8', 'windows-1251', ' ягода')
+                'comment' => 'ягода',
+                'stream' => $stream
             ),
             null,
             TEST_SCRIPT_NAME
         );
+        $comment = 'йес! ягода уф';
         $this->assertSame(
-            'йес! ' . iconv('windows-1251', 'UTF-8', 'уф') . ' ягода',
+            $comment,
             $this->util->get(TEST_QUEUE_NAME, 'comment')
         );
         $this->client->setCharset(
@@ -994,9 +999,7 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
             )
         );
         $this->assertSame(
-            iconv('UTF-8', 'windows-1251', 'йес! ') .
-            'уф' .
-            iconv('UTF-8', 'windows-1251', ' ягода'),
+            iconv('UTF-8', 'windows-1251', $comment),
             $this->util->get(TEST_QUEUE_NAME, 'comment')
         );
         $this->util->remove(TEST_QUEUE_NAME);

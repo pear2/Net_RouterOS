@@ -1,7 +1,7 @@
 Util stuff, mostly.
 
 * __BREAKING CHANGES:__
-    - Removed all $mode arguments from all Countable implementations (turns out no stable 5.6+ releases uses it...), and the COUNT_RECURSIVE implementations (which were mostly useless anyway). Util::count() has the $query argument as its first and only one.
+    - Removed all $mode arguments from all Countable implementations (turns out no stable 5.6+ releases uses it...), and the COUNT_RECURSIVE implementations (which were mostly useless anyway). Util::count() has the $query argument as its first one, and a new $from argument as a second one.
     - All Util CRUD methods throw RouterErrorException when the router returns an error. Previously, you'd need to inspect the returned value to check if there's an error.
     - Util::edit() is no longer an alias of Util::set(). It's now its own method that can modify or unset a single specified property.
     - Util::fileGetContents() now throws RouterErrorException if the file doesn't exist or if there are other problems with getting its contents. Previously, it returned FALSE for such cases.
@@ -11,6 +11,8 @@ Util stuff, mostly.
     - comment()
     - getCurrentTime()
     - newRequest()
+* Script::escapeString() no longer escapes bytes above 0x7F. This means that parameter string values are now influenced by charset settings, and thus no additional conversion is necessary. A new second argument can be set to TRUE to escape all bytes, including the previously untouched ASCII alphanumeric characters and underscores.
+* Stream parameters in Script::append() (and inherently, Script::prepare() and Util::exec()) now have ALL bytes escaped.
 * Script::parseValue() now supports letter notation for time (1h2m3s), not just double colon notation (01:02:03), modeled after RouterOS. Related to that is also that leading zeroes, and zero minutes and seconds are now optional (e.g. "1:" is a valid way of saying 1 hour). Sub-second information is rounded up to the nearest second on current PHP versions (future versions are expected to support sub-second information in DateInterval by allowing seconds to be a double; The code currently attempts to give DateInterval a double, falling back to rounding to a second).
 * Script::parseValue() now recognizes dates in the "M/d/Y H:i:s" format (used across RouterOS), and turns that into a DateTime object for that time (or midnight in UTC if the time part is omitted).
 * Util::getAll() now throws a NotSupportedException if the arguments "follow", "follow-only" or "count-only" are used. The first two, because PHP would hang (since Client::sendSync() is used under the hood), and the last one because it's unredable in the returned output (use Util::count() instead).

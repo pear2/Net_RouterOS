@@ -1007,6 +1007,36 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             $this->assertSame($e, $newLockException);
         }
     }
+    
+    public function testEscapeString()
+    {
+        $this->assertSame('ab_12', Script::escapeString('ab_12'));
+        $this->assertSame('ab_12', Script::escapeString('ab_12', false));
+        $this->assertSame(
+            '\\61\\62\\5F\\31\\32',
+            Script::escapeString('ab_12', true)
+        );
+
+        $this->assertSame('ab_12яг', Script::escapeString('ab_12яг'));
+        $this->assertSame('ab_12яг', Script::escapeString('ab_12яг', false));
+        $this->assertSame(
+            '\\61\\62\\5F\\31\\32\\D1\\8F\\D0\\B3',
+            Script::escapeString('ab_12яг', true)
+        );
+
+        $this->assertSame(
+            'ab_12яг\\3F\\3A\\22\\5C\\2B',
+            Script::escapeString('ab_12яг?:"\\+')
+        );
+        $this->assertSame(
+            'ab_12яг\\3F\\3A\\22\\5C\\2B',
+            Script::escapeString('ab_12яг?:"\\+', false)
+        );
+        $this->assertSame(
+            '\\61\\62\\5F\\31\\32\\D1\\8F\\D0\\B3\\3F\\3A\\22\\5C\\2B',
+            Script::escapeString('ab_12яг?:"\\+', true)
+        );
+    }
 
     public function testPrepareScript()
     {
@@ -1028,7 +1058,9 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             array('msg' => $testParam)
         );
         $this->assertSame(
-            ":local \"msg\" \"{$msg}\";\n/log print \$msg",
+            ':local "msg" "' .
+            Script::escapeString($msg, true) .
+            "\";\n/log print \$msg",
             stream_get_contents($result)
         );
         $this->assertSame(strlen($msg), ftell($testParam));
@@ -1064,7 +1096,7 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             //    new DateInterval('PT0.001002003S')
             //),
             ''                      => array('', null),
-            '[]'                   => array('[]', null),
+            '[]'                    => array('[]', null),
             '1'                     => array('1', 1),
             'true'                  => array('true', true),
             'yes'                   => array('yes', true),
@@ -1074,33 +1106,96 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             'test'                  => array('test', 'test'),
             '0:'                    => array('0:', new DateInterval('PT0H')),
             '1:'                    => array('1:', new DateInterval('PT1H')),
-            '00:00'                 => array('00:00', new DateInterval('PT0M0S')),
-            '00:01'                 => array('00:01', new DateInterval('PT0M1S')),
-            '00:1'                  => array('00:1', new DateInterval('PT0M1S')),
-            '00:1'                  => array('1:1', new DateInterval('PT1M1S')),
-            '00:00:00'              => array('00:00:00', new DateInterval('PT0H0M0S')),
-            '01:02:03'              => array('01:02:03', new DateInterval('PT1H2M3S')),
-            '1:2:3'                 => array('1:2:3', new DateInterval('PT1H2M3S')),
-            '1d00:00:00'            => array('1d00:00:00', new DateInterval('P1DT0H0M0S')),
-            '1w00:00:00'            => array('1w00:00:00', new DateInterval('P7DT0H0M0S')),
-            '1w0d00:00:00'          => array('1w0d00:00:00', new DateInterval('P7DT0H0M0S')),
-            '1w1d00:00:00'          => array('1w1d00:00:00', new DateInterval('P8DT0H0M0S')),
+            '00:00'                 => array(
+                '00:00',
+                new DateInterval('PT0M0S')
+            ),
+            '00:01'                 => array(
+                '00:01',
+                new DateInterval('PT0M1S')
+            ),
+            '00:1'                  => array(
+                '00:1',
+                new DateInterval('PT0M1S')
+            ),
+            '1:1'                   => array(
+                '1:1',
+                new DateInterval('PT1M1S')
+            ),
+            '00:00:00'              => array(
+                '00:00:00',
+                new DateInterval('PT0H0M0S')
+            ),
+            '01:02:03'              => array(
+                '01:02:03',
+                new DateInterval('PT1H2M3S')
+            ),
+            '1:2:3'                 => array(
+                '1:2:3',
+                new DateInterval('PT1H2M3S')
+            ),
+            '1d00:00:00'            => array(
+                '1d00:00:00',
+                new DateInterval('P1DT0H0M0S')
+            ),
+            '1w00:00:00'            => array(
+                '1w00:00:00',
+                new DateInterval('P7DT0H0M0S')
+            ),
+            '1w0d00:00:00'          => array(
+                '1w0d00:00:00',
+                new DateInterval('P7DT0H0M0S')
+            ),
+            '1w1d00:00:00'          => array(
+                '1w1d00:00:00',
+                new DateInterval('P8DT0H0M0S')
+            ),
             '0s'                    => array('0s', new DateInterval('PT0S')),
             '1s'                    => array('1s', new DateInterval('PT1S')),
             '0m'                    => array('0m', new DateInterval('PT0M')),
             '1m'                    => array('1m', new DateInterval('PT1M')),
             '0h'                    => array('0h', new DateInterval('PT0H')),
             '1h'                    => array('1h', new DateInterval('PT1H')),
-            '1m2s'                  => array('1m2s', new DateInterval('PT1M2S')),
-            '1h2m3s'                => array('1h2m3s', new DateInterval('PT1H2M3S')),
-            '1d2h3m4s'              => array('1d2h3m4s', new DateInterval('P1DT2H3M4S')),
-            '1w2s'                  => array('1w2s', new DateInterval('P7DT2S')),
-            '1w2m3s'                => array('1w2m3s', new DateInterval('P7DT2M3S')),
-            '1w2h3m4s'              => array('1w2h3m4s', new DateInterval('P7DT2H3M4S')),
-            '1w2d3h4m5s'            => array('1w2d3h4m5s', new DateInterval('P9DT3H4M5S')),
-            'Dec/21/2012'           => array('Dec/21/2012', new DateTime('2012-12-21 00:00:00', new DateTimeZone('UTC'))),
-            'Dec/21/2012 12:34:56'  => array('Dec/21/2012 12:34:56', new DateTime('2012-12-21 12:34:56', new DateTimeZone('UTC'))),
-            'Dec/99/9999 99:99:99'  => array('Dec/99/9999 99:99:99', 'Dec/99/9999 99:99:99'),
+            '1m2s'                  => array(
+                '1m2s',
+                new DateInterval('PT1M2S')
+            ),
+            '1h2m3s'                => array(
+                '1h2m3s',
+                new DateInterval('PT1H2M3S')
+            ),
+            '1d2h3m4s'              => array(
+                '1d2h3m4s',
+                new DateInterval('P1DT2H3M4S')
+            ),
+            '1w2s'                  => array(
+                '1w2s',
+                new DateInterval('P7DT2S')
+            ),
+            '1w2m3s'                => array(
+                '1w2m3s',
+                new DateInterval('P7DT2M3S')
+            ),
+            '1w2h3m4s'              => array(
+                '1w2h3m4s',
+                new DateInterval('P7DT2H3M4S')
+            ),
+            '1w2d3h4m5s'            => array(
+                '1w2d3h4m5s',
+                new DateInterval('P9DT3H4M5S')
+            ),
+            'Dec/21/2012'           => array(
+                'Dec/21/2012',
+                new DateTime('2012-12-21 00:00:00', new DateTimeZone('UTC'))
+            ),
+            'Dec/21/2012 12:34:56'  => array(
+                'Dec/21/2012 12:34:56',
+                new DateTime('2012-12-21 12:34:56', new DateTimeZone('UTC'))
+            ),
+            'Dec/99/9999 99:99:99'  => array(
+                'Dec/99/9999 99:99:99',
+                'Dec/99/9999 99:99:99'
+            ),
             '{}'                    => array('{}', array()),
             '{a}'                   => array('{a}', array('a')),
             '{1;2}'                 => array('{1;2}', array(1, 2)),
@@ -1108,12 +1203,30 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
             '{"a";"b"}'             => array('{"a";"b"}', array('a', 'b')),
             '{"a;b";c}'             => array('{"a;b";c}', array('a;b', 'c')),
             '{a;"b;c"}'             => array('{a;"b;c"}', array('a', 'b;c')),
-            '{"a;b";c;d}'           => array('{"a;b";c;d}', array('a;b', 'c', 'd')),
-            '{a;"b;c";d}'           => array('{a;"b;c";d}', array('a', 'b;c', 'd')),
-            '{a;b;"c;d"}'           => array('{a;b;"c;d"}', array('a', 'b', 'c;d')),
-            '{{a;b};c}'             => array('{{a;b};c}', array(array('a', 'b'), 'c')),
-            '{a;{b;c};d}'           => array('{a;{b;c};d}', array('a', array('b', 'c'), 'd')),
-            '{a;b;{c;d}}'           => array('{a;b;{c;d}}', array('a', 'b', array('c', 'd'))),
+            '{"a;b";c;d}'           => array(
+                '{"a;b";c;d}',
+                array('a;b', 'c', 'd')
+            ),
+            '{a;"b;c";d}'           => array(
+                '{a;"b;c";d}',
+                array('a', 'b;c', 'd')
+            ),
+            '{a;b;"c;d"}'           => array(
+                '{a;b;"c;d"}',
+                array('a', 'b', 'c;d')
+            ),
+            '{{a;b};c}'             => array(
+                '{{a;b};c}',
+                array(array('a', 'b'), 'c')
+            ),
+            '{a;{b;c};d}'           => array(
+                '{a;{b;c};d}',
+                array('a', array('b', 'c'), 'd')
+            ),
+            '{a;b;{c;d}}'           => array(
+                '{a;b;{c;d}}',
+                array('a', 'b', array('c', 'd'))
+            ),
             '{{a;{b;c}};d}'         => array(
                 '{{a;{b;c}};d}',
                 array(array('a', array('b', 'c')), 'd')

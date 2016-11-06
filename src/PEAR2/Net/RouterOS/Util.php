@@ -226,9 +226,9 @@ class Util implements Countable
      *     Array values are automatically processed with
      *     {@link static::escapeValue()}. Streams are also supported, and are
      *     processed in chunks, each processed with
-     *     {@link static::escapeString()}. Processing starts from the current
-     *     position to the end of the stream, and the stream's pointer is left
-     *     untouched after the reading is done.
+     *     {@link static::escapeString()} with all bytes being escaped.
+     *     Processing starts from the current position to the end of the stream,
+     *     and the stream's pointer is left untouched after the reading is done.
      *     Note that the script's (generated) name is always added as the
      *     variable "_", which will be inadvertently lost if you overwrite it
      *     from here.
@@ -296,18 +296,20 @@ class Util implements Countable
         $request->setArgument('numbers', $name);
         $removeResult = $this->client->sendSync($request);
 
+        $results = new ResponseCollection(
+            array_merge(
+                $addResult->toArray(),
+                $runResult->toArray(),
+                $removeResult->toArray()
+            )
+        );
+
         if (count($runResult->getAllOfType(Response::TYPE_ERROR)) > 0) {
             throw new RouterErrorException(
                 'Error when running script',
                 RouterErrorException::CODE_SCRIPT_RUN_ERROR,
                 null,
-                new ResponseCollection(
-                    array_merge(
-                        $addResult->toArray(),
-                        $runResult->toArray(),
-                        $removeResult->toArray()
-                    )
-                )
+                $results
             );
         }
         if (count($removeResult->getAllOfType(Response::TYPE_ERROR)) > 0) {
@@ -315,23 +317,11 @@ class Util implements Countable
                 'Error when removing script',
                 RouterErrorException::CODE_SCRIPT_REMOVE_ERROR,
                 null,
-                new ResponseCollection(
-                    array_merge(
-                        $addResult->toArray(),
-                        $runResult->toArray(),
-                        $removeResult->toArray()
-                    )
-                )
+                $results
             );
         }
 
-        return new ResponseCollection(
-            array_merge(
-                $addResult->toArray(),
-                $runResult->toArray(),
-                $removeResult->toArray()
-            )
-        );
+        return $results;
     }
 
     /**
@@ -928,17 +918,27 @@ class Util implements Countable
      * queries are allowed as a criteria, in contrast with
      * {@link static::find()}, where numbers and callbacks are allowed also.
      *
-     * @param Query|null $query A query to filter items by. Without it, all items
-     *     are included in the count.
+     * @param Query|null           $query A query to filter items by.
+     *     Without it, all items are included in the count.
+     * @param string|resource|null $from  A comma separated list of item IDs.
+     *     Any items in the set that still exist at the time of couting
+     *     are included in the final tally. Note that the $query filters this
+     *     set further (i.e. the item must be in the list AND match the $query).
+     *     Leaving the value to NULL means all matching items at the current
+     *     menu are included in the count.
      *
      * @return int The number of items, or -1 on failure (e.g. if the
      *     current menu does not have a "print" command or items to be counted).
      */
-    public function count(Query $query = null)
+    public function count(Query $query = null, $from = null)
     {
-        $result = $this->client->sendSync(
-            new Request($this->menu . '/print count-only=""', $query)
-        )->end()->getProperty('ret');
+        $countRequest = new Request(
+            $this->menu . '/print count-only=""',
+            $query
+        );
+        $countRequest->setArgument('from', $from);
+        $result = $this->client->sendSync($countRequest)->end()
+            ->getProperty('ret');
 
         if (null === $result) {
             return -1;
@@ -1147,7 +1147,11 @@ class Util implements Countable
             if (Stream::isStream($message)) {
                 $successToken = fread($message, 1/*strlen('&')*/);
                 if ('&' === $successToken) {
-                    return $message;
+                    $messageCopy = fopen('php://temp', 'r+b');
+                    stream_copy_to_stream($message, $messageCopy);
+                    rewind($messageCopy);
+                    fclose($message);
+                    return $messageCopy;
                 }
                 rewind($message);
             } elseif (strpos($message, '&') === 0) {

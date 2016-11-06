@@ -80,7 +80,7 @@ class Script
      *
      * @return mixed Depending on RouterOS type detected:
      *     - "nil" (the string "[]") or "nothing" (empty string) - NULL.
-     *     - "number" - int or double for large values.
+     *     - "num" - int or double for large values.
      *     - "bool" - a boolean.
      *     - "array" - an array, with the keys and values processed recursively.
      *     - "time" - a {@link DateInterval} object.
@@ -147,7 +147,7 @@ class Script
      *
      * @return string|bool|int|double|null Depending on RouterOS type detected:
      *     - "nil" (the string "[]") or "nothing" (empty string) - NULL.
-     *     - "number" - int or double for large values.
+     *     - "num" - int or double for large values.
      *     - "bool" - a boolean.
      *     - Unrecognized type - casted to a string, unmodified.
      */
@@ -192,6 +192,7 @@ class Script
         $value,
         DateTimeZone $timezone = null
     ) {
+        $previous = null;
         $value = (string)$value;
         if ('' !== $value && preg_match(
             '#^
@@ -221,12 +222,13 @@ class Script
                     $timezone
                 );
             } catch (E $e) {
-                return $value;
+                $previous = $e;
             }
         }
         throw new ParserException(
             'The supplied value can not be converted to a DateTime',
-            ParserException::CODE_DATETIME
+            ParserException::CODE_DATETIME,
+            $previous
         );
     }
 
@@ -406,7 +408,7 @@ class Script
      * variables to it.
      *
      * This is particularly useful when you're creating scripts that you don't
-     * want to execute right now (as with {@link static::exec()}, but instead
+     * want to execute right now (as with {@link Util::exec()}, but instead
      * you want to store it for later execution, perhaps by supplying it to
      * "/system scheduler".
      *
@@ -420,9 +422,9 @@ class Script
      *     Array values are automatically processed with
      *     {@link static::escapeValue()}. Streams are also supported, and are
      *     processed in chunks, each with
-     *     {@link static::escapeString()}. Processing starts from the current
-     *     position to the end of the stream, and the stream's pointer stays at
-     *     the end after reading is done.
+     *     {@link static::escapeString()} with all bytes being escaped.
+     *     Processing starts from the current position to the end of the stream,
+     *     and the stream's pointer is left untouched after the reading is done.
      *
      * @return resource A new PHP temporary stream with the script as contents,
      *     with the pointer back at the start.
@@ -456,9 +458,9 @@ class Script
      *     Array values are automatically processed with
      *     {@link static::escapeValue()}. Streams are also supported, and are
      *     processed in chunks, each with
-     *     {@link static::escapeString()}. Processing starts from the current
-     *     position to the end of the stream, and the stream's pointer stays at
-     *     the end after reading is done.
+     *     {@link static::escapeString()} with all bytes being escaped.
+     *     Processing starts from the current position to the end of the stream,
+     *     and the stream's pointer is left untouched after the reading is done.
      *
      * @return int The number of bytes written to $stream is returned,
      *     and the pointer remains where it was after the write
@@ -481,7 +483,7 @@ class Script
                 $bytes += $writer->send('"');
                 while ($reader->isAvailable() && $reader->isDataAwaiting()) {
                     $bytes += $writer->send(
-                        static::escapeString(fread($pvalue, $chunkSize))
+                        static::escapeString(fread($pvalue, $chunkSize), true)
                     );
                 }
                 $bytes += $writer->send("\";\n");
@@ -518,7 +520,7 @@ class Script
     {
         switch(gettype($value)) {
         case 'NULL':
-            $value = '';
+            $value = '[]';
             break;
         case 'integer':
             $value = (string)$value;
@@ -573,22 +575,28 @@ class Script
      * larger string first), and you can be sure there won't be any code
      * injections coming from it.
      *
-     * For the sake of brevity of the output, alphanumeric characters and
-     * underscores are left untouched
+     * By default, for the sake of brevity of the output, ASCII alphanumeric
+     * characters and underscores are left untouched. And for the sake of
+     * character conversion, bytes above 0x7F are also left untouched.
      *
      * @param string $value Value to be escaped.
+     * @param bool   $full  Whether to escape all bytes in the string, including
+     *     ASCII alphanumeric characters, underscores and bytes above 0x7F.
      *
      * @return string The escaped value.
      *
-     * @internal Why leave ONLY those characters and not also others?
+     * @internal Why leave ONLY those ASCII characters and not also others?
      *     Because those can't in any way be mistaken for language constructs,
      *     unlike many other "safe inside strings, but not outside" ASCII
      *     characters, like ",", ".", "+", "-", "~", etc.
      */
-    public static function escapeString($value)
+    public static function escapeString($value, $full = false)
     {
+        if ($full) {
+            return self::_escapeCharacters(array($value));
+        }
         return preg_replace_callback(
-            '/[^\\_A-Za-z0-9]+/S',
+            '/[^\\_A-Za-z0-9\\x80-\\xFF]+/S',
             array(__CLASS__, '_escapeCharacters'),
             $value
         );
@@ -597,8 +605,9 @@ class Script
     /**
      * Escapes a character for a RouterOS scripting context.
      *
-     * Escapes a character for a RouterOS scripting context. Intended to only be
-     * called for non-alphanumeric characters.
+     * Escapes a character for a RouterOS scripting context.
+     * Intended to only be called by {@link self::escapeString()} for the
+     * matching strings.
      *
      * @param array $chars The matches array, expected to contain exactly one
      *     member, in which is the whole string to be escaped.
