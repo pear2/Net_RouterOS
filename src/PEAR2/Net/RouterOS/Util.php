@@ -216,27 +216,30 @@ class Util implements Countable
      * variables pre declared. This is achieved by prepending 1+count($params)
      * lines before your actual script.
      *
-     * @param string|resource     $source The source of the script, as a string
-     *     or stream. If a stream is provided, reading starts from the current
-     *     position to the end of the stream, and the pointer stays at the end
-     *     after reading is done.
-     * @param array<string,mixed> $params An array of parameters to make
+     * @param string|resource         $source The source of the script,
+     *     as a string or stream. If a stream is provided, reading starts from
+     *     the current position to the end of the stream, and the pointer stays
+     *     at the end after reading is done.
+     * @param array<string|int,mixed> $params An array of parameters to make
      *     available in the script as local variables.
      *     Variable names are array keys, and variable values are array values.
      *     Array values are automatically processed with
      *     {@link static::escapeValue()}. Streams are also supported, and are
-     *     processed in chunks, each processed with
+     *     processed in chunks, each with
      *     {@link static::escapeString()} with all bytes being escaped.
      *     Processing starts from the current position to the end of the stream,
      *     and the stream's pointer is left untouched after the reading is done.
+     *     Variables with a value of type "nothing" can be declared with a
+     *     numeric array key and the variable name as the array value
+     *     (that is casted to a string).
      *     Note that the script's (generated) name is always added as the
      *     variable "_", which will be inadvertently lost if you overwrite it
      *     from here.
-     * @param string|null         $policy Allows you to specify a policy the
+     * @param string|null             $policy Allows you to specify a policy the
      *     script must follow. Has the same format as in terminal.
      *     If left NULL, the script has no restrictions beyond those imposed by
      *     the username.
-     * @param string|null         $name   The script is executed after being
+     * @param string|null             $name   The script is executed after being
      *     saved in "/system script" and is removed after execution.
      *     If this argument is left NULL, a random string,
      *     prefixed with the computer's name, is generated and used

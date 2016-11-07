@@ -12,12 +12,12 @@
         }
     ],
     "support": {
-        "issues": "http://github.com/pear2/Net_RouterOS/issues",
-        "wiki": "http://github.com/pear2/Net_RouterOS/wiki"
+        "issues": "https://github.com/pear2/Net_RouterOS/issues",
+        "wiki": "https://github.com/pear2/Net_RouterOS/wiki"
     },
     "require": {
         "php": ">=5.3.0",
-        "pear2/net_transmitter": ">=1.0.0a5"
+        "pear2/net_transmitter": ">=1.0.0b1"
     },
     "require-dev": {
         "phpunit/phpunit": "@stable",
@@ -30,8 +30,9 @@
         "pear2/cache_shm": "Enables persistent connections.",
         "pear2/console_commandline": "Enables the console",
         "pear2/console_color": "Enables colors in the console",
-        "ext-apc": "This or Wincache is required for persistent connections.",
-        "ext-wincache": "This or APC is required for persistent connections. Reccomended instead of APC on Windows.",
+        "ext-apc": "This, APCu or Wincache is required for persistent connections.",
+        "ext-apcu": "This, APC or Wincache is required for persistent connections.",
+        "ext-wincache": "This, APC or APCu is required for persistent connections. Reccomended for Windows.",
         "ext-openssl": "Enables encrypted connections."
     },
     "autoload": {

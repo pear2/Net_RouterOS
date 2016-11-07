@@ -412,11 +412,11 @@ class Script
      * you want to store it for later execution, perhaps by supplying it to
      * "/system scheduler".
      *
-     * @param string|resource     $source The source of the script, as a string
-     *     or stream. If a stream is provided, reading starts from the current
-     *     position to the end of the stream, and the pointer stays at the end
-     *     after reading is done.
-     * @param array<string,mixed> $params An array of parameters to make
+     * @param string|resource         $source The source of the script,
+     *     as a string or stream. If a stream is provided, reading starts from
+     *     the current position to the end of the stream, and the pointer stays
+     *     at the end after reading is done.
+     * @param array<string|int,mixed> $params An array of parameters to make
      *     available in the script as local variables.
      *     Variable names are array keys, and variable values are array values.
      *     Array values are automatically processed with
@@ -425,6 +425,9 @@ class Script
      *     {@link static::escapeString()} with all bytes being escaped.
      *     Processing starts from the current position to the end of the stream,
      *     and the stream's pointer is left untouched after the reading is done.
+     *     Variables with a value of type "nothing" can be declared with a
+     *     numeric array key and the variable name as the array value
+     *     (that is casted to a string).
      *
      * @return resource A new PHP temporary stream with the script as contents,
      *     with the pointer back at the start.
@@ -446,13 +449,13 @@ class Script
      *
      * Appends a script to an existing stream.
      *
-     * @param resource            $stream An existing stream to write the
+     * @param resource                $stream An existing stream to write the
      *     resulting script to.
-     * @param string|resource     $source The source of the script, as a string
-     *     or stream. If a stream is provided, reading starts from the current
-     *     position to the end of the stream, and the pointer stays at the end
-     *     after reading is done.
-     * @param array<string,mixed> $params An array of parameters to make
+     * @param string|resource         $source The source of the script,
+     *     as a string or stream. If a stream is provided, reading starts from
+     *     the current position to the end of the stream, and the pointer stays
+     *     at the end after reading is done.
+     * @param array<string|int,mixed> $params An array of parameters to make
      *     available in the script as local variables.
      *     Variable names are array keys, and variable values are array values.
      *     Array values are automatically processed with
@@ -461,6 +464,9 @@ class Script
      *     {@link static::escapeString()} with all bytes being escaped.
      *     Processing starts from the current position to the end of the stream,
      *     and the stream's pointer is left untouched after the reading is done.
+     *     Variables with a value of type "nothing" can be declared with a
+     *     numeric array key and the variable name as the array value
+     *     (that is casted to a string).
      *
      * @return int The number of bytes written to $stream is returned,
      *     and the pointer remains where it was after the write
@@ -475,6 +481,11 @@ class Script
         $bytes = 0;
 
         foreach ($params as $pname => $pvalue) {
+            if (is_int($pname)) {
+                $pvalue = static::escapeString((string)$pvalue);
+                $bytes += $writer->send(":local \"{$pvalue}\";\n");
+                continue;
+            }
             $pname = static::escapeString($pname);
             $bytes += $writer->send(":local \"{$pname}\" ");
             if (Stream::isStream($pvalue)) {

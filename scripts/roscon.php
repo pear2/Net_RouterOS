@@ -112,7 +112,11 @@ if (!class_exists('PEAR2\Net\RouterOS\Communicator', true)) {
                     <<<HEREDOC
 No recognized autoloader is available.
 Please install this package with Pyrus, PEAR or Composer.
-Alternatively, install PEAR2_Autoload, and/or add it to your include_path.
+
+If using PEAR or Pyrus, also install PEAR2_Autoload if it's not installed.
+If it's already installed and yet this message appears,
+make sure the folder with PHP files is in the list of paths in php.ini's
+include_path directive.
 HEREDOC
                 );
                 chdir($cwd);

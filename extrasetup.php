@@ -14,40 +14,35 @@
  * @link      http://pear2.php.net/PEAR2_Net_RouterOS
  */
 
-$extrafiles = array();
-$phpDir = Pyrus\Config::current()->php_dir;
 $packages = array(
-    'PEAR2/Autoload',
-    'PEAR2/Cache/SHM',
-    'PEAR2/Console/CommandLine',
-    'PEAR2/Console/Color',
-    'PEAR2/Net/Transmitter'
+    'pear2.php.net' => array(
+        'PEAR2_Autoload',
+        'PEAR2_Cache_SHM',
+        'PEAR2_Console_CommandLine',
+        'PEAR2_Console_Color'
+    )
 );
 
-//Quick&dirty workaround for Console_CommandLine's xmlschema.rng file.
-$extrafiles['data/pear2.php.net/PEAR2_Console_CommandLine/xmlschema.rng']
-    = Pyrus\Config::current()->data_dir . DIRECTORY_SEPARATOR .
-        'pear2.php.net/PEAR2_Console_CommandLine/xmlschema.rng';
+$extrafiles = array();
+$config = Pyrus\Config::current();
+$registry = $config->registry;
+$phpDir = $config->php_dir;
+$dataDir = $config->data_dir;
 
-$oldCwd = getcwd();
-chdir($phpDir);
-foreach ($packages as $pkg) {
-    if (is_dir($pkg)) {
-        foreach (new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator(
-                $pkg,
-                RecursiveDirectoryIterator::UNIX_PATHS
-                | RecursiveDirectoryIterator::SKIP_DOTS
-            ),
-            RecursiveIteratorIterator::LEAVES_ONLY
-        ) as $path) {
-            $extrafiles['src/' . $path->getPathname()] = $path->getRealPath();
+foreach ($packages as $channel => $channelPackages) {
+    foreach ($channelPackages as $package) {
+        foreach ($registry->toPackage($package, $channel)->installcontents
+            as $file => $info) {
+            var_dump($package, $file);
+            if (strpos($file, 'php/') === 0 || strpos($file, 'src/') === 0) {
+                $filename = substr($file, 4);
+                $extrafiles['src/' . $filename]
+                    = realpath($phpDir . DIRECTORY_SEPARATOR . $filename);
+            } elseif (strpos($file, 'data/') === 0) {
+                $filename = substr($file, 5);
+                $extrafiles["data/{$channel}/{$package}/{$filename}"]
+                    = realpath($dataDir . DIRECTORY_SEPARATOR . $channel . DIRECTORY_SEPARATOR . $package . DIRECTORY_SEPARATOR . $filename);
+            }
         }
     }
-
-    if (is_file($pkg . '.php')) {
-        $extrafiles['src/' . $pkg . '.php']
-            = $phpDir . DIRECTORY_SEPARATOR . $pkg . '.php';
-    }
 }
-chdir($oldCwd);

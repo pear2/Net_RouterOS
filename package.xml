@@ -2,7 +2,8 @@
 <package version="2.1" xmlns="http://pear.php.net/dtd/package-2.1" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0     http://pear.php.net/dtd/tasks-1.0.xsd     http://pear.php.net/dtd/package-2.1     http://pear.php.net/dtd/package-2.1.xsd">
  <name>PEAR2_Net_RouterOS</name>
  <channel>pear2.php.net</channel>
- <summary>RouterOS API client implementation.</summary>
+ <summary>RouterOS API client implementation.
+</summary>
  <description>RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.</description>
  <lead>
   <name>Vasil Rangelov</name>
@@ -10,10 +11,10 @@
   <email>boen.robot@gmail.com</email>
   <active>yes</active>
  </lead>
- <date>2014-11-02</date>
- <time>07:37:22</time>
+ <date>2016-11-07</date>
+ <time>03:50:39</time>
  <version>
-  <release>1.0.0b5</release>
+  <release>1.0.0b6</release>
   <api>1.0.0</api>
  </version>
  <stability>
@@ -21,38 +22,34 @@
   <api>stable</api>
  </stability>
  <license uri="http://www.gnu.org/copyleft/lesser.html">LGPL License 2.1</license>
- <notes>Console, some overall improvements, including BREAKING CHANGES.
+ <notes>Util stuff, mostly.
 
-* The PHAR file is now also a console. When installed, the console is available from the executable &quot;roscon&quot;.
 * __BREAKING CHANGES:__
-    - Response::getArgument() is renamed to Response::getProperty() (Note: Request::getArgument() is still valid). Response::getArgument() is left issuing an E_USER_DEPRECATED notice, and will be removed in a later release.
-    - Message::getAllArguments() is removed in favor of IteratorAggregate implementation that returns an ArrayObject. For most intents and purposes, you should be able to just search&amp;replace &quot;-&gt;getAllArguments()&quot; with an empty string (that will implicitly call getIterator()). If you require the arguments as a &quot;real&quot; array, you can replace &quot;-&gt;getAllArguments()&quot; with &quot;-&gt;getIterator()-&gt;getArrayCopy()&quot;.
-    - Message::\_\_invoke() without arguments is now a shortcut for getTag() instead of getting all arguments.
-    - Util::changeMenu() is now renamed to Util::setMenu() and always returns the Util object itself.
-    - ResponseCollection::\_\_invoke() without arguments (or NULL) is now a shortcut for getting the iterator of the current response, instead of for seeking to the last response. Replace &quot;()&quot; with &quot;(-1)&quot; or &quot;-&gt;end()&quot; to achieve the old effect.
-    - ResponseCollection::getLast() is removed. To get the last response, you can instead use array access (or offsetGet()) with &quot;-1&quot; as the offset. Or simply search&amp;replace &quot;-&gt;getLast()&quot; with &quot;-&gt;offsetGet(-1)&quot;.
-    - ResponseCollection::getArgumentMap() is renamed to ResponseCollection::getPropertyMap().
-    - All Query::ACTION\_\* constants are renamed to Query::OP\_\*, and shortened (GREATHER_THAN is now GT, etc.).
+    - Removed all $mode arguments from all Countable implementations (turns out no stable 5.6+ releases uses it...), and the COUNT_RECURSIVE implementations (which were mostly useless anyway). Util::count() has the $query argument as its first one, and a new $from argument as a second one.
+    - All Util CRUD methods throw RouterErrorException when the router returns an error. Previously, you'd need to inspect the returned value to check if there's an error.
+    - Util::edit() is no longer an alias of Util::set(). It's now its own method that can modify or unset a single specified property.
+    - Util::fileGetContents() now throws RouterErrorException if the file doesn't exist or if there are other problems with getting its contents. Previously, it returned FALSE for such cases.
+    - Util's escapeValue(), escapeString(), parseValue(), prepareScript() and appendScript() methods are now in their own new class called &quot;Script&quot;, with the last two now being called just prepare() and append().
+    - Script::escapeValue() now converts DateTime objects into a string having the &quot;M/d/Y H:i:s&quot; format (used across RouterOS), or just &quot;M/d/Y&quot; if the time is exactly midnight, and the timezone is UTC. The old behaviour can be achieved by &quot;manually&quot; adding the DateTime to &quot;new DateTime('@0')&quot;.
 * New Util methods:
-    - getMenu() (serves the same purpose as previously Util::changeMenu() with an emptry string)
-    - getAll()
-    - count() (makes Util an implementation of Countable, reports the number of items at the current menu)
-    - prepareScript()
-    - appendScript()
-* Message now implements Countable, reporting the number of arguments (on COUNTER_NORMAL) or words (on COUNT_RECURSIVE).
-* Util::get() now uses RouterOS' &quot;get&quot; command, unless it returns an empty !done response (as it does for RouterOS versions prior to 6.0), in which case it automatically fallbacks to a print with a query.
-* Util::escapeValue() and Util::parseValue() now support associative arrays (introduced in RouterOS 6.2).
-* Util::escapeValue() now correctly converts DateTime objects to DateInterval objects relative to UNIX epoch time in UTC. Previously, the current time zone was used instead of UTC.
-* Util::add() and Util::set()/Util::edit() now support flags as values with a numeric key.
-* Util::filePutContents() now behaves correctly when the underlying Client has enabled streaming of responses and/or when the contents is in a stream. 
-* Responses in ResponseCollection can now be getted or seeked to a value relative from the end by supplying a negative offset.
-* ResponseCollection can now be searched by argument values, if you first designate an argument name with the new ResponseCollection::setIndex() method.
-* ResponseCollection can now produce a sorted response collection based on user defined criteria using the new ResponseCollection::orderBy() method.
-* Util::find() now always returns a comma separated list when used without arguments (as opposed to &quot;;&quot; separated, in more recent RouterOS versions).
-* Response receiving now resets if an empty sentence is received, instead of throwing an exception.
-* New Communicator::seekableStreamLength() method, used internally by Util::filePutContents().
-* Doc fixes (Notably: Clarified the acceptability of seekable streams as argument values, which has been present for a long time, but never documented).
-* CS fixes.</notes>
+    - comment()
+    - getCurrentTime()
+    - newRequest()
+* Script::escapeString() no longer escapes bytes above 0x7F. This means that parameter string values are now influenced by charset settings, and thus no additional conversion is necessary. A new second argument can be set to TRUE to escape all bytes, including the previously untouched ASCII alphanumeric characters and underscores.
+* Stream parameters in Script::append() (and inherently, Script::prepare() and Util::exec()) now have ALL bytes escaped.
+* Script::parseValue() now supports letter notation for time (1h2m3s), not just double colon notation (01:02:03), modeled after RouterOS. Related to that is also that leading zeroes, and zero minutes and seconds are now optional (e.g. &quot;1:&quot; is a valid way of saying 1 hour). Sub-second information is rounded up to the nearest second on current PHP versions (future versions are expected to support sub-second information in DateInterval by allowing seconds to be a double; The code currently attempts to give DateInterval a double, falling back to rounding to a second).
+* Script::parseValue() now recognizes dates in the &quot;M/d/Y H:i:s&quot; format (used across RouterOS), and turns that into a DateTime object for that time (or midnight in UTC if the time part is omitted).
+* Util::getAll() now throws a NotSupportedException if the arguments &quot;follow&quot;, &quot;follow-only&quot; or &quot;count-only&quot; are used. The first two, because PHP would hang (since Client::sendSync() is used under the hood), and the last one because it's unredable in the returned output (use Util::count() instead).
+* Util::setMenu() can now go back to the root menu.
+* Util::exec() and stream valued arguments in both Util and Client no longer cause a hang when using charset conversion.
+* Util::get() can now accept a query as an argument for $number
+* Util::get() can have $valueName set to NULL (as is now by default), in which case all properties are retrieved in an array, parsed with Script::parseValueToArray().
+* Util::get() no longer fallbacks automatically with a &quot;print&quot; request for buggy versions. You may &quot;manually&quot; call Util::getAll() if you suspect that's an issue.
+* Util::find() now works even when the underlying Client streams responses.
+* Util::move()'s second argument $destination is now optional, and without it (or if set to NULL), the item is moved at the bottom of the menu.
+* Client::login() consumes the !done or !fatal response even when called on an already logged in connection.
+* Client::sendAsync() no longer throws an exception if a request is canceled multiple times by the returned value of a callback.
+* The console now checks whether PEAR2_CommandLine is installed, ensuring better error messages when this package is installed without its optional dependencies.</notes>
  <contents>
   <dir name="/">
    <dir name="data" baseinstalldir="/">
@@ -71,14 +68,36 @@
     <file role="doc" name="phpdoc.dist.xml">
      <tasks:replace type="pear-config" to="php_dir" from="../src"/>
     </file>
+    <file role="doc" name="sami.php"/>
    </dir>
    <dir name="examples">
-    <file role="doc" name="callback-and-loop.php"/>
-    <file role="doc" name="loop-and-extract.php"/>
-    <file role="doc" name="send-and-complete.php"/>
-    <file role="doc" name="send-and-forget.php"/>
-    <file role="doc" name="sync-request-arguments.php"/>
-    <file role="doc" name="sync-request-simple.php"/>
+    <dir name="Client">
+     <file role="doc" name="callback-and-loop.php"/>
+     <file role="doc" name="loop-and-extract.php"/>
+     <file role="doc" name="send-and-complete.php"/>
+     <file role="doc" name="send-and-forget.php"/>
+     <file role="doc" name="sync-request-arguments.php"/>
+     <file role="doc" name="sync-request-simple.php"/>
+    </dir>
+    <dir name="Util">
+     <file role="doc" name="add.php"/>
+     <file role="doc" name="count.php"/>
+     <file role="doc" name="enable_disable_remove.php"/>
+     <file role="doc" name="exec-basic.php"/>
+     <file role="doc" name="exec-params.php"/>
+     <file role="doc" name="exec-policy.php"/>
+     <file role="doc" name="file-get.php"/>
+     <file role="doc" name="file-put.php"/>
+     <file role="doc" name="find-callback.php"/>
+     <file role="doc" name="find-numbers.php"/>
+     <file role="doc" name="get-null.php"/>
+     <file role="doc" name="get-number.php"/>
+     <file role="doc" name="getAll.php"/>
+     <file role="doc" name="move.php"/>
+     <file role="doc" name="parseValue.php"/>
+     <file role="doc" name="set-multiple.php"/>
+     <file role="doc" name="set-single.php"/>
+    </dir>
    </dir>
    <dir name="scripts" baseinstalldir="/">
     <file role="script" name="roscon">
@@ -146,6 +165,11 @@
         <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
         <tasks:replace type="package-info" to="description" from="~~description~~"/>
        </file>
+       <file role="php" name="ParserException.php">
+        <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+        <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+        <tasks:replace type="package-info" to="description" from="~~description~~"/>
+       </file>
        <file role="php" name="Query.php">
         <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
         <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
@@ -167,6 +191,16 @@
         <tasks:replace type="package-info" to="description" from="~~description~~"/>
        </file>
        <file role="php" name="ResponseCollection.php">
+        <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+        <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+        <tasks:replace type="package-info" to="description" from="~~description~~"/>
+       </file>
+       <file role="php" name="RouterErrorException.php">
+        <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
+        <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
+        <tasks:replace type="package-info" to="description" from="~~description~~"/>
+       </file>
+       <file role="php" name="Script.php">
         <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
         <tasks:replace type="package-info" to="summary" from="~~summary~~"/>
         <tasks:replace type="package-info" to="description" from="~~description~~"/>
@@ -219,10 +253,54 @@
      <file role="test" name="Safe.php"/>
      <file role="test" name="Unsafe.php"/>
     </dir>
+    <dir name="Communicator">
+     <dir name="Safe">
+      <dir name="NonPersistent">
+       <file role="test" name="EncryptedTest.php"/>
+       <file role="test" name="UnencryptedTest.php"/>
+      </dir>
+      <dir name="Persistent">
+       <file role="test" name="EncryptedTest.php"/>
+       <file role="test" name="UnencryptedTest.php"/>
+      </dir>
+      <file role="test" name="NonPersistent.php"/>
+      <file role="test" name="Persistent.php"/>
+     </dir>
+     <dir name="Unsafe">
+      <dir name="NonPersistent">
+       <file role="test" name="EncryptedTest.php"/>
+       <file role="test" name="UnencryptedTest.php"/>
+      </dir>
+      <dir name="Persistent">
+       <file role="test" name="EncryptedTest.php"/>
+       <file role="test" name="UnencryptedTest.php"/>
+      </dir>
+      <file role="test" name="NonPersistent.php"/>
+      <file role="test" name="Persistent.php"/>
+     </dir>
+     <file role="test" name="Safe.php"/>
+     <file role="test" name="Unsafe.php"/>
+    </dir>
     <dir name="Extra">
      <file role="test" name="isHostnameInvalid.php">
       <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
      </file>
+    </dir>
+    <dir name="Misc">
+     <dir name="Connection">
+      <dir name="NonPersistent">
+       <file role="test" name="EncryptedTest.php"/>
+       <file role="test" name="UnencryptedTest.php"/>
+      </dir>
+      <dir name="Persistent">
+       <file role="test" name="EncryptedTest.php"/>
+       <file role="test" name="UnencryptedTest.php"/>
+      </dir>
+      <file role="test" name="NonPersistent.php"/>
+      <file role="test" name="Persistent.php"/>
+     </dir>
+     <file role="test" name="Connection.php"/>
+     <file role="test" name="ConnectionlessTest.php"/>
     </dir>
     <dir name="Util">
      <dir name="Safe">
@@ -252,18 +330,23 @@
      <file role="test" name="Safe.php"/>
      <file role="test" name="Unsafe.php"/>
     </dir>
+    <dir name="vm">
+     <file role="test" name="RouterOS.packer.json"/>
+     <file role="test" name="RouterOS.qemu.bat">
+      <tasks:windowseol/>
+     </file>
+     <file role="test" name="RouterOS.qemu.sh"/>
+     <file role="test" name="RouterOS_SETTINGS.rsc"/>
+    </dir>
     <file role="test" name="bootstrap.php">
      <tasks:replace type="pear-config" to="php_dir" from="../src"/>
      <tasks:replace type="pear-config" to="php_dir" from="../../Net_Transmitter.git/src"/>
      <tasks:replace type="pear-config" to="php_dir" from="../../Cache_SHM.git/src"/>
      <tasks:replace type="package-info" to="version" from="GIT: $Id$"/>
     </file>
-    <file role="test" name="ConnectionTest.php"/>
-    <file role="test" name="HandlingTest.php"/>
     <file role="test" name="phpunit.xml">
      <tasks:replace type="pear-config" to="php_dir" from="../src"/>
     </file>
-    <file role="test" name="RouterOS_SETTINGS.rsc"/>
    </dir>
   </dir>
  </contents>
@@ -278,7 +361,7 @@
    <package>
     <name>PEAR2_Net_Transmitter</name>
     <channel>pear2.php.net</channel>
-    <min>1.0.0a5</min>
+    <min>1.0.0b1</min>
    </package>
    <extension>
     <name>pcre</name>
@@ -316,12 +399,30 @@
    <install name="docs/apigen.neon" as="apigen.neon"/>
    <install name="docs/doxygen.ini" as="doxygen.ini"/>
    <install name="docs/phpdoc.dist.xml" as="phpdoc.dist.xml"/>
-   <install name="examples/callback-and-loop.php" as="examples/callback-and-loop.php"/>
-   <install name="examples/loop-and-extract.php" as="examples/loop-and-extract.php"/>
-   <install name="examples/send-and-complete.php" as="examples/send-and-complete.php"/>
-   <install name="examples/send-and-forget.php" as="examples/send-and-forget.php"/>
-   <install name="examples/sync-request-arguments.php" as="examples/sync-request-arguments.php"/>
-   <install name="examples/sync-request-simple.php" as="examples/sync-request-simple.php"/>
+   <install name="docs/sami.php" as="sami.php"/>
+   <install name="examples/Client/callback-and-loop.php" as="examples/Client/callback-and-loop.php"/>
+   <install name="examples/Client/loop-and-extract.php" as="examples/Client/loop-and-extract.php"/>
+   <install name="examples/Client/send-and-complete.php" as="examples/Client/send-and-complete.php"/>
+   <install name="examples/Client/send-and-forget.php" as="examples/Client/send-and-forget.php"/>
+   <install name="examples/Client/sync-request-arguments.php" as="examples/Client/sync-request-arguments.php"/>
+   <install name="examples/Client/sync-request-simple.php" as="examples/Client/sync-request-simple.php"/>
+   <install name="examples/Util/add.php" as="examples/Util/add.php"/>
+   <install name="examples/Util/count.php" as="examples/Util/count.php"/>
+   <install name="examples/Util/enable_disable_remove.php" as="examples/Util/enable_disable_remove.php"/>
+   <install name="examples/Util/exec-basic.php" as="examples/Util/exec-basic.php"/>
+   <install name="examples/Util/exec-params.php" as="examples/Util/exec-params.php"/>
+   <install name="examples/Util/exec-policy.php" as="examples/Util/exec-policy.php"/>
+   <install name="examples/Util/file-get.php" as="examples/Util/file-get.php"/>
+   <install name="examples/Util/file-put.php" as="examples/Util/file-put.php"/>
+   <install name="examples/Util/find-callback.php" as="examples/Util/find-callback.php"/>
+   <install name="examples/Util/find-numbers.php" as="examples/Util/find-numbers.php"/>
+   <install name="examples/Util/get-null.php" as="examples/Util/get-null.php"/>
+   <install name="examples/Util/get-number.php" as="examples/Util/get-number.php"/>
+   <install name="examples/Util/getAll.php" as="examples/Util/getAll.php"/>
+   <install name="examples/Util/move.php" as="examples/Util/move.php"/>
+   <install name="examples/Util/parseValue.php" as="examples/Util/parseValue.php"/>
+   <install name="examples/Util/set-multiple.php" as="examples/Util/set-multiple.php"/>
+   <install name="examples/Util/set-single.php" as="examples/Util/set-single.php"/>
    <install name="scripts/roscon" as="roscon"/>
    <install name="scripts/roscon.bat" as="roscon.bat"/>
    <install name="scripts/roscon.php" as="roscon.php"/>
@@ -333,11 +434,14 @@
    <install name="src/PEAR2/Net/RouterOS/LengthException.php" as="PEAR2/Net/RouterOS/LengthException.php"/>
    <install name="src/PEAR2/Net/RouterOS/Message.php" as="PEAR2/Net/RouterOS/Message.php"/>
    <install name="src/PEAR2/Net/RouterOS/NotSupportedException.php" as="PEAR2/Net/RouterOS/NotSupportedException.php"/>
+   <install name="src/PEAR2/Net/RouterOS/ParserException.php" as="PEAR2/Net/RouterOS/ParserException.php"/>
    <install name="src/PEAR2/Net/RouterOS/Query.php" as="PEAR2/Net/RouterOS/Query.php"/>
    <install name="src/PEAR2/Net/RouterOS/Registry.php" as="PEAR2/Net/RouterOS/Registry.php"/>
    <install name="src/PEAR2/Net/RouterOS/Request.php" as="PEAR2/Net/RouterOS/Request.php"/>
    <install name="src/PEAR2/Net/RouterOS/Response.php" as="PEAR2/Net/RouterOS/Response.php"/>
    <install name="src/PEAR2/Net/RouterOS/ResponseCollection.php" as="PEAR2/Net/RouterOS/ResponseCollection.php"/>
+   <install name="src/PEAR2/Net/RouterOS/RouterErrorException.php" as="PEAR2/Net/RouterOS/RouterErrorException.php"/>
+   <install name="src/PEAR2/Net/RouterOS/Script.php" as="PEAR2/Net/RouterOS/Script.php"/>
    <install name="src/PEAR2/Net/RouterOS/SocketException.php" as="PEAR2/Net/RouterOS/SocketException.php"/>
    <install name="src/PEAR2/Net/RouterOS/UnexpectedValueException.php" as="PEAR2/Net/RouterOS/UnexpectedValueException.php"/>
    <install name="src/PEAR2/Net/RouterOS/Util.php" as="PEAR2/Net/RouterOS/Util.php"/>
@@ -356,11 +460,30 @@
    <install name="tests/Client/Unsafe/Persistent.php" as="Client/Unsafe/Persistent.php"/>
    <install name="tests/Client/Unsafe/Persistent/EncryptedTest.php" as="Client/Unsafe/Persistent/EncryptedTest.php"/>
    <install name="tests/Client/Unsafe/Persistent/UnencryptedTest.php" as="Client/Unsafe/Persistent/UnencryptedTest.php"/>
-   <install name="tests/ConnectionTest.php" as="ConnectionTest.php"/>
+   <install name="tests/Communicator/Safe.php" as="Communicator/Safe.php"/>
+   <install name="tests/Communicator/Safe/NonPersistent.php" as="Communicator/Safe/NonPersistent.php"/>
+   <install name="tests/Communicator/Safe/NonPersistent/EncryptedTest.php" as="Communicator/Safe/NonPersistent/EncryptedTest.php"/>
+   <install name="tests/Communicator/Safe/NonPersistent/UnencryptedTest.php" as="Communicator/Safe/NonPersistent/UnencryptedTest.php"/>
+   <install name="tests/Communicator/Safe/Persistent.php" as="Communicator/Safe/Persistent.php"/>
+   <install name="tests/Communicator/Safe/Persistent/EncryptedTest.php" as="Communicator/Safe/Persistent/EncryptedTest.php"/>
+   <install name="tests/Communicator/Safe/Persistent/UnencryptedTest.php" as="Communicator/Safe/Persistent/UnencryptedTest.php"/>
+   <install name="tests/Communicator/Unsafe.php" as="Communicator/Unsafe.php"/>
+   <install name="tests/Communicator/Unsafe/NonPersistent.php" as="Communicator/Unsafe/NonPersistent.php"/>
+   <install name="tests/Communicator/Unsafe/NonPersistent/EncryptedTest.php" as="Communicator/Unsafe/NonPersistent/EncryptedTest.php"/>
+   <install name="tests/Communicator/Unsafe/NonPersistent/UnencryptedTest.php" as="Communicator/Unsafe/NonPersistent/UnencryptedTest.php"/>
+   <install name="tests/Communicator/Unsafe/Persistent.php" as="Communicator/Unsafe/Persistent.php"/>
+   <install name="tests/Communicator/Unsafe/Persistent/EncryptedTest.php" as="Communicator/Unsafe/Persistent/EncryptedTest.php"/>
+   <install name="tests/Communicator/Unsafe/Persistent/UnencryptedTest.php" as="Communicator/Unsafe/Persistent/UnencryptedTest.php"/>
    <install name="tests/Extra/isHostnameInvalid.php" as="Extra/isHostnameInvalid.php"/>
-   <install name="tests/HandlingTest.php" as="HandlingTest.php"/>
+   <install name="tests/Misc/Connection.php" as="Misc/Connection.php"/>
+   <install name="tests/Misc/Connection/NonPersistent.php" as="Misc/Connection/NonPersistent.php"/>
+   <install name="tests/Misc/Connection/NonPersistent/EncryptedTest.php" as="Misc/Connection/NonPersistent/EncryptedTest.php"/>
+   <install name="tests/Misc/Connection/NonPersistent/UnencryptedTest.php" as="Misc/Connection/NonPersistent/UnencryptedTest.php"/>
+   <install name="tests/Misc/Connection/Persistent.php" as="Misc/Connection/Persistent.php"/>
+   <install name="tests/Misc/Connection/Persistent/EncryptedTest.php" as="Misc/Connection/Persistent/EncryptedTest.php"/>
+   <install name="tests/Misc/Connection/Persistent/UnencryptedTest.php" as="Misc/Connection/Persistent/UnencryptedTest.php"/>
+   <install name="tests/Misc/ConnectionlessTest.php" as="Misc/ConnectionlessTest.php"/>
    <install name="tests/phpunit.xml" as="phpunit.xml"/>
-   <install name="tests/RouterOS_SETTINGS.rsc" as="RouterOS_SETTINGS.rsc"/>
    <install name="tests/Util/Safe.php" as="Util/Safe.php"/>
    <install name="tests/Util/Safe/NonPersistent/EncryptedTest.php" as="Util/Safe/NonPersistent/EncryptedTest.php"/>
    <install name="tests/Util/Safe/NonPersistent/UnencryptedTest.php" as="Util/Safe/NonPersistent/UnencryptedTest.php"/>
@@ -375,6 +498,10 @@
    <install name="tests/Util/Unsafe/Persistent.php" as="Util/Unsafe/Persistent.php"/>
    <install name="tests/Util/Unsafe/Persistent/EncryptedTest.php" as="Util/Unsafe/Persistent/EncryptedTest.php"/>
    <install name="tests/Util/Unsafe/Persistent/UnencryptedTest.php" as="Util/Unsafe/Persistent/UnencryptedTest.php"/>
+   <install name="tests/vm/RouterOS.packer.json" as="vm/RouterOS.packer.json"/>
+   <install name="tests/vm/RouterOS.qemu.bat" as="vm/RouterOS.qemu.bat"/>
+   <install name="tests/vm/RouterOS.qemu.sh" as="vm/RouterOS.qemu.sh"/>
+   <install name="tests/vm/RouterOS_SETTINGS.rsc" as="vm/RouterOS_SETTINGS.rsc"/>
   </filelist>
  </phprelease>
 </package>

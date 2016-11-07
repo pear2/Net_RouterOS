@@ -1043,10 +1043,13 @@ class ConnectionlessTest extends PHPUnit_Framework_TestCase
         $msg = 'testing';
         $result = Script::prepare(
             '/log print $msg',
-            array('msg' => $msg)
+            array(
+                'msg' => $msg,
+                $msg
+            )
         );
         $this->assertSame(
-            ":local \"msg\" \"{$msg}\";\n/log print \$msg",
+            ":local \"msg\" \"{$msg}\";\n:local \"{$msg}\";\n/log print \$msg",
             stream_get_contents($result)
         );
 
