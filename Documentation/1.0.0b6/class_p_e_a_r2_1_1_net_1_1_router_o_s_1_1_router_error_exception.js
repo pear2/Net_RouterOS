@@ -1,0 +1,26 @@
+var class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception =
+[
+    [ "__construct", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#addbe16a3cb4117f6646899ccf89ebefe", null ],
+    [ "__toString", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#a7516ca30af0db3cdbf9a7739b48ce91d", null ],
+    [ "getResponses", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#a23b5694091fd594edd4b7e2d9ea7ab08", null ],
+    [ "CODE_ADD_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#a17f629808023ca5b2511207dec492a07", null ],
+    [ "CODE_CACHE_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#a077ba4c404d7c5974ba250a48b6c6ee7", null ],
+    [ "CODE_COMMENT_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#a49b57f212144ce760e64ebf1a8de92f2", null ],
+    [ "CODE_DISABLE_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#a4c1ed2eeaaa44e0a992a60e044e98c76", null ],
+    [ "CODE_ENABLE_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#a4f0770f9ab9ee9c3d3d990c80f33ac83", null ],
+    [ "CODE_EXEC_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#a747ca7d789f72d476d7518b84447942e", null ],
+    [ "CODE_GET_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#aae296942d60f6c9690fb13de1b9d4314", null ],
+    [ "CODE_GETALL_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#a0f0d85f1767e893327e5670e92104070", null ],
+    [ "CODE_ITEM_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#a0020fc9b111d82080a41c92c50ea0821", null ],
+    [ "CODE_MOVE_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#ad952d884bbd6d172978e6b29c4d14cb8", null ],
+    [ "CODE_READ_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#a56494f8d587b2ec6820544d7be247dcc", null ],
+    [ "CODE_REMOVE_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#ac090a19799bc37e3d05dd32b083eeebf", null ],
+    [ "CODE_SCRIPT_ADD_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#a145ea3a112fa0a4496e3d4c7a3f06d99", null ],
+    [ "CODE_SCRIPT_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#a897d5c600508112f9810bbf7454cbb48", null ],
+    [ "CODE_SCRIPT_FILE_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#a2c956276c4439737969e50d8ba7c0467", null ],
+    [ "CODE_SCRIPT_REMOVE_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#ad45ef4c2825a5227164facae806942e6", null ],
+    [ "CODE_SCRIPT_RUN_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#a75c1d25d16d39ba5b3d7f9015af4cba4", null ],
+    [ "CODE_SET_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#aea0c274f41fb7c20a6cd9cee18550d8b", null ],
+    [ "CODE_UNSET_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#aade5be2b8b0d0548120277730df67a5d", null ],
+    [ "CODE_WRITE_ERROR", "class_p_e_a_r2_1_1_net_1_1_router_o_s_1_1_router_error_exception.html#a527fb7da8c835c4363e9f86603fc9124", null ]
+];
