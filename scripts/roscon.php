@@ -73,55 +73,83 @@ if (!class_exists('PEAR2\Net\RouterOS\Communicator', true)) {
     $cwd = getcwd();
     chdir(__DIR__);
 
-    //The composer autoloader from this package.
-    //Also matched if the bin-dir is changed to a folder that is directly
-    //descended from the composer project root.
-    $autoloader = stream_resolve_include_path('../vendor/autoload.php');
-    if (false !== $autoloader) {
-        include_once $autoloader;
-    } else {
-        //The composer autoloader, when this package is a dependency.
-        $autoloader = stream_resolve_include_path(
-            (false === ($vendorDir = getenv('COMPOSER_VENDOR_DIR'))
-                ? '../../..'
-                : $vendorDir) . '/autoload.php'
-        );
+    $composerAutoloaderPaths = array();
+    $vendorDir = getenv('COMPOSER_VENDOR_DIR');
+    if (false !== $vendorDir) {
+        $composerAutoloaderPaths[] = $vendorDir . '/autoload.php';
         unset($vendorDir);
+    }
+    $composerAutoloaderPaths[] = '../vendor/autoload.php';
+    $composerAutoloaderPaths[] = '../../../autoload.php';
+    foreach ($composerAutoloaderPaths as $autoloaderPath) {
+        $autoloader = stream_resolve_include_path($autoloaderPath);
         if (false !== $autoloader) {
             include_once $autoloader;
+            if (class_exists('PEAR2\Net\RouterOS\Communicator', true)) {
+                break;
+            }
+            $autoloader = false;
+        }
+    }
+    unset($autoloaderPath, $composerAutoloaderPaths);
+    if (false === $autoloader) {
+        //PEAR2_Autoload, most probably installed globally.
+        $autoloader = stream_resolve_include_path('PEAR2/Autoload.php');
+        if (false !== $autoloader) {
+            include_once $autoloader;
+            Autoload::initialize(
+                realpath('../src')
+            );
+            Autoload::initialize(
+                realpath('../../Net_Transmitter.git/src')
+            );
+            Autoload::initialize(
+                realpath('../../Console_Color.git/src')
+            );
+            Autoload::initialize(
+                realpath('../../Console_CommandLine.git/src')
+            );
         } else {
-            //PEAR2_Autoload, most probably installed globally.
-            $autoloader = stream_resolve_include_path('PEAR2/Autoload.php');
-            if (false !== $autoloader) {
-                include_once $autoloader;
-                Autoload::initialize(
-                    realpath('../src')
-                );
-                Autoload::initialize(
-                    realpath('../../Net_Transmitter.git/src')
-                );
-                Autoload::initialize(
-                    realpath('../../Console_Color.git/src')
-                );
-                Autoload::initialize(
-                    realpath('../../Console_CommandLine.git/src')
-                );
-            } else {
-                fwrite(
-                    STDERR,
-                    <<<HEREDOC
+            $phpIniLocation = php_ini_loaded_file();
+            $phpIncludePath = get_include_path();
+            $defaultDirPyrus = __DIR__ . DIRECTORY_SEPARATOR . 'php';
+            $defaultDirPear = __DIR__ . DIRECTORY_SEPARATOR . 'pear';
+            fwrite(
+                STDERR,
+                <<<HEREDOC
 No recognized autoloader is available.
 Please install this package with Pyrus, PEAR or Composer.
 
 If using PEAR or Pyrus, also install PEAR2_Autoload if it's not installed.
+
 If it's already installed and yet this message appears,
 make sure the folder with PHP files is in the list of paths in php.ini's
 include_path directive.
+
+The loaded php.ini is at
+```
+{$phpIniLocation}
+```
+
+and the computed include_path value is
+```
+{$phpIncludePath}
+```
+
+If you use the default settings for Pyrus, the folder to add is probably
+```
+{$defaultDirPyrus}
+```
+
+and for PEAR's default settings, the folder to add is probably
+```
+{$defaultDirPear}
+```
+
 HEREDOC
-                );
-                chdir($cwd);
-                exit(10);
-            }
+            );
+            chdir($cwd);
+            exit(10);
         }
     }
 
@@ -138,30 +166,49 @@ if (!class_exists('PEAR2\Console\CommandLine', true)) {
 PEAR2_Console_CommandLine was not found.
 Please install it with the package manager used to install PEAR2_Net_RouterOS.
 (i.e. Pyrus, PEAR or Composer)
+
 HEREDOC
     );
     exit(11);
 }
 
 // Locate the data dir, in preference as:
-// 1. The PHP_PEAR_DATA_DIR environment variable, if available
-// 2. The data folder at "mypear" (filled at install time by Pyrus/PEAR)
-// 3. The source layout's data folder (also used when running in PHAR).
-$dataDir = (false != ($pearDataDir = getenv('PHP_PEAR_DATA_DIR')))
-    ? realpath($pearDataDir . '/@PACKAGE_CHANNEL@/@PACKAGE_NAME@')
-    : false;
-if (false === $dataDir) {
-    $dataDir = realpath('@PEAR2_DATA_DIR@/@PACKAGE_CHANNEL@/@PACKAGE_NAME@')
-        ?: (realpath('@PEAR2_DATA_DIR@/@PACKAGE_NAME@')
-        ?: (is_dir(__DIR__ . '/../data')
-        ? __DIR__ . '/../data'
-        : false));
+// 1. If outside of PHAR file
+// 1.1. The data folder filled at install time by Pyrus.
+// 1.2. The PHP_PEAR_DATA_DIR environment variable, if available. 
+// 1.3. The data folder filled at install time by PEAR.
+// 2. The source layout's data folder, inside a channel/package subfolder
+//    (in case this package itself is bundled by another Pyrus package)
+// 3. The source layout's data folder, inside a package subfolder
+//    (in case this package itself is bundled by another PEAR package)
+// 4. The source layout's data folder (used with Composer or from Git).
+$dataDirPaths = array();
+if (!class_exists('Phar', false) || !Phar::running()) {
+    $dataDirPaths[] = '@PEAR2_DATA_DIR@/@PACKAGE_CHANNEL@/@PACKAGE_NAME@';
+    if (($pearDataDir = getenv('PHP_PEAR_DATA_DIR'))) {
+        $dataDirPaths[] = $pearDataDir . '/@PACKAGE_NAME@';
+    }
+    $dataDirPaths[] = '@PEAR2_DATA_DIR@/@PACKAGE_NAME@';
 }
+$dataDirPaths[] = __DIR__ . '/../data/@PACKAGE_CHANNEL@/@PACKAGE_NAME@';
+$dataDirPaths[] = __DIR__ . '/../data/@PACKAGE_NAME@';
+$dataDirPaths[] = __DIR__ . '/../data';
+$dataDir = false;
+foreach ($dataDirPaths as $dataDirPath) {
+    if (is_dir($dataDirPath)) {
+        $dataDir = $dataDirPath;
+        break;
+    }
+}
+unset($dataDirPaths);
 
 if (false === $dataDir) {
     fwrite(
         STDERR,
-        'Unable to find data dir.'
+        <<<HEREDOC
+Unable to find data dir.
+
+HEREDOC
     );
     exit(11);
 }
@@ -175,6 +222,7 @@ if (false === $consoleDefFile) {
 The console definition file (roscon.xml) was not found at the data dir, which
 was found to be at
 {$dataDir}
+
 HEREDOC
     );
     exit(12);
@@ -186,7 +234,7 @@ try {
 } catch (CommandLine\Exception $e) {
     fwrite(
         STDERR,
-        'Error when parsing command line: ' . $e->getMessage() . "\n"
+        "Error when parsing command line: {$e->getMessage()}\n"
     );
     $cmdParser->displayUsage(13);
 }
@@ -255,6 +303,7 @@ if ('yes' === $cmd->options['isColored']) {
             <<<HEREDOC
 Warning: Color was forced, but PEAR2_Console_Color is not available.
          Resuming with colors disabled.
+
 HEREDOC
         );
     }
@@ -283,6 +332,11 @@ try {
     if ($e instanceof RouterOS\SocketException
         && $e->getCode() === RouterOS\SocketException::CODE_CONNECTION_FAIL
     ) {
+        $phpBin = defined('PHP_BINARY')
+            ? PHP_BINARY
+            : (PHP_BINDIR . DIRECTORY_SEPARATOR .
+                (PHP_SAPI === 'cli' ? 'php' : 'php-cgi') .
+                (stristr(PHP_OS, 'win') === false ? '' : '.exe'));
         fwrite(
             STDERR,
             <<<HEREDOC
@@ -310,13 +364,21 @@ Possible reasons:
 
 5. Your web server is configured to forbid that outgoing connection.
    If you're the web server administrator, check your web server's firewall's
-   settings. If you're on a hosting plan... Typically, shared hosts block all
+   settings. The binary you need to whitelist is probably
+   ```
+   {$phpBin}
+   ```
+
+   If you're on a hosting plan... Typically, shared hosts block all
    outgoing connections, but it's also possible that only connections to that
    port are blocked. Try to connect to a host on a popular port (21, 80, 443,
    etc.), and if successful, change the API service port to that port. If the
    connection fails even then, ask your host to configure their firewall so as
    to allow you to make outgoing connections to the ip:port you've set the API
    service on.
+   
+   Note that using the library may require a different binary to be
+   whitelisted, depending on how PHP is running as.
 
 6. The router has a firewall filter/mangle/nat rule that overrides the settings
    at the "/ip service" menu.

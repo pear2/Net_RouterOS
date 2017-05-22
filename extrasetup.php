@@ -18,6 +18,7 @@ $packages = array(
     'pear2.php.net' => array(
         'PEAR2_Autoload',
         'PEAR2_Cache_SHM',
+        'PEAR2_Net_Transmitter',
         'PEAR2_Console_CommandLine',
         'PEAR2_Console_Color'
     )
@@ -33,7 +34,6 @@ foreach ($packages as $channel => $channelPackages) {
     foreach ($channelPackages as $package) {
         foreach ($registry->toPackage($package, $channel)->installcontents
             as $file => $info) {
-            var_dump($package, $file);
             if (strpos($file, 'php/') === 0 || strpos($file, 'src/') === 0) {
                 $filename = substr($file, 4);
                 $extrafiles['src/' . $filename]

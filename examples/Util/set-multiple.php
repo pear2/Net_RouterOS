@@ -9,6 +9,7 @@ $util = new RouterOS\Util(
 $util->setMenu('/ip arp');
 $util->set(
     $util->find(
+        0,
         function ($response) {
             //Matches any item with a comment that starts with two digits
             return preg_match('/^\d\d/', $response->getArgument('comment'));

@@ -11,8 +11,8 @@
   <email>boen.robot@gmail.com</email>
   <active>yes</active>
  </lead>
- <date>2016-11-07</date>
- <time>03:50:39</time>
+ <date>2017-05-22</date>
+ <time>15:41:15</time>
  <version>
   <release>1.0.0b6</release>
   <api>1.0.0</api>
@@ -37,6 +37,8 @@
     - newRequest()
 * Script::escapeString() no longer escapes bytes above 0x7F. This means that parameter string values are now influenced by charset settings, and thus no additional conversion is necessary. A new second argument can be set to TRUE to escape all bytes, including the previously untouched ASCII alphanumeric characters and underscores.
 * Stream parameters in Script::append() (and inherently, Script::prepare() and Util::exec()) now have ALL bytes escaped.
+* Script::escapeValue() converts NULL to &quot;nil&quot; instead of &quot;nothing&quot;.
+* The $params array in Script::append() can declare variables with a value of type &quot;nothing&quot; by using numeric keys, and the variable names as values.
 * Script::parseValue() now supports letter notation for time (1h2m3s), not just double colon notation (01:02:03), modeled after RouterOS. Related to that is also that leading zeroes, and zero minutes and seconds are now optional (e.g. &quot;1:&quot; is a valid way of saying 1 hour). Sub-second information is rounded up to the nearest second on current PHP versions (future versions are expected to support sub-second information in DateInterval by allowing seconds to be a double; The code currently attempts to give DateInterval a double, falling back to rounding to a second).
 * Script::parseValue() now recognizes dates in the &quot;M/d/Y H:i:s&quot; format (used across RouterOS), and turns that into a DateTime object for that time (or midnight in UTC if the time part is omitted).
 * Util::getAll() now throws a NotSupportedException if the arguments &quot;follow&quot;, &quot;follow-only&quot; or &quot;count-only&quot; are used. The first two, because PHP would hang (since Client::sendSync() is used under the hood), and the last one because it's unredable in the returned output (use Util::count() instead).
@@ -58,6 +60,21 @@
     </file>
    </dir>
    <dir name="docs" baseinstalldir="/">
+    <dir name="wiki">
+     <file role="doc" name="Approaches-with-Client.md"/>
+     <file role="doc" name="Getting-started.md"/>
+     <file role="doc" name="Home.md"/>
+     <file role="doc" name="Manipulating-RouterOS-data-using-Client.md"/>
+     <file role="doc" name="Optional-features.md"/>
+     <file role="doc" name="Roscon.md"/>
+     <file role="doc" name="Script-composition-and-parsing.md"/>
+     <file role="doc" name="Shortcuts.md"/>
+     <file role="doc" name="Using-queries.md"/>
+     <file role="doc" name="Util-basics.md"/>
+     <file role="doc" name="Util-extras.md"/>
+     <file role="doc" name="_Footer.md"/>
+     <file role="doc" name="_Sidebar.md"/>
+    </dir>
     <file role="doc" name="apigen.neon">
      <tasks:replace type="pear-config" to="php_dir" from="../src"/>
     </file>
@@ -79,9 +96,14 @@
      <file role="doc" name="sync-request-arguments.php"/>
      <file role="doc" name="sync-request-simple.php"/>
     </dir>
+    <dir name="Script">
+     <file role="doc" name="parseValue.php"/>
+     <file role="doc" name="prepare.php"/>
+    </dir>
     <dir name="Util">
      <file role="doc" name="add.php"/>
      <file role="doc" name="count.php"/>
+     <file role="doc" name="edit.php"/>
      <file role="doc" name="enable_disable_remove.php"/>
      <file role="doc" name="exec-basic.php"/>
      <file role="doc" name="exec-params.php"/>
@@ -94,7 +116,6 @@
      <file role="doc" name="get-number.php"/>
      <file role="doc" name="getAll.php"/>
      <file role="doc" name="move.php"/>
-     <file role="doc" name="parseValue.php"/>
      <file role="doc" name="set-multiple.php"/>
      <file role="doc" name="set-single.php"/>
     </dir>
@@ -381,7 +402,7 @@
    <package>
     <name>PEAR2_Console_CommandLine</name>
     <channel>pear2.php.net</channel>
-    <min>0.2.1</min>
+    <min>0.2.2</min>
    </package>
    <package>
     <name>PEAR2_Console_Color</name>
@@ -400,14 +421,30 @@
    <install name="docs/doxygen.ini" as="doxygen.ini"/>
    <install name="docs/phpdoc.dist.xml" as="phpdoc.dist.xml"/>
    <install name="docs/sami.php" as="sami.php"/>
+   <install name="docs/wiki/Approaches-with-Client.md" as="wiki/Approaches-with-Client.md"/>
+   <install name="docs/wiki/Getting-started.md" as="wiki/Getting-started.md"/>
+   <install name="docs/wiki/Home.md" as="wiki/Home.md"/>
+   <install name="docs/wiki/Manipulating-RouterOS-data-using-Client.md" as="wiki/Manipulating-RouterOS-data-using-Client.md"/>
+   <install name="docs/wiki/Optional-features.md" as="wiki/Optional-features.md"/>
+   <install name="docs/wiki/Roscon.md" as="wiki/Roscon.md"/>
+   <install name="docs/wiki/Script-composition-and-parsing.md" as="wiki/Script-composition-and-parsing.md"/>
+   <install name="docs/wiki/Shortcuts.md" as="wiki/Shortcuts.md"/>
+   <install name="docs/wiki/Using-queries.md" as="wiki/Using-queries.md"/>
+   <install name="docs/wiki/Util-basics.md" as="wiki/Util-basics.md"/>
+   <install name="docs/wiki/Util-extras.md" as="wiki/Util-extras.md"/>
+   <install name="docs/wiki/_Footer.md" as="wiki/_Footer.md"/>
+   <install name="docs/wiki/_Sidebar.md" as="wiki/_Sidebar.md"/>
    <install name="examples/Client/callback-and-loop.php" as="examples/Client/callback-and-loop.php"/>
    <install name="examples/Client/loop-and-extract.php" as="examples/Client/loop-and-extract.php"/>
    <install name="examples/Client/send-and-complete.php" as="examples/Client/send-and-complete.php"/>
    <install name="examples/Client/send-and-forget.php" as="examples/Client/send-and-forget.php"/>
    <install name="examples/Client/sync-request-arguments.php" as="examples/Client/sync-request-arguments.php"/>
    <install name="examples/Client/sync-request-simple.php" as="examples/Client/sync-request-simple.php"/>
+   <install name="examples/Script/parseValue.php" as="examples/Script/parseValue.php"/>
+   <install name="examples/Script/prepare.php" as="examples/Script/prepare.php"/>
    <install name="examples/Util/add.php" as="examples/Util/add.php"/>
    <install name="examples/Util/count.php" as="examples/Util/count.php"/>
+   <install name="examples/Util/edit.php" as="examples/Util/edit.php"/>
    <install name="examples/Util/enable_disable_remove.php" as="examples/Util/enable_disable_remove.php"/>
    <install name="examples/Util/exec-basic.php" as="examples/Util/exec-basic.php"/>
    <install name="examples/Util/exec-params.php" as="examples/Util/exec-params.php"/>
@@ -420,7 +457,6 @@
    <install name="examples/Util/get-number.php" as="examples/Util/get-number.php"/>
    <install name="examples/Util/getAll.php" as="examples/Util/getAll.php"/>
    <install name="examples/Util/move.php" as="examples/Util/move.php"/>
-   <install name="examples/Util/parseValue.php" as="examples/Util/parseValue.php"/>
    <install name="examples/Util/set-multiple.php" as="examples/Util/set-multiple.php"/>
    <install name="examples/Util/set-single.php" as="examples/Util/set-single.php"/>
    <install name="scripts/roscon" as="roscon"/>

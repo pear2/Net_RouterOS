@@ -6,10 +6,11 @@
 .gitignore export-ignore
 .scrutinizer.yml export-ignore
 .travis.yml export-ignore
-README.md export-ignore
 README export-ignore
+README.md export-ignore
 CREDITS export-ignore
 RELEASE-* export-ignore
+extrasetup.php export-ignore
 package.xml export-ignore
 packagexmlsetup.php export-ignore
-extrasetup.php export-ignore
+scanoptions.php export-ignore

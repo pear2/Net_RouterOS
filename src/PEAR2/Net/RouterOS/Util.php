@@ -522,7 +522,7 @@ class Util implements Countable
      *     there are no items (e.g. "/system identity"), you can specify NULL.
      *     You can also specify a {@link Query}, in which case the first match
      *     will be considered the target item.
-     * @param string|null           $valueName The name of the value to get.
+     * @param string|resource|null  $valueName The name of the value to get.
      *     If omitted, or set to NULL, gets all properties of the target item.
      *
      * @return string|resource|null|array The value of the specified
@@ -730,7 +730,10 @@ class Util implements Countable
      *     index as the array key, and the name of the flag as the array value.
      *
      * @return ResponseCollection Returns the response collection, allowing you
-     *     to inspect errors, if any.
+     *     to inspect the output. Current RouterOS versions don't return
+     *     anything useful, but if future ones do, you can read it right away.
+     *
+     * @throws RouterErrorException When the router returns one or more errors.
      */
     public function set($numbers, array $newValues)
     {
@@ -768,7 +771,10 @@ class Util implements Countable
      *     If set to NULL, the property is unset.
      *
      * @return ResponseCollection Returns the response collection, allowing you
-     *     to inspect errors, if any.
+     *     to inspect the output. Current RouterOS versions don't return
+     *     anything useful, but if future ones do, you can read it right away.
+     *
+     * @throws RouterErrorException When the router returns one or more errors.
      */
     public function edit($numbers, $valueName, $newValue)
     {
@@ -789,7 +795,10 @@ class Util implements Countable
      * @param string $valueName The name of the value you want to unset.
      *
      * @return ResponseCollection Returns the response collection, allowing you
-     *     to inspect errors, if any.
+     *     to inspect the output. Current RouterOS versions don't return
+     *     anything useful, but if future ones do, you can read it right away.
+     *
+     * @throws RouterErrorException When the router returns one or more errors.
      */
     public function unsetValue($numbers, $valueName)
     {
@@ -887,7 +896,10 @@ class Util implements Countable
      *     will be moved to the bottom of the menu.
      *
      * @return ResponseCollection Returns the response collection, allowing you
-     *     to inspect errors, if any.
+     *     to inspect the output. Current RouterOS versions don't return
+     *     anything useful, but if future ones do, you can read it right away.
+     *
+     * @throws RouterErrorException When the router returns one or more errors.
      */
     public function move($numbers, $destination = null)
     {

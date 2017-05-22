@@ -189,32 +189,32 @@ class Response extends Message
                     0,
                     SEEK_END
                 )) {
-                    rewind($word);
-                    $ind = fread($word, 1);
-                    if ('=' === $ind || '.' === $ind) {
-                        $prefix = stream_get_line($word, null, '=');
+                rewind($word);
+                $ind = fread($word, 1);
+                if ('=' === $ind || '.' === $ind) {
+                    $prefix = stream_get_line($word, null, '=');
+                }
+                if ('=' === $ind) {
+                    $value = fopen('php://temp', 'r+b');
+                    $bytesCopied = ftell($word);
+                    while (!feof($word)) {
+                        $bytesCopied += stream_copy_to_stream(
+                            $word,
+                            $value,
+                            0xFFFFF,
+                            $bytesCopied
+                        );
                     }
-                    if ('=' === $ind) {
-                        $value = fopen('php://temp', 'r+b');
-                        $bytesCopied = ftell($word);
-                        while (!feof($word)) {
-                            $bytesCopied += stream_copy_to_stream(
-                                $word,
-                                $value,
-                                0xFFFFF,
-                                $bytesCopied
-                            );
-                        }
-                        rewind($value);
-                        $this->setAttribute($prefix, $value);
-                        continue;
-                    }
-                    if ('.' === $ind && 'tag' === $prefix) {
-                        $this->setTag(stream_get_contents($word, -1, -1));
-                        continue;
-                    }
-                    rewind($word);
-                    $this->unrecognizedWords[] = $word;
+                    rewind($value);
+                    $this->setAttribute($prefix, $value);
+                    continue;
+                }
+                if ('.' === $ind && 'tag' === $prefix) {
+                    $this->setTag(stream_get_contents($word, -1, -1));
+                    continue;
+                }
+                rewind($word);
+                $this->unrecognizedWords[] = $word;
             }
         } else {
             for ($word = $com->getNextWord(); '' !== $word;

@@ -104,6 +104,8 @@ $packageGen = function (
 
     $oldCwd = getcwd();
     chdir(__DIR__);
+    $package->setRawRelease('php', '');
+    $release = $package->getReleaseToInstall('php');
     foreach (new RecursiveIteratorIterator(
         new RecursiveDirectoryIterator(
             '.',
@@ -112,8 +114,12 @@ $packageGen = function (
         ),
         RecursiveIteratorIterator::LEAVES_ONLY
     ) as $path) {
-            $filename = substr($path->getPathname(), 2);
-            $cFilename = str_replace('src/', 'php/', $filename);
+        if ('.git' === $path->getFilename()) {
+            continue;
+        }
+
+        $filename = substr($path->getPathname(), 2);
+        $cFilename = str_replace('src/', 'php/', $filename);
 
         if (isset($package->files[$filename])) {
             $parsedFilename = pathinfo($filename);
@@ -135,7 +141,7 @@ $packageGen = function (
                     $as = substr($as, 0, -4);
                 }
             }
-            $package->getReleaseToInstall('php')->installAs($filename, $as);
+            $release->installAs($filename, $as);
 
             $contents = file_get_contents($filename);
             foreach ($config['replace'] as $from => $attribs) {
