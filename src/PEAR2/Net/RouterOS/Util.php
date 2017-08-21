@@ -761,7 +761,10 @@ class Util implements Countable
     }
 
     /**
-     * Alias of {@link static::set()}
+     * Sets or unsets a value.
+     *
+     * Sets or unsets a value of a single property on all items at the current
+     * menu which match certain criteria.
      *
      * @param mixed                $numbers   Items to be modified.
      *     Can be any criteria accepted by {@link static::find()} or NULL
