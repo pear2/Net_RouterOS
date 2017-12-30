@@ -107,11 +107,12 @@ class Client
     protected $registry = null;
 
     /**
-     * Whether to stream future responses.
+     * Stream response words that are above this many bytes.
+     * NULL to disable streaming completely.
      *
-     * @var bool
+     * @var int|null
      */
-    private $_streamingResponses = false;
+    private $_streamingResponses = null;
 
     /**
      * Creates a new instance of a RouterOS API client.
@@ -287,7 +288,7 @@ class Client
     ) {
         $request = new Request('/login');
         $request->send($com);
-        $response = new Response($com, false, $timeout);
+        $response = new Response($com, null, $timeout);
         $request->setArgument('name', $username);
         $request->setArgument(
             'response',
@@ -298,14 +299,14 @@ class Client
         );
         $request->verify($com)->send($com);
 
-        $response = new Response($com, false, $timeout);
+        $response = new Response($com, null, $timeout);
         if ($response->getType() === Response::TYPE_FINAL) {
             return null === $response->getProperty('ret');
         } else {
             while ($response->getType() !== Response::TYPE_FINAL
                 && $response->getType() !== Response::TYPE_FATAL
             ) {
-                $response = new Response($com, false, $timeout);
+                $response = new Response($com, null, $timeout);
             }
             return false;
         }
@@ -701,34 +702,39 @@ class Client
     /**
      * Sets response streaming setting.
      *
-     * Sets whether future responses are streamed. If responses are streamed,
-     * the argument values are returned as streams instead of strings. This is
-     * particularly useful if you expect a response that may contain one or more
-     * very large words.
+     * Sets when future response words are streamed. If a word is streamed,
+     * the property value is returned a stream instead of a string, and
+     * unrecognized words are returned entirely as streams instead of strings.
+     * This is particularly useful if you expect a response that may contain
+     * one or more very large words.
      *
-     * @param bool $streamingResponses Whether to stream future responses.
+     * @param int|null $threshold Threshold after which to stream
+     *     a word. That is, a word less than this length will not be streamed.
+     *     If set to 0, effectively all words are streamed.
+     *     NULL to disable streaming altogether.
      *
-     * @return bool The previous value of the setting.
+     * @return $this The client object.
      *
-     * @see isStreamingResponses()
+     * @see getStreamingResponses()
      */
-    public function setStreamingResponses($streamingResponses)
+    public function setStreamingResponses($threshold)
     {
-        $oldValue = $this->_streamingResponses;
-        $this->_streamingResponses = (bool) $streamingResponses;
-        return $oldValue;
+        $this->_streamingResponses = $threshold === null
+            ? null
+            : (int) $threshold;
+        return $this;
     }
 
     /**
      * Gets response streaming setting.
      *
-     * Gets whether future responses are streamed.
+     * Gets when future response words are streamed.
      *
-     * @return bool The value of the setting.
+     * @return int|null The value of the setting.
      *
      * @see setStreamingResponses()
      */
-    public function isStreamingResponses()
+    public function getStreamingResponses()
     {
         return $this->_streamingResponses;
     }

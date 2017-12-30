@@ -363,7 +363,7 @@ Possible reasons:
    under your control that may affect the connection.
 
 5. Your web server is configured to forbid that outgoing connection.
-   If you're the web server administrator, check your web server's firewall's
+   If you're the web server administrator, check your web server's firewall
    settings. The binary you need to whitelist is probably
    ```
    {$phpBin}
@@ -376,7 +376,7 @@ Possible reasons:
    connection fails even then, ask your host to configure their firewall so as
    to allow you to make outgoing connections to the ip:port you've set the API
    service on.
-   
+
    Note that using the library may require a different binary to be
    whitelisted, depending on how PHP is running as.
 

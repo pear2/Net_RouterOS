@@ -88,6 +88,25 @@ class Communicator
     protected $charsets = array();
 
     /**
+     * Length of next word.
+     *
+     * Length of next word. NULL if no peeking was done.
+     *
+     * @var int|double|null
+     */
+    protected $nextWordLength = null;
+
+    /**
+     * Last state of the word lock.
+     *
+     * Last state of the word lock when using persisntent connections.
+     * Unused by non-persistent connections.
+     *
+     * @var int|false
+     */
+    protected $nextWordLock = false;
+
+    /**
      * The transmitter for the connection.
      *
      * @var T\TcpClient
@@ -545,6 +564,29 @@ class Communicator
     }
 
     /**
+     * Get the length of the next word in queue.
+     *
+     * Get the length of the next word in queue without getting the word.
+     * For pesisntent connections, note that the underlying transmitter will
+     * be locked for receiving until either {@link self::getNextWord()} or
+     * {@link self::getNextWordAsStream()} is called.
+     *
+     * @return int|double
+     */
+    public function getNextWordLength()
+    {
+        if (null === $this->nextWordLength) {
+            if ($this->trans->isPersistent()) {
+                $this->nextWordLock = $this->trans->lock(
+                    T\Stream::DIRECTION_RECEIVE
+                );
+            }
+            $this->nextWordLength = self::decodeLength($this->trans);
+        }
+        return $this->nextWordLength;
+    }
+
+    /**
      * Get the next word in queue as a string.
      *
      * Get the next word in queue as a string, after automatically decoding its
@@ -556,19 +598,14 @@ class Communicator
      */
     public function getNextWord()
     {
+        $word = $this->trans->receive(
+            $this->getNextWordLength(),
+            'word'
+        );
         if ($this->trans->isPersistent()) {
-            $old = $this->trans->lock(T\Stream::DIRECTION_RECEIVE);
-            $word = $this->trans->receive(
-                self::decodeLength($this->trans),
-                'word'
-            );
-            $this->trans->lock($old, true);
-        } else {
-            $word = $this->trans->receive(
-                self::decodeLength($this->trans),
-                'word'
-            );
+            $this->trans->lock($this->nextWordLock, true);
         }
+        $this->nextWordLength = null;
 
         if (null !== ($remoteCharset = $this->getCharset(self::CHARSET_REMOTE))
             && null !== ($localCharset = $this->getCharset(self::CHARSET_LOCAL))
@@ -605,21 +642,15 @@ class Communicator
             );
         }
 
+        $stream = $this->trans->receiveStream(
+            $this->getNextWordLength(),
+            $filters,
+            'stream word'
+        );
         if ($this->trans->isPersistent()) {
-            $old = $this->trans->lock(T\Stream::DIRECTION_RECEIVE);
-            $stream = $this->trans->receiveStream(
-                self::decodeLength($this->trans),
-                $filters,
-                'stream word'
-            );
-            $this->trans->lock($old, true);
-        } else {
-            $stream = $this->trans->receiveStream(
-                self::decodeLength($this->trans),
-                $filters,
-                'stream word'
-            );
+            $this->trans->lock($this->nextWordLock, true);
         }
+        $this->nextWordLength = null;
 
         return $stream;
     }

@@ -145,6 +145,114 @@ abstract class Unsafe extends PHPUnit_Framework_TestCase
         }
     }
 
+    public function testResponseStreamingThreshold()
+    {
+        $comment = str_pad('t', 2 * strlen(TEST_QUEUE_NAME), 't');
+        $addRequest = new Request('/queue/simple/add');
+        $addRequest->setArgument('name', TEST_QUEUE_NAME)
+            ->setArgument('target', '0.0.0.0/0')
+            ->setArgument('comment', $comment);
+
+
+        $this->object->setStreamingResponses(
+            7/*strlen('=name=') + 1*/ + strlen(TEST_QUEUE_NAME)
+        );
+        $responses = $this->object->sendSync($addRequest);
+        $this->assertSame(
+            1,
+            count($responses),
+            'There should be only one response.'
+        );
+
+        //Without tag
+        $printRequest = new Request('/queue/simple/print');
+        $printRequest->setArgument('from', TEST_QUEUE_NAME);
+        $responses = $this->object->sendSync($printRequest);
+
+        $this->assertSame(
+            TEST_QUEUE_NAME,
+            $responses->current()->getProperty('name')
+        );
+        $this->assertInternalType(
+            'resource',
+            $responses->current()->getProperty('comment')
+        );
+        $this->assertSame(
+            $comment,
+            stream_get_contents($responses->current()->getProperty('comment'))
+        );
+
+        //With tag above threshold (that should never be streamed)
+        $printRequest = new Request('/queue/simple/print');
+        $printRequest->setArgument('from', TEST_QUEUE_NAME);
+        $printRequest->setTag($comment);
+        $responses = $this->object->sendSync($printRequest);
+
+        $this->assertSame(
+            TEST_QUEUE_NAME,
+            $responses->current()->getProperty('name')
+        );
+        $this->assertInternalType(
+            'resource',
+            $responses->current()->getProperty('comment')
+        );
+        $this->assertSame(
+            $comment,
+            stream_get_contents($responses->current()->getProperty('comment'))
+        );
+        $this->assertSame(
+            $comment,
+            $responses->current()->getTag()
+        );
+
+        //With tag below threshold
+        $printRequest = new Request('/queue/simple/print');
+        $printRequest->setArgument('from', TEST_QUEUE_NAME);
+        $printRequest->setTag(TEST_QUEUE_NAME);
+        $responses = $this->object->sendSync($printRequest);
+
+        $this->assertSame(
+            TEST_QUEUE_NAME,
+            $responses->current()->getProperty('name')
+        );
+        $this->assertInternalType(
+            'resource',
+            $responses->current()->getProperty('comment')
+        );
+        $this->assertSame(
+            $comment,
+            stream_get_contents($responses->current()->getProperty('comment'))
+        );
+        $this->assertSame(
+            TEST_QUEUE_NAME,
+            $responses->current()->getTag()
+        );
+
+        //With streaming disabled
+        $printRequest = new Request('/queue/simple/print');
+        $printRequest->setArgument('from', TEST_QUEUE_NAME);
+        $this->object->setStreamingResponses(null);
+        $responses = $this->object->sendSync($printRequest);
+
+        $this->assertSame(
+            TEST_QUEUE_NAME,
+            $responses->current()->getProperty('name')
+        );
+        $this->assertSame(
+            $comment,
+            $responses->current()->getProperty('comment')
+        );
+
+        $removeRequest = new Request('/queue/simple/remove');
+        $removeRequest->setArgument('numbers', TEST_QUEUE_NAME);
+        $responses = $this->object->sendSync($removeRequest);
+        $this->assertInstanceOf(
+            ROS_NAMESPACE . '\ResponseCollection',
+            $responses,
+            'Response should be one.'
+        );
+    }
+
     public function testSendSyncReturningResponseLarge3bytesLength()
     {
         $memoryLimit = ini_set('memory_limit', -1);

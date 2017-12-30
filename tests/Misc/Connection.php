@@ -511,7 +511,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
         $quitRequest->send($com);
         $quitResponse = new Response(
             $com,
-            false,
+            null,
             ini_get('default_socket_timeout')
         );
         $this->assertEquals(
@@ -543,7 +543,7 @@ abstract class Connection extends PHPUnit_Framework_TestCase
         $quitRequest->send($com);
         $quitResponse = new Response(
             $com,
-            true,
+            0,
             ini_get('default_socket_timeout')
         );
         $this->assertEquals(

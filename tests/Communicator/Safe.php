@@ -44,7 +44,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $request($com);
         $response = new Response(
             $com,
-            false,
+            null,
             ini_get('default_socket_timeout')
         );
         $this->assertInternalType('string', $response());
@@ -75,7 +75,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
     public function testInvalidSocketOnStreamReceive()
     {
         try {
-            $response = new Response($this->object, true);
+            $response = new Response($this->object, 0);
             $this->fail('Receiving had to fail.');
         } catch (SocketException $e) {
             $this->assertEquals(

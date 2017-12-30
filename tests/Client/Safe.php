@@ -51,7 +51,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             'The list is empty'
         );
         $this->assertEquals(Response::TYPE_DATA, $list1->current()->getType());
-        
+
         $list2 = $this->object->sendSync(
             new Request('/ip/arp/print', null, 't')
         );
@@ -82,7 +82,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             'The list is empty'
         );
         $this->assertEquals(Response::TYPE_DATA, $list2->current()->getType());
-        
+
         $this->assertEquals(
             count($list1),
             count($list2)
@@ -91,9 +91,9 @@ abstract class Safe extends PHPUnit_Framework_TestCase
 
     public function testSendSyncReturningCollectionWithStreams()
     {
-        $this->assertFalse($this->object->isStreamingResponses());
-        $this->assertFalse($this->object->setStreamingResponses(true));
-        $this->assertTrue($this->object->isStreamingResponses());
+        $this->assertNull($this->object->getStreamingResponses());
+        $this->assertSame($this->object, $this->object->setStreamingResponses(0));
+        $this->assertSame(0, $this->object->getStreamingResponses());
         $list = $this->object->sendSync(new Request('/ip/arp/print'));
         $this->assertInstanceOf(
             ROS_NAMESPACE . '\ResponseCollection',
@@ -232,13 +232,13 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $this->object->sendAsync($ping2);
         $this->object->loop(2);
         $this->object->cancelRequest();
-        
+
         $ping1responses = $this->object->extractNewResponses('ping1');
-        
+
         $ping1responses->end();
         $ping1responses->prev();
         $this->assertEquals(Response::TYPE_ERROR, $ping1responses->getType());
-        
+
         $ping2responses = $this->object->extractNewResponses('ping2');
         $ping2responses->end();
         $ping2responses->prev();
@@ -301,7 +301,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             'Improper active request count after cancel test.'
         );
     }
-    
+
     public function testSendAsyncAndMultipleCancelFromCallback()
     {
         $printRequest = new Request('/queue/simple/print');
@@ -346,7 +346,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             $this->object->getPendingRequestsCount(),
             'Improper pending request count after extraction test.'
         );
-        
+
         $this->assertGreaterThan(
             0,
             count($responses->getAllTagged('ping1')),
@@ -543,7 +543,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $this->object->sendAsync($arpPrint);
         $list = $this->object->completeRequest('arp');
 
-        
+
         $this->assertInstanceOf(
             ROS_NAMESPACE . '\ResponseCollection',
             $list,
@@ -592,13 +592,13 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $arpPrint = new Request('/ip/arp/print');
         $arpPrint->setTag('arp');
         $this->object->sendAsync($arpPrint);
-        $this->assertFalse($this->object->isStreamingResponses());
-        $this->assertFalse($this->object->setStreamingResponses(true));
-        $this->assertTrue($this->object->isStreamingResponses());
+        $this->assertNull($this->object->getStreamingResponses());
+        $this->assertSame($this->object, $this->object->setStreamingResponses(0));
+        $this->assertSame(0, $this->object->getStreamingResponses());
 
         $list = $this->object->completeRequest('arp');
 
-        
+
         $this->assertInstanceOf(
             ROS_NAMESPACE . '\ResponseCollection',
             $list,
@@ -628,7 +628,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             $list1[(string) $response->getProperty('.id')] = $response;
         }
         ksort($list1);
-        
+
         $this->object->sendAsync(
             $arpPrint,
             function ($response, $client) use (&$list2) {
@@ -731,7 +731,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         );
         $this->object->cancelRequest('ping');
     }
-    
+
     public function testListenOverTimeout()
     {
         $this->object->sendAsync(
@@ -750,7 +750,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             $this->object->extractNewResponses('l')->toArray()
         );
     }
-    
+
     public function testClientInvokability()
     {
         $obj = $this->object;
@@ -777,7 +777,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $arpResponses2 = $obj->extractNewResponses('arp');
         $this->assertEquals(0, $obj->getPendingRequestsCount());
         $this->assertGreaterThan(0, count($arpResponses2));
-        
+
         $arpResponses3 = $obj(new Request('/ip/arp/print'));
 
         $this->assertEquals(count($arpResponses1), count($arpResponses2));
@@ -801,7 +801,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             'The list is not a collection'
         );
 
-        $this->object->setStreamingResponses(true);
+        $this->object->setStreamingResponses(0);
         $streamList = $this->object->sendSync($request);
         $this->assertInstanceOf(
             ROS_NAMESPACE . '\ResponseCollection',
@@ -1288,7 +1288,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
             Communicator::getDefaultCharset(Communicator::CHARSET_LOCAL)
         );
     }
-    
+
     public function testSendSyncReturningResponseLargeDataException()
     {
         //Required for this test

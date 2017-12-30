@@ -82,8 +82,8 @@ class Response extends Message
      *
      * @param Communicator  $com       The communicator from which to extract
      *     the new response.
-     * @param bool          $asStream  Whether to populate the argument values
-     *     with streams instead of strings.
+     * @param int|null      $streamOn  Threshold after which to stream
+     *     a word. NULL to disable streaming altogether.
      * @param int           $sTimeout  If a response is not immediately
      *     available, wait this many seconds. If NULL, wait indefinitely.
      * @param int|null      $usTimeout Microseconds to add to the waiting time.
@@ -95,7 +95,7 @@ class Response extends Message
      */
     public function __construct(
         Communicator $com,
-        $asStream = false,
+        $streamOn = null,
         $sTimeout = 0,
         $usTimeout = null,
         Registry $reg = null
@@ -105,18 +105,18 @@ class Response extends Message
                 $old = $com->getTransmitter()
                     ->lock(T\Stream::DIRECTION_RECEIVE);
                 try {
-                    $this->_receive($com, $asStream, $sTimeout, $usTimeout);
+                    $this->_receive($com, $streamOn, $sTimeout, $usTimeout);
                 } catch (E $e) {
                     $com->getTransmitter()->lock($old, true);
                     throw $e;
                 }
                 $com->getTransmitter()->lock($old, true);
             } else {
-                $this->_receive($com, $asStream, $sTimeout, $usTimeout);
+                $this->_receive($com, $streamOn, $sTimeout, $usTimeout);
             }
         } else {
             while (null === ($response = $reg->getNextResponse())) {
-                $newResponse = new self($com, true, $sTimeout, $usTimeout);
+                $newResponse = new self($com, 0, $sTimeout, $usTimeout);
                 $tagInfo = $reg::parseTag($newResponse->getTag());
                 $newResponse->setTag($tagInfo[1]);
                 if (!$reg->add($newResponse, $tagInfo[0])) {
@@ -126,16 +126,30 @@ class Response extends Message
             }
 
             $this->_type = $response->_type;
+            $this->setTag($response->getTag());
             $this->attributes = $response->attributes;
             $this->unrecognizedWords = $response->unrecognizedWords;
-            $this->setTag($response->getTag());
-
-            if (!$asStream) {
-                foreach ($this->attributes as $name => $value) {
+            if (null === $streamOn) {
+                foreach ($response->attributes as $name => $value) {
                     $this->setAttribute(
                         $name,
                         stream_get_contents($value)
                     );
+                }
+                foreach ($response->unrecognizedWords as $i => $value) {
+                    $this->unrecognizedWords[$i] = stream_get_contents($value);
+                }
+            } else {
+                foreach ($response->attributes as $name => $value) {
+                    fseek($value, 0, SEEK_END);
+                    $valueLength = ftell($value);
+                    rewind($value);
+                    if ((strlen($name) + 2 + $valueLength) < $streamOn) {
+                        $this->setAttribute(
+                            $name,
+                            stream_get_contents($value)
+                        );
+                    }
                 }
                 foreach ($response->unrecognizedWords as $i => $value) {
                     $this->unrecognizedWords[$i] = stream_get_contents($value);
@@ -152,8 +166,8 @@ class Response extends Message
      *
      * @param Communicator $com       The communicator from which to extract
      *     the new response.
-     * @param bool         $asStream  Whether to populate the argument values
-     *     with streams instead of strings.
+     * @param int|null     $streamOn  Threshold after which to stream
+     *     a word. NULL to disable streaming altogether.
      * @param int          $sTimeout  If a response is not immediately
      *     available, wait this many seconds. If NULL, wait indefinitely.
      *     Note that if an empty sentence is received, the timeout will be
@@ -164,7 +178,7 @@ class Response extends Message
      */
     private function _receive(
         Communicator $com,
-        $asStream = false,
+        $streamOn = null,
         $sTimeout = 0,
         $usTimeout = null
     ) {
@@ -181,42 +195,7 @@ class Response extends Message
             $type = $com->getNextWord();
         } while ('' === $type);
         $this->setType($type);
-        if ($asStream) {
-            for ($word = $com->getNextWordAsStream(), fseek($word, 0, SEEK_END);
-                ftell($word) !== 0;
-                $word = $com->getNextWordAsStream(), fseek(
-                    $word,
-                    0,
-                    SEEK_END
-                )) {
-                rewind($word);
-                $ind = fread($word, 1);
-                if ('=' === $ind || '.' === $ind) {
-                    $prefix = stream_get_line($word, null, '=');
-                }
-                if ('=' === $ind) {
-                    $value = fopen('php://temp', 'r+b');
-                    $bytesCopied = ftell($word);
-                    while (!feof($word)) {
-                        $bytesCopied += stream_copy_to_stream(
-                            $word,
-                            $value,
-                            0xFFFFF,
-                            $bytesCopied
-                        );
-                    }
-                    rewind($value);
-                    $this->setAttribute($prefix, $value);
-                    continue;
-                }
-                if ('.' === $ind && 'tag' === $prefix) {
-                    $this->setTag(stream_get_contents($word, -1, -1));
-                    continue;
-                }
-                rewind($word);
-                $this->unrecognizedWords[] = $word;
-            }
-        } else {
+        if (null === $streamOn) {
             for ($word = $com->getNextWord(); '' !== $word;
                 $word = $com->getNextWord()) {
                 if (preg_match('/^=([^=]+)=(.*)$/sS', $word, $matches)) {
@@ -227,6 +206,47 @@ class Response extends Message
                     $this->unrecognizedWords[] = $word;
                 }
             }
+        } else {
+            while ($com->getNextWordLength() !== 0) {
+                if ($com->getNextWordLength() < $streamOn) {
+                    $word = $com->getNextWord();
+                    if (preg_match('/^=([^=]+)=(.*)$/sS', $word, $matches)) {
+                        $this->setAttribute($matches[1], $matches[2]);
+                    } elseif (preg_match('/^\.tag=(.*)$/sS', $word, $matches)) {
+                        $this->setTag($matches[1]);
+                    } else {
+                        $this->unrecognizedWords[] = $word;
+                    }
+                } else {
+                    $word = $com->getNextWordAsStream();
+                    $ind = fread($word, 1);
+                    if ('=' === $ind || '.' === $ind) {
+                        $prefix = stream_get_line($word, null, '=');
+                    }
+                    if ('=' === $ind) {
+                        $value = fopen('php://temp', 'r+b');
+                        $bytesCopied = ftell($word);
+                        while (!feof($word)) {
+                            $bytesCopied += stream_copy_to_stream(
+                                $word,
+                                $value,
+                                0xFFFFF,
+                                $bytesCopied
+                            );
+                        }
+                        rewind($value);
+                        $this->setAttribute($prefix, $value);
+                        continue;
+                    }
+                    if ('.' === $ind && 'tag' === $prefix) {
+                        $this->setTag(stream_get_contents($word, -1, -1));
+                        continue;
+                    }
+                    rewind($word);
+                    $this->unrecognizedWords[] = $word;
+                }
+            }
+            $com->getNextWord();
         }
     }
 
