@@ -139,11 +139,9 @@ class Response extends Message
                 foreach ($response->unrecognizedWords as $i => $value) {
                     $this->unrecognizedWords[$i] = stream_get_contents($value);
                 }
-            } else {
+            } elseif (0 !== $streamOn) {
                 foreach ($response->attributes as $name => $value) {
-                    fseek($value, 0, SEEK_END);
-                    $valueLength = ftell($value);
-                    rewind($value);
+                    $valueLength = $com::seekableStreamLength($value);
                     if ((strlen($name) + 2 + $valueLength) < $streamOn) {
                         $this->setAttribute(
                             $name,
@@ -152,7 +150,12 @@ class Response extends Message
                     }
                 }
                 foreach ($response->unrecognizedWords as $i => $value) {
-                    $this->unrecognizedWords[$i] = stream_get_contents($value);
+                    $valueLength = $com::seekableStreamLength($value);
+                    if ($valueLength < $streamOn) {
+                        $this->unrecognizedWords[$i] = stream_get_contents(
+                            $value
+                        );
+                    }
                 }
             }
         }
