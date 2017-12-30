@@ -22,7 +22,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
     {
         $value = fopen('php://output', 'a');
         try {
-            $this->object->sendWordFromStream('', $value);
+            $this->object->sendWord('', $value);
             $this->fail('Call had to fail.');
         } catch (InvalidArgumentException $e) {
             $this->assertEquals(

@@ -824,14 +824,14 @@ class Util implements Countable
     /**
      * Adds a new item at the current menu.
      *
-     * @param array<string,string|resource>|array<int,string> $values Accepts
+     * @param array<string,string|resource>|array<int,string> $values     Accepts
      *     one or more items to add to the current menu.
      *     The data about each item is specified as an array with the names of
      *     each property as an array key, and the value as an array value.
      *     Flags (properties with a value "true" that is interpreted as
      *     equivalent of "yes" from CLI) can also be specified with a numeric
      *     index as the array key, and the name of the flag as the array value.
-     * @param array<string,string|resource>|array<int,string> $...    Additional
+     * @param array<string,string|resource>|array<int,string> $values,... Additional
      *     items.
      *
      * @return string A comma separated list of the new items' IDs.

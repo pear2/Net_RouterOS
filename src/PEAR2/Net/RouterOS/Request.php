@@ -329,11 +329,7 @@ class Request extends Message
         }
         foreach ($this->attributes as $name => $value) {
             $prefix = '=' . $name . '=';
-            if (is_string($value)) {
-                $bytes += $com->sendWord($prefix . $value);
-            } else {
-                $bytes += $com->sendWordFromStream($prefix, $value);
-            }
+            $bytes += $com->sendWord($prefix, $value);
         }
         $query = $this->getQuery();
         if ($query instanceof Query) {

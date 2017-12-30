@@ -421,7 +421,10 @@ class Communicator
      *
      * Sends a word and automatically encodes its length when doing so.
      *
-     * @param string $word The word to send.
+     * @param string|resource $word     The word to send, as a string
+     * or seekable stream.
+     * @param string|resource $word,... Additional word fragments to be sent
+     * as a single word.
      *
      * @return int The number of bytes sent.
      *
@@ -430,73 +433,65 @@ class Communicator
      */
     public function sendWord($word)
     {
-        if (null !== ($remoteCharset = $this->getCharset(self::CHARSET_REMOTE))
-            && null !== ($localCharset = $this->getCharset(self::CHARSET_LOCAL))
-        ) {
-            $word = iconv(
-                $localCharset,
-                $remoteCharset . '//IGNORE//TRANSLIT',
-                $word
-            );
+        $length = 0;
+        $isCharsetConversionEnabled
+            = null !== ($rCharset = $this->getCharset(self::CHARSET_REMOTE))
+            && null !== ($lCharset = $this->getCharset(self::CHARSET_LOCAL));
+        $wordFragments = array();
+        foreach (func_get_args() as $word) {
+            if (is_string($word)) {
+                if ($isCharsetConversionEnabled) {
+                    $word = iconv(
+                        $lCharset,
+                        $rCharset . '//IGNORE//TRANSLIT',
+                        $word
+                    );
+                }
+                $length += strlen($word);
+            } else {
+                if (!self::isSeekableStream($word)) {
+                    throw new InvalidArgumentException(
+                        'Only seekable streams can be sent.',
+                        InvalidArgumentException::CODE_SEEKABLE_REQUIRED
+                    );
+                }
+                if ($isCharsetConversionEnabled) {
+                    $word = self::iconvStream(
+                        $lCharset,
+                        $rCharset . '//IGNORE//TRANSLIT',
+                        $word
+                    );
+                }
+                flock($word, LOCK_SH);
+                $length += self::seekableStreamLength($word);
+            }
+            $wordFragments[] = $word;
         }
-        $length = strlen($word);
         static::verifyLengthSupport($length);
         if ($this->trans->isPersistent()) {
             $old = $this->trans->lock(T\Stream::DIRECTION_SEND);
-            $bytes = $this->trans->send(self::encodeLength($length) . $word);
+
+            $bytesSent = $this->trans->send(self::encodeLength($length));
+            foreach ($wordFragments as $fragment) {
+                $bytesSent += $this->trans->send($fragment);
+                if (!is_string($fragment)) {
+                    flock($fragment, LOCK_UN);
+                }
+            }
+
             $this->trans->lock($old, true);
-            return $bytes;
-        }
-        return $this->trans->send(self::encodeLength($length) . $word);
-    }
-
-    /**
-     * Sends a word based on a stream.
-     *
-     * Sends a word based on a stream and automatically encodes its length when
-     * doing so. The stream is read from its current position to its end, and
-     * then returned to its current position. Because of those operations, the
-     * supplied stream must be seekable.
-     *
-     * @param string   $prefix A string to prepend before the stream contents.
-     * @param resource $stream The seekable stream to send.
-     *
-     * @return int The number of bytes sent.
-     *
-     * @see sendWord()
-     */
-    public function sendWordFromStream($prefix, $stream)
-    {
-        if (!self::isSeekableStream($stream)) {
-            throw new InvalidArgumentException(
-                'The stream must be seekable.',
-                InvalidArgumentException::CODE_SEEKABLE_REQUIRED
-            );
-        }
-        if (null !== ($remoteCharset = $this->getCharset(self::CHARSET_REMOTE))
-            && null !== ($localCharset = $this->getCharset(self::CHARSET_LOCAL))
-        ) {
-            $prefix = iconv(
-                $localCharset,
-                $remoteCharset . '//IGNORE//TRANSLIT',
-                $prefix
-            );
-            $stream = self::iconvStream(
-                $localCharset,
-                $remoteCharset . '//IGNORE//TRANSLIT',
-                $stream
-            );
+            return $bytesSent;
         }
 
-        flock($stream, LOCK_SH);
-        $totalLength = strlen($prefix) + self::seekableStreamLength($stream);
-        static::verifyLengthSupport($totalLength);
+        $bytesSent = $this->trans->send(self::encodeLength($length));
+        foreach ($wordFragments as $word) {
+            $bytesSent += $this->trans->send($word);
+            if (!is_string($word)) {
+                flock($word, LOCK_UN);
+            }
+        }
 
-        $bytes = $this->trans->send(self::encodeLength($totalLength) . $prefix);
-        $bytes += $this->trans->send($stream);
-
-        flock($stream, LOCK_UN);
-        return $bytes;
+        return $bytesSent;
     }
 
     /**
@@ -602,7 +597,7 @@ class Communicator
             $this->getNextWordLength(),
             'word'
         );
-        if ($this->trans->isPersistent()) {
+        if (false !== $this->nextWordLock) {
             $this->trans->lock($this->nextWordLock, true);
         }
         $this->nextWordLength = null;
@@ -647,7 +642,7 @@ class Communicator
             $filters,
             'stream word'
         );
-        if ($this->trans->isPersistent()) {
+        if (false !== $this->nextWordLock) {
             $this->trans->lock($this->nextWordLock, true);
         }
         $this->nextWordLength = null;

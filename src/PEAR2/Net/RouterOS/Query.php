@@ -233,11 +233,7 @@ class Query
                 $bytes += $com->sendWord($prefix);
             } else {
                 $prefix .= '=';
-                if (is_string($value)) {
-                    $bytes += $com->sendWord($prefix . $value);
-                } else {
-                    $bytes += $com->sendWordFromStream($prefix, $value);
-                }
+                $bytes += $com->sendWord($prefix, $value);
             }
         }
         return $bytes;
