@@ -470,27 +470,33 @@ class Communicator
         static::verifyLengthSupport($length);
         if ($this->trans->isPersistent()) {
             $old = $this->trans->lock(T\Stream::DIRECTION_SEND);
-
-            $bytesSent = $this->trans->send(self::encodeLength($length));
-            foreach ($wordFragments as $fragment) {
-                $bytesSent += $this->trans->send($fragment);
-                if (!is_string($fragment)) {
-                    flock($fragment, LOCK_UN);
-                }
-            }
-
+            $bytesSent = $this->_sendWord($length, $wordFragments);
             $this->trans->lock($old, true);
+
             return $bytesSent;
         }
 
+        return $this->_sendWord($length, $wordFragments);
+    }
+
+    /**
+     * Send the word fragments
+     *
+     * @param int|double          $length        The previously computed
+     *     length of all fragments.
+     * @param (string|resource)[] $wordFragments The fragments to send.
+     *
+     * @return int The number of bytes sent.
+     */
+    private function _sendWord($length, $wordFragments)
+    {
         $bytesSent = $this->trans->send(self::encodeLength($length));
-        foreach ($wordFragments as $word) {
-            $bytesSent += $this->trans->send($word);
-            if (!is_string($word)) {
-                flock($word, LOCK_UN);
+        foreach ($wordFragments as $fragment) {
+            $bytesSent += $this->trans->send($fragment);
+            if (!is_string($fragment)) {
+                flock($fragment, LOCK_UN);
             }
         }
-
         return $bytesSent;
     }
 
