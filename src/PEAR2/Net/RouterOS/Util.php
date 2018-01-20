@@ -407,18 +407,21 @@ class Util implements Countable
      * Finds the IDs of items at the current menu.
      *
      * Finds the IDs of items based on specified criteria, and returns them as
-     * a comma separated string, ready for insertion at a "numbers" argument.
+     * a comma separated list, ready for insertion at a "numbers" argument,
+     * a print's "from" argument, or an equivalent items targeting argument.
      *
      * Accepts zero or more criteria as arguments. If zero arguments are
-     * specified, returns all items' IDs. The value of each criteria can be a
-     * number (just as in Winbox), a literal ID to be included, a {@link Query}
-     * object, or a callback. If a callback is specified, it is called for each
-     * item, with the item as an argument. If it returns a true value, the
-     * item's ID is included in the result. Every other value is casted to a
-     * string. A string is treated as a comma separated values of IDs, numbers
-     * or callback names. Non-existent callback names are instead placed in the
-     * result, which may be useful in menus that accept identifiers other than
-     * IDs, but note that it can cause errors on other menus.
+     * specified, returns all items' IDs. The value of each criteria can be an
+     * integer (a number as in Winbox), a {@link Query} object, or a callback.
+     * Other values (including non existent callback names) are casted to a
+     * string. A string is treated as a comma separated list of IDs or
+     * whatever else the menu can accept as a unique identifier.
+     * Those lists are then normalized (meaning excessive commas are stripped
+     * and trimmed), and appended to the result.
+     *
+     * Callbacks are called for each item, with the item
+     * as an argument. If the callback returns a true value, the item's ID is
+     * included in the result.
      *
      * @return string A comma separated list of all items matching the
      *     specified criteria.
@@ -454,11 +457,12 @@ class Util implements Countable
                     new Request($this->menu . '/print .proplist=.id', $criteria)
                 )->getAllOfType(Response::TYPE_DATA) as $response) {
                     $newId = $response->getProperty('.id');
-                    $idList .= strtolower(
+                    $newId = strtolower(
                         is_string($newId)
                         ? $newId
-                        : stream_get_contents($newId) . ','
+                        : stream_get_contents($newId)
                     );
+                    $idList .= $newId . ',';
                 }
             } elseif (is_callable($criteria)) {
                 $idCache = array();
@@ -477,37 +481,20 @@ class Util implements Countable
                     $idCache[] = $newId;
                 }
                 $this->idCache = $idCache;
-            } else {
+            } elseif (is_int($criteria)) {
                 $this->find();
-                if (is_int($criteria)) {
-                    if (isset($this->idCache[$criteria])) {
-                        $idList = $this->idCache[$criteria] . ',';
-                    }
+                if (isset($this->idCache[$criteria])) {
+                    $idList = $this->idCache[$criteria] . ',';
+                }
+            } else {
+                $criteria = (string)$criteria;
+                if (false === strpos($criteria, ',')) {
+                    $idList .= $criteria . ',';
                 } else {
-                    $criteria = (string)$criteria;
-                    if ($criteria === (string)(int)$criteria) {
-                        if (isset($this->idCache[(int)$criteria])) {
-                            $idList .= $this->idCache[(int)$criteria] . ',';
-                        }
-                    } elseif (false === strpos($criteria, ',')) {
-                        $idList .= $criteria . ',';
-                    } else {
-                        $criteriaArr = explode(',', $criteria);
-                        for ($i = count($criteriaArr) - 1; $i >= 0; --$i) {
-                            if ('' === $criteriaArr[$i]) {
-                                unset($criteriaArr[$i]);
-                            } elseif ('*' === $criteriaArr[$i][0]) {
-                                $idList .= $criteriaArr[$i] . ',';
-                                unset($criteriaArr[$i]);
-                            }
-                        }
-                        if (!empty($criteriaArr)) {
-                            $idList .= call_user_func_array(
-                                array($this, 'find'),
-                                $criteriaArr
-                            ) . ',';
-                        }
-                    }
+                    $idList .= trim(
+                        preg_replace('/,{2,}/S', ',', $criteria),
+                        ','
+                    ) . ',';
                 }
             }
         }
@@ -540,10 +527,10 @@ class Util implements Countable
         if ($number instanceof Query) {
             $number = explode(',', $this->find($number));
             $number = $number[0];
-        } elseif (is_int($number) || ((string)$number === (string)(int)$number)) {
+        } elseif (is_int($number)) {
             $this->find();
-            if (isset($this->idCache[(int)$number])) {
-                $number = $this->idCache[(int)$number];
+            if (isset($this->idCache[$number])) {
+                $number = $this->idCache[$number];
             } else {
                 throw new RouterErrorException(
                     'Unable to resolve number from ID cache (no such item maybe)',
