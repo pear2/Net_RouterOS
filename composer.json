@@ -3,7 +3,7 @@
     "description": "This package allows you to read and write information from a RouterOS host using MikroTik's RouterOS API.",
     "keywords": ["routeros", "package", "api", "mikrotik", "pear2", "router"],
     "homepage": "http://pear2.github.com/Net_RouterOS/",
-    "license": "LGPL-2.1",
+    "license": "LGPL-2.1-only",
     "authors": [
         {
             "name": "Vasil Rangelov",
