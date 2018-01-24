@@ -22,6 +22,7 @@ use PHPUnit_Framework_TestCase;
  * ~
  *
  * @group Misc
+ * @group Connectionless
  *
  * @category Net
  * @package  PEAR2_Net_RouterOS

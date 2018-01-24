@@ -175,7 +175,7 @@ HEREDOC
 // Locate the data dir, in preference as:
 // 1. If outside of PHAR file
 // 1.1. The data folder filled at install time by Pyrus.
-// 1.2. The PHP_PEAR_DATA_DIR environment variable, if available. 
+// 1.2. The PHP_PEAR_DATA_DIR environment variable, if available.
 // 1.3. The data folder filled at install time by PEAR.
 // 2. The source layout's data folder, inside a channel/package subfolder
 //    (in case this package itself is bundled by another Pyrus package)
@@ -245,21 +245,31 @@ $comTimeout = null === $cmd->options['conTime']
             : $cmd->options['time'])
     : $cmd->options['conTime'];
 $cmd->options['time'] = $cmd->options['time'] ?: 3;
-$comContext = null === $cmd->options['caPath']
-    ? null
-    : stream_context_create(
-        is_file($cmd->options['caPath'])
-        ? array(
-            'ssl' => array(
-                'verify_peer' => true,
-                'cafile' => $cmd->options['caPath'])
-          )
-        : array(
-            'ssl' => array(
-                'verify_peer' => true,
-                'capath' => $cmd->options['caPath'])
-          )
+$comContext = null;
+if ($cmd->options['crypto']) {
+    $comContextOpts = array(
+        'ssl' => array(
+            'capture_peer_cert' => true,
+            'verify_peer' => !!$cmd->options['caPath'],
+            'verify_peer_name' => !!$cmd->options['caPath'],
+        )
     );
+    if ($cmd->options['caPath']) {
+        $comContextOpts['ssl'][is_file($cmd->options['caPath']) ? 'cafile' : 'capath'] = $cmd->options['caPath'];
+    } elseif(!$cmd->options['fingerprint']) {
+        $comContextOpts['ssl']['ciphers'] = 'ADH';
+    }
+
+    if ($cmd->options['fingerprint']) {
+        $comContextOpts['ssl']['peer_fingerprint'] = array('sha256' => $cmd->options['fingerprint']);
+    }
+
+    if ($cmd->options['ciphers']) {
+        $comContextOpts['ssl']['ciphers'] = $cmd->options['ciphers'];
+    }
+
+    $comContext = stream_context_create($comContextOpts);
+}
 
 $cColors = array(
     'SEND' => '',
@@ -401,6 +411,39 @@ Possible reasons:
 
 HEREDOC
         );
+        if ($cmd->options['crypto']) {
+            fwrite(
+                STDERR,
+                <<<HEREDOC
+
+7. Encryption misconfiguration or impersonation attempt by an attacker.
+   Check carefully the values and presense of encryption related options, i.e.
+   the "--ca", "--ciphers" and "--fingerprint" options.
+   If not using a certifcate, make sure to NOT specify any of those options.
+   If using a certificate, make sure to specify at least one of those options
+   with a valid value. Also make sure the clock of this device and the router
+   are accurate (check the date in particular), and that the certificate
+   has not expired yet.
+   If using a certificate and the "--ca" option, keep in mind the name is
+   also checked (just like with certificates in a web browser). Make sure
+   your certificate includes a subject alt name for the hostname you use to
+   connect to the router.
+   If using a certificate and the "--fingerprint" option, keep in mind that
+   renewing a certificate changes the fingerprint.
+
+   You can check details for the current certificate by checking the output of
+   the following command from a terminal:
+   ```
+   /certificate print from=[/ip service get "api-ssl" "certificate"] detail
+   ```
+
+   If everything appears OK, there may be an attacker in your network trying
+   to impersonate RouterOS.
+
+
+HEREDOC
+            );
+        }
     }
     return;
 }
@@ -616,6 +659,19 @@ if ($cmd->options['verbose']) {
             fwrite(STDOUT, "{$cColors[$mode]}{$word}{$cColors['']}\n");
         }
     };
+}
+
+if ($com->getTransmitter()->isAvailable()) {
+    $printWord('NOTE', '', 'Connection started');
+}
+
+if ($cmd->options['crypto']
+    && !$cmd->options['fingerprint']
+    && function_exists('openssl_x509_fingerprint')
+) {
+    $contextParams = $com->getTransmitter()->getContextParams();
+    $cert = $contextParams['options']['ssl']['peer_certificate'];
+    $printWord('NOTE', openssl_x509_fingerprint($cert, 'sha256'), 'Certificate fingerprint');
 }
 
 //Input/Output cycle

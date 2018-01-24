@@ -484,7 +484,7 @@ class Util implements Countable
             } elseif (is_int($criteria)) {
                 $this->find();
                 if (isset($this->idCache[$criteria])) {
-                    $idList = $this->idCache[$criteria] . ',';
+                    $idList .= $this->idCache[$criteria] . ',';
                 }
             } else {
                 $criteria = (string)$criteria;
@@ -492,7 +492,7 @@ class Util implements Countable
                     $idList .= $criteria . ',';
                 } else {
                     $idList .= trim(
-                        preg_replace('/,{2,}/S', ',', $criteria),
+                        preg_replace('/,+/S', ',', $criteria),
                         ','
                     ) . ',';
                 }

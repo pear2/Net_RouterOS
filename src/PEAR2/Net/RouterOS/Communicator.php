@@ -151,20 +151,26 @@ class Communicator
         if (($context === null) && !$isUnencrypted) {
             $context = stream_context_get_default();
             $opts = stream_context_get_options($context);
-            if (!isset($opts['ssl']['ciphers'])
-                || 'DEFAULT' === $opts['ssl']['ciphers']
+            $verifyPeer = isset($opts['ssl']['cafile'])
+                || isset($opts['ssl']['capath'])
+                || !!ini_get('openssl.cafile')
+                || !!ini_get('openssl.capath');
+            $newOpts = array(
+                'ssl' => array(
+                    'verify_peer' => $verifyPeer,
+                    'verify_peer_name' => $verifyPeer
+                )
+            );
+            if (!$verifyPeer
+                && (!isset($opts['ssl']['ciphers'])
+                || 'DEFAULT' === $opts['ssl']['ciphers'])
             ) {
-                stream_context_set_option(
-                    $context,
-                    array(
-                        'ssl' => array(
-                            'ciphers' => 'ADH',
-                            'verify_peer' => false,
-                            'verify_peer_name' => false
-                        )
-                    )
-                );
+                $newOpts['ssl']['ciphers'] = 'ADH';
             }
+            stream_context_set_option(
+                $context,
+                $newOpts
+            );
         }
         // @codeCoverageIgnoreStart
         // The $port is customizable in testing.

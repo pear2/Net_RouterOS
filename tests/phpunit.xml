@@ -174,12 +174,13 @@
             <!-- Actions on router -->
             <group>Safe</group>
             <group>Unsafe</group>
+            <group>Misc</group>
 
             <!-- Interaction class used -->
             <group>Client</group>
             <group>Communicator</group>
             <group>Util</group>
-            <group>Misc</group>
+            <group>Connectionless</group>
 
             <!-- Special case -->
             <!-- Encrypted connections should start though they are unstable -->
