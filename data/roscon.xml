@@ -36,6 +36,16 @@ Defaults to PHP's default_socket_timeout ini option.</description>
         <description>Optional path to a file or folder to use for certification authority, when using encryption. Ignored when not using encryption or using ADH cipher.</description>
         <action>StoreString</action>
     </option>
+    <option name="ciphers">
+        <long_name>--ciphers</long_name>
+        <description>Cipher string to use when using encrypted connections. Ignored otherwise. If neither the "--ca" or "--fingerprint" option is specified, "ADH" is used.</description>
+        <action>StoreString</action>
+    </option>
+    <option name="fingerprint">
+        <long_name>--fingerprint</long_name>
+        <description>SHA256 fingerprint of the "api-ssl" certificate (as shown in RouterOS). Connection will fail on mismatch, thus fully protecting you from impersonators that might otherwise use a recognized CA. If not specified, the given fingerprint will be displayed. This option requires PHP 5.6 or later, and will silently be ignored on earlier versions.</description>
+        <action>StoreString</action>
+    </option>
     <option name="time">
         <short_name>-t</short_name>
         <long_name>--timeout</long_name>
