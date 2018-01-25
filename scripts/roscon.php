@@ -257,7 +257,7 @@ if ($cmd->options['crypto']) {
     );
     if ($cmd->options['caPath']) {
         $comContextOpts['ssl'][is_file($cmd->options['caPath']) ? 'cafile' : 'capath'] = $cmd->options['caPath'];
-    } elseif(!$cmd->options['fingerprint']) {
+    } elseif (!$cmd->options['fingerprint']) {
         $comContextOpts['ssl']['ciphers'] = 'ADH';
     }
 

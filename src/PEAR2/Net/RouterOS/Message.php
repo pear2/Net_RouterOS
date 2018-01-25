@@ -60,7 +60,7 @@ abstract class Message implements IteratorAggregate, Countable
     /**
      * An optional tag to associate the message with.
      *
-     * @var string
+     * @var string|null
      */
     private $_tag = null;
 
@@ -125,7 +125,7 @@ abstract class Message implements IteratorAggregate, Countable
     /**
      * Gets the tag that the message is associated with.
      *
-     * @return string The current tag or NULL if there isn't a tag.
+     * @return string|null The current tag or NULL if there isn't a tag.
      *
      * @see setTag()
      */
@@ -140,7 +140,7 @@ abstract class Message implements IteratorAggregate, Countable
      * Sets the tag to associate the message with. Setting NULL erases the
      * currently set tag.
      *
-     * @param string $tag The tag to set.
+     * @param string|null $tag The tag to set.
      *
      * @return $this The message object.
      *
