@@ -47,7 +47,7 @@ class Request extends Message
     /**
      * A query for the command.
      *
-     * @var Query
+     * @var Query|null
      */
     private $_query;
 
