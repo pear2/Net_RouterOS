@@ -50,7 +50,7 @@ foreach (array('spl', 'pcre') as $ext) {
         $missing_extensions[] = $ext;
     }
 }
-if ($missing_extensions) {
+if (!empty($missing_extensions)) {
     echo "\nERROR: You must compile PHP with the following extensions enabled:\n",
         implode(', ', $missing_extensions), "\n",
         "or install the necessary extensions for your distribution.\n";
