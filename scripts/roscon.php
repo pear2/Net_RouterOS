@@ -249,7 +249,8 @@ $comContext = null;
 if ($cmd->options['crypto']) {
     $comContextOpts = array(
         'ssl' => array(
-            'capture_peer_cert' => true,
+            'capture_peer_cert' => !$cmd->options['fingerprint']
+                && function_exists('openssl_x509_fingerprint'),
             'verify_peer' => !!$cmd->options['caPath'],
             'verify_peer_name' => !!$cmd->options['caPath'],
         )
@@ -419,7 +420,8 @@ HEREDOC
 7. Encryption misconfiguration or impersonation attempt by an attacker.
    Check carefully the values and presense of encryption related options, i.e.
    the "--ca", "--ciphers" and "--fingerprint" options.
-   If not using a certifcate, make sure to NOT specify any of those options.
+   If not using a certifcate, make sure to NOT specify any of those options,
+   or explicitly include only ADH ciphers in the "--ciphers" option.
    If using a certificate, make sure to specify at least one of those options
    with a valid value. Also make sure the clock of this device and the router
    are accurate (check the date in particular), and that the certificate
@@ -439,7 +441,6 @@ HEREDOC
 
    If everything appears OK, there may be an attacker in your network trying
    to impersonate RouterOS.
-
 
 HEREDOC
             );
@@ -663,15 +664,14 @@ if ($cmd->options['verbose']) {
 
 if ($com->getTransmitter()->isAvailable()) {
     $printWord('NOTE', '', 'Connection started');
-}
 
-if ($cmd->options['crypto']
-    && !$cmd->options['fingerprint']
-    && function_exists('openssl_x509_fingerprint')
-) {
-    $contextParams = $com->getTransmitter()->getContextParams();
-    $cert = $contextParams['options']['ssl']['peer_certificate'];
-    $printWord('NOTE', openssl_x509_fingerprint($cert, 'sha256'), 'Certificate fingerprint');
+    if ($cmd->options['crypto']
+        && $comContextOpts['ssl']['capture_peer_cert']
+    ) {
+        $contextParams = $com->getTransmitter()->getContextParams();
+        $cert = $contextParams['options']['ssl']['peer_certificate'];
+        $printWord('NOTE', openssl_x509_fingerprint($cert, 'sha256'), 'Certificate fingerprint');
+    }
 }
 
 //Input/Output cycle

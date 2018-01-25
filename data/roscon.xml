@@ -33,7 +33,7 @@ Defaults to PHP's default_socket_timeout ini option.</description>
     </option>
     <option name="caPath">
         <long_name>--ca</long_name>
-        <description>Optional path to a file or folder to use for certification authority, when using encryption. Ignored when not using encryption or using ADH cipher.</description>
+        <description>Path to a file or folder to use for certification authority, when using encryption. Ignored when not using encryption. This option should not be set when not using a certificate.</description>
         <action>StoreString</action>
     </option>
     <option name="ciphers">
@@ -43,7 +43,7 @@ Defaults to PHP's default_socket_timeout ini option.</description>
     </option>
     <option name="fingerprint">
         <long_name>--fingerprint</long_name>
-        <description>SHA256 fingerprint of the "api-ssl" certificate (as shown in RouterOS). Connection will fail on mismatch, thus fully protecting you from impersonators that might otherwise use a recognized CA. If not specified, the given fingerprint will be displayed. This option requires PHP 5.6 or later, and will silently be ignored on earlier versions.</description>
+        <description>SHA256 fingerprint of the "api-ssl" certificate (as shown in RouterOS). Connection will fail on mismatch, thus fully protecting you from impersonators that might otherwise use a recognized certification authority. If not specified, the given fingerprint will be displayed. This option requires PHP 5.6 or later, and will silently be ignored on earlier versions.</description>
         <action>StoreString</action>
     </option>
     <option name="time">
