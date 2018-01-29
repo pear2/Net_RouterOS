@@ -251,8 +251,8 @@ if ($cmd->options['crypto']) {
         'ssl' => array(
             'capture_peer_cert' => !$cmd->options['fingerprint']
                 && function_exists('openssl_x509_fingerprint'),
-            'verify_peer' => !!$cmd->options['caPath'],
-            'verify_peer_name' => !!$cmd->options['caPath'],
+            'verify_peer' => isset($cmd->options['caPath']),
+            'verify_peer_name' => isset($cmd->options['caPath']),
         )
     );
     if ($cmd->options['caPath']) {
