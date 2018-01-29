@@ -130,11 +130,15 @@ class Communicator
      *     Must be one of the PEAR2\Net\Transmitter\NetworkStream::CRYPTO_*
      *     constants. Off by default. RouterOS currently supports only TLS, but
      *     the setting is provided in this fashion for forward compatibility's
-     *     sake. And for the sake of simplicity, if you specify an encryption,
-     *     don't specify a context and your default context uses the value
-     *     "DEFAULT" for ciphers, "ADH" will be automatically added to the list
-     *     of ciphers.
+     *     sake.
      * @param resource|null $context A context for the socket.
+     *     If not set, the default context will be used, and adjusted to use
+     *     "ADH" as the "ciphers" SSL context option if there are no CAs on
+     *     any level and that option has not been explicitly set.
+     *     If that option has been set to "ADH" (explicitly or not),
+     *     the "verify_peer" option will be set to FALSE, unless explicitly
+     *     set otherwise. The "verify_peer_name" option is set to match
+     *     "verify_peer", unless explicitly set otherwise.
      *
      * @see sendWord()
      */
@@ -151,20 +155,52 @@ class Communicator
         if (($context === null) && !$isUnencrypted) {
             $context = stream_context_get_default();
             $opts = stream_context_get_options($context);
-            $verifyPeer = isset($opts['ssl']['cafile'])
-                || isset($opts['ssl']['capath'])
-                || !!ini_get('openssl.cafile')
-                || !!ini_get('openssl.capath');
+            if (isset($opts['ssl']['verify_peer'])) {
+                $verifyPeer = !!$opts['ssl']['verify_peer'];
+            } elseif (isset($opts['ssl']['ciphers'])
+                && 'ADH' === $opts['ssl']['ciphers']
+            ) {
+                $verifyPeer = false;
+            } else {
+                $verifyPeer = isset($opts['ssl']['cafile'])
+                    || isset($opts['ssl']['capath']);
+                if (!$verifyPeer
+                    && function_exists('openssl_get_cert_locations')
+                ) {
+                    $fileCt = array(
+                        'default_cert_file',
+                        'default_cert_file_env',
+                        'ini_cafile'
+                    );
+                    $getenvCt = array(
+                        'default_cert_file_env',
+                        'default_cert_dir_env'
+                    );
+                    foreach (openssl_get_cert_locations() as $ct => $cl) {
+                        if (in_array($ct, $getenvCt, true)) {
+                            $cl = (string) getenv($cl);
+                        }
+                        if ('' === $cl) {
+                            continue;
+                        }
+                        $verifyPeer = in_array($ct, $fileCt)
+                            ? is_file($cl)
+                            : is_dir($cl);
+                        if ($verifyPeer) {
+                            break;
+                        }
+                    }
+                }
+            }
             $newOpts = array(
                 'ssl' => array(
                     'verify_peer' => $verifyPeer,
-                    'verify_peer_name' => $verifyPeer
+                    'verify_peer_name' => isset(
+                        $opts['ssl']['verify_peer_name']
+                    ) ? !!$opts['ssl']['verify_peer_name'] : $verifyPeer
                 )
             );
-            if (!$verifyPeer
-                && (!isset($opts['ssl']['ciphers'])
-                || 'DEFAULT' === $opts['ssl']['ciphers'])
-            ) {
+            if (!$verifyPeer && !isset($opts['ssl']['ciphers'])) {
                 $newOpts['ssl']['ciphers'] = 'ADH';
             }
             stream_context_set_option(
@@ -209,16 +245,16 @@ class Communicator
      * function. Depending on the argument given, one of the other functions in
      * the class is invoked and its returned value is returned by this function.
      *
-     * @param string|null $string A string of the word to send, or NULL to get
-     *     the next word as a string.
+     * If one or more arguments are provided, it sends a word with the supplied
+     * word fragments. Otherwise, gets the next word as a string.
      *
-     * @return int|string If a string is provided, returns the number of bytes
+     * @return int|string If arguments are given, returns the number of bytes
      *     sent, otherwise returns the next word as a string.
      */
-    public function __invoke($string = null)
+    public function __invoke()
     {
-        return null === $string ? $this->getNextWord()
-            : $this->sendWord($string);
+        return 0 === func_num_args() ? $this->getNextWord()
+            : call_user_func_array(array($this, 'sendWord'), func_get_args());
     }
 
     /**
