@@ -454,10 +454,10 @@ class Util implements Countable
                     new Request($this->menu . '/print .proplist=.id', $criteria)
                 )->getAllOfType(Response::TYPE_DATA) as $response) {
                     $newId = $response->getProperty('.id');
-                    $idList .= strtolower(
+                    $idList .= (strtolower(
                         is_string($newId)
                         ? $newId
-                        : stream_get_contents($newId) . ','
+                        : stream_get_contents($newId)) . ','
                     );
                 }
             } elseif (is_callable($criteria)) {
