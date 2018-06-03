@@ -79,7 +79,6 @@ class Query
      */
     protected function __construct()
     {
-
     }
 
     /**

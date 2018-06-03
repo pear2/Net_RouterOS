@@ -1,5 +1,5 @@
-composer.phar
-vendor/
+/vendor
+/composer.lock
 /tests/vm/output-virtualbox-iso
 /tests/vm/output-qemu
 /tests/vm/packer_cache

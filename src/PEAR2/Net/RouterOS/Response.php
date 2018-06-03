@@ -189,7 +189,8 @@ class Response extends Message
             if (!$com->getTransmitter()->isDataAwaiting(
                 $sTimeout,
                 $usTimeout
-            )) {
+            )
+            ) {
                 throw new SocketException(
                     'No data within the time limit',
                     SocketException::CODE_NO_DATA

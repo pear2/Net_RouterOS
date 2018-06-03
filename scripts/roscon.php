@@ -12,7 +12,7 @@
  * @author    Vasil Rangelov <boen.robot@gmail.com>
  * @copyright 2011 Vasil Rangelov
  * @license   http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
- * @version   GIT: $Id$
+ * @version   GIT: $Format:%x24Commit:%H%x24$
  * @link      http://pear2.php.net/PEAR2_Net_RouterOS
  */
 
@@ -256,13 +256,17 @@ if ($cmd->options['crypto']) {
         )
     );
     if ($cmd->options['caPath']) {
-        $comContextOpts['ssl'][is_file($cmd->options['caPath']) ? 'cafile' : 'capath'] = $cmd->options['caPath'];
+        $comContextOpts['ssl'][
+            is_file($cmd->options['caPath']) ? 'cafile' : 'capath'
+        ] = $cmd->options['caPath'];
     } elseif (!$cmd->options['fingerprint']) {
         $comContextOpts['ssl']['ciphers'] = 'ADH';
     }
 
     if ($cmd->options['fingerprint']) {
-        $comContextOpts['ssl']['peer_fingerprint'] = array('sha256' => $cmd->options['fingerprint']);
+        $comContextOpts['ssl']['peer_fingerprint'] = array(
+            'sha256' => $cmd->options['fingerprint']
+        );
     }
 
     if ($cmd->options['ciphers']) {
@@ -455,7 +459,8 @@ if (null !== $cmd->args['username']) {
             $cmd->args['username'],
             (string)$cmd->args['password'],
             $comTimeout
-        )) {
+        )
+        ) {
             fwrite(
                 STDERR,
                 <<<HEREDOC
@@ -670,7 +675,11 @@ if ($com->getTransmitter()->isAvailable()) {
     ) {
         $contextParams = $com->getTransmitter()->getContextParams();
         $cert = $contextParams['options']['ssl']['peer_certificate'];
-        $printWord('NOTE', openssl_x509_fingerprint($cert, 'sha256'), 'Certificate fingerprint');
+        $printWord(
+            'NOTE',
+            openssl_x509_fingerprint($cert, 'sha256'),
+            'Certificate fingerprint'
+        );
     }
 }
 

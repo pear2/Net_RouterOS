@@ -533,7 +533,10 @@ class Util implements Countable
                 $number = $this->idCache[$number];
             } else {
                 throw new RouterErrorException(
-                    'Unable to resolve number from ID cache (no such item maybe)',
+                    <<< 'EOT'
+Unable to resolve number from ID cache (no such item maybe)
+EOT
+                    ,
                     RouterErrorException::CODE_CACHE_ERROR
                 );
             }
@@ -811,14 +814,14 @@ class Util implements Countable
     /**
      * Adds a new item at the current menu.
      *
-     * @param array<string,string|resource>|array<int,string> $values     Accepts
+     * @param array<string,string|resource>|array<int,string> $values     Accept
      *     one or more items to add to the current menu.
      *     The data about each item is specified as an array with the names of
      *     each property as an array key, and the value as an array value.
      *     Flags (properties with a value "true" that is interpreted as
      *     equivalent of "yes" from CLI) can also be specified with a numeric
      *     index as the array key, and the name of the flag as the array value.
-     * @param array<string,string|resource>|array<int,string> $values,... Additional
+     * @param array<string,string|resource>|array<int,string> $values,... More
      *     items.
      *
      * @return string A comma separated list of the new items' IDs.
@@ -969,8 +972,9 @@ class Util implements Countable
      *     The "follow" and "follow-only" arguments are prohibited,
      *     as they would cause a synchronous request to run forever, without
      *     allowing the results to be observed.
-     *     If you need to use those arguments, use {@link static::newRequest()},
-     *     and pass the resulting {@link Request} to {@link Client::sendAsync()}.
+     *     If you need to use those arguments, use
+     *     {@link static::newRequest()}, and pass the resulting {@link Request}
+     *     to {@link Client::sendAsync()}.
      *     The "count-only" argument is also prohibited, as results from it
      *     would not be consumable. Use {@link static::count()} for that.
      * @param Query|null                                      $query A query to

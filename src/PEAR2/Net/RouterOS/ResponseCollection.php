@@ -299,7 +299,6 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      */
     public function offsetSet($offset, $value)
     {
-
     }
 
     /**
@@ -316,7 +315,6 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      */
     public function offsetUnset($offset)
     {
-
     }
 
     /**

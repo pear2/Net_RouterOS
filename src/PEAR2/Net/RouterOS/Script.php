@@ -207,7 +207,8 @@ class Script
             $#uix',
             $value,
             $date
-        )) {
+        )
+        ) {
             if (!isset($date['time'])) {
                 $date['time'] = '00:00:00';
                 $timezone = new DateTimeZone('UTC');
@@ -265,7 +266,8 @@ class Script
             $/x',
             $value,
             $time
-        )) {
+        )
+        ) {
             $days = isset($time[2]) ? (int)$time[2] : 0;
             if (isset($time[1])) {
                 $days += 7 * (int)$time[1];
@@ -308,8 +310,9 @@ class Script
                 //@codeCoverageIgnoreStart
                 // See previous ignored section's note.
                 //
-                // This section is added for backwards compatibility with current
-                // PHP versions, when in the future sub-second support is added.
+                // This section is added for backwards compatibility with
+                // current PHP versions, when in the future sub-second support
+                // is added.
                 // In that event, the test inputs for older versions will be
                 // expected to get a rounded up result of the sub-second data.
             } catch (E $e) {
@@ -529,7 +532,7 @@ class Script
      */
     public static function escapeValue($value)
     {
-        switch(gettype($value)) {
+        switch (gettype($value)) {
         case 'NULL':
             $value = '[]';
             break;

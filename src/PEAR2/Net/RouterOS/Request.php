@@ -415,7 +415,8 @@ class Request extends Message
                 '/^="(([^\\\"]|\\\"|\\\\)*)"/sS',
                 $string,
                 $matches
-            )) {
+            )
+            ) {
                 $token = $matches[0];
                 $this->setArgument(
                     $name,
@@ -441,6 +442,5 @@ class Request extends Message
         if (null !== $name && ('' !== ($name = trim($name)))) {
             $this->setArgument($name, '');
         }
-
     }
 }
