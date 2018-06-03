@@ -44,15 +44,15 @@ if (version_compare(phpversion(), '5.3.0', '<')) {
     exit(1);
 }
 
-$missing_extensions = array();
+$missingExtensions = array();
 foreach (array('spl', 'pcre') as $ext) {
     if (!extension_loaded($ext)) {
-        $missing_extensions[] = $ext;
+        $missingExtensions[] = $ext;
     }
 }
-if (!empty($missing_extensions)) {
-    echo "\nERROR: You must compile PHP with the following extensions enabled:\n",
-        implode(', ', $missing_extensions), "\n",
+if (!empty($missingExtensions)) {
+    echo "\nERROR: You must compile PHP with the following extensions:\n",
+        implode(', ', $missingExtensions), "\n",
         "or install the necessary extensions for your distribution.\n";
     exit(1);
 }
@@ -157,4 +157,6 @@ WARNING: You can ONLY use the console through the PHAR file, because the
 HEREDOC;
     }
 }
+
+// phpcs:disable
 __HALT_COMPILER();

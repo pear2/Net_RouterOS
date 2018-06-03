@@ -856,7 +856,7 @@ class Client
                     try {
                         $this->cancelRequest($tag);
                     } catch (DataFlowException $e) {
-                        if ($e->getCode() !== DataFlowException::CODE_UNKNOWN_REQUEST
+                        if ($e->getCode() !== $e::CODE_UNKNOWN_REQUEST
                         ) {
                             throw $e;
                         }
