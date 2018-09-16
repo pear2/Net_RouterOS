@@ -287,29 +287,35 @@ class Client
         $timeout = null
     ) {
         $request = new Request('/login');
-        $request->send($com);
-        $response = new Response($com, null, $timeout);
         $request->setArgument('name', $username);
-        $request->setArgument(
-            'response',
-            '00' . md5(
-                chr(0) . $password
-                . pack('H*', $response->getProperty('ret'))
-            )
-        );
+        $request->setArgument('password', $password);
         $request->verify($com)->send($com);
-
-        $response = new Response($com, null, $timeout);
-        if ($response->getType() === Response::TYPE_FINAL) {
-            return null === $response->getProperty('ret');
-        } else {
-            while ($response->getType() !== Response::TYPE_FINAL
-                && $response->getType() !== Response::TYPE_FATAL
-            ) {
-                $response = new Response($com, null, $timeout);
+        $response = new Response($com, false, $timeout);
+        if ($response->getType() === Response::TYPE_FINAL && null === $response->getProperty('ret')) {
+            // version >= 6.43
+            return null === $response->getProperty('message');
+        } elseif ($response->getType() === Response::TYPE_FINAL) {
+            // version < 6.43
+            $request->setArgument('password', '');
+            $request->setArgument(
+                'response',
+                '00' . md5(
+                    chr(0) . $password
+                    . pack('H*', $response->getProperty('ret'))
+                )
+            );
+            $request->verify($com)->send($com);
+            $response = new Response($com, false, $timeout);
+            if ($response->getType() === Response::TYPE_FINAL) {
+                return null === $response->getProperty('ret');
             }
-            return false;
         }
+        while ($response->getType() !== Response::TYPE_FINAL
+            && $response->getType() !== Response::TYPE_FATAL
+        ) {
+            $response = new Response($com, false, $timeout);
+        }
+        return false;
     }
 
     /**
