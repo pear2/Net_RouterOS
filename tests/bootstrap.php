@@ -69,6 +69,7 @@ $resolve = function ($hostname) use (&$resolve) {
             }
         }
     }
+    return '0.0.0.0';
 };
 
 if ($defineConstants) {

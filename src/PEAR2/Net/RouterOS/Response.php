@@ -66,7 +66,7 @@ class Response extends Message
     /**
      * An array of unrecognized words in network order.
      *
-     * @var string[]
+     * @var (string|resource)[]
      */
     protected $unrecognizedWords = array();
 
@@ -343,5 +343,22 @@ class Response extends Message
     public function getUnrecognizedWords()
     {
         return $this->unrecognizedWords;
+    }
+
+    /**
+     * Get actionable debug info.
+     *
+     * This is a magic method available to PHP 5.6 and above, due to which
+     * output of var_dump() will be more actionable.
+     *
+     * You can still call it in earlier versions to get the object as a plain array.
+     *
+     * @return array The info, as an associative array.
+     */
+    public function __debugInfo()
+    {
+        return parent::__debugInfo() + array(
+            'unrecognized' => $this->unrecognizedWords
+        );
     }
 }

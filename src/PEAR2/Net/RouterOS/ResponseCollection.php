@@ -61,6 +61,31 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
 {
 
     /**
+     * Used in {@link static::toArray()} as part of a bit mask.
+     *
+     * If set, it is effectively ignored. It is used merely as a placeholder.
+     */
+    const ARRAY_DEFAULT = 0;
+
+    /**
+     * Used in {@link static::toArray()} as part of a bit mask.
+     *
+     * If set, uses an index when available.
+     * if not set, ignores it even if one was set with
+     * {@link static::setIndex()}.
+     */
+    const ARRAY_INDEXED = 1;
+
+    /**
+     * Used in {@link static::toArray()} as part of a bit mask.
+     *
+     * If set, also serializes all {@link Response} objects to a plain array
+     * using the __debugInfo() method.
+     * If not set, the result will be an array of {@link Response} objects.
+     */
+    const ARRAY_RECURSIVE = 2;
+
+    /**
      * An array with all {@link Response} objects.
      *
      * An array with all Response objects.
@@ -166,7 +191,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      *     If the collection is indexed, you can also supply a value to seek to.
      *     Setting NULL will get the current response's iterator.
      *
-     * @return Response|ArrayObject The {@link Response} at the specified
+     * @return Response|\ArrayObject The {@link Response} at the specified
      *     offset, the current response's iterator (which is an ArrayObject)
      *     when NULL is given, or FALSE if the offset is invalid
      *     or the collection is empty.
@@ -222,23 +247,43 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     /**
      * Gets the whole collection as an array.
      *
-     * @param bool $useIndex Whether to use the index values as keys for the
-     *     resulting array.
+     * @param int $flags A bit mask of this class' ARRAY_* constants.
      *
      * @return Response[] An array with all responses, in network order.
      */
-    public function toArray($useIndex = false)
+    public function toArray($flags = self::ARRAY_DEFAULT)
     {
-        if ($useIndex) {
+        $result = $this->responses;
+        if (($flags & self::ARRAY_INDEXED) === self::ARRAY_INDEXED) {
             $positions = $this->responsesIndex[$this->index];
             asort($positions, SORT_NUMERIC);
             $positions = array_flip($positions);
-            return array_combine(
+            $result = array_combine(
                 $positions,
                 array_intersect_key($this->responses, $positions)
             );
         }
-        return $this->responses;
+        if (($flags & self::ARRAY_RECURSIVE) === self::ARRAY_RECURSIVE) {
+            foreach ($result as $key => $value) {
+                $result[$key] = $value->__debugInfo();
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Get actionable debug info.
+     *
+     * This is a magic method available to PHP 5.6 and above, due to which
+     * output of var_dump() will be more actionable.
+     *
+     * You can still call it in earlier versions to get the object as a plain array.
+     *
+     * @return array The info, as an associative array.
+     */
+    public function __debugInfo()
+    {
+        return $this->toArray(self::ARRAY_INDEXED | self::ARRAY_RECURSIVE);
     }
 
     /**
