@@ -521,12 +521,21 @@ class Util implements Countable
      *
      * @throws RouterErrorException When the router returns an error response
      *     (e.g. no such item, invalid property, etc.).
+     *     This exception is also thrown for a query that has no match or
+     *     if $numbers is an int not found in the ID cache, which most often
+     *     happens if there is no such item in the first place.
      */
     public function get($number, $valueName = null)
     {
         if ($number instanceof Query) {
             $number = explode(',', $this->find($number));
             $number = $number[0];
+            if ('' === $number) {
+                throw new RouterErrorException(
+                    'Query did not match an item',
+                    RouterErrorException::CODE_GET_LOOKUP_ERROR
+                );
+            }
         } elseif (is_int($number)) {
             $this->find();
             if (isset($this->idCache[$number])) {

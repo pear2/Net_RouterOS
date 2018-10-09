@@ -50,6 +50,7 @@ class RouterErrorException extends RuntimeException implements Exception
 
     const CODE_CACHE_ERROR          = 0x100001;
     const CODE_GET_ERROR            = 0x110001;
+    const CODE_GET_LOOKUP_ERROR     = 0x130001;
     const CODE_GETALL_ERROR         = 0x110002;
     const CODE_ADD_ERROR            = 0x120001;
     const CODE_SET_ERROR            = 0x120002;
