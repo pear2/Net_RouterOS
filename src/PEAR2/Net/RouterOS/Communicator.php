@@ -132,13 +132,14 @@ class Communicator
         if (($context === null) && !$isUnencrypted) {
             $context = stream_context_get_default();
             $opts = stream_context_get_options($context);
-            if (!isset($opts['ssl']['ciphers'])
-                || 'DEFAULT' === $opts['ssl']['ciphers']
+            $sslOrTls = strtolower(substr($crypto, 0, 3));
+            if (!isset($opts[$sslOrTls]['ciphers'])
+                || 'DEFAULT' === $opts[$sslOrTls]['ciphers']
             ) {
                 stream_context_set_option(
                     $context,
                     array(
-                        'ssl' => array(
+                        $sslOrTls => array(
                             'ciphers' => 'ADH',
                             'verify_peer' => false,
                             'verify_peer_name' => false
