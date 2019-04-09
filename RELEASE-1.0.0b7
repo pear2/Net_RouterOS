@@ -1,3 +1,4 @@
+* RouterOS 6.43+ login method (PAP) is now supported (PR #42 by @sieberlukas)
 * Util::get() and Util::find() no longer treat numeric arguments as numbers, but instead treat them as literals to pass to the router. This means that items with names that resemble numbers can now be targeted.
 * Util::find() no longer processes comma separated lists recursively. Instead, they are included in the result after a normalization. This means that items with names that are also the names of callbacks can be targeted by simply adding a "," at the end of the name.
 * Different response properties can now be streamed depending on a threshold, instead of "all or nothing", as was before.
