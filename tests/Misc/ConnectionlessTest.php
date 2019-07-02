@@ -16,7 +16,7 @@ use PEAR2\Net\RouterOS\Response;
 use PEAR2\Net\RouterOS\Script;
 use PEAR2\Net\RouterOS\UnexpectedValueException;
 use PEAR2\Net\Transmitter as T;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * ~
@@ -30,7 +30,7 @@ use PHPUnit_Framework_TestCase;
  * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
  * @link     http://pear2.php.net/PEAR2_Net_RouterOS
  */
-class ConnectionlessTest extends PHPUnit_Framework_TestCase
+class ConnectionlessTest extends TestCase
 {
     /**
      * @param string $command

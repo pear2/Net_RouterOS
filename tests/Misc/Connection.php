@@ -10,7 +10,7 @@ use PEAR2\Net\RouterOS\Request;
 use PEAR2\Net\RouterOS\Response;
 use PEAR2\Net\RouterOS\SocketException;
 use PEAR2\Net\Transmitter as T;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * ~
@@ -23,7 +23,7 @@ use PHPUnit_Framework_TestCase;
  * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
  * @link     http://pear2.php.net/PEAR2_Net_RouterOS
  */
-abstract class Connection extends PHPUnit_Framework_TestCase
+abstract class Connection extends TestCase
 {
 
     /**

@@ -10,10 +10,10 @@ use PEAR2\Net\RouterOS\Query;
 use PEAR2\Net\RouterOS\Request;
 use PEAR2\Net\RouterOS\Response;
 use PEAR2\Net\RouterOS\UnexpectedValueException;
-use PHPUnit_Framework_Assert;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 
-abstract class Safe extends PHPUnit_Framework_TestCase
+abstract class Safe extends TestCase
 {
 
     /**
@@ -190,18 +190,18 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $this->object->sendAsync(
             $ping,
             function ($response, $client) use (&$repliesCount) {
-                PHPUnit_Framework_TestCase::assertInstanceOf(
+                TestCase::assertInstanceOf(
                     ROS_NAMESPACE . '\Response',
                     $response,
                     'A callback must receive a single response per call'
                 );
-                PHPUnit_Framework_TestCase::assertInstanceOf(
+                TestCase::assertInstanceOf(
                     ROS_NAMESPACE . '\Client',
                     $client,
                     'A callback must receive a copy of the client object'
                 );
 
-                PHPUnit_Framework_TestCase::assertEquals(
+                TestCase::assertEquals(
                     'ping',
                     $response->getTag(),
                     'The callback must only receive responses meant for it.'
@@ -370,18 +370,18 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $this->object->sendAsync(
             $ping,
             function ($response, $client) use (&$responseCount) {
-                PHPUnit_Framework_TestCase::assertInstanceOf(
+                TestCase::assertInstanceOf(
                     ROS_NAMESPACE . '\Response',
                     $response,
                     'A callback must receive a single response per call'
                 );
-                PHPUnit_Framework_TestCase::assertInstanceOf(
+                TestCase::assertInstanceOf(
                     ROS_NAMESPACE . '\Client',
                     $client,
                     'A callback must receive a copy of the client object'
                 );
 
-                PHPUnit_Framework_TestCase::assertEquals(
+                TestCase::assertEquals(
                     'ping',
                     $response->getTag(),
                     'The callback must only receive responses meant for it.'
@@ -424,25 +424,25 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $this->object->sendAsync(
             $ping,
             function ($response, $client) use (&$repliesCount, &$mark, $limit) {
-                PHPUnit_Framework_TestCase::assertInstanceOf(
+                TestCase::assertInstanceOf(
                     ROS_NAMESPACE . '\Response',
                     $response,
                     'A callback must receive a single response per call'
                 );
-                PHPUnit_Framework_TestCase::assertInstanceOf(
+                TestCase::assertInstanceOf(
                     ROS_NAMESPACE . '\Client',
                     $client,
                     'A callback must receive a copy of the client object'
                 );
 
-                PHPUnit_Framework_TestCase::assertEquals(
+                TestCase::assertEquals(
                     'ping',
                     $response->getTag(),
                     'The callback must only receive responses meant for it.'
                 );
                 $repliesCount++;
                 if ($repliesCount <= $limit) {
-                    PHPUnit_Framework_TestCase::assertEquals(
+                    TestCase::assertEquals(
                         Response::TYPE_DATA,
                         $response->getType(),
                         'Callbacks inside must be of type ' .
@@ -474,18 +474,18 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $arpPrint->setTag('arp');
         $repliesCount = 0;
         $arpCallback = function ($response, $client) use (&$repliesCount) {
-                PHPUnit_Framework_TestCase::assertInstanceOf(
+                TestCase::assertInstanceOf(
                     ROS_NAMESPACE . '\Response',
                     $response,
                     'A callback must receive a single response per call'
                 );
-                PHPUnit_Framework_TestCase::assertInstanceOf(
+                TestCase::assertInstanceOf(
                     ROS_NAMESPACE . '\Client',
                     $client,
                     'A callback must receive a copy of the client object'
                 );
 
-                PHPUnit_Framework_TestCase::assertEquals(
+                TestCase::assertEquals(
                     'arp',
                     $response->getTag(),
                     'The callback must only receive responses meant for it.'
@@ -516,18 +516,18 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $this->object->sendAsync(
             $ping,
             function ($response, $client) use (&$repliesCount) {
-                PHPUnit_Framework_TestCase::assertInstanceOf(
+                TestCase::assertInstanceOf(
                     ROS_NAMESPACE . '\Response',
                     $response,
                     'A callback must receive a single response per call'
                 );
-                PHPUnit_Framework_TestCase::assertInstanceOf(
+                TestCase::assertInstanceOf(
                     ROS_NAMESPACE . '\Client',
                     $client,
                     'A callback must receive a copy of the client object'
                 );
 
-                PHPUnit_Framework_TestCase::assertEquals(
+                TestCase::assertEquals(
                     'ping',
                     $response->getTag(),
                     'The callback must only receive responses meant for it.'
@@ -567,18 +567,18 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $this->object->sendAsync(
             $ping,
             function ($response, $client) use (&$repliesCount) {
-                PHPUnit_Framework_TestCase::assertInstanceOf(
+                TestCase::assertInstanceOf(
                     ROS_NAMESPACE . '\Response',
                     $response,
                     'A callback must receive a single response per call'
                 );
-                PHPUnit_Framework_TestCase::assertInstanceOf(
+                TestCase::assertInstanceOf(
                     ROS_NAMESPACE . '\Client',
                     $client,
                     'A callback must receive a copy of the client object'
                 );
 
-                PHPUnit_Framework_TestCase::assertEquals(
+                TestCase::assertEquals(
                     'ping',
                     $response->getTag(),
                     'The callback must only receive responses meant for it.'
@@ -632,18 +632,18 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $this->object->sendAsync(
             $arpPrint,
             function ($response, $client) use (&$list2) {
-                PHPUnit_Framework_TestCase::assertInstanceOf(
+                TestCase::assertInstanceOf(
                     ROS_NAMESPACE . '\Response',
                     $response,
                     'A callback must receive a single response per call'
                 );
-                PHPUnit_Framework_TestCase::assertInstanceOf(
+                TestCase::assertInstanceOf(
                     ROS_NAMESPACE . '\Client',
                     $client,
                     'A callback must receive a copy of the client object'
                 );
 
-                PHPUnit_Framework_TestCase::assertEquals(
+                TestCase::assertEquals(
                     'arp',
                     $response->getTag(),
                     'The callback must only receive responses meant for it.'
@@ -737,7 +737,7 @@ abstract class Safe extends PHPUnit_Framework_TestCase
         $this->object->sendAsync(
             new Request('/queue simple listen', null, 'l'),
             function ($response) {
-                PHPUnit_Framework_Assert::assertFalse($response);
+                Assert::assertFalse($response);
             }
         );
         $this->assertSame(1, $this->object->getPendingRequestsCount());

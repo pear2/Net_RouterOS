@@ -95,3 +95,7 @@ if ($defineConstants) {
         );
     }
 }
+
+if (!class_exists('PHPUnit\Framework\TestCase', true)) {
+    include_once 'phpunit.polyfill.php';
+}

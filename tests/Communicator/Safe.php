@@ -8,9 +8,9 @@ use PEAR2\Net\RouterOS\Response;
 use PEAR2\Net\RouterOS\Query;
 use PEAR2\Net\RouterOS\InvalidArgumentException;
 use PEAR2\Net\RouterOS\SocketException;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-abstract class Safe extends PHPUnit_Framework_TestCase
+abstract class Safe extends TestCase
 {
 
     /**

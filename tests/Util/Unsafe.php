@@ -14,9 +14,9 @@ use PEAR2\Net\RouterOS\ResponseCollection;
 use PEAR2\Net\RouterOS\RouterErrorException;
 use PEAR2\Net\RouterOS\Script;
 use PEAR2\Net\RouterOS\Util;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-abstract class Unsafe extends PHPUnit_Framework_TestCase
+abstract class Unsafe extends TestCase
 {
     const REGEX_ID = '\*[a-f0-9]+';
     const REGEX_IDLIST = '/^((\*[a-f0-9]+)\,)*(\*[a-f0-9]+)$/';
