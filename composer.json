@@ -20,6 +20,7 @@
         "pear2/net_transmitter": ">=1.0.0b1 || dev-develop@dev"
     },
     "require-dev": {
+        "ext-iconv": "*",
         "phpunit/phpunit": "@stable",
         "squizlabs/php_codesniffer": "@stable",
         "pear2/net_transmitter": "dev-develop@dev",
@@ -31,6 +32,7 @@
         "pear2/cache_shm": "Enables persistent connections.",
         "pear2/console_commandline": "Enables the console",
         "pear2/console_color": "Enables colors in the console",
+        "ext-iconv": "Used for charset conversion",
         "ext-apc": "This, APCu or Wincache is required for persistent connections.",
         "ext-apcu": "This, APC or Wincache is required for persistent connections.",
         "ext-wincache": "This, APC or APCu is required for persistent connections. Reccomended for Windows.",

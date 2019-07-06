@@ -276,7 +276,8 @@ class Request extends Message
      * This is a magic method available to PHP 5.6 and above, due to which
      * output of var_dump() will be more actionable.
      *
-     * You can still call it in earlier versions to get the object as a plain array.
+     * You can still call it in earlier versions to get the object as a
+     * plain array.
      *
      * @return array The info, as an associative array.
      */

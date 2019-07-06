@@ -132,7 +132,7 @@ class Util implements Countable
             $menuRequest = new Request('/menu');
             if ('/' === $newMenu) {
                 $this->menu = '';
-            } elseif ('/' === $newMenu[0]) {
+            } elseif (strpos($newMenu, '/') === 0) {
                 $this->menu = $menuRequest->setCommand($newMenu)->getCommand();
             } else {
                 $newMenu = (string)substr(
@@ -436,7 +436,9 @@ class Util implements Countable
                 if (null === $ret) {
                     $this->idCache = array();
                     return '';
-                } elseif (!is_string($ret)) {
+                }
+
+                if (!is_string($ret)) {
                     $ret = stream_get_contents($ret);
                 }
 
@@ -453,6 +455,7 @@ class Util implements Countable
         $idList = '';
         foreach (func_get_args() as $criteria) {
             if ($criteria instanceof Query) {
+                /** @var Response $response */
                 foreach ($this->client->sendSync(
                     new Request($this->menu . '/print .proplist=.id', $criteria)
                 )->getAllOfType(Response::TYPE_DATA) as $response) {
@@ -466,6 +469,7 @@ class Util implements Countable
                 }
             } elseif (is_callable($criteria)) {
                 $idCache = array();
+                /** @var Response $response */
                 foreach ($this->client->sendSync(
                     new Request($this->menu . '/print')
                 )->getAllOfType(Response::TYPE_DATA) as $response) {
@@ -528,6 +532,7 @@ class Util implements Countable
     public function get($number, $valueName = null)
     {
         if ($number instanceof Query) {
+            /** @noinspection CallableParameterUseCaseInTypeContextInspection */
             $number = explode(',', $this->find($number));
             $number = $number[0];
             if ('' === $number) {
@@ -1113,10 +1118,12 @@ EOT
             $fileSize = stream_get_contents($fileSize);
         }
         if (Communicator::isSeekableStream($data)) {
-            return Communicator::seekableStreamLength($data) == $fileSize;
-        } else {
-            return sprintf('%u', strlen((string)$data)) === $fileSize;
+            return (double)$fileSize === Communicator::seekableStreamLength(
+                /** @scrutinizer ignore-type */ $data
+            );
         }
+
+        return sprintf('%u', strlen((string)$data)) === $fileSize;
     }
 
     /**
@@ -1157,7 +1164,9 @@ EOT
                 $responses
             );
         } catch (RouterErrorException $e) {
-            if ($e->getCode() !== RouterErrorException::CODE_SCRIPT_RUN_ERROR) {
+            if ($e->getCode() !== RouterErrorException::CODE_SCRIPT_RUN_ERROR
+                || null === $e->getResponses()
+            ) {
                 throw $e;
             }
             $message = $e->getResponses()->getAllOfType(Response::TYPE_ERROR)

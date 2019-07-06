@@ -557,6 +557,7 @@ class Script
             }
             $value = '{' . substr($result, 1) . '}';
             break;
+            /** @noinspection PhpMissingBreakStatementInspection */
         case 'object':
             if ($value instanceof DateTime) {
                 $usec = $value->format('u');

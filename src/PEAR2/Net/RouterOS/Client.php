@@ -832,8 +832,8 @@ class Client
      *     If NULL, wait indefinitely.
      * @param int      $usTimeout Microseconds to add to the waiting time.
      *
+     * @return Response  The dispatched response.
      * @throws SocketException When there's no response within the time limit.
-     * @return Response The dispatched response.
      */
     protected function dispatchNextResponse($sTimeout = 0, $usTimeout = 0)
     {

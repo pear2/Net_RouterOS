@@ -156,7 +156,7 @@ class Communicator
             $context = stream_context_get_default();
             $opts = stream_context_get_options($context);
             if (isset($opts['ssl']['verify_peer'])) {
-                $verifyPeer = !!$opts['ssl']['verify_peer'];
+                $verifyPeer = (bool)$opts['ssl']['verify_peer'];
             } elseif (isset($opts['ssl']['ciphers'])
                 && 'ADH' === $opts['ssl']['ciphers']
             ) {
@@ -197,7 +197,7 @@ class Communicator
                     'verify_peer' => $verifyPeer,
                     'verify_peer_name' => isset(
                         $opts['ssl']['verify_peer_name']
-                    ) ? !!$opts['ssl']['verify_peer_name'] : $verifyPeer
+                    ) ? (bool)$opts['ssl']['verify_peer_name'] : $verifyPeer
                 )
             );
             if (!$verifyPeer && !isset($opts['ssl']['ciphers'])) {
@@ -582,21 +582,29 @@ class Communicator
                 null,
                 $length
             );
-        } elseif ($length < 0x80) {
+        }
+        if ($length < 0x80) {
             return chr($length);
-        } elseif ($length < 0x4000) {
+        }
+        if ($length < 0x4000) {
             return pack('n', $length |= 0x8000);
-        } elseif ($length < 0x200000) {
+        }
+        if ($length < 0x200000) {
             $length |= 0xC00000;
             return pack('n', $length >> 8) . chr($length & 0xFF);
-        } elseif ($length < 0x10000000) {
+        }
+        if ($length < 0x10000000) {
             return pack('N', $length |= 0xE0000000);
-        } elseif ($length <= 0xFFFFFFFF) {
+        }
+        if ($length <= 0xFFFFFFFF) {
             return chr(0xF0) . pack('N', $length);
-        } elseif ($length <= 0x7FFFFFFFF) {
-            $length = 'f' . base_convert($length, 10, 16);
-            return chr(hexdec(substr($length, 0, 2))) .
-                pack('N', hexdec(substr($length, 2)));
+        }
+        if ($length <= 0x7FFFFFFFF) {
+            $lengthHex = 'f' . base_convert($length, 10, 16);
+            return chr(/** @scrutinizer ignore-type */ hexdec(
+                    substr($lengthHex, 0, 2)
+                )) .
+                pack('N', hexdec(substr($lengthHex, 2)));
         }
         throw new LengthException(
             'Length must not be above 0x7FFFFFFFF.',
@@ -709,10 +717,13 @@ class Communicator
      *
      * @return int|double The decoded length.
      *     Is of type "double" only for values above "2 << 31".
+     *
+     * @throws NotSupportedException If the stream contains an unsupported
+     * control byte.
      */
     public static function decodeLength(T\Stream $trans)
     {
-        if ($trans->isPersistent() && $trans instanceof T\TcpClient) {
+        if ($trans instanceof T\TcpClient && $trans->isPersistent()) {
             $old = $trans->lock($trans::DIRECTION_RECEIVE);
             $length = self::_decodeLength($trans);
             $trans->lock($old, true);
@@ -735,6 +746,9 @@ class Communicator
      *
      * @return int|double The decoded length.
      *     Is of type "double" only for values above "2 << 31".
+     *
+     * @throws NotSupportedException If the stream contains an unsupported
+     * control byte.
      */
     private static function _decodeLength(T\Stream $trans)
     {
@@ -742,13 +756,16 @@ class Communicator
         if ($byte & 0x80) {
             if (($byte & 0xC0) === 0x80) {
                 return (($byte & 077) << 8 ) + ord($trans->receive(1));
-            } elseif (($byte & 0xE0) === 0xC0) {
+            }
+            if (($byte & 0xE0) === 0xC0) {
                 $rem = unpack('n~', $trans->receive(2));
                 return (($byte & 037) << 16 ) + $rem['~'];
-            } elseif (($byte & 0xF0) === 0xE0) {
+            }
+            if (($byte & 0xF0) === 0xE0) {
                 $rem = unpack('n~/C~~', $trans->receive(3));
                 return (($byte & 017) << 24 ) + ($rem['~'] << 8) + $rem['~~'];
-            } elseif (($byte & 0xF8) === 0xF0) {
+            }
+            if (($byte & 0xF8) === 0xF0) {
                 $rem = unpack('N~', $trans->receive(4));
                 return (($byte & 007) * 0x100000000/* '<< 32' or '2^32' */)
                     + (double) sprintf('%u', $rem['~']);

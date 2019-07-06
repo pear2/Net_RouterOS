@@ -92,11 +92,11 @@ class Query
     {
         $operator = (string) $operator;
         switch ($operator) {
-        case Query::OP_EX:
-        case Query::OP_NEX:
-        case Query::OP_EQ:
-        case Query::OP_LT:
-        case Query::OP_GT:
+        case self::OP_EX:
+        case self::OP_NEX:
+        case self::OP_EQ:
+        case self::OP_LT:
+        case self::OP_GT:
             return $operator;
         default:
             throw new UnexpectedValueException(
@@ -277,7 +277,8 @@ class Query
      * This is a magic method available to PHP 5.6 and above, due to which
      * output of var_dump() will be more actionable.
      *
-     * You can still call it in earlier versions to get the object as a plain array.
+     * You can still call it in earlier versions to get the object as a
+     * plain array.
      *
      * @return array The info, as an associative array.
      */
@@ -307,7 +308,7 @@ class Query
         $this->words[] = array(
             static::sanitizeOperator($operator)
             . Message::sanitizeAttributeName($name),
-            (null === $value ? null : Message::sanitizeAttributeValue($value))
+            null === $value ? null : Message::sanitizeAttributeValue($value)
         );
         return $this;
     }
