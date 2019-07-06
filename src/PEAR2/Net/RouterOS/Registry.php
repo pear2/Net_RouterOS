@@ -90,7 +90,7 @@ class Registry
      *
      * Parses a tag to reveal the ownership part of it, and the original tag.
      *
-     * @param string $tag The tag (as received) to parse.
+     * @param string|null $tag The tag (as received) to parse.
      *
      * @return array<int,string|null> An array with
      *     the first member being the ownership tag, and
@@ -166,11 +166,11 @@ class Registry
     /**
      * Add a response to the registry.
      *
-     * @param Response $response     The response to add. The caller of this
+     * @param Response    $response     The response to add. The caller of this
      *     function is responsible for ensuring that the ownership tag and the
      *     original tag are separated, so that only the original one remains in
      *     the response.
-     * @param string   $ownershipTag The ownership tag that the response had.
+     * @param string|null $ownershipTag The ownership tag that the response had.
      *
      * @return bool TRUE if the request was added to its buffer, FALSE if
      *     this instance owns the response, and therefore doesn't need to add

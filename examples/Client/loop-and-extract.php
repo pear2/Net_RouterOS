@@ -25,7 +25,7 @@ $client->loop();
 
 $responses = $client->extractNewResponses();
 foreach ($responses as $response) {
-    if ($response->getType() !== Response::TYPE_FINAL) {
+    if ($response->getType() !== RouterOS\Response::TYPE_FINAL) {
         echo "Error with {$response->getTag()}!\n";
     } else {
         echo "OK with {$response->getTag()}!\n";

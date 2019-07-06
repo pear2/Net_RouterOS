@@ -550,7 +550,7 @@ class Communicator
      * supports words up to 0xFFFFFFFF in length, so that's the only check
      * performed.
      *
-     * @param int $length The length to verify.
+     * @param int|double $length The length to verify.
      *
      * @return void
      */

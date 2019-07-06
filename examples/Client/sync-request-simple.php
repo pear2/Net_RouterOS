@@ -13,7 +13,7 @@ try {
 $responses = $client->sendSync(new RouterOS\Request('/ip/arp/print'));
 
 foreach ($responses as $response) {
-    if ($response->getType() === Response::TYPE_DATA) {
+    if ($response->getType() === RouterOS\Response::TYPE_DATA) {
         echo 'IP: ', $response->getProperty('address'),
         ' MAC: ', $response->getProperty('mac-address'),
         "\n";

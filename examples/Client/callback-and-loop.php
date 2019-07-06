@@ -11,7 +11,7 @@ try {
 
 //Custom function, defined specifically for the example
 $responseHandler = function ($response) {
-    if ($response->getType() === Response::TYPE_FINAL) {
+    if ($response->getType() === RouterOS\Response::TYPE_FINAL) {
         echo "{$response->getTag()} is done.\n";
     }
 };

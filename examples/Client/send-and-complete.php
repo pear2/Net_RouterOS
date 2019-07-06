@@ -22,13 +22,13 @@ $addRequest->setTag('arp2');
 $client->sendAsync($addRequest);
 
 foreach ($client->completeRequest('arp1') as $response) {
-    if ($response->getType() === Response::TYPE_ERROR) {
+    if ($response->getType() === RouterOS\Response::TYPE_ERROR) {
         echo "Error response for 'arp1'!\n";
     }
 }
 
 foreach ($client->completeRequest('arp2') as $response) {
-    if ($response->getType() === Response::TYPE_ERROR) {
+    if ($response->getType() === RouterOS\Response::TYPE_ERROR) {
         echo "Error response for 'arp2'!\n";
     }
 }
