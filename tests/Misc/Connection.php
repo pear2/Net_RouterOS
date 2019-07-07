@@ -303,7 +303,10 @@ abstract class Connection extends TestCase
                 $e->getCode()
             );
             $this->assertTrue($e->getPrevious() instanceof T\SocketException);
-            $this->assertEquals(8, $e->getPrevious()->getCode());
+            $this->assertEquals(
+                T\SocketException::CODE_CLIENT_CONNECT_FAIL,
+                $e->getPrevious()->getCode()
+            );
             $this->assertEquals(
                 10060,
                 $e->getPrevious()->getSocketErrorNumber()
@@ -361,7 +364,10 @@ abstract class Connection extends TestCase
                 $e->getCode()
             );
             $this->assertTrue($e->getPrevious() instanceof T\SocketException);
-            $this->assertEquals(8, $e->getPrevious()->getCode());
+            $this->assertEquals(
+                T\SocketException::CODE_CLIENT_CONNECT_FAIL,
+                $e->getPrevious()->getCode()
+            );
             $this->assertEquals(
                 10061,
                 $e->getPrevious()->getSocketErrorNumber()
@@ -389,7 +395,10 @@ abstract class Connection extends TestCase
                 $e->getCode()
             );
             $this->assertTrue($e->getPrevious() instanceof T\SocketException);
-            $this->assertEquals(7, $e->getPrevious()->getCode());
+            $this->assertEquals(
+                T\SocketException::CODE_CLIENT_INIT_FAIL,
+                $e->getPrevious()->getCode()
+            );
         }
     }
 
@@ -414,7 +423,7 @@ abstract class Connection extends TestCase
                 $e->getCode()
             );
             $this->assertTrue($e->getPrevious() instanceof T\SocketException);
-            $this->assertEquals(6, $e->getPrevious()->getCode());
+            $this->assertEquals(T\SocketException::CODE_INVALID_CONTEXT, $e->getPrevious()->getCode());
         }
     }
 
@@ -439,7 +448,10 @@ abstract class Connection extends TestCase
                 $e->getCode()
             );
             $this->assertTrue($e->getPrevious() instanceof T\SocketException);
-            $this->assertEquals(6, $e->getPrevious()->getCode());
+            $this->assertEquals(
+                T\SocketException::CODE_INVALID_CONTEXT,
+                $e->getPrevious()->getCode()
+            );
         }
     }
 

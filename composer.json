@@ -21,7 +21,8 @@
     },
     "require-dev": {
         "ext-iconv": "*",
-        "phpunit/phpunit": "@stable",
+        "phpunit/phpunit": "^5.0.0",
+        "phpunit/phpunit-mock-objects": "^3.4.0",
         "squizlabs/php_codesniffer": "@stable",
         "pear2/net_transmitter": "dev-develop@dev",
         "pear2/cache_shm": "dev-develop",

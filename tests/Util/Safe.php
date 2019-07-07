@@ -308,16 +308,16 @@ abstract class Safe extends TestCase
     public function testFindByCommaSeparatedValue()
     {
         $this->util->setMenu('/queue/simple');
-        $findResults = $this->util->find('0,1');
-        $this->assertRegExp(
-            self::REGEX_IDLIST,
+        $findResults = $this->util->find('INVALID,SILENT');
+        $this->assertSame(
+            'INVALID,SILENT',
             $findResults
         );
         $this->assertCount(2, explode(',', $findResults));
 
-        $findResults = $this->util->find('0,,1');
-        $this->assertRegExp(
-            self::REGEX_IDLIST,
+        $findResults = $this->util->find('INVALID,,SILENT');
+        $this->assertSame(
+            'INVALID,SILENT',
             $findResults
         );
         $this->assertCount(2, explode(',', $findResults));
@@ -325,16 +325,16 @@ abstract class Safe extends TestCase
 
         $this->client->setStreamingResponses(true);
         $this->util->setMenu('/queue/simple');
-        $findResults = $this->util->find('0,1');
-        $this->assertRegExp(
-            self::REGEX_IDLIST,
+        $findResults = $this->util->find('INVALID,SILENT');
+        $this->assertSame(
+            'INVALID,SILENT',
             $findResults
         );
         $this->assertCount(2, explode(',', $findResults));
 
-        $findResults = $this->util->find('0,,1');
-        $this->assertRegExp(
-            self::REGEX_IDLIST,
+        $findResults = $this->util->find('INVALID,,SILENT');
+        $this->assertSame(
+            'INVALID,SILENT',
             $findResults
         );
         $this->assertCount(2, explode(',', $findResults));

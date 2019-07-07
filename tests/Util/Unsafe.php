@@ -275,7 +275,7 @@ abstract class Unsafe extends TestCase
             count(explode(',', $this->util->find()))
         );
         $this->assertSame($id, $this->util->find($itemCount));
-        $this->assertSame($id, $this->util->find((string)$itemCount));
+        $this->assertSame((string)$itemCount, $this->util->find((string)$itemCount));
 
         $this->util->remove($id);
     }
