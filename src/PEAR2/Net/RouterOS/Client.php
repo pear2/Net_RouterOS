@@ -279,37 +279,19 @@ class Client
      *
      * @return bool TRUE on success, FALSE on failure.
      */
-    private static function _login(
-        Communicator $com,
-        $username,
-        $password = '',
-        $timeout = null
-    ) {
-        $request = new Request('/login');
-        $request->send($com);
-        $response = new Response($com, false, $timeout);
-        $request->setArgument('name', $username);
-        $request->setArgument(
-            'response',
-            '00' . md5(
-                chr(0) . $password
-                . pack('H*', $response->getProperty('ret'))
-            )
-        );
-        $request->verify($com)->send($com);
-
-        $response = new Response($com, false, $timeout);
-        if ($response->getType() === Response::TYPE_FINAL) {
-            return null === $response->getProperty('ret');
-        } else {
-            while ($response->getType() !== Response::TYPE_FINAL
-                && $response->getType() !== Response::TYPE_FATAL
-            ) {
-                $response = new Response($com, false, $timeout);
-            }
-            return false;
-        }
-    }
+     private static function _login(
+             Communicator $com,
+             $username,
+             $password = '',
+             $timeout = null
+         ) {
+             $request = new Request('/login');
+             $request->setArgument('name', $username);
+             $request->setArgument('password', $password);
+             $request->send($com);
+             $response = new Response($com, false, $timeout);
+             return $response->getType() === Response::TYPE_FINAL;
+         }
 
     /**
      * Sets the charset(s) for this connection.
