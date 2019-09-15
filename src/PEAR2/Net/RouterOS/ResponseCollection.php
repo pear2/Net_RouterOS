@@ -284,7 +284,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      */
     public function __debugInfo()
     {
-        return $this->toArray(self::ARRAY_INDEXED | self::ARRAY_RECURSIVE);
+        return $this->toArray(self::ARRAY_RECURSIVE);
     }
 
     /**
