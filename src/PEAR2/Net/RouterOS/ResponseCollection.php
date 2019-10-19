@@ -254,7 +254,9 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     public function toArray($flags = self::ARRAY_DEFAULT)
     {
         $result = $this->responses;
-        if (($flags & self::ARRAY_INDEXED) === self::ARRAY_INDEXED) {
+        if (($flags & self::ARRAY_INDEXED) === self::ARRAY_INDEXED
+            && null !== $this->index
+        ) {
             $positions = $this->responsesIndex[$this->index];
             asort($positions, SORT_NUMERIC);
             $positions = array_flip($positions);

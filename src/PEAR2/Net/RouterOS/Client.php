@@ -289,9 +289,14 @@ class Client
         $request = new Request('/login');
         $request->setArgument('name', $username);
         $request->setArgument('password', $password);
+        $oldCharset = $com->getCharset($com::CHARSET_ALL);
+        $com->setCharset(null, $com::CHARSET_ALL);
         $request->verify($com)->send($com);
+        $com->setCharset($oldCharset, $com::CHARSET_ALL);
         $response = new Response($com, false, $timeout);
-        if ($response->getType() === Response::TYPE_FINAL && null === $response->getProperty('ret')) {
+        if ($response->getType() === Response::TYPE_FINAL
+            && null === $response->getProperty('ret')
+        ) {
             // version >= 6.43
             return null === $response->getProperty('message');
         } elseif ($response->getType() === Response::TYPE_FINAL) {
@@ -301,7 +306,12 @@ class Client
                 'response',
                 '00' . md5(
                     chr(0) . $password
-                    . pack('H*', is_string($response->getProperty('ret')) ? $response->getProperty('ret') : stream_get_contents($response->getProperty('ret')))
+                    . pack(
+                        'H*',
+                        is_string($response->getProperty('ret'))
+                        ? $response->getProperty('ret')
+                        : stream_get_contents($response->getProperty('ret'))
+                    )
                 )
             );
             $request->verify($com)->send($com);
@@ -327,7 +337,7 @@ class Client
      * {@link Communicator::CHARSET_REMOTE}, and when receiving,
      * {@link Communicator::CHARSET_REMOTE} is converted to
      * {@link Communicator::CHARSET_LOCAL}. Setting NULL to either charset will
-     * disable charset convertion, and data will be both sent and received "as
+     * disable charset conversion, and data will be both sent and received "as
      * is".
      *
      * @param mixed $charset     The charset to set. If $charsetType is
@@ -392,7 +402,7 @@ class Client
     {
         //Error checking
         $tag = $request->getTag();
-        if ('' == $tag) {
+        if ('' === (string)$tag) {
             throw new DataFlowException(
                 'Asynchonous commands must have a tag.',
                 DataFlowException::CODE_TAG_REQUIRED
@@ -652,7 +662,7 @@ class Client
     public function cancelRequest($tag = null)
     {
         $cancelRequest = new Request('/cancel');
-        $hasTag = !('' == $tag);
+        $hasTag = !('' === (string)$tag);
         $hasReg = null !== $this->registry;
         if ($hasReg && !$hasTag) {
             $tags = array_merge(
@@ -856,7 +866,7 @@ class Client
             $this->pendingRequestsCount--;
         }
 
-        if ('' != $tag) {
+        if ('' !== (string)$tag) {
             if ($this->isRequestActive($tag, self::FILTER_CALLBACK)) {
                 if ($this->callbacks[$tag]($response, $this)) {
                     try {
