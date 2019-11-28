@@ -457,8 +457,8 @@ class Util implements Countable
                     $idList .= strtolower(
                         is_string($newId)
                         ? $newId
-                        : stream_get_contents($newId) . ','
-                    );
+                        : stream_get_contents($newId)
+                    ) . ',';
                 }
             } elseif (is_callable($criteria)) {
                 $idCache = array();
