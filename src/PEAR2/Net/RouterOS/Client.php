@@ -1,9 +1,10 @@
 <?php
 
 /**
- * ~~summary~~
+ * RouterOS API client implementation.
+
  *
- * ~~description~~
+ * RouterOS is the flag product of the company MikroTik and is a powerful router software. One of its many abilities is to allow control over it via an API. This package provides a client for that API, in turn allowing you to use PHP to control RouterOS hosts.
  *
  * PHP version 5
  *
@@ -12,7 +13,7 @@
  * @author    Vasil Rangelov <boen.robot@gmail.com>
  * @copyright 2011 Vasil Rangelov
  * @license   http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
- * @version   GIT: $Id$
+ * @version   1.0.0b6
  * @link      http://pear2.php.net/PEAR2_Net_RouterOS
  */
 /**
@@ -231,7 +232,7 @@ class Client
         $username,
         $password = '',
         $timeout = null
-    ) {
+    ) {/*
         if (null !== ($remoteCharset = $com->getCharset($com::CHARSET_REMOTE))
             && null !== ($localCharset = $com->getCharset($com::CHARSET_LOCAL))
         ) {
@@ -240,7 +241,7 @@ class Client
                 $remoteCharset . '//IGNORE//TRANSLIT',
                 $password
             );
-        }
+        }*/
         $old = null;
         try {
             if ($com->getTransmitter()->isPersistent()) {
@@ -286,16 +287,10 @@ class Client
         $timeout = null
     ) {
         $request = new Request('/login');
-        $request->send($com);
-        $response = new Response($com, false, $timeout);
+        //$request->send($com);
+        //$response = new Response($com, false, $timeout);
         $request->setArgument('name', $username);
-        $request->setArgument(
-            'response',
-            '00' . md5(
-                chr(0) . $password
-                . pack('H*', $response->getProperty('ret'))
-            )
-        );
+        $request->setArgument('password', $password);
         $request->verify($com)->send($com);
 
         $response = new Response($com, false, $timeout);
