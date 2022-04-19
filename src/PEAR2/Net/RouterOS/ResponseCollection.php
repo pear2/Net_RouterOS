@@ -246,7 +246,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      *
      * @return int The number of responses in the collection.
      */
-    public function count()
+    public function count(): int
     {
         return count($this->responses);
     }
@@ -260,7 +260,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      *
      * @return bool TRUE if the offset exists, FALSE otherwise.
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return is_int($offset)
             ? array_key_exists($offset, $this->responses)
@@ -333,21 +333,21 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     /**
      * Moves the position pointer to a specified position.
      *
-     * @param int|string $position The position to move to. If the collection is
+     * @param int|string $offset The position to move to. If the collection is
      *     indexed, you can also supply a value to move the pointer to.
      *     A non-existent index will move the pointer to "-1".
      *
      * @return Response|false The {@link Response} at the specified position,
      *     or FALSE if the specified position is not valid.
      */
-    public function seek($position)
+    public function seek($offset)
     {
-        $this->position = is_int($position)
-            ? ($position >= 0
-            ? $position
-            : count($this->responses) + $position)
-            : ($this->offsetExists($position)
-            ? $this->responsesIndex[$this->index][$position]
+        $this->position = is_int($offset)
+            ? ($offset >= 0
+            ? $offset
+            : count($this->responses) + $offset)
+            : ($this->offsetExists($offset)
+            ? $this->responsesIndex[$this->index][$offset]
             : -1);
         return $this->current();
     }
@@ -417,7 +417,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      *
      * @return bool TRUE if the pointer is valid, FALSE otherwise.
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->offsetExists($this->position);
     }

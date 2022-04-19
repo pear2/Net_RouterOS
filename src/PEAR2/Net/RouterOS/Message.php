@@ -34,6 +34,7 @@ use IteratorAggregate;
  * Required for IteratorAggregate::getIterator() to work properly with foreach.
  */
 use ArrayObject;
+use Traversable;
 
 /**
  * Represents a RouterOS message.
@@ -180,7 +181,7 @@ abstract class Message implements IteratorAggregate, Countable
      * @see getArgument()
      * @see setArgument()
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new ArrayObject($this->attributes);
     }
@@ -190,7 +191,7 @@ abstract class Message implements IteratorAggregate, Countable
      *
      * @return int The number of attributes.
      */
-    public function count()
+    public function count(): int
     {
         return count($this->attributes);
     }
