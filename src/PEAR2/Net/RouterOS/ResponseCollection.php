@@ -358,6 +358,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * @return Response|false The next {@link Response} object,
      *     or FALSE if the position is not valid.
      */
+    #[\ReturnTypeWillChange]
     public function next()
     {
         ++$this->position;
@@ -370,6 +371,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * @return Response|false The response at the current pointer position,
      *     or FALSE if the position is not valid.
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return $this->valid() ? $this->responses[$this->position] : false;
@@ -381,6 +383,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * @return Response|false The next {@link Response} object,
      *     or FALSE if the position is not valid.
      */
+    #[\ReturnTypeWillChange]
     public function prev()
     {
         --$this->position;
@@ -394,6 +397,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * @return Response|false The last response in the collection,
      *     or FALSE if the collection is empty.
      */
+    #[\ReturnTypeWillChange]
     public function end()
     {
         $this->position = count($this->responses) - 1;
@@ -407,6 +411,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      *     i.e. the pointer position itself, or FALSE if the position
      *     is not valid.
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return $this->valid() ? $this->position : false;
