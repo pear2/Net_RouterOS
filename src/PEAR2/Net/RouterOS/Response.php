@@ -225,7 +225,7 @@ class Response extends Message
                     $word = $com->getNextWordAsStream();
                     $ind = fread($word, 1);
                     if ('=' === $ind || '.' === $ind) {
-                        $prefix = stream_get_line($word, null, '=');
+                        $prefix = stream_get_line($word, 0, '=');
                     }
                     if ('=' === $ind) {
                         $value = fopen('php://temp', 'r+b');

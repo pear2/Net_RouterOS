@@ -952,6 +952,7 @@ EOT
      * @return int The number of items, or -1 on failure (e.g. if the
      *     current menu does not have a "print" command or items to be counted).
      */
+    #[\ReturnTypeWillChange]
     public function count(Query $query = null, $from = null)
     {
         $countRequest = new Request(

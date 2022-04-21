@@ -16,7 +16,7 @@
         "wiki": "https://github.com/pear2/Net_RouterOS/wiki"
     },
     "require": {
-        "php": ">=5.3.0",
+        "php": ">=5.3",
         "pear2/net_transmitter": ">=1.0.0b1 || dev-develop@dev"
     },
     "require-dev": {

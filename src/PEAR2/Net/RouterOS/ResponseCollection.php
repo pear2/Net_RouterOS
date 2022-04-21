@@ -294,6 +294,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      *
      * @return int The number of responses in the collection.
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->responses);
@@ -308,6 +309,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      *
      * @return bool TRUE if the offset exists, FALSE otherwise.
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return is_int($offset)
@@ -379,21 +381,21 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
     /**
      * Moves the position pointer to a specified position.
      *
-     * @param int|string $position The position to move to. If the collection is
+     * @param int|string $offset The position to move to. If the collection is
      *     indexed, you can also supply a value to move the pointer to.
      *     A non-existent index will move the pointer to "-1".
      *
      * @return Response|false The {@link Response} at the specified position,
      *     or FALSE if the specified position is not valid.
      */
-    public function seek($position)
+    public function seek($offset)
     {
-        $this->position = is_int($position)
-            ? ($position >= 0
-            ? $position
-            : count($this->responses) + $position)
-            : ($this->offsetExists($position)
-            ? $this->responsesIndex[$this->index][$position]
+        $this->position = is_int($offset)
+            ? ($offset >= 0
+            ? $offset
+            : count($this->responses) + $offset)
+            : ($this->offsetExists($offset)
+            ? $this->responsesIndex[$this->index][$offset]
             : -1);
         return $this->current();
     }
@@ -404,6 +406,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * @return Response|false The next {@link Response} object,
      *     or FALSE if the position is not valid.
      */
+    #[\ReturnTypeWillChange]
     public function next()
     {
         ++$this->position;
@@ -416,6 +419,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * @return Response|false The response at the current pointer position,
      *     or FALSE if the position is not valid.
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return $this->valid() ? $this->responses[$this->position] : false;
@@ -427,6 +431,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * @return Response|false The next {@link Response} object,
      *     or FALSE if the position is not valid.
      */
+    #[\ReturnTypeWillChange]
     public function prev()
     {
         --$this->position;
@@ -440,6 +445,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      * @return Response|false The last response in the collection,
      *     or FALSE if the collection is empty.
      */
+    #[\ReturnTypeWillChange]
     public function end()
     {
         $this->position = count($this->responses) - 1;
@@ -453,6 +459,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      *     i.e. the pointer position itself, or FALSE if the position
      *     is not valid.
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return $this->valid() ? $this->position : false;
@@ -463,6 +470,7 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      *
      * @return bool TRUE if the pointer is valid, FALSE otherwise.
      */
+    #[\ReturnTypeWillChange]
     public function valid()
     {
         return $this->offsetExists($this->position);
