@@ -294,7 +294,8 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      *
      * @return int The number of responses in the collection.
      */
-    public function count(): int
+    #[\ReturnTypeWillChange]
+    public function count()
     {
         return count($this->responses);
     }
@@ -308,7 +309,8 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      *
      * @return bool TRUE if the offset exists, FALSE otherwise.
      */
-    public function offsetExists($offset): bool
+    #[\ReturnTypeWillChange]
+    public function offsetExists($offset)
     {
         return is_int($offset)
             ? array_key_exists($offset, $this->responses)
@@ -468,7 +470,8 @@ class ResponseCollection implements ArrayAccess, SeekableIterator, Countable
      *
      * @return bool TRUE if the pointer is valid, FALSE otherwise.
      */
-    public function valid(): bool
+    #[\ReturnTypeWillChange]
+    public function valid()
     {
         return $this->offsetExists($this->position);
     }
