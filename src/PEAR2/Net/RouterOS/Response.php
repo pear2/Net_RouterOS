@@ -53,6 +53,11 @@ class Response extends Message
     const TYPE_DATA = '!re';
 
     /**
+     * A response with empty data (from RouterOS 7.18).
+     */
+    const TYPE_EMPTY = '!empty';
+
+    /**
      * A response signifying error.
      */
     const TYPE_ERROR = '!trap';
@@ -270,6 +275,7 @@ class Response extends Message
         switch ($type) {
         case self::TYPE_FINAL:
         case self::TYPE_DATA:
+        case self::TYPE_EMPTY:
         case self::TYPE_ERROR:
         case self::TYPE_FATAL:
             $this->_type = $type;
